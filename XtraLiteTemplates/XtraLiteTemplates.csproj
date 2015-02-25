@@ -38,18 +38,14 @@
     <Folder Include="Interpretation\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Tom\DocumentTomNode.cs" />
+    <Compile Include="Tom\CompositeTomNode.cs" />
+    <Compile Include="Tom\TomDocumentBuilder.cs" />
     <Compile Include="Directives\Directive.cs" />
     <Compile Include="Directives\DirectiveComponent.cs" />
     <Compile Include="Directives\DirectiveDefinition.cs" />
-    <Compile Include="Directives\Standard\ConditionalDirective_5.cs" />
-    <Compile Include="Directives\Standard\ConditionalDirective_4.cs" />
-    <Compile Include="Directives\Standard\ConditionalDirective_3.cs" />
-    <Compile Include="Directives\Standard\ConditionalDirective_2.cs" />
-    <Compile Include="Directives\Standard\ConditionalDirective_1.cs" />
-    <Compile Include="Directives\Standard\ForeachDirective.cs" />
-    <Compile Include="Directives\Standard\InterpolationDirective_3.cs" />
-    <Compile Include="Directives\Standard\InterpolationDirective_2.cs" />
-    <Compile Include="Directives\Standard\InterpolationDirective_1.cs" />
+    <Compile Include="Tom\TomNode.cs" />
+    <Compile Include="Tom\PlainTextTomNode.cs" />
     <Compile Include="ValidationHelper.cs" />
     <Compile Include="Parsing\ParsingException.cs" />
     <Compile Include="Parsing\StandardParserProperties.cs" />
@@ -57,10 +53,6 @@
     <Compile Include="Parsing\StringForwardCursor.cs" />
     <Compile Include="Parsing\TemplateParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="TOM\CompositeNode.cs" />
-    <Compile Include="TOM\DocumentNode.cs" />
-    <Compile Include="TOM\PlainTextNode.cs" />
-    <Compile Include="TOM\TomNode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\Portable\$(TargetFrameworkVersion)\Microsoft.Portable.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

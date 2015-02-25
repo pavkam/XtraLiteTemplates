@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XtraLiteTemplates.TOM
+namespace XtraLiteTemplates.Tom
 {
-    public sealed class DocumentNode : CompositeNode
+    public sealed class DocumentTomNode : CompositeTomNode
     {
-        internal DocumentNode()
+        public DocumentTomNode()
             : base(null)
         {
         }

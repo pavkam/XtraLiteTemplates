@@ -8,6 +8,12 @@ namespace XtraLiteTemplates
 {
     internal static class ValidationHelper
     {
+        public static void Assert(String argumentName, String condition, Boolean truth)
+        {
+            if (!truth)
+                throw new ArgumentException(String.Format("Expected condition '{0}' to be satisfied for argument '{1}'.", condition, argumentName), argumentName);
+        }
+
         public static void AssertArgumentIsNotNull(String argumentName, Object argumentValue)
         {
             if (argumentValue == null)

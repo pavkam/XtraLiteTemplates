@@ -100,7 +100,7 @@ namespace XtraLiteTemplates.Parsing
         {
             Char result;
             if (!TryReadNext(out result))
-                throw new InvalidOperationException("Cannot read any more characters from the input string as the end has been reached.");
+                throw new ParsingException("Cannot read any more characters from the input string as the end has been reached.");
 
             return result;
         }

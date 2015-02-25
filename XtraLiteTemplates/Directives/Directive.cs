@@ -8,13 +8,14 @@ namespace XtraLiteTemplates.Directives
 {
     public abstract class Directive
     {
-        private DirectiveDefinition m_definition;
+        protected DirectiveDefinition StartDefinition { get; private set; }
+        protected DirectiveDefinition EndDefinition { get; private set; }
 
-        public Directive(DirectiveDefinition definition)
+        public Directive()
         {
-            ValidationHelper.AssertArgumentIsNotNull("definition", definition);
-
-            m_definition = definition;
+            /* Initialize the start and end definitions. */
+            StartDefinition = new DirectiveDefinition();
+            EndDefinition = new DirectiveDefinition();
         }
 
         protected virtual Boolean AcceptsConstant(String componentKey, String constantValue)

@@ -9,18 +9,20 @@ namespace XtraLiteTemplates.Parsing
     public class StandardParserProperties : IParserProperties
     {
         public StandardParserProperties()
-            : this('{', '}')
+            : this('{', '}', '\'')
         {
         }
 
         public StandardParserProperties(
-            Char directiveSectionStartCharacter, Char directiveSectionEndCharacter)
+            Char directiveSectionStartCharacter, Char directiveSectionEndCharacter, Char stringConstantStartAndEndCharacter)
         {
             DirectiveSectionStartCharacter = directiveSectionStartCharacter;
             DirectiveSectionEndCharacter = directiveSectionEndCharacter;
+            StringConstantStartAndEndCharacter = stringConstantStartAndEndCharacter;
         }
 
         public Char DirectiveSectionStartCharacter { get; private set; }
         public Char DirectiveSectionEndCharacter { get; private set; }
+        public Char StringConstantStartAndEndCharacter { get; private set; }
     }
 }

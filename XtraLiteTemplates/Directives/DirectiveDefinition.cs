@@ -39,6 +39,14 @@ namespace XtraLiteTemplates.Directives
             }
         }
 
+        internal Int32 ComponentCount
+        {
+            get
+            {
+                return m_components.Count;
+            }
+        }
+
         public DirectiveDefinition ExpectKeyword(String keyword)
         {
             ValidationHelper.AssertArgumentIsNotAnEmptyString("keyword", keyword);

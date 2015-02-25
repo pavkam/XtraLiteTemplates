@@ -10,5 +10,6 @@ namespace XtraLiteTemplates.Parsing
     {
         Char DirectiveSectionStartCharacter { get; }
         Char DirectiveSectionEndCharacter { get; }
+        Char StringConstantStartAndEndCharacter { get; }
     }
 }

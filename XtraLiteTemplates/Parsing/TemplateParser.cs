@@ -3,12 +3,27 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XtraLiteTemplates.TOM;
+using XtraLiteTemplates.Tom;
 
 namespace XtraLiteTemplates.Parsing
 {
     public class TemplateParser
     {
+        private enum TokenType
+        {
+            Identifier,
+            Numerical,
+            String,
+            Symbolic,
+        }
+
+        private struct Token
+        {
+            public TokenType Type;
+            public String Value;
+        }
+
+
         public String Template { get; private set; }
         public IParserProperties Properties { get; private set; }
 
@@ -38,84 +53,176 @@ namespace XtraLiteTemplates.Parsing
 
         }
 
-        public DocumentNode Parse()
+        internal List<Token> ParseDirective(StringForwardCursor cursor)
         {
-            /* Start a cursor to be used when reading the string. */
-            StringForwardCursor cursor = new StringForwardCursor(Template);
-
-            Boolean previousCharacterWasDirectiveSectionStart = false;
-            Boolean currentlyParsingDirective = false;
-
-            StringBuilder plainTextBuffer = new StringBuilder();
-            StringBuilder directiveBuffer = new StringBuilder();
-
-            DocumentNode document = new DocumentNode();
-            CompositeNode currentParentNode = document;
-
-            while (!cursor.EndOfString)
+            Char current = cursor.ReadNext();
+            while (true)
             {
-                Char current = cursor.ReadNext();
-
-                if (current == Properties.DirectiveSectionStartCharacter)
+                if (currentlyParsingStringInADirective)
                 {
-                    /* Directive start character detected "{". Check if another one before that (then this is an escape sequence). */
-                    if (previousCharacterWasDirectiveSectionStart)
+                    if (current == Properties.StringConstantStartAndEndCharacter)
                     {
-                        /* Yes, this is an escape sequence "{{". Add it as plain text. */
-                        plainTextBuffer.Append(current);
-                        previousCharacterWasDirectiveSectionStart = false;
+                        current = cursor.ReadNext();
+                        if (current != Properties.StringConstantStartAndEndCharacter)
+                        {
+                            directiveTokens.Add(new Token()
+                            {
+                                Type = TokenType.String,
+                                Value = tokenBuffer.ToString(),
+                            });
+
+                            tokenBuffer.Clear();
+                            currentlyParsingStringInADirective = false;
+
+                            continue;
+                        }
                     }
-                    else
+
+                    tokenBuffer.Append(current);
+                    current = cursor.ReadNext();
+                }
+                else if (currentlyParsingDirective)
+                {
+                    if (current == Properties.StringConstantStartAndEndCharacter)
                     {
-                        /* No, this is the first instance of the directive start character "{". Mark it as such. */
-                        previousCharacterWasDirectiveSectionStart = true;                        
+                        /* put the stuff before into the token list... do not know how yet */
+                        currentlyParsingStringInADirective = true;
+
+                        current = cursor.ReadNext();
+                        continue;
+                    }
+                    else if (current == Properties.DirectiveSectionEndCharacter)
+                    {
+                        current = cursor.ReadNext();
+                        if (current != Properties.DirectiveSectionEndCharacter)
+                        {
+                            directiveTokens.Add(new Token()
+                            {
+                                Type = TokenType.String,
+                                Value = tokenBuffer.ToString(),
+                            });
+
+                            tokenBuffer.Clear();
+                            currentlyParsingStringInADirective = false;
+
+                            continue;
+                        }
+                    }
+
+                    tokenBuffer.Append(current);
+                    current = cursor.ReadNext();
+                }
+                else if (current == Properties.DirectiveSectionStartCharacter)
+                {
+                    var next = cursor.ReadNext();
+                    if (next != current)
+                    {
+                        currentlyParsingDirective = true;
+                        current = next;
+
+                        continue;
                     }
                 }
                 else
                 {
-                    if (previousCharacterWasDirectiveSectionStart)
-                    {
-                        /* Create a text TOM node. */
-                        PlainTextNode node = new PlainTextNode(currentParentNode, plainTextBuffer.ToString());
-                        currentParentNode.AddChild(node);
+                    plainTextBuffer.Append(current);
 
-                        plainTextBuffer.Clear();
-                        currentlyParsingDirective = true;
-                    }
-
-                    if (current == Properties.DirectiveSectionEndCharacter)
-                    {
-                        /* Directive end character detected "}". */
-                        if (currentlyParsingDirective)
-                        {
-                            /* A directive was actively parsed. Close it off. */
-                            currentlyParsingDirective = false;
-                            
-                            ContinueParsingDirective(directiveBuffer.ToString());
-                            directiveBuffer.Clear();
-                        } 
-                        else
-                        {
-                            /* Just a random sitting "}" character. Treat as simple text. */
-                            plainTextBuffer.Append(current);
-                        }
-                    }
-                    else if (currentlyParsingDirective)
-                    {
-                        /* Nothing special over here, but we are parsing a directive, so put all the text into the proper buffer. */
-                        directiveBuffer.Append(current);
-                    }
-                    else
-                    {
-                        /* Finally, this is just plain-old text. */
-                        plainTextBuffer.Append(current);
-                    }
-
-                    previousCharacterWasDirectiveSectionStart = false;
+                    if (!cursor.TryReadNext(out current))
+                        break;
                 }
             }
+        }
 
-            return document;
+        internal void Parse(TomDocumentBuilder builder)
+        {
+            ValidationHelper.AssertArgumentIsNotNull("builder", builder);
+
+            /* Start a cursor to be used when reading the string. */
+            StringForwardCursor cursor = new StringForwardCursor(Template);
+
+            Boolean currentlyParsingDirective = false;
+            Boolean currentlyParsingStringInADirective = false;
+
+            List<Token> directiveTokens = new List<Token>();
+            StringBuilder plainTextBuffer = new StringBuilder();
+            StringBuilder tokenBuffer = new StringBuilder();
+
+            Char current = cursor.ReadNext();
+            while (true)
+            {
+                if (currentlyParsingStringInADirective)
+                {                    
+                    if (current == Properties.StringConstantStartAndEndCharacter)
+                    {
+                        current = cursor.ReadNext();
+                        if (current != Properties.StringConstantStartAndEndCharacter)
+                        {
+                            directiveTokens.Add(new Token()
+                            {
+                                Type = TokenType.String,
+                                Value = tokenBuffer.ToString(),
+                            });
+
+                            tokenBuffer.Clear();
+                            currentlyParsingStringInADirective = false;
+
+                            continue;
+                        }
+                    }
+
+                    tokenBuffer.Append(current);
+                    current = cursor.ReadNext();
+                }
+                else if (currentlyParsingDirective)
+                {
+                    if (current == Properties.StringConstantStartAndEndCharacter)
+                    {
+                        /* put the stuff before into the token list... do not know how yet */
+                        currentlyParsingStringInADirective = true;
+
+                        current = cursor.ReadNext();
+                        continue;
+                    } 
+                    else if (current == Properties.DirectiveSectionEndCharacter)
+                    {
+                        current = cursor.ReadNext();
+                        if (current != Properties.DirectiveSectionEndCharacter)
+                        {
+                            directiveTokens.Add(new Token()
+                            {
+                                Type = TokenType.String,
+                                Value = tokenBuffer.ToString(),
+                            });
+
+                            tokenBuffer.Clear();
+                            currentlyParsingStringInADirective = false;
+
+                            continue;
+                        }
+                    }
+
+                    tokenBuffer.Append(current);
+                    current = cursor.ReadNext();
+                }
+                else if (current == Properties.DirectiveSectionStartCharacter)
+                {
+                    var next = cursor.ReadNext();
+                    if (next != current)
+                    {
+                        currentlyParsingDirective = true;
+                        current = next;
+
+                        continue;
+                    }
+                }
+                else
+                {
+                    plainTextBuffer.Append(current);
+
+                    if (!cursor.TryReadNext(out current))
+                        break;
+                }
+            }
         }
     }
 }
