@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Utils
 {
     internal static class ValidationHelper
     {
@@ -25,6 +25,21 @@ namespace XtraLiteTemplates
             AssertArgumentIsNotNull(argumentName, argumentValue);
             if (argumentValue.Length == 0)
                 throw new ArgumentException(String.Format("Expected a non-empty string value for argument '{0}'.", argumentName), argumentName);
+        }
+
+        public static void AssertCollectionIsNotEmpty<T>(String argumentName, IReadOnlyCollection<T> argumentValue)
+        {
+            AssertArgumentIsNotNull(argumentName, argumentValue);
+            if (argumentValue.Count == 0)
+                throw new ArgumentException(String.Format("Expected a non-empty collection: '{0}'.", argumentName), argumentName);
+        }
+
+        public static void AssertObjectCollectionIsNotEmpty<T>(String argumentName, IReadOnlyCollection<T> argumentValue)
+            where T: class
+        {
+            AssertCollectionIsNotEmpty(argumentName, argumentValue);
+            foreach (var o in argumentValue)
+                AssertArgumentIsNotNull(String.Format("element of {0}", argumentName), o);
         }
 
         public static void AssertArgumentGreaterThanZero(String argumentName, Int32 argumentValue)

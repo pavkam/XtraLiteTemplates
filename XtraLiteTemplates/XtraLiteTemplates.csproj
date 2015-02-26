@@ -38,6 +38,12 @@
     <Folder Include="Interpretation\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Directives\DirectiveMatchResult.cs" />
+    <Compile Include="Directives\Arbiter.cs" />
+    <Compile Include="Directives\DirectiveFacing.cs" />
+    <Compile Include="Parsing\DirectiveToken.cs" />
+    <Compile Include="Parsing\CharacterPosition.cs" />
+    <Compile Include="Tom\DirectiveTomNode.cs" />
     <Compile Include="Tom\DocumentTomNode.cs" />
     <Compile Include="Tom\CompositeTomNode.cs" />
     <Compile Include="Tom\TomDocumentBuilder.cs" />
@@ -46,10 +52,9 @@
     <Compile Include="Directives\DirectiveDefinition.cs" />
     <Compile Include="Tom\TomNode.cs" />
     <Compile Include="Tom\PlainTextTomNode.cs" />
-    <Compile Include="ValidationHelper.cs" />
-    <Compile Include="Parsing\ParsingException.cs" />
-    <Compile Include="Parsing\StandardParserProperties.cs" />
-    <Compile Include="Parsing\IParserProperties.cs" />
+    <Compile Include="Utils\ValidationHelper.cs" />
+    <Compile Include="Parsing\TemplateParseException.cs" />
+    <Compile Include="Parsing\ParserProperties.cs" />
     <Compile Include="Parsing\StringForwardCursor.cs" />
     <Compile Include="Parsing\TemplateParser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

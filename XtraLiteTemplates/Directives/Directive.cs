@@ -3,13 +3,19 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XtraLiteTemplates.Utils;
 
 namespace XtraLiteTemplates.Directives
 {
     public abstract class Directive
     {
-        protected DirectiveDefinition StartDefinition { get; private set; }
-        protected DirectiveDefinition EndDefinition { get; private set; }
+        public Boolean IsComposite
+        {
+            get
+            {
+                return EndDefinition.ComponentCount > 0;
+            }
+        }
 
         public Directive()
         {
@@ -18,12 +24,19 @@ namespace XtraLiteTemplates.Directives
             EndDefinition = new DirectiveDefinition();
         }
 
-        protected virtual Boolean AcceptsConstant(String componentKey, String constantValue)
+        private DirectiveComponent GetFacingComponent(DirectiveFacing facing, Int32 index)
         {
-            return true;
+            var definition = StartDefinition;
+            if (facing == DirectiveFacing.Tail)
+                definition = EndDefinition;
+
+            return definition[index];
         }
 
-        protected virtual Boolean AcceptsVariable(String componentKey, String variableName, String variableValue)
+        protected DirectiveDefinition StartDefinition { get; private set; }
+        protected DirectiveDefinition EndDefinition { get; private set; }
+
+        protected virtual Boolean AcceptsConstant(String componentKey, String constant)
         {
             return true;
         }
@@ -33,64 +46,63 @@ namespace XtraLiteTemplates.Directives
             return true;
         }
 
-        internal Boolean MatchesKeywordComponent(Int32 index, String keyword)
+
+        internal Boolean MatchesKeywordComponent(DirectiveFacing facing, Int32 index, String keyword)
         {
             ValidationHelper.AssertArgumentIsNotAnEmptyString("keyword", keyword);
 
             /* Find the component in the definition. */
-            var component = m_definition[index];
+            var component = GetFacingComponent(facing, index);
 
             if (component == null)
                 return false;
-            if (component.Type != DirectiveComponent.DirectiveComponentType.Keyword)
+            else if (component.Type != DirectiveComponent.DirectiveComponentType.Keyword)
                 return false;
-
-            return component.Keyword.Equals(component.Keyword);
+            else
+                return component.Keyword.Equals(component.Keyword);
         }
 
-        internal Boolean MatchesVariableComponent(Int32 index, String variableName, String variableValue)
+        internal Boolean MatchesVariableComponent(DirectiveFacing facing, Int32 index)
         {
-            ValidationHelper.AssertArgumentIsNotAnEmptyString("variableName", variableName);
-
             /* Find the component in the definition. */
-            var component = m_definition[index];
+            var component = GetFacingComponent(facing, index);
 
             if (component == null)
                 return false;
-            if (component.Type != DirectiveComponent.DirectiveComponentType.Variable)
+            else if (component.Type != DirectiveComponent.DirectiveComponentType.Variable)
                 return false;
-
-            return AcceptsVariable(component.Key, variableName, variableValue);
+            else
+                return true;
         }
 
-        internal Boolean MatchesConstantComponent(Int32 index, String constantValue)
+        internal Boolean MatchesConstantComponent(DirectiveFacing facing, Int32 index, String constantValue)
         {
             ValidationHelper.AssertArgumentIsNotAnEmptyString("constantValue", constantValue);
 
             /* Find the component in the definition. */
-            var component = m_definition[index];
+            var component = GetFacingComponent(facing, index);
 
             if (component == null)
                 return false;
-            if (component.Type != DirectiveComponent.DirectiveComponentType.Constant)
+            else if (component.Type != DirectiveComponent.DirectiveComponentType.Constant)
                 return false;
-
-            return AcceptsConstant(component.Key, constantValue);
+            else
+                return AcceptsConstant(component.Key, constantValue);
         }
 
-        internal Boolean MatchesIdentifierComponent(Int32 index, String identifier)
+        internal Boolean MatchesIdentifierComponent(DirectiveFacing facing, Int32 index, String identifier)
         {
             ValidationHelper.AssertArgumentIsNotAnEmptyString("identifier", identifier);
 
             /* Find the component in the definition. */
-            var component = m_definition[index];
+            var component = GetFacingComponent(facing, index);
 
             if (component == null)
                 return false;
-            if (component.Type != DirectiveComponent.DirectiveComponentType.Constant)
+            else if (component.Type != DirectiveComponent.DirectiveComponentType.Constant)
                 return false;
-
-            return AcceptsIdentifier(component.Key, identifier);
+            else 
+                return AcceptsIdentifier(component.Key, identifier);
         }
     }
 }

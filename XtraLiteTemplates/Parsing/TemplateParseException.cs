@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XtraLiteTemplates.Parsing
 {
-    public sealed class ParsingException : Exception
+    public sealed class TemplateParseException : Exception
     {
         public Char Character { get; private set; }
 
@@ -14,7 +14,7 @@ namespace XtraLiteTemplates.Parsing
         public Int32 PositionInLine { get; private set; }
         public Int32 Line { get; private set; }
 
-        internal ParsingException(Char character, Int32 position, Int32 line, Int32 positionInLine, String errorMessage) : base(errorMessage)
+        internal TemplateParseException(Char character, Int32 position, Int32 line, Int32 positionInLine, String errorMessage) : base(errorMessage)
         {
             Character = character;
             Position = position;
