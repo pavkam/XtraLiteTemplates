@@ -41,7 +41,9 @@
     <Compile Include="Directives\Arbiter.cs" />
     <Compile Include="Directives\DirectiveFacing.cs" />
     <Compile Include="Interpretation\InterpretationContext.cs" />
-    <Compile Include="Interpretation\SimpleTypeWrapper.cs" />
+    <Compile Include="Interpretation\PropertyContext.cs" />
+    <Compile Include="Utils\BranchedDictionary.cs" />
+    <Compile Include="Utils\TypeMemberAccessor.cs" />
     <Compile Include="Parsing\DirectiveToken.cs" />
     <Compile Include="Parsing\CharacterPosition.cs" />
     <Compile Include="Tom\DirectiveTomNode.cs" />
