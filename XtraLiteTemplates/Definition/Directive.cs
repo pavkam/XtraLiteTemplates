@@ -61,9 +61,37 @@ namespace XtraLiteTemplates.Definition
             }
         }
 
-
-        internal Int32 Evaluate(TextWriter writer, TemplateNode node)
+        internal Int32 Evaluate(TextWriter writer, IReadOnlyCollection<IEvaluable> children, 
+            IReadOnlyCollection<MatchedDirectiveDefinitionComponent> matchedComponents, IEvaluationContext evaluationContext)
         {
+            /* Transform */
+            List<InputParameter> parameters = new List<InputParameter>();
+            foreach (var comp in matchedComponents)
+            {
+                InputParameter parameter = null;
+                switch (comp.Component.Type)
+                {
+                    case DirectiveDefinitionComponentType.Constant:
+                        Decimal test;
+                        if (Decimal.TryParse(comp.Literal.Literal, out test))
+                            parameter = new InputParameter(InputParameterType.NumericalConstant, comp.Component.Key, comp.Literal.Literal);
+                        else
+                            parameter = new InputParameter(InputParameterType.NumericalConstant, comp.Component.Key, comp.Literal.Literal);
+                        break;
+                    case DirectiveDefinitionComponentType.Indentifier:
+                        parameter = new InputParameter(InputParameterType.Identifier, comp.Component.Key, comp.Literal.Literal);
+                        break;
+                    case DirectiveDefinitionComponentType.Variable:
+                        var variable = evaluationContext.FetchVariable(comp.Literal.Literal);
+                        parameter = new InputParameter(InputParameterType.Variable, comp.Component.Key, variable);
+                        break;
+                }
+
+                if (parameter != null)
+                    parameters.Add(parameter);
+            }
+
+            /* Evaluate the operation*/
         }
     }
 }

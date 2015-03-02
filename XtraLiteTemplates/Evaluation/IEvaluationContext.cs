@@ -12,5 +12,8 @@ namespace XtraLiteTemplates.Evaluation
     {
         void RegisterVariable(String name, Object value, Object context);
         void RegisterVariable(String name, Object value);
+
+        void OpenVariableScope();
+        void CloseVariableScope();
     }
 }

@@ -19,9 +19,10 @@ namespace XtraLiteTemplates.Parsing.ObjectModel
             Text = text;
         }
 
-        public override Boolean Evaluate(TextWriter writer, Object evaluationContext)
+        public override Int32 Evaluate(TextWriter writer, IEvaluationContext evaluationContext)
         {
             ValidationHelper.AssertArgumentIsNotNull("writer", writer);
+            ValidationHelper.AssertArgumentIsNotNull("evaluationContext", evaluationContext);
 
             if (!String.IsNullOrEmpty(Text))
                 writer.Write(Text);

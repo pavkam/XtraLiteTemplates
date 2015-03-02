@@ -13,20 +13,25 @@ namespace XtraLiteTemplates.Parsing.ObjectModel
     public sealed class SimpleDirectiveNode : TemplateNode
     {
         public Directive Directive { get; private set; }
+        public IReadOnlyCollection<MatchedDirectiveDefinitionComponent> Components { get; private set; }
 
-        internal SimpleDirectiveNode(CompositeNode parent, Directive directive)
+        internal SimpleDirectiveNode(CompositeNode parent, Directive directive, 
+            IReadOnlyCollection<MatchedDirectiveDefinitionComponent> components)
             : base(parent)
         {
             ValidationHelper.AssertArgumentIsNotNull("directive", directive);
+            ValidationHelper.AssertObjectCollectionIsNotEmpty("components", components);
 
             Directive = directive;
+            Components = components;
         }
 
-        public override Boolean Evaluate(TextWriter writer, Object evaluationContext)
+        public override Int32 Evaluate(TextWriter writer, IEvaluationContext evaluationContext)
         {
             ValidationHelper.AssertArgumentIsNotNull("writer", writer);
+            ValidationHelper.AssertArgumentIsNotNull("evaluationContext", evaluationContext);
 
-            return Directive.Evaluate(writer, this, evaluationContext);
+            return Directive.Evaluate(writer, null, Components, evaluationContext);
         }
     }
 }

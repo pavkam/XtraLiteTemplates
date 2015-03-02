@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace XtraLiteTemplates.Evaluation
 {
-    public sealed struct InputParameter
+    public sealed class InputParameter
     {
         public InputParameterType Type { get; private set; }
         public String Key { get; private set; }

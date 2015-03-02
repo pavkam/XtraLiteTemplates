@@ -48,6 +48,7 @@
     <Compile Include="Evaluation\InputParameter.cs" />
     <Compile Include="Evaluation\InputParameterType.cs" />
     <Compile Include="Evaluation\EvaluationContext.cs" />
+    <Compile Include="Evaluation\IEvaluable.cs" />
     <Compile Include="Evaluation\VariableCollection.cs" />
     <Compile Include="Parsing\DirectiveLiteral.cs" />
     <Compile Include="Parsing\DirectiveLiteralType.cs" />

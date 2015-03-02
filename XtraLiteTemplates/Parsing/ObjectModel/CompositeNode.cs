@@ -9,7 +9,7 @@ using XtraLiteTemplates.Utils;
 
 namespace XtraLiteTemplates.Parsing.ObjectModel
 {
-    public class CompositeNode : TemplateNode
+    public abstract class CompositeNode : TemplateNode
     {
         private List<TemplateNode> m_children;
 
@@ -32,13 +32,6 @@ namespace XtraLiteTemplates.Parsing.ObjectModel
             ValidationHelper.Assert("child", "not self", child != this);
 
             m_children.Add(child);
-        }
-
-        public override Int32 Evaluate(TextWriter writer, Object evaluationContext)
-        {
-            ValidationHelper.AssertArgumentIsNotNull("writer", writer);
-
-            return Directive.Evaluate(writer, this, evaluationContext);
         }
     }
 }

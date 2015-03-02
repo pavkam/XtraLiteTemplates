@@ -34,5 +34,7 @@ namespace XtraLiteTemplates.Evaluation
         {
             RegisterVariable(name, value, null);
         }
+
+
     }
 }

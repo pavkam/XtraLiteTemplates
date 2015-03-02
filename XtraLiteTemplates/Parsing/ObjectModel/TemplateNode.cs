@@ -4,10 +4,11 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XtraLiteTemplates.Evaluation;
 
 namespace XtraLiteTemplates.Parsing.ObjectModel
 {
-    public abstract class TemplateNode
+    public abstract class TemplateNode : IEvaluable
     {
         public CompositeNode Parent { get; private set; }
 
@@ -16,6 +17,6 @@ namespace XtraLiteTemplates.Parsing.ObjectModel
             Parent = parent;
         }
 
-        public abstract Int32 Evaluate(TextWriter writer, Object evaluationContext);
+        public abstract Int32 Evaluate(TextWriter writer, IEvaluationContext evaluationContext);
     }
 }
