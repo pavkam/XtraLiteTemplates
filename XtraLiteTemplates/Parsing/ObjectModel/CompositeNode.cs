@@ -38,13 +38,7 @@ namespace XtraLiteTemplates.Parsing.ObjectModel
         {
             ValidationHelper.AssertArgumentIsNotNull("writer", writer);
 
-            Int32 characterCount = 0;
-            foreach (var child in Children)
-            {
-                characterCount += child.Evaluate(writer, evaluationContext);
-            }
-
-            return characterCount;
+            return Directive.Evaluate(writer, this, evaluationContext);
         }
     }
 }

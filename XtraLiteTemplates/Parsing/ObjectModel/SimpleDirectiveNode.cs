@@ -26,7 +26,7 @@ namespace XtraLiteTemplates.Parsing.ObjectModel
         {
             ValidationHelper.AssertArgumentIsNotNull("writer", writer);
 
-            return Directive.EvaluateTomNode(writer, context, this);
+            return Directive.Evaluate(writer, this, evaluationContext);
         }
     }
 }

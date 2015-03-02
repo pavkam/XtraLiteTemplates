@@ -14,20 +14,20 @@ namespace XtraLiteTemplates.Parsing
     {
         public String Template { get; private set; }
         public ParserProperties Properties { get; private set; }
-        public IDirectiveSelectionStrategy DirectiveSelectionStrategy { get; private set; }
+        public IDirectiveSelectionStrategy DirectiveSelector { get; private set; }
         public Boolean StrictDirectiveSelection { get; private set; }
 
         public TemplateParser(ParserProperties properties, 
-            IDirectiveSelectionStrategy directiveSelectionStrategy,
+            IDirectiveSelectionStrategy directiveSelector,
             Boolean strictDirectiveSelection, String template)
         {
             ValidationHelper.AssertArgumentIsNotNull("properties", properties);
             ValidationHelper.AssertArgumentIsNotNull("template", template);
-            ValidationHelper.AssertArgumentIsNotNull("selectionStrategy", directiveSelectionStrategy);
+            ValidationHelper.AssertArgumentIsNotNull("directiveSelector", directiveSelector);
 
             Properties = properties;
             Template = template;
-            DirectiveSelectionStrategy = directiveSelectionStrategy;
+            DirectiveSelector = directiveSelector;
             StrictDirectiveSelection = strictDirectiveSelection;
         }
 
@@ -129,10 +129,8 @@ namespace XtraLiteTemplates.Parsing
         }
 
 
-        public TemplateDocument Parse(IDirectiveSelectionStrategy selectionStrategy)
+        public TemplateDocument Parse()
         {
-            ValidationHelper.AssertArgumentIsNotNull("selectionStrategy", selectionStrategy);
-
             /* Start a cursor to be used when reading the string. */
             StringForwardCursor cursor = new StringForwardCursor(Template);
 
@@ -187,7 +185,7 @@ namespace XtraLiteTemplates.Parsing
                         if (directiveLiteralType != null)
                             directiveLiterals.Add(new DirectiveLiteral(directiveLiteralType.Value, tokenBuffer.ToString()));
 
-                        currentNode = CreateDirectiveNode(selectionStrategy, currentNode, directiveLiterals);
+                        currentNode = CreateDirectiveNode(directiveSelector, currentNode, directiveLiterals);
                         directiveLiterals.Clear();
                     }
                     else if (current == Properties.StringConstantStartCharacter && !isEscapedChar)

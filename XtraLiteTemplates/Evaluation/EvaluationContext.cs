@@ -1,62 +1,38 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XtraLiteTemplates.Tom;
 using XtraLiteTemplates.Utils;
 
 namespace XtraLiteTemplates.Evaluation
 {
-    public class EvaluationContext : IEvaluationContext
+    public sealed class EvaluationContext : IEvaluationContext
     {
-        private BranchableVariableContext m_variableContext;
-        public TomNode m_current { get; private set; }
+        private VariableCollection m_variables;
 
-        public DocumentTomNode Document { get; private set; }
-        public Boolean CaseSensitive { get; private set; }
-
-        public EvaluationContext(DocumentTomNode document, Boolean caseSensitive)
+        public EvaluationContext(IEqualityComparer<String> comparer)
         {
-            ValidationHelper.AssertArgumentIsNotNull("document", document);
-
-            CaseSensitive = caseSensitive;
-            Document = document;
-            m_current = document;
-
-            m_variableContext = new BranchableVariableContext(caseSensitive);
+            ValidationHelper.AssertArgumentIsNotNull("comparer", comparer);
+            m_variables = new VariableCollection(comparer);
         }
 
-        public void AssignVariable(String name, Object value)
+        public EvaluationContext()
+            : this(StringComparer.Ordinal)
+        {
+        }
+
+        public void RegisterVariable(String name, Object value, Object context)
         {
             ValidationHelper.AssertArgumentIsNotAnEmptyString("name", name);
 
-            m_variableContext[name] = value;
+            m_variables.Set(name, value, context);
         }
 
-        public void EvaluateChildren(TextWriter writer)
+        public void RegisterVariable(String name, Object value)
         {
-            ValidationHelper.AssertArgumentIsNotNull("writer", writer);
-
-            /* Iterate on all the children of the "current" node */
-            foreach (var child in m_current.Children)
-            {
-                if (child is PlainTextTomNode)
-                    writer.Write((child as PlainTextTomNode).PlainText);
-                else
-                {
-                    /* Save the actual */
-                    var actual = m_current;
-                    m_current = child;
-
-                    /* Recurse. */
-                    EvaluateChildren(writer);
-
-                    /* Restore actual. */
-                    m_current = actual;
-                }
-            }
+            RegisterVariable(name, value, null);
         }
     }
 }

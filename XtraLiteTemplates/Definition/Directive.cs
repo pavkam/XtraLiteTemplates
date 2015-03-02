@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using XtraLiteTemplates.Evaluation;
-using XtraLiteTemplates.Tom;
+using XtraLiteTemplates.Parsing.ObjectModel;
 using XtraLiteTemplates.Utils;
 
 namespace XtraLiteTemplates.Definition
@@ -62,19 +62,8 @@ namespace XtraLiteTemplates.Definition
         }
 
 
-        internal Boolean EvaluateTomNode(TextWriter writer, IEvaluationContext context, TomNode node)
+        internal Int32 Evaluate(TextWriter writer, TemplateNode node)
         {
-            /* Open a new variable scope. */
-            context.InitiateNewVariableScope();
-            try
-            {
-                if ()
-            }
-            finally
-            {
-                /* Close the scope with any price. */
-                context.CloseCurrentVariableScope();
-            }
         }
     }
 }

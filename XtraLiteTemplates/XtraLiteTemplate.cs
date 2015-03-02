@@ -4,10 +4,10 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XtraLiteTemplates.Directives;
+using XtraLiteTemplates.Definition;
 using XtraLiteTemplates.Evaluation;
 using XtraLiteTemplates.Parsing;
-using XtraLiteTemplates.Tom;
+using XtraLiteTemplates.Parsing.ObjectModel;
 using XtraLiteTemplates.Utils;
 
 namespace XtraLiteTemplates
@@ -16,16 +16,14 @@ namespace XtraLiteTemplates
     {
         public String Template { get; private set; }
         public ParserProperties ParserProperties { get; private set; }
-        public DocumentTomNode CompiledTemplate { get; private set; }
+        public IDirectiveSelectionStrategy DirectiveSelector { get; private set; }
+        public Boolean Strict { get; private set; }
+        public TemplateDocument CompiledTemplate { get; private set; }
 
         private void CompileTemplate()
         {
-            var parser = new TemplateParser(ParserProperties, Template);
-            var arbiter = new Arbiter(false);
-            var builder = new TomDocumentBuilder(arbiter);
-
-            parser.Parse(builder);
-            CompiledTemplate = builder.GetDocument();
+            var parser = new TemplateParser(ParserProperties, DirectiveSelector, Strict, Template);
+            CompiledTemplate = parser.Parse();
         }
 
         public XtraLiteTemplate(ParserProperties parserProperties, String template)
@@ -38,26 +36,37 @@ namespace XtraLiteTemplates
 
             CompileTemplate();
         }
-
-        public void Evaluate(TextWriter writer, params Variable[] variables)
+        
+        public void Evaluate(TextWriter writer, IEvaluationContext evaluationContext)
         {
             ValidationHelper.AssertArgumentIsNotNull("writer", writer);
+            ValidationHelper.AssertArgumentIsNotNull("evaluationContext", evaluationContext);
+
+            CompiledTemplate.Evaluate(writer, evaluationContext);
+        }
+
+        public void Evaluate(TextWriter writer, IEqualityComparer<String> comparer, params Variable[] variables)
+        {
+            ValidationHelper.AssertArgumentIsNotNull("writer", writer);
+            ValidationHelper.AssertArgumentIsNotNull("comparer", comparer);
 
             /* Evaluate ... */
-            var evaluationContext = new EvaluationContext(CompiledTemplate);
+            var evaluationContext = new EvaluationContext(comparer);
 
             /* Attachg the variable to the context. */
             foreach (var v in variables)
-                evaluationContext.AssignVariable(v.Name, v.Value);
+                evaluationContext.RegisterVariable(v.Name, v.Value);
 
-            evaluationContext.EvaluateChildren(writer);
+            Evaluate(writer, evaluationContext);
         }
 
-        public String Evaluate(params Variable[] variables)
+        public String Evaluate(Boolean caseSensitive, params Variable[] variables)
         {
+            IEqualityComparer<String> comparer = caseSensitive ? StringComparer.Ordinal : StringComparer.OrdinalIgnoreCase;
+
             using (var writer = new StringWriter())
             {
-                Evaluate(writer, variables);
+                Evaluate(writer, comparer, variables);
                 return writer.ToString();
             }   
         }

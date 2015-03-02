@@ -44,11 +44,11 @@
     <Compile Include="Definition\DirectiveDefinitionComponentType.cs" />
     <Compile Include="Definition\DirectiveCollection.cs" />
     <Compile Include="Definition\DirectiveDefinitionPlacement.cs" />
-    <Compile Include="Evaluation\EvaluatedDirectiveComponent.cs" />
-    <Compile Include="Evaluation\IEvaluable.cs" />
     <Compile Include="Evaluation\IEvaluationContext.cs" />
+    <Compile Include="Evaluation\InputParameter.cs" />
+    <Compile Include="Evaluation\InputParameterType.cs" />
     <Compile Include="Evaluation\EvaluationContext.cs" />
-    <Compile Include="Evaluation\BranchableVariableContext.cs" />
+    <Compile Include="Evaluation\VariableCollection.cs" />
     <Compile Include="Parsing\DirectiveLiteral.cs" />
     <Compile Include="Parsing\DirectiveLiteralType.cs" />
     <Compile Include="Parsing\ObjectModel\CompositeDirectiveNode.cs" />
@@ -59,7 +59,6 @@
     <Compile Include="Parsing\ObjectModel\SimpleDirectiveNode.cs" />
     <Compile Include="Parsing\ObjectModel\TemplateDocument.cs" />
     <Compile Include="Parsing\ObjectModel\CompositeNode.cs" />
-    <Compile Include="Parsing\ObjectModel\TomDocumentBuilder.cs" />
     <Compile Include="Definition\Directive.cs" />
     <Compile Include="Definition\DirectiveDefinitionComponent.cs" />
     <Compile Include="Parsing\ObjectModel\TemplateNode.cs" />

@@ -1,17 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
+using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using XtraLiteTemplates.Utils;
 
 namespace XtraLiteTemplates.Evaluation
 {
     public interface IEvaluationContext
     {
-        void InitiateNewVariableScope();
-        void CloseCurrentVariableScope();
-
-        void AssignVariable(String name, Object value);
+        void RegisterVariable(String name, Object value, Object context);
+        void RegisterVariable(String name, Object value);
     }
 }
