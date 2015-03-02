@@ -4,7 +4,8 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XtraLiteTemplates.Tom;
+using XtraLiteTemplates.Definition;
+using XtraLiteTemplates.Parsing.ObjectModel;
 using XtraLiteTemplates.Utils;
 
 namespace XtraLiteTemplates.Parsing
@@ -13,17 +14,67 @@ namespace XtraLiteTemplates.Parsing
     {
         public String Template { get; private set; }
         public ParserProperties Properties { get; private set; }
+        public IDirectiveSelectionStrategy DirectiveSelectionStrategy { get; private set; }
+        public Boolean StrictDirectiveSelection { get; private set; }
 
-        public TemplateParser(ParserProperties properties, String template)
+        public TemplateParser(ParserProperties properties, 
+            IDirectiveSelectionStrategy directiveSelectionStrategy,
+            Boolean strictDirectiveSelection, String template)
         {
-            if (properties == null)
-                throw new ArgumentNullException("properties");
-            if (template == null)
-                throw new ArgumentNullException("template");
+            ValidationHelper.AssertArgumentIsNotNull("properties", properties);
+            ValidationHelper.AssertArgumentIsNotNull("template", template);
+            ValidationHelper.AssertArgumentIsNotNull("selectionStrategy", directiveSelectionStrategy);
 
             Properties = properties;
             Template = template;
+            DirectiveSelectionStrategy = directiveSelectionStrategy;
+            StrictDirectiveSelection = strictDirectiveSelection;
         }
+
+        private CompositeNode CreateDirectiveNode(IDirectiveSelectionStrategy selectionStrategy, CompositeNode parent, 
+            IReadOnlyList<DirectiveLiteral> literals)
+        {
+            /* Select the directive. */
+            var matchingDirectives = selectionStrategy.SelectDirective(literals);
+
+            MatchedDirective directive = null;
+            if (matchingDirectives.Count == 0)
+                throw new InvalidOperationException("no matching node ffs.");
+            else if (StrictDirectiveSelection && matchingDirectives.Count > 1)
+                throw new InvalidOperationException("too many matching nodes ffs.");
+            else
+                directive = matchingDirectives.First();
+
+            /* Process the directive. */
+            
+            if (directive.Placement == DirectiveDefinitionPlacement.Above)
+            {
+                if (directive.Directive.IsComposite)
+                {
+                    var node = new CompositeDirectiveNode(parent, directive.Directive);
+                    parent.AddChild(node);
+                    parent = node;
+                }
+                else
+                {
+                    var node = new SimpleDirectiveNode(parent, directive.Directive);
+                    parent.AddChild(node);
+                }
+            }
+            else
+            {
+                var hopefullyMatchingOpening = (parent as CompositeDirectiveNode);
+                if (hopefullyMatchingOpening != null && hopefullyMatchingOpening.Directive == directive.Directive)
+                {
+                    parent = parent.Parent;
+                }
+                else
+                    throw new InvalidOperationException("Closing an unrelated node. Not matching the current open one.");
+            }
+
+            return parent;
+        }
+
 
         private void ParseError(Char character, Int32 position, Int32 line, Int32 positionInLine, String errorMessage)
         {
@@ -77,20 +128,25 @@ namespace XtraLiteTemplates.Parsing
                 "Unspupported escape sequence.");
         }
 
-        internal void Parse(TomDocumentBuilder builder)
+
+        public TemplateDocument Parse(IDirectiveSelectionStrategy selectionStrategy)
         {
-            Debug.Assert(builder != null);
+            ValidationHelper.AssertArgumentIsNotNull("selectionStrategy", selectionStrategy);
 
             /* Start a cursor to be used when reading the string. */
             StringForwardCursor cursor = new StringForwardCursor(Template);
 
-            List<DirectiveToken> directiveTokens = new List<DirectiveToken>();
+            List<DirectiveLiteral> directiveLiterals = new List<DirectiveLiteral>();
 
             StringBuilder plainTextBuffer = new StringBuilder();
             StringBuilder tokenBuffer = new StringBuilder();
-            Nullable<DirectiveToken.TokenType> tokenType = null;
+            Nullable<DirectiveLiteralType> directiveLiteralType = null;
 
             Boolean parsingDirective = false;
+
+            /* Prepare document Object Model. */
+            TemplateDocument document = new TemplateDocument();
+            CompositeNode currentNode = document;
 
             Char current = '\0';
             Boolean isEscapedChar = false;
@@ -108,14 +164,14 @@ namespace XtraLiteTemplates.Parsing
 
                 if (parsingDirective)
                 {
-                    if (tokenType == DirectiveToken.TokenType.String)
+                    if (directiveLiteralType == DirectiveLiteralType.StringConstant)
                     {
                         if (current == Properties.StringConstantEndCharacter && !isEscapedChar)
                         {
                             /* Finalize the string. */
-                            directiveTokens.Add(new DirectiveToken(tokenType.Value, tokenBuffer.ToString()));
+                            directiveLiterals.Add(new DirectiveLiteral(directiveLiteralType.Value, tokenBuffer.ToString()));
 
-                            tokenType = null;
+                            directiveLiteralType = null;
                         }
                         else
                         {
@@ -128,86 +184,86 @@ namespace XtraLiteTemplates.Parsing
                         /* Finalize the directive. */
                         parsingDirective = false;
 
-                        if (tokenType != null)
-                            directiveTokens.Add(new DirectiveToken(tokenType.Value, tokenBuffer.ToString()));
+                        if (directiveLiteralType != null)
+                            directiveLiterals.Add(new DirectiveLiteral(directiveLiteralType.Value, tokenBuffer.ToString()));
 
-                        builder.AddDirective(directiveTokens);
-                        directiveTokens.Clear();
+                        currentNode = CreateDirectiveNode(selectionStrategy, currentNode, directiveLiterals);
+                        directiveLiterals.Clear();
                     }
                     else if (current == Properties.StringConstantStartCharacter && !isEscapedChar)
                     {
                         /* Start string. */
-                        if (tokenType != null)
+                        if (directiveLiteralType != null)
                         {
-                            directiveTokens.Add(new DirectiveToken(tokenType.Value, tokenBuffer.ToString()));
+                            directiveLiterals.Add(new DirectiveLiteral(directiveLiteralType.Value, tokenBuffer.ToString()));
                             tokenBuffer.Clear();
                         }
 
                         tokenBuffer.Append(current);
-                        tokenType = DirectiveToken.TokenType.String;
+                        directiveLiteralType = DirectiveLiteralType.StringConstant;
                     }
                     else
                     {
                         /* Check for token boundaries and such. */
                         if (Char.IsWhiteSpace(current))
                         {
-                            if (tokenType != null)
+                            if (directiveLiteralType != null)
                             {
-                                directiveTokens.Add(new DirectiveToken(tokenType.Value, tokenBuffer.ToString()));
-                                tokenType = null;
+                                directiveLiterals.Add(new DirectiveLiteral(directiveLiteralType.Value, tokenBuffer.ToString()));
+                                directiveLiteralType = null;
                             }
                         }
                         else if (Char.IsLetter(current))
                         {
-                            if (tokenType == DirectiveToken.TokenType.Identifier)
+                            if (directiveLiteralType == DirectiveLiteralType.NormalIdentifier)
                                 tokenBuffer.Append(current);
-                            else if (tokenType == DirectiveToken.TokenType.Numerical)
+                            else if (directiveLiteralType == DirectiveLiteralType.NumericalConstant)
                             {
-                                tokenType = DirectiveToken.TokenType.Identifier;
+                                directiveLiteralType = DirectiveLiteralType.NormalIdentifier;
                                 tokenBuffer.Append(current);
                             }
                             else
                             {
-                                if (tokenType != null)
+                                if (directiveLiteralType != null)
                                 {
-                                    directiveTokens.Add(new DirectiveToken(tokenType.Value, tokenBuffer.ToString()));
+                                    directiveLiterals.Add(new DirectiveLiteral(directiveLiteralType.Value, tokenBuffer.ToString()));
                                     tokenBuffer.Clear();
                                 }
 
                                 tokenBuffer.Append(current);
-                                tokenType = DirectiveToken.TokenType.Identifier;
+                                directiveLiteralType = DirectiveLiteralType.NormalIdentifier;
                             }
                         }
                         else if (Char.IsDigit(current)) //* NEGATIVE OR POSITIVE NUMBERS! *//
                         {
-                            if (tokenType == DirectiveToken.TokenType.Identifier || tokenType == DirectiveToken.TokenType.Numerical)
+                            if (directiveLiteralType == DirectiveLiteralType.NormalIdentifier || directiveLiteralType == DirectiveLiteralType.NumericalConstant)
                                 tokenBuffer.Append(current);
                             else
                             {
-                                if (tokenType != null)
+                                if (directiveLiteralType != null)
                                 {
-                                    directiveTokens.Add(new DirectiveToken(tokenType.Value, tokenBuffer.ToString()));
+                                    directiveLiterals.Add(new DirectiveLiteral(directiveLiteralType.Value, tokenBuffer.ToString()));
                                     tokenBuffer.Clear();
                                 }
 
                                 tokenBuffer.Append(current);
-                                tokenType = DirectiveToken.TokenType.Numerical;
+                                directiveLiteralType = DirectiveLiteralType.NumericalConstant;
                             }
                         }
                         else if (Char.IsPunctuation(current) || Char.IsSeparator(current) || Char.IsSymbol(current))
                         {
-                            if (tokenType == DirectiveToken.TokenType.Symbolic)
+                            if (directiveLiteralType == DirectiveLiteralType.SymbologicalIdentifier)
                                 tokenBuffer.Append(current);
                             else
                             {
-                                if (tokenType != null)
+                                if (directiveLiteralType != null)
                                 {
-                                    directiveTokens.Add(new DirectiveToken(tokenType.Value, tokenBuffer.ToString()));
+                                    directiveLiterals.Add(new DirectiveLiteral(directiveLiteralType.Value, tokenBuffer.ToString()));
                                     tokenBuffer.Clear();
                                 }
 
                                 tokenBuffer.Append(current);
-                                tokenType = DirectiveToken.TokenType.Symbolic;
+                                directiveLiteralType = DirectiveLiteralType.SymbologicalIdentifier;
                             }
                         }
                         else
@@ -220,6 +276,12 @@ namespace XtraLiteTemplates.Parsing
                 }
                 else if (current == Properties.DirectiveSectionStartCharacter && !isEscapedChar)
                 {
+                    if (plainTextBuffer.Length > 0)
+                    {
+                        currentNode.AddChild(new TextNode(currentNode, plainTextBuffer.ToString()));
+                        plainTextBuffer.Clear();
+                    }
+
                     /* Starting a directive. */
                     parsingDirective = true;
                 }

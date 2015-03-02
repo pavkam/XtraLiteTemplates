@@ -4,15 +4,15 @@ using System.Diagnostics;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using XtraLiteTemplates.Directives;
+using XtraLiteTemplates.Definition;
 using XtraLiteTemplates.Parsing;
 using XtraLiteTemplates.Utils;
 
-namespace XtraLiteTemplates.Tom
+namespace XtraLiteTemplates.Parsing.ObjectModel
 {
     internal sealed class TomDocumentBuilder
     {
-        private CompositeTomNode m_currentComposite;
+        private CompositeNode m_currentComposite;
 
         internal Arbiter Arbiter { get; private set; }
 
@@ -21,7 +21,7 @@ namespace XtraLiteTemplates.Tom
             Debug.Assert(arbiter != null);
 
             Arbiter = arbiter;
-            m_currentComposite = new DocumentTomNode();
+            m_currentComposite = new TemplateDocument();
         }
 
         internal PlainTextTomNode AddPlainText(String plainText)
@@ -34,7 +34,7 @@ namespace XtraLiteTemplates.Tom
             return child;
         }
 
-        internal DirectiveTomNode AddDirective(IReadOnlyList<DirectiveToken> directiveTokens)
+        internal SimpleDirectiveNode AddDirective(IReadOnlyList<DirectiveToken> directiveTokens)
         {
             Debug.Assert(directiveTokens != null);
             Debug.Assert(directiveTokens.Count > 0);
@@ -49,22 +49,22 @@ namespace XtraLiteTemplates.Tom
                 throw new InvalidOperationException("Could not select directive - too many?"); 
             else                
             {
-                DirectiveTomNode node;
+                SimpleDirectiveNode node;
                 if (matchResult == DirectiveMatchResult.MatchingFaceDirective)
                 {
-                    node = new DirectiveTomNode(m_currentComposite, selectedDirective);
+                    node = new SimpleDirectiveNode(m_currentComposite, selectedDirective);
                     if (node.Directive.IsComposite)
                         m_currentComposite = node;
                 }
                 else
                 {
-                    Debug.Assert(m_currentComposite is DirectiveTomNode);
+                    Debug.Assert(m_currentComposite is SimpleDirectiveNode);
 
-                    node = (m_currentComposite as DirectiveTomNode);
+                    node = (m_currentComposite as SimpleDirectiveNode);
                     var directive = node.Directive;
                     if (directive == selectedDirective)
                     {
-                        m_currentComposite = m_currentComposite.Parent as CompositeTomNode;
+                        m_currentComposite = m_currentComposite.Parent as CompositeNode;
                     }
                     else
                         throw new InvalidOperationException("Closing an unrelated node. Not matching the current open one.");
@@ -74,10 +74,10 @@ namespace XtraLiteTemplates.Tom
             }
         }
 
-        internal DocumentTomNode GetDocument()
+        internal TemplateDocument GetDocument()
         {
-            if (m_currentComposite is DocumentTomNode)
-                return m_currentComposite as DocumentTomNode;
+            if (m_currentComposite is TemplateDocument)
+                return m_currentComposite as TemplateDocument;
             else
                 throw new InvalidOperationException("Not all blocks closed. Fix me,");
         }

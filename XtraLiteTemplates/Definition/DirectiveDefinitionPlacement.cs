@@ -4,11 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XtraLiteTemplates.Directives
+namespace XtraLiteTemplates.Definition
 {
-    public enum DirectiveFacing
+    public enum DirectiveDefinitionPlacement
     {
-        Face,
-        Tail,
+        Above,
+        Below,
     }
 }

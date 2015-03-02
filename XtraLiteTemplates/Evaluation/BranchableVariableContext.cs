@@ -6,11 +6,11 @@ using System.Text;
 using System.Threading.Tasks;
 using XtraLiteTemplates.Utils;
 
-namespace XtraLiteTemplates.Interpretation
+namespace XtraLiteTemplates.Evaluation
 {
-    public sealed class PropertyContext
+    public sealed class BranchableVariableContext
     {
-        private PropertyContext m_parentContext;
+        private BranchableVariableContext m_parentContext;
         private Dictionary<String, Object> m_currentProperties;
         private HashSet<String> m_parentRemovedProperties;
         private Dictionary<Type, TypeMemberAccessor> m_accessors;
@@ -62,7 +62,7 @@ namespace XtraLiteTemplates.Interpretation
             m_accessors = new Dictionary<Type, TypeMemberAccessor>();
         }
 
-        private PropertyContext(PropertyContext parentContext)
+        private BranchableVariableContext(BranchableVariableContext parentContext)
         {
             Debug.Assert(parentContext != null);
 
@@ -72,7 +72,7 @@ namespace XtraLiteTemplates.Interpretation
             InitializeContext(parentContext.m_currentProperties.Comparer);
         }
 
-        public PropertyContext(Boolean caseSensitive)
+        public BranchableVariableContext(Boolean caseSensitive)
         {
             /* Select a string comparer. */
             IEqualityComparer<String> comparer = 
@@ -83,9 +83,9 @@ namespace XtraLiteTemplates.Interpretation
             InitializeContext(comparer);
         }
 
-        public PropertyContext Branch()
+        public BranchableVariableContext Branch()
         {
-            return new PropertyContext(this);
+            return new BranchableVariableContext(this);
         }
 
         public Object this[String property]
