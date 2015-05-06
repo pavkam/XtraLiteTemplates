@@ -142,6 +142,15 @@ namespace XtraLiteTemplates
 
             var leftNode = node.LeftNode as ConstantExpressionNode;
             var rightNode = node.RightNode as ConstantExpressionNode;
+            if (leftNode != null && rightNode == null)
+            {
+                /* Left node has a value. Try to apply short-circuit logic here. Maybe skip the whole right side evaluation entirely. */
+                Object result;
+                if (node.Operator.EvaluateLeft(leftNode.Operand, out result))
+                    return new ConstantExpressionNode(node.Parent, result);
+            }
+            
+            /* Normal evaluation ensues. */
             if (leftNode != null && rightNode != null)
             {
                 Object result;
@@ -149,7 +158,8 @@ namespace XtraLiteTemplates
                     ExpressionException.CannotEvaluateOperator(node.Operator, leftNode.Operand);
                 else
                     return new ConstantExpressionNode(node.Parent, result);
-            }
+            } 
+            
 
             return node;
         }

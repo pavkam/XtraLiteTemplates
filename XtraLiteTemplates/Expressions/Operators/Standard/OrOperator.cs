@@ -57,6 +57,12 @@ namespace XtraLiteTemplates
             result = left | right;
             return true;
         }
+
+        protected override Boolean EvaluateLeft(Boolean left, out Object result)
+        {
+            result = left;
+            return left == true;
+        }
     }
 }
 

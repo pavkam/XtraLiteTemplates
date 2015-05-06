@@ -48,14 +48,23 @@ namespace XtraLiteTemplates.NUnit
             expression.FeedSymbol("(");
             expression.FeedConstant(4.00);            
             expression.FeedSymbol("+");
-            expression.FeedConstant(5.00);
+            expression.FeedConstant(0);
             expression.FeedSymbol("/");
-            expression.FeedConstant(-1);
+            expression.FeedConstant("he\"llo");
             expression.FeedSymbol(")");
-            expression.Close();
+            expression.Close(true);
+
+            dynamic a = "Hello";
+
+            if (a / "hello")
+            {
+
+            }
 
             var repr = expression.ToString(ExpressionFormatStyle.Canonical);
             Assert.AreEqual("1 + 2", repr);
+
+
         }
     }
 }

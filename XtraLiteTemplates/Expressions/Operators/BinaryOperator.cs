@@ -40,6 +40,12 @@ namespace XtraLiteTemplates
         }
 
         public abstract Boolean Evaluate(Object left, Object right, out Object result);
+
+        public virtual Boolean EvaluateLeft(Object left, out Object result)
+        {
+            result = left;
+            return false;
+        }
     }
 }
 

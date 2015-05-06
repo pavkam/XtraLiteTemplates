@@ -97,6 +97,51 @@ namespace XtraLiteTemplates
             result = null;
             return false;
         }
+
+        public override Boolean EvaluateLeft(Object left, out Object result)
+        {
+            /* Try normal operators. */
+            Int64 arg_i;
+            if (TryAsInteger(left, out arg_i))
+                return EvaluateLeft(arg_i, out result);
+            Double arg_f;
+            if (TryAsFloat(left, out arg_f))
+                return EvaluateLeft(arg_f, out result);
+            Boolean arg_b;
+            if (TryAsBoolean(left, out arg_b))
+                return EvaluateLeft(arg_b, out result);
+            String arg_s;
+            if (TryAsString(left, out arg_s))
+                return EvaluateLeft(arg_f, out result);
+
+            /* Default to Undefined. */
+            result = null;
+            return false;
+        }
+
+        protected virtual Boolean EvaluateLeft(String left, out Object result)
+        {
+            result = left;
+            return false;
+        }
+
+        protected virtual Boolean EvaluateLeft(Int64 left, out Object result)
+        {
+            result = left;
+            return false;
+        }
+
+        protected virtual Boolean EvaluateLeft(Double left, out Object result)
+        {
+            result = left;
+            return false;
+        }
+
+        protected virtual Boolean EvaluateLeft(Boolean left, out Object result)
+        {
+            result = left;
+            return false;
+        }
     }
 }
 

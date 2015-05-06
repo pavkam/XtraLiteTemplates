@@ -52,10 +52,22 @@ namespace XtraLiteTemplates
             return true;
         }
 
+        protected override Boolean EvaluateLeft(Int64 left, out Object result)
+        {
+            result = left;
+            return left == 0;
+        }
+
         protected override Boolean Evaluate(Boolean left, Boolean right, out Object result)
         {
             result = left && right;
             return true;
+        }
+
+        protected override Boolean EvaluateLeft(Boolean left, out Object result)
+        {
+            result = left;
+            return left == false;
         }
     }
 }
