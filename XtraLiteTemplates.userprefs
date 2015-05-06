@@ -1,0 +1,12 @@
+﻿<Properties StartupItem="XtraLiteTemplates/XtraLiteTemplates/XtraLiteTemplates.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates/Expressions/ConstantExpressionNode.cs">
+    <Files>
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/ConstantExpressionNode.cs" Line="34" Column="11" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
