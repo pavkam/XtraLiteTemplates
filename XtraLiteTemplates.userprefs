@@ -6,7 +6,7 @@
       <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/TokenizerTest.cs" Line="282" Column="45" />
       <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/ExpressionTests.cs" Line="40" Column="49" />
       <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/packages.config" Line="1" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs" Line="33" Column="30" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs" Line="562" Column="10" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.NUnit.TestPad">
