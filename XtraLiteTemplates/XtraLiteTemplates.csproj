@@ -32,6 +32,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Expressions\ReferenceExpressionNode.cs" />
+    <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\OperatorExpressionNode.cs" />
     <Compile Include="Expressions\Operators\Standard\SubscriptOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\ShiftRightOperator.cs" />

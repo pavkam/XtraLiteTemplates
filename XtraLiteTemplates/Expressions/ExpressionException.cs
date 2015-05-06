@@ -37,24 +37,66 @@ namespace XtraLiteTemplates
         {
         }
 
-        internal static void UnexpectedConstant(Object operand)
+        internal static void CannotEvaluateOperator(Operator @operator, Object constant)
         {
-            throw new ExpressionException("Unexpected constant value '{0}' encountered while parsing expression.", operand);
+            Debug.Assert(@operator != null);
+            throw new ExpressionException("Operator {0} could not be applied to value '{1}'.", @operator, constant);
+        }
+
+        internal static void UnexpectedExpressionNode(ExpressionNode node)
+        {
+            Debug.Assert(node != null);
+            throw new ExpressionException("Unexpected term '{0}' encountered while building expression.", node.ToString());
         }
 
         internal static void UndefinedOperator(String symbol)
         {
+            Debug.Assert(!String.IsNullOrEmpty(symbol));
             throw new ExpressionException("Undefined or un-supported operator '{0}' encountered while parsing expression.", symbol);
         }
 
         internal static void UnexpectedOperator(String symbol)
         {
+            Debug.Assert(!String.IsNullOrEmpty(symbol));
             throw new ExpressionException("Unexpected operator '{0}' encountered while parsing expression.", symbol);
         }
 
         internal static void UnmatchedGroupOperator(String endSymbol)
         {
+            Debug.Assert(!String.IsNullOrEmpty(endSymbol));
             throw new ExpressionException("Unexpected group end symbol '{0}'. No matching group found.", endSymbol);
+        }
+
+        internal static void OperatorAlreadyRegistered(Operator @operator)
+        {
+            Debug.Assert(@operator != null);
+            throw new InvalidOperationException(String.Format("Operator identified by symbol '{0}' has already been registered with expression.", @operator));
+        }
+
+        internal static void CannotAddMoreOperatorsExpressionStarted()
+        {
+            throw new InvalidOperationException("Cannot register operators while the expression is being built. Operators must be registered before the first expression node is created.");
+        }
+
+        internal static void CannotCloseExpressionNotYetStarted()
+        {
+            throw new InvalidOperationException("Cannot finalize the expression. No actual data was fed into it.");
+        }
+
+        internal static void CannotFeedMoreToExpressionClosed()
+        {
+            throw new ExpressionException("The expression has been finalized. Cannot feed in more data into it.");
+        }
+
+        internal static void CannotCloseExpressionInvalidState(Operator @operator)
+        {
+            Debug.Assert(@operator != null);
+            throw new ExpressionException("Expression cannot be finalized, it is not balanced. End operator is '{0}'.", @operator);
+        }
+
+        internal static void CannotUseExpressionNotClosed()
+        {
+            throw new InvalidOperationException("Expression has not been finalized.");
         }
     }
 }

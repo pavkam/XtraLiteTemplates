@@ -32,21 +32,181 @@ namespace XtraLiteTemplates
     using System.Collections.Generic;
     using System.Diagnostics;
 
-    public class Expression
+    public sealed class Expression
     {
-        public enum FormattingStyle
-        {
-            Arithmetic,
-            Polish,
-            Canonical,
-        }
-
         private ExpressionNode m_current;
         private ExpressionNode m_root;
         private Dictionary<String, UnaryOperator> m_unaryOperators;
         private Dictionary<String, BinaryOperator> m_binaryOperators;
         private Dictionary<String, GroupOperator> m_startGroupOperators;
         private Dictionary<String, GroupOperator> m_endGroupOperators;
+
+        private Boolean ConstantOrReferenceAcceptedNext
+        {
+            get
+            {
+                return
+                    (m_current == null) ||
+                    (m_current is UnaryOperatorExpressionNode) ||
+                    (m_current is BinaryOperatorExpressionNode) ||
+                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null);
+            }
+        }
+
+        private void AppendChild(Object value, Boolean isReference)
+        {
+            Debug.Assert(!isReference || value is String);
+
+            ExpressionNode node = isReference ?
+                (ExpressionNode)(new ReferenceExpressionNode(m_current, (String)value)) :
+                new ConstantExpressionNode(m_current, value);
+
+            if (!ConstantOrReferenceAcceptedNext)
+                ExpressionException.UnexpectedExpressionNode(node);
+
+            if (m_current != null)
+            {
+                var unaryOperator = m_current as UnaryOperatorExpressionNode;
+                if (unaryOperator != null)
+                {
+                    Debug.Assert(unaryOperator.Child == null);
+                    unaryOperator.Child = node;
+                }
+                else
+                {
+                    var groupOperator = m_current as GroupOperatorExpressionNode;
+                    if (groupOperator != null)
+                        groupOperator.Child = node;
+                    else
+                    {
+                        var binaryOperator = m_current as BinaryOperatorExpressionNode;
+                        if (binaryOperator != null)
+                        {
+                            Debug.Assert(binaryOperator.LeftNode != null);
+                            Debug.Assert(binaryOperator.RightNode == null);
+
+                            binaryOperator.RightNode = node;
+                        }
+                    }
+                }
+            }
+
+            m_current = node;
+        }
+
+        private ExpressionNode Reduce(UnaryOperatorExpressionNode node)
+        {
+            Debug.Assert(node != null);
+
+            node.Child = Reduce(node.Child);
+
+            var childNode = node.Child as ConstantExpressionNode;
+            if (childNode != null)
+            {
+                Object result;
+                if (!node.Operator.Evaluate(childNode.Operand, out result))
+                    ExpressionException.CannotEvaluateOperator(node.Operator, childNode.Operand);
+                else
+                    return new ConstantExpressionNode(node.Parent, result);
+            }
+
+            return node;
+        }
+
+        private ExpressionNode Reduce(GroupOperatorExpressionNode node)
+        {
+            Debug.Assert(node != null);
+
+            /* Cannot be redured of reference detected. */
+            node.Child = Reduce(node.Child);
+
+            var childNode = node.Child as ConstantExpressionNode;
+            if (childNode != null)
+            {
+                Object result;
+                if (!node.Operator.Evaluate(childNode.Operand, out result))
+                    ExpressionException.CannotEvaluateOperator(node.Operator, childNode.Operand);
+                else
+                    return new ConstantExpressionNode(node.Parent, result);
+            }
+
+            return node;
+        }
+
+        private ExpressionNode Reduce(BinaryOperatorExpressionNode node)
+        {
+            Debug.Assert(node != null);
+
+            node.LeftNode = Reduce(node.LeftNode);
+            node.RightNode = Reduce(node.RightNode);
+
+            var leftNode = node.LeftNode as ConstantExpressionNode;
+            var rightNode = node.RightNode as ConstantExpressionNode;
+            if (leftNode != null && rightNode != null)
+            {
+                Object result;
+                if (!node.Operator.Evaluate(leftNode.Operand, rightNode.Operand, out result))
+                    ExpressionException.CannotEvaluateOperator(node.Operator, leftNode.Operand);
+                else
+                    return new ConstantExpressionNode(node.Parent, result);
+            }
+
+            return node;
+        }
+
+        private ExpressionNode Reduce(ExpressionNode node)
+        {
+            Debug.Assert(node != null);
+            if (node is ConstantExpressionNode || node is ReferenceExpressionNode)
+                return node;
+            else
+            {
+                var unaryNode = node as UnaryOperatorExpressionNode;
+                if (unaryNode != null)
+                    return Reduce(unaryNode);
+                else
+                {
+                    var binaryNode = node as BinaryOperatorExpressionNode;
+                    if (binaryNode != null)
+                        return Reduce(binaryNode);
+                    else
+                    {
+                        var groupNode = node as GroupOperatorExpressionNode;
+                        if (groupNode != null)
+                            return Reduce(groupNode);
+                    }
+                }
+            }
+
+            return node;
+        }
+
+        public Boolean Closed
+        {
+            get
+            {
+                return m_root != null;
+            }
+        }
+        
+        public Boolean Started
+        {
+            get
+            {
+                return m_current != null;
+            }
+        }
+
+        public Boolean IsSupportedOperator(String symbol)
+        {
+            Expect.NotEmpty("symbol", symbol);
+
+            return 
+                m_unaryOperators.ContainsKey(symbol) ||
+                m_binaryOperators.ContainsKey(symbol) ||
+                m_startGroupOperators.ContainsKey(symbol) ||
+                m_endGroupOperators.ContainsKey(symbol);
+        }
 
         public IEqualityComparer<String> Comparer { get; private set; }
 
@@ -68,257 +228,252 @@ namespace XtraLiteTemplates
         }
 
 
-        public void RegisterOperator(BinaryOperator @operator)
+        public Expression RegisterOperator(Operator @operator)
         {
             Expect.NotNull("operator", @operator);
 
-            m_binaryOperators.Add(@operator.Symbol, @operator);
-        }
+            if (Started)
+                ExpressionException.CannotAddMoreOperatorsExpressionStarted();
 
-        public void RegisterOperator(UnaryOperator @operator)
-        {
-            Expect.NotNull("operator", @operator);
+            Debug.Assert(!Closed);
 
-            m_unaryOperators.Add(@operator.Symbol, @operator);
-        }
-
-        public void RegisterOperator(GroupOperator @operator)
-        {
-            Expect.NotNull("operator", @operator);
-
-            m_startGroupOperators.Add(@operator.Symbol, @operator);
-            m_endGroupOperators.Add(@operator.Terminator, @operator);
-        }
-
-        public void FeedConstant(Object constant)
-        {
-            if (m_current == null)
+            if (@operator is UnaryOperator)
             {
-                /* This is the first node ever. */
-                m_current = new ConstantExpressionNode(null, constant);
+                var unaryOperator = (UnaryOperator)@operator;
+                if (m_unaryOperators.ContainsKey(unaryOperator.Symbol) ||
+                    m_startGroupOperators.ContainsKey(unaryOperator.Symbol) ||
+                    m_endGroupOperators.ContainsKey(unaryOperator.Symbol))
+                {
+                    ExpressionException.OperatorAlreadyRegistered(unaryOperator);
+                }
+
+                m_unaryOperators.Add(@operator.Symbol, unaryOperator);
+            }
+            else if (@operator is BinaryOperator)
+            {
+                var binaryOperator = (BinaryOperator)@operator;
+                if (m_binaryOperators.ContainsKey(binaryOperator.Symbol) ||
+                    m_startGroupOperators.ContainsKey(binaryOperator.Symbol) ||
+                    m_endGroupOperators.ContainsKey(binaryOperator.Symbol))
+                {
+                    ExpressionException.OperatorAlreadyRegistered(binaryOperator);
+                }
+
+
+                m_binaryOperators.Add(@operator.Symbol, binaryOperator);
+            }
+            else if (@operator is GroupOperator)
+            {
+                var groupOperator = (GroupOperator)@operator;
+                if (m_unaryOperators.ContainsKey(groupOperator.Symbol) ||
+                    m_unaryOperators.ContainsKey(groupOperator.Terminator) ||
+                    m_binaryOperators.ContainsKey(groupOperator.Symbol) ||
+                    m_binaryOperators.ContainsKey(groupOperator.Terminator) ||
+                    m_startGroupOperators.ContainsKey(groupOperator.Symbol) ||
+                    m_startGroupOperators.ContainsKey(groupOperator.Terminator) ||
+                    m_endGroupOperators.ContainsKey(groupOperator.Symbol) ||
+                    m_endGroupOperators.ContainsKey(groupOperator.Terminator))
+                {
+                    ExpressionException.OperatorAlreadyRegistered(@operator);
+                }
+
+                m_startGroupOperators.Add(groupOperator.Symbol, groupOperator);
+                m_endGroupOperators.Add(groupOperator.Terminator, groupOperator);
+            }
+            else
+                Debug.Assert(false, "Unsupported operator type.");
+
+            return this;
+        }
+
+
+
+        public Expression FeedConstant(Object constant)
+        {
+            if (Closed)
+                ExpressionException.CannotFeedMoreToExpressionClosed();
+
+            AppendChild(constant, false);
+
+            return this;
+        }
+
+        public Expression FeedSymbol(String symbol)
+        {
+            Expect.NotEmpty("symbol", symbol);
+
+            if (Closed)
+                ExpressionException.CannotFeedMoreToExpressionClosed();
+
+            if (!IsSupportedOperator(symbol))
+            {
+                /* Consider this to be a reference. */
+                AppendChild(symbol, true);
             }
             else
             {
-                /* Check that the current node is not a previous constant. */
-                if (m_current is ConstantExpressionNode)
-                    ExpressionException.UnexpectedConstant(constant);
-
-                var unary = m_current as UnaryOperatorExpressionNode;
-                if (unary != null)
+                /* Identify the previous node first, and based on that decide what type of operator to expect. */
+                if (m_current == null ||
+                    m_current is UnaryOperatorExpressionNode ||
+                    m_current is BinaryOperatorExpressionNode ||
+                    m_current is GroupOperatorExpressionNode)
                 {
-                    Debug.Assert(unary.Child == null);
-                    unary.Child = new ConstantExpressionNode(unary, constant);
+                    var unary = m_current as UnaryOperatorExpressionNode;
+                    var binary = m_current as BinaryOperatorExpressionNode;
+                    var group = m_current as GroupOperatorExpressionNode;
 
-                    m_current = unary.Child;
+                    Debug.Assert(unary == null || unary.Child == null);
+                    Debug.Assert(binary == null || binary.RightNode == null);
+                    Debug.Assert(binary == null || binary.LeftNode != null);
+
+                    if (group != null && group.Child != null)
+                        ExpressionException.UnexpectedOperator(symbol);
+
+                    /* Binary operations only can be applied here. */
+                    GroupOperator matchingGroup;
+                    if (m_startGroupOperators.TryGetValue(symbol, out matchingGroup))
+                    {
+                        /* This be a group-start symbol. Find the matching group. */
+                        m_current = new GroupOperatorExpressionNode(m_current, matchingGroup);
+                    }
+                    else
+                    {
+                        /* Only unary operators are allowed. */
+                        UnaryOperator matchingUnary;
+                        if (!m_unaryOperators.TryGetValue(symbol, out matchingUnary))
+                            ExpressionException.UndefinedOperator(symbol);
+
+                        m_current = new UnaryOperatorExpressionNode(unary, matchingUnary);
+                    }
+
+                    /* Attach the node. */
+                    if (unary != null)
+                        unary.Child = m_current;
+                    else if (group != null)
+                        group.Child = m_current;
+                    else if (binary != null)
+                        binary.RightNode = m_current;
+                    else
+                        Debug.Assert(false);
                 }
-
-                var group = m_current as GroupOperatorExpressionNode;
-                if (group != null && group.Child == null)
+                else if (m_current is ConstantExpressionNode || m_current is ReferenceExpressionNode  || m_current is GroupOperatorExpressionNode)
                 {
-                    group.Child = new ConstantExpressionNode(group, constant);
-                    m_current = group.Child;
+                    if (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null)
+                        ExpressionException.UnexpectedOperator(symbol);
+
+                    /* Binary operations only can be applied here. */
+                    GroupOperator matchingGroup;
+                    if (m_endGroupOperators.TryGetValue(symbol, out matchingGroup))
+                    {
+                        /* This be a group-end symbol. Find the matching group. */
+                        GroupOperatorExpressionNode group = null;
+                        var _current = m_current;
+                        while (_current.Parent != null)
+                        {
+                            _current = _current.Parent;
+                            group = _current as GroupOperatorExpressionNode;
+                            if (group != null)
+                                break;
+                        }
+
+                        if (group == null || group.Operator.Terminator != symbol)
+                            ExpressionException.UnmatchedGroupOperator(symbol);
+                        else
+                        {
+                            /* Find root of the group. */
+                            var root = m_current;
+                            while (root.Parent != group)
+                                root = root.Parent;
+
+                            group.Child = root;
+
+                            m_current = group;
+                        }
+                    }
+                    else
+                    {
+                        /* Binary operations only can be applied here. */
+                        BinaryOperator matchingBinary;
+                        if (!m_binaryOperators.TryGetValue(symbol, out matchingBinary))
+                            ExpressionException.UndefinedOperator(symbol);
+
+                        /* Apply precendence levels here. Go up the tree while the precendence is greater or equal. */
+                        ExpressionNode left = m_current, parent = m_current.Parent;
+                        while (left.Parent != null)
+                        {
+                            Int32 prec = ((OperatorExpressionNode)left.Parent).Operator.Precedence;
+                            if (prec > matchingBinary.Precedence)
+                                break;
+
+                            left = left.Parent;
+                            parent = left.Parent;
+                        }
+
+                        m_current = new BinaryOperatorExpressionNode(parent, matchingBinary)
+                        {
+                            LeftNode = left,
+                        };
+
+                        if (left.Parent is BinaryOperatorExpressionNode)
+                            (left.Parent as BinaryOperatorExpressionNode).RightNode = m_current;
+                        left.Parent = m_current;
+                    }
                 }
-
-                var binary = m_current as BinaryOperatorExpressionNode;
-                if (binary != null)
-                {
-                    Debug.Assert(binary.LeftNode != null);
-                    Debug.Assert(binary.RightNode == null);
-                    binary.RightNode = new ConstantExpressionNode(binary, constant);
-
-                    m_current = binary.RightNode;
-                }
-            }
-        }
-
-        public void FeedSymbol(String symbol)
-        {
-            /* Identify the previous node first, and based on that decide what type of operator to expect. */
-            if (m_current == null ||
-                m_current is UnaryOperatorExpressionNode ||
-                m_current is BinaryOperatorExpressionNode ||
-                m_current is GroupOperatorExpressionNode)
-            {
-                var unary = m_current as UnaryOperatorExpressionNode;
-                var binary = m_current as BinaryOperatorExpressionNode;
-                var group = m_current as GroupOperatorExpressionNode;
-
-                Debug.Assert(unary == null || unary.Child == null);
-                Debug.Assert(binary == null || binary.RightNode == null);
-                Debug.Assert(binary == null || binary.LeftNode != null);
-
-                if (group != null && group.Child != null)
-                    ExpressionException.UnexpectedOperator(symbol);
-
-                /* Binary operations only can be applied here. */
-                GroupOperator matchingGroup;
-                if (m_startGroupOperators.TryGetValue(symbol, out matchingGroup))
-                {
-                    /* This be a group-start symbol. Find the matching group. */
-                    m_current = new GroupOperatorExpressionNode(m_current, matchingGroup);
-                }
-                else
-                {
-                    /* Only unary operators are allowed. */
-                    UnaryOperator matchingUnary;
-                    if (!m_unaryOperators.TryGetValue(symbol, out matchingUnary))
-                        ExpressionException.UndefinedOperator(symbol);
-
-                    m_current = new UnaryOperatorExpressionNode(unary, matchingUnary);
-                }
-
-                /* Attach the node. */
-                if (unary != null)
-                    unary.Child = m_current;
-                else if (group != null)
-                    group.Child = m_current;
-                else if (binary != null)
-                    binary.RightNode = m_current;
                 else
                     Debug.Assert(false);
             }
-            else if (m_current is ConstantExpressionNode || m_current is GroupOperatorExpressionNode)
-            {
-                if (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null)
-                    ExpressionException.UnexpectedOperator(symbol);
 
-                /* Binary operations only can be applied here. */
-                GroupOperator matchingGroup;
-                if (m_endGroupOperators.TryGetValue(symbol, out matchingGroup))
-                {
-                    /* This be a group-end symbol. Find the matching group. */
-                    GroupOperatorExpressionNode group = null;
-                    var _current = m_current;
-                    while (_current.Parent != null)
-                    {
-                        _current = _current.Parent;
-                        group = _current as GroupOperatorExpressionNode;
-                        if (group != null)
-                            break;
-                    }
-
-                    if (group == null || group.Operator.Terminator != symbol)
-                        ExpressionException.UnmatchedGroupOperator(symbol);
-                    else
-                    {
-                        /* Find root of the group. */
-                        var root = m_current;
-                        while (root.Parent != group)
-                            root = root.Parent;
-
-                        group.Child = root;
-
-                        m_current = group;
-                    }
-                }
-                else
-                {
-                    /* Binary operations only can be applied here. */
-                    BinaryOperator matchingBinary;
-                    if (!m_binaryOperators.TryGetValue(symbol, out matchingBinary))
-                        ExpressionException.UndefinedOperator(symbol);
-
-                    /* Apply precendence levels here. Go up the tree while the precendence is greater or equal. */
-                    ExpressionNode left = m_current, parent = m_current.Parent;
-                    while (left.Parent != null)
-                    {
-                        Int32 prec = ((OperatorExpressionNode)left.Parent).Operator.Precedence;
-                        if (prec > matchingBinary.Precedence)
-                            break;
-
-                        left = left.Parent;
-                        parent = left.Parent;
-                    }
-
-                    m_current = new BinaryOperatorExpressionNode(parent, matchingBinary)
-                    {
-                        LeftNode = left,
-                    };
-                
-                    if (left.Parent is BinaryOperatorExpressionNode)
-                        (left.Parent as BinaryOperatorExpressionNode).RightNode = m_current;
-                    left.Parent = m_current;
-                }
-            }
-            else
-                Debug.Assert(false);
+            return this;
         }
 
-        public void Close()
+        public Expression Close(Boolean reduce)
         {
-            m_root = m_current;
-            while (m_root != null && m_root.Parent != null)
-                m_root = m_root.Parent;
+            if (!Started)
+                ExpressionException.CannotCloseExpressionNotYetStarted();
+            if (!Closed)
+            {
+                if (m_current is OperatorExpressionNode)
+                {
+                    var groupNode = m_current as GroupOperatorExpressionNode;
+                    if (groupNode == null || groupNode.Child == null)
+                        ExpressionException.CannotCloseExpressionInvalidState(((OperatorExpressionNode)m_current).Operator);
+                }
+
+                /* The building process has ended. Find the root. */
+                m_root = m_current;
+                while (m_root.Parent != null)
+                    m_root = m_root.Parent;
+
+                /* Reduce the expression if so was desired. */
+                if (reduce)
+                    m_root = Reduce(m_root);
+            }
+
+            return this;
         }
 
-        private String ToString(ExpressionNode node, FormattingStyle style)
+        public Expression Close()
         {
-            Debug.Assert(node != null);
-
-            var unary = node as UnaryOperatorExpressionNode;
-            if (unary != null)
-                return String.Format("{0}{1}", unary.Operator, ToString(unary.Child, style));
-            
-            var binary = node as BinaryOperatorExpressionNode;
-            if (binary != null)
-            {
-                if (style == FormattingStyle.Arithmetic)
-                {
-                    return String.Format("{0} {1} {2}", ToString(binary.LeftNode, style),
-                        binary.Operator.Symbol, ToString(binary.RightNode, style));
-                } 
-                else if (style == FormattingStyle.Polish)
-                {
-                    return String.Format("{0} {1} {2}",
-                        binary.Operator, ToString(binary.LeftNode, style), ToString(binary.RightNode, style));
-                } 
-                else
-                {
-                    return String.Format("{0}{{{1},{2}}}",
-                        binary.Operator, ToString(binary.LeftNode, style), ToString(binary.RightNode, style));
-                }
-            }
-
-            var group = node as GroupOperatorExpressionNode;
-            if (group != null)
-            {
-                if (style == FormattingStyle.Arithmetic)
-                {
-                    return String.Format("{0} {1} {2}", group.Operator.Symbol,
-                        ToString(group.Child, style), group.Operator.Terminator);
-                }
-                else if (style == FormattingStyle.Polish)
-                {
-                    return String.Format("{0}{1}{2}", group.Operator.Symbol,
-                        ToString(group.Child, style), group.Operator.Terminator);
-                }
-                else
-                {
-                    return String.Format("{0}{{{1}}}", group.Operator, ToString(group.Child, style));
-                }
-            }
-
-            var constant = node as ConstantExpressionNode;
-            if (constant != null)
-            {
-                return constant.Operand.ToString();
-            }
-
-            return null;
+            return Close(true);
         }
+
 
         public override String ToString()
         {
-            return ToString(FormattingStyle.Arithmetic);
+            return ToString(ExpressionFormatStyle.Arithmetic);
         }
 
-        public String ToString(FormattingStyle style)
+        public String ToString(ExpressionFormatStyle style)
         {
-            if (m_root != null)
-                return ToString(m_root, style);
-            else
-                return null;
+            if (!Closed)
+                ExpressionException.CannotUseExpressionNotClosed();
+
+            Debug.Assert(Started);
+
+            return m_root.ToString(style);
         }
+
+
 
         public static Expression CreateStandardCStyle()
         {

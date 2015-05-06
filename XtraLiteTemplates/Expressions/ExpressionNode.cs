@@ -30,13 +30,20 @@ namespace XtraLiteTemplates
     using System;
     using System.Collections.Generic;
 
-    public abstract class ExpressionNode
+    internal abstract class ExpressionNode
     {
         public ExpressionNode Parent { get; internal set; }
 
         protected ExpressionNode(ExpressionNode parent)
         {
             Parent = parent;
+        }
+
+        public abstract String ToString(ExpressionFormatStyle style);
+
+        public override String ToString()
+        {
+            return ToString(ExpressionFormatStyle.Arithmetic);
         }
     }
 }

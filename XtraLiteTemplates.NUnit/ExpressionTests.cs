@@ -49,11 +49,13 @@ namespace XtraLiteTemplates.NUnit
             expression.FeedConstant(4.00);            
             expression.FeedSymbol("+");
             expression.FeedConstant(5.00);
+            expression.FeedSymbol("/");
+            expression.FeedConstant(-1);
             expression.FeedSymbol(")");
             expression.Close();
 
-            var repr = expression.ToString(Expression.FormattingStyle.Canonical);
-           // Assert.AreEqual("1 + 2", repr);
+            var repr = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("1 + 2", repr);
         }
     }
 }

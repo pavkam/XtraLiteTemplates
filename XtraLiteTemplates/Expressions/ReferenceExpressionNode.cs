@@ -28,18 +28,25 @@
 namespace XtraLiteTemplates
 {
     using System;
+    using System.CodeDom;
+    using System.CodeDom.Compiler;
     using System.Diagnostics;
+    using System.IO;
 
-    internal abstract class OperatorExpressionNode : ExpressionNode
+    internal sealed class ReferenceExpressionNode : ExpressionNode
     {
-        public Operator Operator { get; private set; }
+        public String Identifier { get; private set; }
 
-        internal OperatorExpressionNode(ExpressionNode parent, Operator @operator)
+        public ReferenceExpressionNode(ExpressionNode parent, String identifier)
             : base(parent)
         {
-            Debug.Assert(@operator != null);
+            Debug.Assert(!String.IsNullOrEmpty(identifier));
+            Identifier = identifier;
+        }
 
-            Operator = @operator;
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            return String.Format("@{0}", Identifier);
         }
     }
 }

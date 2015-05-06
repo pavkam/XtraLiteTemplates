@@ -29,8 +29,9 @@
 namespace XtraLiteTemplates
 {
     using System;
+    using System.Diagnostics;
 
-    public sealed class BinaryOperatorExpressionNode : OperatorExpressionNode
+    internal sealed class BinaryOperatorExpressionNode : OperatorExpressionNode
     {
         public new BinaryOperator Operator
         {
@@ -47,6 +48,24 @@ namespace XtraLiteTemplates
         internal BinaryOperatorExpressionNode(ExpressionNode parent, BinaryOperator @operator)
             : base(parent, @operator)
         {
+        }
+
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            var leftAsString = LeftNode != null ? LeftNode.ToString(style) : null;
+            var rightAsString = RightNode != null ? RightNode.ToString(style) : null;
+
+            String result = null;
+
+            if (style == ExpressionFormatStyle.Arithmetic)
+                result = String.Format("{0} {1} {2}", leftAsString, Operator, rightAsString);
+            else if (style == ExpressionFormatStyle.Polish)
+                result = String.Format("{0} {1} {2}", Operator, leftAsString, rightAsString);
+            else if (style == ExpressionFormatStyle.Canonical)
+                result = String.Format("{0}{{{1},{2}}}", Operator, leftAsString, rightAsString);
+
+            Debug.Assert(result != null);
+            return result;
         }
     }
 }

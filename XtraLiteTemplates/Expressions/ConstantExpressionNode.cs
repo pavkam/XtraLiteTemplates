@@ -28,8 +28,11 @@
 namespace XtraLiteTemplates
 {
     using System;
+    using System.CodeDom;
+    using System.CodeDom.Compiler;
+    using System.IO;
 
-    public sealed class ConstantExpressionNode : ExpressionNode
+    internal sealed class ConstantExpressionNode : ExpressionNode
     {
         public Object Operand { get; private set; }
 
@@ -37,6 +40,25 @@ namespace XtraLiteTemplates
             : base(parent)
         {
             Operand = operand;
+        }
+
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            if (Operand == null)
+                return "undefined";
+            else if (Operand is String)
+            {
+                using (var writer = new StringWriter())
+                {
+                    using (var provider = CodeDomProvider.CreateProvider("CSharp"))
+                    {
+                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand), writer, null);
+                        return writer.ToString();
+                    }
+                }
+            }
+            else
+                return Operand.ToString();
         }
     }
 }

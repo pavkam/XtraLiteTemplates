@@ -28,8 +28,9 @@
 namespace XtraLiteTemplates
 {
     using System;
+    using System.Diagnostics;
 
-    public sealed class UnaryOperatorExpressionNode : OperatorExpressionNode
+    internal sealed class UnaryOperatorExpressionNode : OperatorExpressionNode
     {
         public new UnaryOperator Operator
         {
@@ -44,6 +45,21 @@ namespace XtraLiteTemplates
         public UnaryOperatorExpressionNode(ExpressionNode parent, UnaryOperator @operator)
             : base(parent, @operator)
         {
+        }
+
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            var childAsString = Child != null ? Child.ToString(style) : null;
+
+            String result = null;
+
+            if (style == ExpressionFormatStyle.Canonical)
+                result = String.Format("{0}{{{1}}}", Operator, childAsString);
+            else
+                result = String.Format("{0}{1}", Operator, childAsString);
+
+            Debug.Assert(result != null);
+            return result;
         }
     }
 }

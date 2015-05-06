@@ -28,8 +28,9 @@
 namespace XtraLiteTemplates
 {
     using System;
+    using System.Diagnostics;
 
-    public sealed class GroupOperatorExpressionNode : OperatorExpressionNode
+    internal sealed class GroupOperatorExpressionNode : OperatorExpressionNode
     {
         public new GroupOperator Operator
         {
@@ -44,6 +45,23 @@ namespace XtraLiteTemplates
         internal GroupOperatorExpressionNode(ExpressionNode parent, GroupOperator @operator)
             : base(parent, @operator)
         {
+        }
+
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            var childAsString = Child != null ? Child.ToString(style) : null;
+
+            String result = null;
+
+            if (style == ExpressionFormatStyle.Arithmetic)
+                result = String.Format("{0} {1} {2}", Operator.Symbol, childAsString, Operator.Terminator);
+            else if (style == ExpressionFormatStyle.Polish)
+                result = String.Format("{0}{1}{2}", Operator.Symbol, childAsString, Operator.Terminator);
+            else if (style == ExpressionFormatStyle.Canonical)
+                result = String.Format("{0}{{{1}}}", Operator, childAsString);
+
+            Debug.Assert(result != null);
+            return result;
         }
     }
 }
