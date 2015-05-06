@@ -41,7 +41,7 @@ namespace XtraLiteTemplates
             PascalStyle = CStyle;
         }
 
-        protected SubscriptOperator(String symbol, String terminator)
+        public SubscriptOperator(String symbol, String terminator)
             : base(symbol, terminator)
         {
         }

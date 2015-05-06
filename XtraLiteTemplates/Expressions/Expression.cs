@@ -106,27 +106,27 @@ namespace XtraLiteTemplates
                 var unary = m_current as UnaryOperatorExpressionNode;
                 if (unary != null)
                 {
-                    Debug.Assert(unary.OperandNode == null);
-                    unary.OperandNode = new ConstantExpressionNode(unary, constant);
+                    Debug.Assert(unary.Child == null);
+                    unary.Child = new ConstantExpressionNode(unary, constant);
 
-                    m_current = unary.OperandNode;
+                    m_current = unary.Child;
                 }
 
                 var group = m_current as GroupOperatorExpressionNode;
-                if (group != null && group.FirstOperandNode == null)
+                if (group != null && group.Child == null)
                 {
-                    group.FirstOperandNode = new ConstantExpressionNode(group, constant);
-                    m_current = group.FirstOperandNode;
+                    group.Child = new ConstantExpressionNode(group, constant);
+                    m_current = group.Child;
                 }
 
                 var binary = m_current as BinaryOperatorExpressionNode;
                 if (binary != null)
                 {
-                    Debug.Assert(binary.LeftOperandNode != null);
-                    Debug.Assert(binary.RightOperandNode == null);
-                    binary.RightOperandNode = new ConstantExpressionNode(binary, constant);
+                    Debug.Assert(binary.LeftNode != null);
+                    Debug.Assert(binary.RightNode == null);
+                    binary.RightNode = new ConstantExpressionNode(binary, constant);
 
-                    m_current = binary.RightOperandNode;
+                    m_current = binary.RightNode;
                 }
             }
         }
@@ -143,11 +143,11 @@ namespace XtraLiteTemplates
                 var binary = m_current as BinaryOperatorExpressionNode;
                 var group = m_current as GroupOperatorExpressionNode;
 
-                Debug.Assert(unary == null || unary.OperandNode == null);
-                Debug.Assert(binary == null || binary.RightOperandNode == null);
-                Debug.Assert(binary == null || binary.LeftOperandNode != null);
+                Debug.Assert(unary == null || unary.Child == null);
+                Debug.Assert(binary == null || binary.RightNode == null);
+                Debug.Assert(binary == null || binary.LeftNode != null);
 
-                if (group != null && group.FirstOperandNode != null)
+                if (group != null && group.Child != null)
                     ExpressionException.UnexpectedOperator(symbol);
 
                 /* Binary operations only can be applied here. */
@@ -169,17 +169,17 @@ namespace XtraLiteTemplates
 
                 /* Attach the node. */
                 if (unary != null)
-                    unary.OperandNode = m_current;
+                    unary.Child = m_current;
                 else if (group != null)
-                    group.FirstOperandNode = m_current;
+                    group.Child = m_current;
                 else if (binary != null)
-                    binary.RightOperandNode = m_current;
+                    binary.RightNode = m_current;
                 else
                     Debug.Assert(false);
             }
             else if (m_current is ConstantExpressionNode || m_current is GroupOperatorExpressionNode)
             {
-                if (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).FirstOperandNode == null)
+                if (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null)
                     ExpressionException.UnexpectedOperator(symbol);
 
                 /* Binary operations only can be applied here. */
@@ -206,7 +206,7 @@ namespace XtraLiteTemplates
                         while (root.Parent != group)
                             root = root.Parent;
 
-                        group.FirstOperandNode = root;
+                        group.Child = root;
 
                         m_current = group;
                     }
@@ -232,11 +232,11 @@ namespace XtraLiteTemplates
 
                     m_current = new BinaryOperatorExpressionNode(parent, matchingBinary)
                     {
-                        LeftOperandNode = left,
+                        LeftNode = left,
                     };
                 
                     if (left.Parent is BinaryOperatorExpressionNode)
-                        (left.Parent as BinaryOperatorExpressionNode).RightOperandNode = m_current;
+                        (left.Parent as BinaryOperatorExpressionNode).RightNode = m_current;
                     left.Parent = m_current;
                 }
             }
@@ -257,25 +257,25 @@ namespace XtraLiteTemplates
 
             var unary = node as UnaryOperatorExpressionNode;
             if (unary != null)
-                return String.Format("{0}{1}", unary.Operator, ToString(unary.OperandNode, style));
+                return String.Format("{0}{1}", unary.Operator, ToString(unary.Child, style));
             
             var binary = node as BinaryOperatorExpressionNode;
             if (binary != null)
             {
                 if (style == FormattingStyle.Arithmetic)
                 {
-                    return String.Format("{0} {1} {2}", ToString(binary.LeftOperandNode, style),
-                        binary.Operator.Symbol, ToString(binary.RightOperandNode, style));
+                    return String.Format("{0} {1} {2}", ToString(binary.LeftNode, style),
+                        binary.Operator.Symbol, ToString(binary.RightNode, style));
                 } 
                 else if (style == FormattingStyle.Polish)
                 {
                     return String.Format("{0} {1} {2}",
-                        binary.Operator, ToString(binary.LeftOperandNode, style), ToString(binary.RightOperandNode, style));
+                        binary.Operator, ToString(binary.LeftNode, style), ToString(binary.RightNode, style));
                 } 
                 else
                 {
                     return String.Format("{0}{{{1},{2}}}",
-                        binary.Operator, ToString(binary.LeftOperandNode, style), ToString(binary.RightOperandNode, style));
+                        binary.Operator, ToString(binary.LeftNode, style), ToString(binary.RightNode, style));
                 }
             }
 
@@ -285,16 +285,16 @@ namespace XtraLiteTemplates
                 if (style == FormattingStyle.Arithmetic)
                 {
                     return String.Format("{0} {1} {2}", group.Operator.Symbol,
-                        ToString(group.FirstOperandNode, style), group.Operator.Terminator);
+                        ToString(group.Child, style), group.Operator.Terminator);
                 }
                 else if (style == FormattingStyle.Polish)
                 {
                     return String.Format("{0}{1}{2}", group.Operator.Symbol,
-                        ToString(group.FirstOperandNode, style), group.Operator.Terminator);
+                        ToString(group.Child, style), group.Operator.Terminator);
                 }
                 else
                 {
-                    return String.Format("{0}{{{1}}}", group.Operator, ToString(group.FirstOperandNode, style));
+                    return String.Format("{0}{{{1}}}", group.Operator, ToString(group.Child, style));
                 }
             }
 

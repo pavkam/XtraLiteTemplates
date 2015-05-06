@@ -39,7 +39,7 @@ namespace XtraLiteTemplates
             }
         }
 
-        public ExpressionNode OperandNode { get; internal set; }
+        public ExpressionNode Child { get; internal set; }
 
         public UnaryOperatorExpressionNode(ExpressionNode parent, UnaryOperator @operator)
             : base(parent, @operator)

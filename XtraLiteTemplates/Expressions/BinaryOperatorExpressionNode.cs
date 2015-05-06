@@ -25,6 +25,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+
 namespace XtraLiteTemplates
 {
     using System;
@@ -39,9 +40,9 @@ namespace XtraLiteTemplates
             }
         }
 
-        public ExpressionNode LeftOperandNode { get; internal set; }
+        public ExpressionNode LeftNode { get; internal set; }
 
-        public ExpressionNode RightOperandNode { get; internal set; }
+        public ExpressionNode RightNode { get; internal set; }
 
         internal BinaryOperatorExpressionNode(ExpressionNode parent, BinaryOperator @operator)
             : base(parent, @operator)

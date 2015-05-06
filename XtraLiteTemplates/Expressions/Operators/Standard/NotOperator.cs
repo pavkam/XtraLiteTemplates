@@ -46,13 +46,13 @@ namespace XtraLiteTemplates
         {
         }
 
-        public override Boolean Evaluate(Boolean arg, out Object result)
+        protected override Boolean Evaluate(Boolean arg, out Object result)
         {
             result = !arg;
             return true;
         }
 
-        public override Boolean Evaluate(Int64 arg, out Object result)
+        protected override Boolean Evaluate(Int64 arg, out Object result)
         {
             result = ~arg;
             return true;

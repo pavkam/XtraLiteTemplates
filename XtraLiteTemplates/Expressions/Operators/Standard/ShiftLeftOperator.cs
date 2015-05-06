@@ -46,7 +46,7 @@ namespace XtraLiteTemplates
         {
         }
 
-        public override Boolean Evaluate(Int64 left, Int64 right, out Object result)
+        protected override Boolean Evaluate(Int64 left, Int64 right, out Object result)
         {
             result = left << (Int32)right;
             return true;

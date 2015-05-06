@@ -74,25 +74,25 @@ namespace XtraLiteTemplates
             return false;
         }
 
-        public virtual Boolean Evaluate(Int64 left, Int64 right, out Object result)
+        protected virtual Boolean Evaluate(Int64 left, Int64 right, out Object result)
         {
             result = null;
             return false;
         }
 
-        public virtual Boolean Evaluate(Double left, Double right, out Object result)
+        protected virtual Boolean Evaluate(Double left, Double right, out Object result)
         {
             result = null;
             return false;
         }
 
-        public virtual Boolean Evaluate(Boolean left, Boolean right, out Object result)
+        protected virtual Boolean Evaluate(Boolean left, Boolean right, out Object result)
         {
             result = null;
             return false;
         }
 
-        public virtual Boolean Evaluate(String left, String right, out Object result)
+        protected virtual Boolean Evaluate(String left, String right, out Object result)
         {
             result = null;
             return false;

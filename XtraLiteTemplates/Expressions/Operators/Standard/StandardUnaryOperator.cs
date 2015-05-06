@@ -48,7 +48,7 @@ namespace XtraLiteTemplates
                 return Evaluate(arg_f, out result);
             Boolean arg_b;
             if (TryAsBoolean(arg, out arg_b))
-                return Evaluate(arg_f, out result);
+                return Evaluate(arg_b, out result);
             String arg_s;
             if (TryAsString(arg, out arg_s))
                 return Evaluate(arg_f, out result);
@@ -58,25 +58,25 @@ namespace XtraLiteTemplates
             return false;
         }
 
-        public virtual Boolean Evaluate(String arg, out Object result)
+        protected virtual Boolean Evaluate(String arg, out Object result)
         {
             result = null;
             return false;
         }
 
-        public virtual Boolean Evaluate(Int64 arg, out Object result)
+        protected virtual Boolean Evaluate(Int64 arg, out Object result)
         {
             result = null;
             return false;
         }
 
-        public virtual Boolean Evaluate(Double arg, out Object result)
+        protected virtual Boolean Evaluate(Double arg, out Object result)
         {
             result = null;
             return false;
         }
 
-        public virtual Boolean Evaluate(Boolean arg, out Object result)
+        protected virtual Boolean Evaluate(Boolean arg, out Object result)
         {
             result = null;
             return false;

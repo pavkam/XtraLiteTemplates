@@ -43,7 +43,7 @@ namespace XtraLiteTemplates
             Terminator = terminator;
         }
 
-        public virtual Boolean Evaluate(Object arg, Object result)
+        public virtual Boolean Evaluate(Object arg, out Object result)
         {
             result = arg;
             return true;
