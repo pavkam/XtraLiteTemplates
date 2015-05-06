@@ -1,9 +1,28 @@
 ﻿<Properties StartupItem="XtraLiteTemplates/XtraLiteTemplates/XtraLiteTemplates.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates/Expressions/ConstantExpressionNode.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs">
     <Files>
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/ConstantExpressionNode.cs" Line="34" Column="11" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/ConstantExpressionNode.cs" Line="34" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/TokenizerTest.cs" Line="282" Column="45" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/ExpressionTests.cs" Line="40" Column="49" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/packages.config" Line="1" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs" Line="33" Column="30" />
     </Files>
+    <Pads>
+      <Pad Id="MonoDevelop.NUnit.TestPad">
+        <State name="__root__">
+          <Node name="XtraLiteTemplates" expanded="True" selected="True">
+            <Node name="XtraLiteTemplates.NUnit" expanded="True">
+              <Node name="XtraLiteTemplates" expanded="True">
+                <Node name="NUnit" expanded="True">
+                  <Node name="ExpressionTests" expanded="True" />
+                </Node>
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore />

@@ -58,7 +58,7 @@ namespace XtraLiteTemplates.NUnit
             }
             catch (Exception e)
             {
-                Assert.IsInstanceOfType(typeof(ParseException), e);
+                Assert.IsInstanceOf(typeof(ParseException), e);
                 Assert.AreEqual(String.Format("Unexpected character '{0}' found at position {1}.", character, index), e.Message);
                 if (e is ParseException)
                 {
@@ -75,7 +75,7 @@ namespace XtraLiteTemplates.NUnit
             }
             catch (Exception e)
             {
-                Assert.IsInstanceOfType(typeof(ParseException), e);
+                Assert.IsInstanceOf(typeof(ParseException), e);
                 Assert.AreEqual(String.Format("Invalid escape character '{0}' at position {1}.", character, index), e.Message);
                 if (e is ParseException)
                 {
@@ -92,7 +92,7 @@ namespace XtraLiteTemplates.NUnit
             }
             catch (Exception e)
             {
-                Assert.IsInstanceOfType(typeof(ParseException), e);
+                Assert.IsInstanceOf(typeof(ParseException), e);
                 Assert.AreEqual(String.Format("Unexpected end of stream detected at position {0}.", index), e.Message);
                 if (e is ParseException)
                 {

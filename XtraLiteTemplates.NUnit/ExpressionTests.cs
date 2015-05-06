@@ -54,17 +54,8 @@ namespace XtraLiteTemplates.NUnit
             expression.FeedSymbol(")");
             expression.Close(true);
 
-            dynamic a = "Hello";
-
-            if (a / "hello")
-            {
-
-            }
-
             var repr = expression.ToString(ExpressionFormatStyle.Canonical);
             Assert.AreEqual("1 + 2", repr);
-
-
         }
     }
 }
