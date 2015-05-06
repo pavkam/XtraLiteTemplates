@@ -9,7 +9,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseContruction_1()
         {
-            var expression = Expression.CreateStandard();
+            var expression = Expression.CreateStandardCStyle();
 
             expression.FeedConstant(1.00);
             expression.FeedSymbol("+");
@@ -24,7 +24,7 @@ namespace XtraLiteTemplates.NUnit
             expression.FeedSymbol(")");
             expression.Close();
 
-            var repr = expression.ToString();
+            var repr = expression.ToString(Expression.FormattingStyle.Canonical);
             Assert.AreEqual("1 + 2", repr);
         }
     }

@@ -28,33 +28,18 @@
 namespace XtraLiteTemplates
 {
     using System;
-    using System.Diagnostics;
 
-    public class ExpressionException : InvalidOperationException
+    public abstract class OperatorExpressionNode : ExpressionNode
     {
-        internal ExpressionException(String format, params Object[] args)
-            : base(String.Format(format, args))
-        {
-        }
+        public Operator Operator { get; private set; }
 
-        internal static void UnexpectedConstant(Object operand)
+        internal OperatorExpressionNode(ExpressionNode parent, Operator @operator)
+            : base(parent)
         {
-            throw new ExpressionException("Unexpected constant value '{0}' encountered while parsing expression.", operand);
-        }
+            Expect.NotNull("operator", @operator);
 
-        internal static void UndefinedOperator(String symbol)
-        {
-            throw new ExpressionException("Undefined or un-supported operator '{0}' encountered while parsing expression.", symbol);
-        }
-
-        internal static void UnexpectedOperator(String symbol)
-        {
-            throw new ExpressionException("Unexpected operator '{0}' encountered while parsing expression.", symbol);
-        }
-
-        internal static void UnmatchedGroupOperator(String endSymbol)
-        {
-            throw new ExpressionException("Unexpected group end symbol '{0}'. No matching group found.", endSymbol);
+            Operator = @operator;
         }
     }
 }
+

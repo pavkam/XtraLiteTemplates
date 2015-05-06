@@ -29,18 +29,21 @@ namespace XtraLiteTemplates
 {
     using System;
 
-    public sealed class GroupOperatorExpressionNode : ExpressionNode
+    public sealed class GroupOperatorExpressionNode : OperatorExpressionNode
     {
-        public GroupOperator Operator { get; private set; }
+        public new GroupOperator Operator
+        {
+            get
+            {
+                return base.Operator as GroupOperator;
+            }
+        }
 
         public ExpressionNode FirstOperandNode { get; internal set; }
 
         internal GroupOperatorExpressionNode(ExpressionNode parent, GroupOperator @operator)
-            : base(parent)
+            : base(parent, @operator)
         {
-            Expect.NotNull("operator", @operator);
-
-            Operator = @operator;
         }
     }
 }

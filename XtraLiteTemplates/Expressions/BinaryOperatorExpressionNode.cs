@@ -29,20 +29,23 @@ namespace XtraLiteTemplates
 {
     using System;
 
-    public sealed class BinaryOperatorExpressionNode : ExpressionNode
+    public sealed class BinaryOperatorExpressionNode : OperatorExpressionNode
     {
-        public BinaryOperator Operator { get; private set; }
+        public new BinaryOperator Operator
+        {
+            get
+            {
+                return base.Operator as BinaryOperator;
+            }
+        }
 
         public ExpressionNode LeftOperandNode { get; internal set; }
 
         public ExpressionNode RightOperandNode { get; internal set; }
 
         internal BinaryOperatorExpressionNode(ExpressionNode parent, BinaryOperator @operator)
-            : base(parent)
+            : base(parent, @operator)
         {
-            Expect.NotNull("operator", @operator);
-
-            Operator = @operator;
         }
     }
 }

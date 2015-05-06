@@ -39,7 +39,7 @@ namespace XtraLiteTemplates
             Expect.GreaterThan("precedence", precedence, 1);
         }
 
-        public abstract Boolean Evaluate(Object left, Object right, Object result);
+        public abstract Boolean Evaluate(Object left, Object right, out Object result);
     }
 }
 

@@ -37,7 +37,7 @@ namespace XtraLiteTemplates
         {
         }
 
-        public abstract Boolean Evaluate(Object arg, Object result);
+        public abstract Boolean Evaluate(Object arg, out Object result);
     }
 }
 

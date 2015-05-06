@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
@@ -32,6 +32,25 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Expressions\OperatorExpressionNode.cs" />
+    <Compile Include="Expressions\Operators\Standard\SubscriptOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\ShiftRightOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\ShiftLeftOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\GreaterThanOrEqualsOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\GreaterThanOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\LowerThanOrEqualsOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\LowerThanOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\NotEqualsOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\EqualsOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\XorOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\OrOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\ModuloOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\DivideOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\AndOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\StandardBinaryOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\StandardUnaryOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\MultiplyOperator.cs" />
+    <Compile Include="Expressions\Operators\Standard\SubtractOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="Token.cs" />
@@ -44,7 +63,6 @@
     <Compile Include="Expressions\BinaryOperatorExpressionNode.cs" />
     <Compile Include="Expressions\Operators\UnaryOperator.cs" />
     <Compile Include="Expressions\Operators\BinaryOperator.cs" />
-    <Compile Include="Expressions\Operators\StandardOperators.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\ExpressionException.cs" />
     <Compile Include="Expressions\Operators\GroupOperator.cs" />
@@ -56,10 +74,5 @@
     <Compile Include="Expressions\Operators\Standard\SumOperator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <Folder Include="Expressions\" />
-    <Folder Include="Expressions\Operators\" />
-    <Folder Include="Expressions\Operands\" />
-    <Folder Include="Expressions\Operators\Standard\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

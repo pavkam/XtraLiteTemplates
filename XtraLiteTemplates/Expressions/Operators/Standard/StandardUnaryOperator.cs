@@ -25,36 +25,62 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+
 namespace XtraLiteTemplates
 {
     using System;
-    using System.Diagnostics;
 
-    public class ExpressionException : InvalidOperationException
+    public abstract class StandardUnaryOperator : UnaryOperator
     {
-        internal ExpressionException(String format, params Object[] args)
-            : base(String.Format(format, args))
+        protected StandardUnaryOperator(String symbol)
+            : base(symbol)
         {
         }
 
-        internal static void UnexpectedConstant(Object operand)
+        public override Boolean Evaluate(Object arg, out Object result)
         {
-            throw new ExpressionException("Unexpected constant value '{0}' encountered while parsing expression.", operand);
+            /* Try normal operators. */
+            Int64 arg_i;
+            if (TryAsInteger(arg, out arg_i))
+                return Evaluate(arg_i, out result);
+            Double arg_f;
+            if (TryAsFloat(arg, out arg_f))
+                return Evaluate(arg_f, out result);
+            Boolean arg_b;
+            if (TryAsBoolean(arg, out arg_b))
+                return Evaluate(arg_f, out result);
+            String arg_s;
+            if (TryAsString(arg, out arg_s))
+                return Evaluate(arg_f, out result);
+
+            /* Default to Undefined. */
+            result = null;
+            return false;
         }
 
-        internal static void UndefinedOperator(String symbol)
+        public virtual Boolean Evaluate(String arg, out Object result)
         {
-            throw new ExpressionException("Undefined or un-supported operator '{0}' encountered while parsing expression.", symbol);
+            result = null;
+            return false;
         }
 
-        internal static void UnexpectedOperator(String symbol)
+        public virtual Boolean Evaluate(Int64 arg, out Object result)
         {
-            throw new ExpressionException("Unexpected operator '{0}' encountered while parsing expression.", symbol);
+            result = null;
+            return false;
         }
 
-        internal static void UnmatchedGroupOperator(String endSymbol)
+        public virtual Boolean Evaluate(Double arg, out Object result)
         {
-            throw new ExpressionException("Unexpected group end symbol '{0}'. No matching group found.", endSymbol);
+            result = null;
+            return false;
+        }
+
+        public virtual Boolean Evaluate(Boolean arg, out Object result)
+        {
+            result = null;
+            return false;
         }
     }
 }
+

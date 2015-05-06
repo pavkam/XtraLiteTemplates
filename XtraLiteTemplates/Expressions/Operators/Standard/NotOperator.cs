@@ -30,31 +30,32 @@ namespace XtraLiteTemplates
 {
     using System;
 
-    public abstract class NotOperator : UnaryOperator
+    public sealed class NotOperator : StandardUnaryOperator
     {
-        protected NotOperator(String symbol)
+        public static UnaryOperator CStyle { get; private set; }
+        public static UnaryOperator PascalStyle { get; private set; }
+
+        static NotOperator()
+        {
+            CStyle = new NotOperator("!");
+            PascalStyle = new NotOperator("not");
+        }
+
+        public NotOperator(String symbol)
             : base(symbol)
         {
         }
 
-        public override Boolean Evaluate(Object arg, out Object result)
+        public override Boolean Evaluate(Boolean arg, out Object result)
         {
-            Boolean arg_b;
-            if (TryAsBoolean(arg, out arg_b))
-            {
-                result = !arg_b;
-                return true;
-            }
+            result = !arg;
+            return true;
+        }
 
-            Int64 arg_i;
-            if (TryAsInteger(arg, out arg_i))
-            {
-                result = !arg_i;
-                return true;
-            }
-
-            result = null;
-            return false;
+        public override Boolean Evaluate(Int64 arg, out Object result)
+        {
+            result = ~arg;
+            return true;
         }
     }
 }

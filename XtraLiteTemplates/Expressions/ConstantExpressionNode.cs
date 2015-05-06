@@ -31,13 +31,11 @@ namespace XtraLiteTemplates
 
     public sealed class ConstantExpressionNode : ExpressionNode
     {
-        public Operand Operand { get; private set; }
+        public Object Operand { get; private set; }
 
-        public ConstantExpressionNode(ExpressionNode parent, Operand operand)
+        public ConstantExpressionNode(ExpressionNode parent, Object operand)
             : base(parent)
         {
-            Expect.NotNull("operand", operand);
-
             Operand = operand;
         }
     }

@@ -25,36 +25,50 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+
 namespace XtraLiteTemplates
 {
     using System;
-    using System.Diagnostics;
 
-    public class ExpressionException : InvalidOperationException
+    public sealed class NotEqualsOperator : StandardBinaryOperator
     {
-        internal ExpressionException(String format, params Object[] args)
-            : base(String.Format(format, args))
+        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator PascalStyle { get; private set; }
+
+        static NotEqualsOperator()
+        {
+            CStyle = new NotEqualsOperator("!=");
+            PascalStyle = new NotEqualsOperator("<>");
+        }
+
+        public NotEqualsOperator(String symbol)
+            : base(symbol, 7)
         {
         }
 
-        internal static void UnexpectedConstant(Object operand)
+        public override Boolean Evaluate(Int64 left, Int64 right, out Object result)
         {
-            throw new ExpressionException("Unexpected constant value '{0}' encountered while parsing expression.", operand);
+            result = left != right;
+            return true;
         }
 
-        internal static void UndefinedOperator(String symbol)
+        public override Boolean Evaluate(Double left, Double right, out Object result)
         {
-            throw new ExpressionException("Undefined or un-supported operator '{0}' encountered while parsing expression.", symbol);
+            result = left != right;
+            return true;
         }
 
-        internal static void UnexpectedOperator(String symbol)
+        public override Boolean Evaluate(Boolean left, Boolean right, out Object result)
         {
-            throw new ExpressionException("Unexpected operator '{0}' encountered while parsing expression.", symbol);
+            result = left != right;
+            return true;
         }
 
-        internal static void UnmatchedGroupOperator(String endSymbol)
+        public override Boolean Evaluate(String left, String right, out Object result)
         {
-            throw new ExpressionException("Unexpected group end symbol '{0}'. No matching group found.", endSymbol);
+            result = left != right;
+            return true;
         }
     }
 }
+

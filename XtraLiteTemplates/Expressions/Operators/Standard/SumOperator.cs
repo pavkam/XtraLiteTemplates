@@ -30,31 +30,38 @@ namespace XtraLiteTemplates
 {
     using System;
 
-    public abstract class SumOperator : BinaryOperator
+    public sealed class SumOperator : StandardBinaryOperator
     {
-        protected SumOperator(String symbol)
+        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator PascalStyle { get; private set; }
+
+        static SumOperator()
+        {
+            CStyle = new SumOperator("+");
+            PascalStyle = CStyle;
+        }
+
+        public SumOperator(String symbol)
             : base(symbol, 4)
         {
         }
 
-        public override Boolean Evaluate(Object left, Object right, out Object result)
+        public override Boolean Evaluate(Int64 left, Int64 right, out Object result)
         {
-            Int64 arg_i;
-            if (TryAsInteger(arg, out arg_i))
-            {
-                result = -arg_i;
-                return true;
-            }
+            result = left + right;
+            return true;
+        }
 
-            Double arg_f;
-            if (TryAsFloat(arg, out arg_f))
-            {
-                result = -arg_f;
-                return true;
-            }
+        public override Boolean Evaluate(Double left, Double right, out Object result)
+        {
+            result = left + right;
+            return true;
+        }
 
-            result = null;
-            return false;
+        public override Boolean Evaluate(String left, String right, out Object result)
+        {
+            result = left + right;
+            return true;
         }
     }
 }

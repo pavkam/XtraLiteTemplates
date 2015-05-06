@@ -29,18 +29,21 @@ namespace XtraLiteTemplates
 {
     using System;
 
-    public sealed class UnaryOperatorExpressionNode : ExpressionNode
+    public sealed class UnaryOperatorExpressionNode : OperatorExpressionNode
     {
-        public UnaryOperator Operator { get; private set; }
+        public new UnaryOperator Operator
+        {
+            get
+            {
+                return base.Operator as UnaryOperator;
+            }
+        }
 
         public ExpressionNode OperandNode { get; internal set; }
 
         public UnaryOperatorExpressionNode(ExpressionNode parent, UnaryOperator @operator)
-            : base(parent)
+            : base(parent, @operator)
         {
-            Expect.NotNull("operator", @operator);
-
-            Operator = @operator;
         }
     }
 }

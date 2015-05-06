@@ -25,36 +25,26 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+
 namespace XtraLiteTemplates
 {
     using System;
-    using System.Diagnostics;
 
-    public class ExpressionException : InvalidOperationException
+    public sealed class SubscriptOperator : GroupOperator
     {
-        internal ExpressionException(String format, params Object[] args)
-            : base(String.Format(format, args))
+        public static GroupOperator CStyle { get; private set; }
+        public static GroupOperator PascalStyle { get; private set; }
+
+        static SubscriptOperator()
         {
+            CStyle = new SubscriptOperator("(", ")");
+            PascalStyle = CStyle;
         }
 
-        internal static void UnexpectedConstant(Object operand)
+        protected SubscriptOperator(String symbol, String terminator)
+            : base(symbol, terminator)
         {
-            throw new ExpressionException("Unexpected constant value '{0}' encountered while parsing expression.", operand);
-        }
-
-        internal static void UndefinedOperator(String symbol)
-        {
-            throw new ExpressionException("Undefined or un-supported operator '{0}' encountered while parsing expression.", symbol);
-        }
-
-        internal static void UnexpectedOperator(String symbol)
-        {
-            throw new ExpressionException("Unexpected operator '{0}' encountered while parsing expression.", symbol);
-        }
-
-        internal static void UnmatchedGroupOperator(String endSymbol)
-        {
-            throw new ExpressionException("Unexpected group end symbol '{0}'. No matching group found.", endSymbol);
         }
     }
 }
+

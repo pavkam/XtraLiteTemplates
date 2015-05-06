@@ -34,13 +34,19 @@ namespace XtraLiteTemplates
 
     public class Expression
     {
+        public enum FormattingStyle
+        {
+            Arithmetic,
+            Polish,
+            Canonical,
+        }
+
         private ExpressionNode m_current;
         private ExpressionNode m_root;
         private Dictionary<String, UnaryOperator> m_unaryOperators;
         private Dictionary<String, BinaryOperator> m_binaryOperators;
         private Dictionary<String, GroupOperator> m_startGroupOperators;
         private Dictionary<String, GroupOperator> m_endGroupOperators;
-
 
         public IEqualityComparer<String> Comparer { get; private set; }
 
@@ -80,38 +86,28 @@ namespace XtraLiteTemplates
         {
             Expect.NotNull("operator", @operator);
 
-            m_startGroupOperators.Add(@operator.StartSymbol, @operator);
-            m_endGroupOperators.Add(@operator.EndSymbol, @operator);
+            m_startGroupOperators.Add(@operator.Symbol, @operator);
+            m_endGroupOperators.Add(@operator.Terminator, @operator);
         }
 
-        private void FeedConstant(Object value)
+        public void FeedConstant(Object constant)
         {
-            Operand operand;
-            if (value is Double)
-                operand = new Operand((Double)value);
-            else if (value is Boolean)
-                operand = new Operand((Boolean)value);
-            else if (value != null)
-                operand = new Operand(value.ToString());
-            else
-                operand = Operand.Undefined;
-                    
             if (m_current == null)
             {
                 /* This is the first node ever. */
-                m_current = new ConstantExpressionNode(null, operand);
+                m_current = new ConstantExpressionNode(null, constant);
             }
             else
             {
                 /* Check that the current node is not a previous constant. */
                 if (m_current is ConstantExpressionNode)
-                    ExpressionException.UnexpectedConstant(operand);
+                    ExpressionException.UnexpectedConstant(constant);
 
                 var unary = m_current as UnaryOperatorExpressionNode;
                 if (unary != null)
                 {
                     Debug.Assert(unary.OperandNode == null);
-                    unary.OperandNode = new ConstantExpressionNode(unary, operand);
+                    unary.OperandNode = new ConstantExpressionNode(unary, constant);
 
                     m_current = unary.OperandNode;
                 }
@@ -119,7 +115,7 @@ namespace XtraLiteTemplates
                 var group = m_current as GroupOperatorExpressionNode;
                 if (group != null && group.FirstOperandNode == null)
                 {
-                    group.FirstOperandNode = new ConstantExpressionNode(group, operand);
+                    group.FirstOperandNode = new ConstantExpressionNode(group, constant);
                     m_current = group.FirstOperandNode;
                 }
 
@@ -128,26 +124,11 @@ namespace XtraLiteTemplates
                 {
                     Debug.Assert(binary.LeftOperandNode != null);
                     Debug.Assert(binary.RightOperandNode == null);
-                    binary.RightOperandNode = new ConstantExpressionNode(binary, operand);
+                    binary.RightOperandNode = new ConstantExpressionNode(binary, constant);
 
                     m_current = binary.RightOperandNode;
                 }
             }
-        }
-
-        public void FeedConstant(Double value)
-        {
-            FeedConstant((Object)value);
-        }
-
-        public void FeedConstant(String value)
-        {
-            FeedConstant((Object)value);
-        }
-
-        public void FeedConstant(Boolean value)
-        {
-            FeedConstant((Object)value);
         }
 
         public void FeedSymbol(String symbol)
@@ -216,10 +197,19 @@ namespace XtraLiteTemplates
                             break;
                     }
 
-                    if (group == null || group.Operator.EndSymbol != symbol)
+                    if (group == null || group.Operator.Terminator != symbol)
                         ExpressionException.UnmatchedGroupOperator(symbol);
                     else
+                    {
+                        /* Find root of the group. */
+                        var root = m_current;
+                        while (root.Parent != group)
+                            root = root.Parent;
+
+                        group.FirstOperandNode = root;
+
                         m_current = group;
+                    }
                 }
                 else
                 {
@@ -232,16 +222,7 @@ namespace XtraLiteTemplates
                     ExpressionNode left = m_current, parent = m_current.Parent;
                     while (left.Parent != null)
                     {
-                        Int32 prec = 0;
-                        if (left.Parent is BinaryOperatorExpressionNode)
-                            prec = (left.Parent as BinaryOperatorExpressionNode).Operator.Precedence;
-                        else if (left.Parent is UnaryOperatorExpressionNode)
-                            prec = 1;
-                        else if (left.Parent is GroupOperatorExpressionNode)
-                            prec = 0;
-                        else
-                            Debug.Assert(false);
-
+                        Int32 prec = ((OperatorExpressionNode)left.Parent).Operator.Precedence;
                         if (prec > matchingBinary.Precedence)
                             break;
 
@@ -270,26 +251,51 @@ namespace XtraLiteTemplates
                 m_root = m_root.Parent;
         }
 
-        private String ToString(ExpressionNode node)
+        private String ToString(ExpressionNode node, FormattingStyle style)
         {
             Debug.Assert(node != null);
 
             var unary = node as UnaryOperatorExpressionNode;
             if (unary != null)
-                return String.Format("{0}{1}", unary.Operator, ToString(unary.OperandNode));
+                return String.Format("{0}{1}", unary.Operator, ToString(unary.OperandNode, style));
             
             var binary = node as BinaryOperatorExpressionNode;
             if (binary != null)
             {
-                return String.Format("{0} {1} {2}", ToString(binary.LeftOperandNode), 
-                    binary.Operator.Symbol, ToString(binary.RightOperandNode));
+                if (style == FormattingStyle.Arithmetic)
+                {
+                    return String.Format("{0} {1} {2}", ToString(binary.LeftOperandNode, style),
+                        binary.Operator.Symbol, ToString(binary.RightOperandNode, style));
+                } 
+                else if (style == FormattingStyle.Polish)
+                {
+                    return String.Format("{0} {1} {2}",
+                        binary.Operator, ToString(binary.LeftOperandNode, style), ToString(binary.RightOperandNode, style));
+                } 
+                else
+                {
+                    return String.Format("{0}{{{1},{2}}}",
+                        binary.Operator, ToString(binary.LeftOperandNode, style), ToString(binary.RightOperandNode, style));
+                }
             }
 
             var group = node as GroupOperatorExpressionNode;
             if (group != null)
             {
-                return String.Format("{0} {1} {2}", group.Operator.StartSymbol, 
-                    ToString(group.FirstOperandNode), group.Operator.EndSymbol);
+                if (style == FormattingStyle.Arithmetic)
+                {
+                    return String.Format("{0} {1} {2}", group.Operator.Symbol,
+                        ToString(group.FirstOperandNode, style), group.Operator.Terminator);
+                }
+                else if (style == FormattingStyle.Polish)
+                {
+                    return String.Format("{0}{1}{2}", group.Operator.Symbol,
+                        ToString(group.FirstOperandNode, style), group.Operator.Terminator);
+                }
+                else
+                {
+                    return String.Format("{0}{{{1}}}", group.Operator, ToString(group.FirstOperandNode, style));
+                }
             }
 
             var constant = node as ConstantExpressionNode;
@@ -303,34 +309,89 @@ namespace XtraLiteTemplates
 
         public override String ToString()
         {
+            return ToString(FormattingStyle.Arithmetic);
+        }
+
+        public String ToString(FormattingStyle style)
+        {
             if (m_root != null)
-                return ToString(m_root);
+                return ToString(m_root, style);
             else
                 return null;
         }
 
-
-        public static Expression CreateStandard()
+        public static Expression CreateStandardCStyle()
         {
-            var expression = new Expression(StringComparer.InvariantCultureIgnoreCase);
+            return CreateStandardCStyle(StringComparer.InvariantCultureIgnoreCase);
+        }
 
-            expression.RegisterOperator(StandardOperators.Add);
-            expression.RegisterOperator(StandardOperators.And);
-            expression.RegisterOperator(StandardOperators.Divide);
-            expression.RegisterOperator(StandardOperators.Equal);
-            expression.RegisterOperator(StandardOperators.GreaterThan);
-            expression.RegisterOperator(StandardOperators.GreaterThanOrEqual);
-            expression.RegisterOperator(StandardOperators.LowerThan);
-            expression.RegisterOperator(StandardOperators.LowerThanOrEqual);
-            expression.RegisterOperator(StandardOperators.Multiply);
-            expression.RegisterOperator(StandardOperators.Negate);
-            expression.RegisterOperator(StandardOperators.Not);
-            expression.RegisterOperator(StandardOperators.NotEqual);
-            expression.RegisterOperator(StandardOperators.Or);
-            expression.RegisterOperator(StandardOperators.Paranthesis);
-            expression.RegisterOperator(StandardOperators.Plus);
-            expression.RegisterOperator(StandardOperators.Subtract);
-            expression.RegisterOperator(StandardOperators.Xor);
+        public static Expression CreateStandardCStyle(IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("comparer", comparer);
+
+            var expression = new Expression(comparer);
+
+            expression.RegisterOperator(SubscriptOperator.CStyle);
+
+            expression.RegisterOperator(OrOperator.CStyle);
+            expression.RegisterOperator(AndOperator.CStyle);
+            expression.RegisterOperator(NotOperator.CStyle);
+            expression.RegisterOperator(ShiftLeftOperator.CStyle);
+            expression.RegisterOperator(ShiftRightOperator.CStyle);
+            expression.RegisterOperator(XorOperator.CStyle);
+
+            expression.RegisterOperator(EqualsOperator.CStyle);
+            expression.RegisterOperator(NotEqualsOperator.CStyle);
+            expression.RegisterOperator(GreaterThanOperator.CStyle);
+            expression.RegisterOperator(GreaterThanOrEqualsOperator.CStyle);
+            expression.RegisterOperator(LowerThanOperator.CStyle);
+            expression.RegisterOperator(LowerThanOrEqualsOperator.CStyle);
+
+            expression.RegisterOperator(NeutralOperator.CStyle);
+            expression.RegisterOperator(NegateOperator.CStyle);
+            expression.RegisterOperator(ModuloOperator.CStyle);
+            expression.RegisterOperator(DivideOperator.CStyle);
+            expression.RegisterOperator(MultiplyOperator.CStyle);
+            expression.RegisterOperator(SubtractOperator.CStyle);
+            expression.RegisterOperator(SumOperator.CStyle);
+
+            return expression;
+        }
+
+        public static Expression CreateStandardPascalStyle()
+        {
+            return CreateStandardPascalStyle(StringComparer.InvariantCultureIgnoreCase);
+        }
+
+        public static Expression CreateStandardPascalStyle(IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("comparer", comparer);
+
+            var expression = new Expression(comparer);
+
+            expression.RegisterOperator(SubscriptOperator.PascalStyle);
+
+            expression.RegisterOperator(OrOperator.PascalStyle);
+            expression.RegisterOperator(AndOperator.PascalStyle);
+            expression.RegisterOperator(NotOperator.PascalStyle);
+            expression.RegisterOperator(ShiftLeftOperator.PascalStyle);
+            expression.RegisterOperator(ShiftRightOperator.PascalStyle);
+            expression.RegisterOperator(XorOperator.PascalStyle);
+
+            expression.RegisterOperator(EqualsOperator.PascalStyle);
+            expression.RegisterOperator(NotEqualsOperator.PascalStyle);
+            expression.RegisterOperator(GreaterThanOperator.PascalStyle);
+            expression.RegisterOperator(GreaterThanOrEqualsOperator.PascalStyle);
+            expression.RegisterOperator(LowerThanOperator.PascalStyle);
+            expression.RegisterOperator(LowerThanOrEqualsOperator.PascalStyle);
+
+            expression.RegisterOperator(NeutralOperator.PascalStyle);
+            expression.RegisterOperator(NegateOperator.PascalStyle);
+            expression.RegisterOperator(ModuloOperator.PascalStyle);
+            expression.RegisterOperator(DivideOperator.PascalStyle);
+            expression.RegisterOperator(MultiplyOperator.PascalStyle);
+            expression.RegisterOperator(SubtractOperator.PascalStyle);
+            expression.RegisterOperator(SumOperator.PascalStyle);
 
             return expression;
         }
