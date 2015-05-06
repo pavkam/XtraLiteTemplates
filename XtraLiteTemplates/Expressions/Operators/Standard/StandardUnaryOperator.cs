@@ -37,21 +37,23 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        public override Boolean Evaluate(Object arg, out Object result)
+        public override Boolean Evaluate(Object arg, EvaluationFlags evaluationFlags, out Object result)
         {
+            var treatUndefinedAsZero = evaluationFlags.HasFlag(EvaluationFlags.TreatUndefinedAsTypeDefaultValue);
+
             /* Try normal operators. */
-            Int64 arg_i;
-            if (TryAsInteger(arg, out arg_i))
-                return Evaluate(arg_i, out result);
-            Double arg_f;
-            if (TryAsFloat(arg, out arg_f))
-                return Evaluate(arg_f, out result);
-            Boolean arg_b;
-            if (TryAsBoolean(arg, out arg_b))
-                return Evaluate(arg_b, out result);
-            String arg_s;
-            if (TryAsString(arg, out arg_s))
-                return Evaluate(arg_f, out result);
+            Int64 _integer;
+            if (TryAsInteger(arg, treatUndefinedAsZero, out _integer))
+                return Evaluate(_integer, out result);
+            Boolean _boolean;
+            if (TryAsBoolean(arg, treatUndefinedAsZero, out _boolean))
+                return Evaluate(_boolean, out result);
+            Double _float;
+            if (TryAsFloat(arg, treatUndefinedAsZero, out _float))
+                return Evaluate(_float, out result);
+            String _string;
+            if (TryAsString(arg, treatUndefinedAsZero, out _string))
+                return Evaluate(_float, out result);
 
             /* Default to Undefined. */
             result = null;

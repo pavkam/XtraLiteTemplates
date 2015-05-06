@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.Expressions.Operators
             Terminator = terminator;
         }
 
-        public virtual Boolean Evaluate(Object arg, out Object result)
+        public virtual Boolean Evaluate(Object arg, EvaluationFlags evaluationFlags, out Object result)
         {
             result = arg;
             return true;

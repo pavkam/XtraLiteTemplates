@@ -30,21 +30,15 @@ namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
 
-    public abstract class BinaryOperator : Operator
+    [Flags]
+    public enum EvaluationFlags
     {
-        protected BinaryOperator(String symbol, Int32 precedence)
-            : base(symbol, precedence)
-        {
-            Expect.GreaterThan("precedence", precedence, 1);
-        }
-
-        public abstract Boolean Evaluate(Object left, Object right, EvaluationFlags evaluationFlags, out Object result);
-
-        public virtual Boolean EvaluateLeft(Object left, EvaluationFlags evaluationFlags, out Object result)
-        {
-            result = left;
-            return false;
-        }
+        EvaluateToUndefinedInsteadOfError = 1,
+        TreatUndefinedAsTypeDefaultValue = 2,
+        AllowConversionToInteger = 4,
+        AllowConversionToBoolean = 8,
+        AllowConversionToFloat = 16,
+        AllowConversionToString = 32,
     }
 }
 

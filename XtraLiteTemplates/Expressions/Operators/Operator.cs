@@ -46,8 +46,12 @@ namespace XtraLiteTemplates.Expressions.Operators
         }
 
 
-        protected static Boolean TryAsInteger(Object obj, out Int64 result)
+        protected static Boolean TryAsInteger(Object obj, 
+                                              Boolean treatUndefinedAsZero, Boolean allowConversion, out Int64 result)
         {
+            var success = true;
+            result = default(Int64);
+
             if (obj is Byte)
                 result = (Byte)obj;
             else if (obj is SByte)
@@ -64,66 +68,105 @@ namespace XtraLiteTemplates.Expressions.Operators
                 result = (Int64)obj;
             else if (obj is UInt64)
                 result = (Int64)obj;
-            else
+            else if (obj == null)
+                success = treatUndefinedAsZero;
+            else if (allowConversion)
             {
-                result = default(Int64);
-                return false;
+                Double _float;
+                success = TryAsFloat(obj, out _float, treatUndefinedAsZero, allowConversion);
+                if (success)
+                    result = Convert.ToInt64(_float);
             }
+            else
+                success = false;
 
-            return true;
+            return success;
         }
 
-        protected static Boolean TryAsFloat(Object obj, out Double result)
+        protected static Boolean TryAsFloat(Object obj, 
+                                            Boolean treatUndefinedAsZero, Boolean allowConversion, out Double result)
         {
-            if (obj is Single)
+            var success = true;
+            result = default(Double);
+
+            if (obj is Byte)
+                result = (Byte)obj;
+            else if (obj is SByte)
+                result = (SByte)obj;
+            else if (obj is Int16)
+                result = (Int16)obj;
+            else if (obj is UInt16)
+                result = (UInt16)obj;
+            else if (obj is Int32)
+                result = (Int32)obj;
+            else if (obj is UInt32)
+                result = (UInt32)obj;
+            else if (obj is Int64)
+                result = (Int64)obj;
+            else if (obj is UInt64)
+                result = (Int64)obj;
+            else if (obj is Single)
                 result = (Single)obj;
             else if (obj is Double)
                 result = (Double)obj;
-            else if (obj is Decimal)
-                result = Convert.ToDouble((Decimal)obj);
-            else
+            else if (obj == null)
+                success = treatUndefinedAsZero;
+            else if (allowConversion)
             {
-                Int64 integer;
-                if (TryAsInteger(obj, out integer))
-                    result = integer;
+                if (obj is Decimal)
+                    result = Convert.ToDouble((Decimal)obj);
                 else
-                {
-                    result = default(Int64);
-                    return false;
-                }
+                    success = Double.TryParse(obj.ToString(), out result);
             }
+            else
+                success = false;
 
-            return true;
+            return success;
         }
 
-        protected static Boolean TryAsBoolean(Object obj, out Boolean result)
+        protected static Boolean TryAsBoolean(Object obj, 
+                                              Boolean treatUndefinedAsZero, Boolean allowConversion, out Boolean result)
         {
+            var success = true;
+            result = default(Boolean);
+
             if (obj is Boolean)
                 result = (Boolean)obj;
-            else
+            else if (obj == null)
+                success = treatUndefinedAsZero;
+            else if (allowConversion)
             {
-                result = default(Boolean);
-                return false;
+                Int64 _integer;
+                success = TryAsInteger(obj, out _integer, treatUndefinedAsZero, allowConversion);
+                if (success)
+                    result = _integer != 0;
             }
+            else
+                success = false;
 
-            return true;
+            return success;
         }
 
-        protected static Boolean TryAsString(Object obj, out String result)
+        protected static Boolean TryAsString(Object obj, 
+                                             Boolean treatUndefinedAsZero, Boolean allowConversion, out String result)
         {
+            var success = true;
+            result = String.Empty;
+
             if (obj is String)
                 result = (String)obj;
-            else if (obj is Char[])
-                result = new String((Char[])obj);
-            else
+            else if (obj == null)
+                success = treatUndefinedAsZero;
+            else if (allowConversion)
             {
-                result = null;
-                return false;
+                var _chars = obj as Char[];
+                result = _chars != null ? new String(_chars) : obj.ToString();
             }
+            else
+                success = false;
 
-            return true;
+            return success;
         }
-
 
         public override String ToString()
         {

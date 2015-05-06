@@ -37,7 +37,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        public override Boolean Evaluate(Object left, Object right, out Object result)
+        public override Boolean Evaluate(Object left, Object right, EvaluationFlags evaluationFlags, out Object result)
         {
             /* Try normal operators. */
             Int64 left_i, right_i;
@@ -97,7 +97,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
             return false;
         }
 
-        public override Boolean EvaluateLeft(Object left, out Object result)
+        public override Boolean EvaluateLeft(Object left, EvaluationFlags evaluationFlags, out Object result)
         {
             /* Try normal operators. */
             Int64 arg_i;

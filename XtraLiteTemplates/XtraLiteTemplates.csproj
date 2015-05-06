@@ -73,6 +73,7 @@
     <Compile Include="Expressions\Operators\Standard\NegateOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\NotOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\SumOperator.cs" />
+    <Compile Include="Expressions\Operators\EvaluationFlags.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

@@ -37,7 +37,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         {
         }
 
-        public abstract Boolean Evaluate(Object arg, out Object result);
+        public abstract Boolean Evaluate(Object arg, EvaluationFlags evaluationFlags, out Object result);
     }
 }
 
