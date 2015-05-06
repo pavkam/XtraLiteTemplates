@@ -26,13 +26,14 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
     public sealed class NeutralOperator : StandardUnaryOperator
     {
         public static UnaryOperator CStyle { get; private set; }
+
         public static UnaryOperator PascalStyle { get; private set; }
 
         static NeutralOperator()

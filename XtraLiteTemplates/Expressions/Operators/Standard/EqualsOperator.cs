@@ -26,13 +26,14 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
     public sealed class EqualsOperator : StandardBinaryOperator
     {
         public static BinaryOperator CStyle { get; private set; }
+
         public static BinaryOperator PascalStyle { get; private set; }
 
         static EqualsOperator()

@@ -29,7 +29,7 @@ using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
-    using System;
+    using XtraLiteTemplates.Expressions;
 
     [TestFixture]
     public class ExpressionTests : TestBase

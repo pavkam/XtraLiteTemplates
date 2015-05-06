@@ -26,7 +26,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
 

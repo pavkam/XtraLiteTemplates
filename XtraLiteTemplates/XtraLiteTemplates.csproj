@@ -80,7 +80,7 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <DotNetNamingPolicy DirectoryNamespaceAssociation="Hierarchical" ResourceNamePolicy="FileFormatDefault" />
+          <DotNetNamingPolicy DirectoryNamespaceAssociation="PrefixedHierarchical" ResourceNamePolicy="FileFormatDefault" />
         </Policies>
       </Properties>
     </MonoDevelop>

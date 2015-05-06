@@ -26,11 +26,13 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Expressions
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
     public sealed class Expression
     {
@@ -47,9 +49,9 @@ namespace XtraLiteTemplates
             {
                 return
                     (m_current == null) ||
-                    (m_current is UnaryOperatorExpressionNode) ||
-                    (m_current is BinaryOperatorExpressionNode) ||
-                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null);
+                (m_current is UnaryOperatorExpressionNode) ||
+                (m_current is BinaryOperatorExpressionNode) ||
+                (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null);
             }
         }
 
@@ -198,7 +200,7 @@ namespace XtraLiteTemplates
                 return m_root != null;
             }
         }
-        
+
         public Boolean Started
         {
             get
@@ -213,9 +215,9 @@ namespace XtraLiteTemplates
 
             return 
                 m_unaryOperators.ContainsKey(symbol) ||
-                m_binaryOperators.ContainsKey(symbol) ||
-                m_startGroupOperators.ContainsKey(symbol) ||
-                m_endGroupOperators.ContainsKey(symbol);
+            m_binaryOperators.ContainsKey(symbol) ||
+            m_startGroupOperators.ContainsKey(symbol) ||
+            m_endGroupOperators.ContainsKey(symbol);
         }
 
         public IEqualityComparer<String> Comparer { get; private set; }
@@ -366,7 +368,7 @@ namespace XtraLiteTemplates
                     else
                         Debug.Assert(false);
                 }
-                else if (m_current is ConstantExpressionNode || m_current is ReferenceExpressionNode  || m_current is GroupOperatorExpressionNode)
+                else if (m_current is ConstantExpressionNode || m_current is ReferenceExpressionNode || m_current is GroupOperatorExpressionNode)
                 {
                     if (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null)
                         ExpressionException.UnexpectedOperator(symbol);

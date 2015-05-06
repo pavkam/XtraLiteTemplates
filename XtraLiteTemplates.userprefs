@@ -1,12 +1,13 @@
 ﻿<Properties StartupItem="XtraLiteTemplates/XtraLiteTemplates/XtraLiteTemplates.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/StandardUnaryOperator.cs">
     <Files>
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/ConstantExpressionNode.cs" Line="34" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/TokenizerTest.cs" Line="282" Column="45" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/ConstantExpressionNode.cs" Line="1" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/TokenizerTest.cs" Line="58" Column="14" />
       <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/ExpressionTests.cs" Line="40" Column="49" />
       <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/packages.config" Line="1" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs" Line="562" Column="10" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs" Line="538" Column="13" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/StandardUnaryOperator.cs" Line="31" Column="18" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.NUnit.TestPad">

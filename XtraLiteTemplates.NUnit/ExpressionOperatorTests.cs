@@ -30,6 +30,8 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
     [TestFixture]
     public class ExpressionOperatorTests : TestBase

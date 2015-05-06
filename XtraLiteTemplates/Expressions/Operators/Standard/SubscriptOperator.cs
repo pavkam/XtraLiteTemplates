@@ -26,13 +26,14 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
     public sealed class SubscriptOperator : GroupOperator
     {
         public static GroupOperator CStyle { get; private set; }
+
         public static GroupOperator PascalStyle { get; private set; }
 
         static SubscriptOperator()
