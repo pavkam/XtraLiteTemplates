@@ -40,6 +40,7 @@ namespace XtraLiteTemplates.Expressions
         private ExpressionNode m_root;
         private List<Operator> m_supportedOperators;
         private Func<IEvaluationContext, Object> m_function;
+        private Int32 m_groupLevel;
         private Dictionary<String, UnaryOperator> m_unaryOperators;
         private Dictionary<String, BinaryOperator> m_binaryOperators;
         private Dictionary<String, GroupOperator> m_startGroupOperators;
@@ -66,7 +67,7 @@ namespace XtraLiteTemplates.Expressions
                 new ConstantExpressionNode(m_current, value);
 
             if (!ContinuationExpected)
-                ExpressionException.UnexpectedExpressionNode(node);
+                ExpressionException.InvalidExpressionTerm(value);
 
             if (m_current != null)
             {
@@ -421,13 +422,14 @@ namespace XtraLiteTemplates.Expressions
                     {
                         /* This be a group-start symbol. Find the matching group. */
                         m_current = new GroupOperatorExpressionNode(m_current, matchingGroup);
+                        m_groupLevel++;
                     }
                     else
                     {
                         /* Only unary operators are allowed. */
                         UnaryOperator matchingUnary;
                         if (!m_unaryOperators.TryGetValue(symbol, out matchingUnary))
-                            ExpressionException.UndefinedOperator(symbol);
+                            ExpressionException.InvalidExpressionTerm(symbol);
 
                         m_current = new UnaryOperatorExpressionNode(m_current, matchingUnary);
                     }
@@ -443,7 +445,7 @@ namespace XtraLiteTemplates.Expressions
                 else if (m_current is ConstantExpressionNode || m_current is ReferenceExpressionNode || m_current is GroupOperatorExpressionNode)
                 {
                     if (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null)
-                        ExpressionException.UnexpectedOperator(symbol);
+                        ExpressionException.InvalidExpressionTerm(symbol);
 
                     /* Binary operations only can be applied here. */
                     GroupOperator matchingGroup;
@@ -461,7 +463,7 @@ namespace XtraLiteTemplates.Expressions
                         }
 
                         if (group == null || group.Operator.Terminator != symbol)
-                            ExpressionException.UnmatchedGroupOperator(symbol);
+                            ExpressionException.InvalidExpressionTerm(symbol);
                         else
                         {
                             /* Find root of the group. */
@@ -472,6 +474,7 @@ namespace XtraLiteTemplates.Expressions
                             group.Child = root;
 
                             m_current = group;
+                            m_groupLevel--;
                         }
                     }
                     else
@@ -479,7 +482,7 @@ namespace XtraLiteTemplates.Expressions
                         /* Binary operations only can be applied here. */
                         BinaryOperator matchingBinary;
                         if (!m_binaryOperators.TryGetValue(symbol, out matchingBinary))
-                            ExpressionException.UndefinedOperator(symbol);
+                            ExpressionException.InvalidExpressionTerm(symbol);
 
                         /* Apply precendence levels here. Go up the tree while the precendence is greater or equal. */
                         ExpressionNode left = m_current, parent = m_current.Parent;
@@ -527,14 +530,9 @@ namespace XtraLiteTemplates.Expressions
         {
             if (!Constructed)
             {
-                if (ContinuationExpected)
-                    ExpressionException.CannotCloseExpressionInvalidState(((OperatorExpressionNode)m_current).Operator);
+                if (ContinuationExpected || m_groupLevel > 0)
+                    ExpressionException.CannotConstructExpressionInvalidState();
 
-                /* The building process has ended. Find the root. */
-              /*  m_root = m_current;
-                while (m_root.Parent != null)
-                    m_root = m_root.Parent;
-                */
                 /* Reduce the expression if so was desired. */
                 m_root = Reduce(m_root);
                 m_function = Build(m_root);
@@ -560,21 +558,14 @@ namespace XtraLiteTemplates.Expressions
         public String ToString(ExpressionFormatStyle style)
         {
             if (m_root == null)
-                return null;
+                return "??";
             else
                 return m_root.ToString(style);
         }
 
         public static Expression CreateStandardCStyle()
         {
-            return CreateStandardCStyle(StringComparer.InvariantCultureIgnoreCase);
-        }
-
-        public static Expression CreateStandardCStyle(IEqualityComparer<String> comparer)
-        {
-            Expect.NotNull("comparer", comparer);
-
-            var expression = new Expression(comparer);
+            var expression = new Expression(StringComparer.Ordinal);
 
             expression.RegisterOperator(SubscriptOperator.CStyle);
 
@@ -605,14 +596,7 @@ namespace XtraLiteTemplates.Expressions
 
         public static Expression CreateStandardPascalStyle()
         {
-            return CreateStandardPascalStyle(StringComparer.InvariantCultureIgnoreCase);
-        }
-
-        public static Expression CreateStandardPascalStyle(IEqualityComparer<String> comparer)
-        {
-            Expect.NotNull("comparer", comparer);
-
-            var expression = new Expression(comparer);
+            var expression = new Expression(StringComparer.OrdinalIgnoreCase);
 
             expression.RegisterOperator(SubscriptOperator.PascalStyle);
 

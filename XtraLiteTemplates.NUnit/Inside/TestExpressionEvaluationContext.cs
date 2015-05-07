@@ -34,21 +34,58 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System.Diagnostics;
     using System.Linq;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
 
     public sealed class TestExpressionEvaluationContext : IEvaluationContext
     {
+        private Boolean m_gatherErrors;
         private Dictionary<String, Object> m_variables;
 
-        public Object HandleEvaluationError(Expressions.Operators.Operator @operator, Object operand)
+        public Object HandleEvaluationError(Operator @operator, Object operand)
         {
             Assert.NotNull(@operator);
-            return null;
+
+            if (m_gatherErrors)
+            {
+                var tuple = operand as Tuple<String>;
+                String operandStr = null;
+                if (tuple != null)
+                    operandStr = tuple.Item1;
+                else if (operand != null)
+                    operandStr = operand.ToString();
+
+                return Tuple.Create(String.Format("{0}{1}", @operator.Symbol, operandStr));
+            }
+            else
+                return null;
         }
 
-        public Object HandleEvaluationError(Expressions.Operators.Operator @operator, Object leftOperand, Object rightOperand)
+        public Object HandleEvaluationError(Operator @operator, Object leftOperand, Object rightOperand)
         {
             Assert.NotNull(@operator);
-            return null;
+
+            if (m_gatherErrors)
+            {
+                var leftTuple = leftOperand as Tuple<String>;
+                var rightTuple = rightOperand as Tuple<String>;
+
+                String leftOperandStr = null;
+                String rightOperandStr = null;
+
+                if (leftTuple != null)
+                    leftOperandStr = leftTuple.Item1;
+                else if (leftOperand != null)
+                    leftOperandStr = leftOperand.ToString();
+
+                if (rightTuple != null)
+                    rightOperandStr = rightTuple.Item1;
+                else if (rightOperand != null)
+                    rightOperandStr = rightOperand.ToString();
+
+                return Tuple.Create(String.Format("{0}{1}{2}", leftOperandStr, @operator.Symbol, rightOperandStr));
+            }
+            else
+                return null;
         }
 
         public Object GetVariable(String identifier)
@@ -62,12 +99,13 @@ namespace XtraLiteTemplates.NUnit.Inside
                 return null;
         }
 
-        public TestExpressionEvaluationContext(IEqualityComparer<String> comparer, 
+        public TestExpressionEvaluationContext(Boolean gatherErrors, IEqualityComparer<String> comparer, 
             IReadOnlyCollection<KeyValuePair<String, Object>> variables)
         {
             Debug.Assert(comparer != null);
             Debug.Assert(variables != null);
 
+            m_gatherErrors = gatherErrors;
             m_variables = variables.ToDictionary(k => k.Key, v => v.Value);
         }
     }

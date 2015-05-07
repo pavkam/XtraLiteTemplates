@@ -53,8 +53,8 @@ namespace XtraLiteTemplates.Expressions
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            var leftAsString = LeftNode != null ? LeftNode.ToString(style) : null;
-            var rightAsString = RightNode != null ? RightNode.ToString(style) : null;
+            var leftAsString = LeftNode != null ? LeftNode.ToString(style) : "??";
+            var rightAsString = RightNode != null ? RightNode.ToString(style) : "??";
 
             String result = null;
 

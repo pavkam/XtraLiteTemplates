@@ -45,31 +45,10 @@ namespace XtraLiteTemplates.Expressions
             throw new ExpressionException("Operator {0} could not be applied to value '{1}'.", @operator, constant);
         }
 
-        internal static void UnexpectedExpressionNode(ExpressionNode node)
+        internal static void InvalidExpressionTerm(Object term)
         {
-            Debug.Assert(node != null);
-            throw new ExpressionException("Unexpected term '{0}' encountered while building expression.", node.ToString());
+            throw new ExpressionException("Invalid expression term: '{0}'.", term);
         }
-
-        internal static void UndefinedOperator(String symbol)
-        {
-            Debug.Assert(!String.IsNullOrEmpty(symbol));
-            throw new ExpressionException("Undefined or un-supported operator '{0}' encountered while parsing expression.", symbol);
-        }
-
-        internal static void UnexpectedOperator(String symbol)
-        {
-            Debug.Assert(!String.IsNullOrEmpty(symbol));
-            throw new ExpressionException("Unexpected operator '{0}' encountered while parsing expression.", symbol);
-        }
-
-        internal static void UnmatchedGroupOperator(String endSymbol)
-        {
-            Debug.Assert(!String.IsNullOrEmpty(endSymbol));
-            throw new ExpressionException("Unexpected group end symbol '{0}'. No matching group found.", endSymbol);
-        }
-
-
 
         internal static void OperatorAlreadyRegistered(Operator @operator)
         {
@@ -84,18 +63,17 @@ namespace XtraLiteTemplates.Expressions
 
         internal static void CannotModifyAConstructedExpression()
         {
-            throw new InvalidOperationException("Cannot modify a contructed expression.");
+            throw new InvalidOperationException("Cannot modify a finalized expression.");
         }
 
-        internal static void CannotCloseExpressionInvalidState(Operator @operator)
+        internal static void CannotConstructExpressionInvalidState()
         {
-            Debug.Assert(@operator != null);
-            throw new ExpressionException("Expression cannot be finalized, it is not balanced. End operator is '{0}'.", @operator);
+            throw new ExpressionException("Unbalanced expressions cannot be finalized.");
         }
 
         internal static void CannotEvaluateUnconstructedExpression()
         {
-            throw new InvalidOperationException("Expression has not been contructed.");
+            throw new InvalidOperationException("Expression has not been finalized.");
         }
     }
 }

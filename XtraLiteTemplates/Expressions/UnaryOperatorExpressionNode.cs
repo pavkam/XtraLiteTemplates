@@ -51,7 +51,7 @@ namespace XtraLiteTemplates.Expressions
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            var childAsString = Child != null ? Child.ToString(style) : null;
+            var childAsString = Child != null ? Child.ToString(style) : "??";
 
             String result = null;
 
