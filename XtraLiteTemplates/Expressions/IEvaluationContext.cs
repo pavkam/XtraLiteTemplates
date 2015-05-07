@@ -25,46 +25,17 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
-namespace XtraLiteTemplates.NUnit
+namespace XtraLiteTemplates.Expressions
 {
     using System;
+    using XtraLiteTemplates.Expressions.Operators;
 
-    [TestFixture]
-    public class TokenTests : TestBase
+    public interface IEvaluationContext
     {
-        [Test]
-        public void TestCaseContruction_1()
-        {
-            var token = new Token(Token.TokenType.Unparsed, "some_value", 100, 999);
+        Object HandleEvaluationError(Operator @operator, Object operand);
+        Object HandleEvaluationError(Operator @operator, Object leftOperand, Object rightOperand);
 
-            Assert.AreEqual(100, token.CharacterIndex);
-            Assert.AreEqual(999, token.OriginalLength);
-            Assert.AreEqual(Token.TokenType.Unparsed, token.Type);
-            Assert.AreEqual("some_value", token.Value);
-        }
-
-        [Test]
-        public void TestCaseContruction_2()
-        {
-            var token = new Token(Token.TokenType.String, null, 0, 1);
-
-            Assert.AreEqual(0, token.CharacterIndex);
-            Assert.AreEqual(1, token.OriginalLength);
-            Assert.AreEqual(Token.TokenType.String, token.Type);
-            Assert.AreEqual(String.Empty, token.Value);
-        }
-
-        [Test]
-        public void TestCaseConstructionExceptions()
-        {
-            ExpectArgumentLessThanException("characterIndex", 0, () => new Token(Token.TokenType.Number, "100", -1, 1));
-            ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new Token(Token.TokenType.Number, "100", 1, 0));
-
-            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Identifier, null, 0, 1));
-            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Identifier, String.Empty, 0, 1));
-        }
+        Object GetVariable(String identifier);
     }
 }
-

@@ -33,7 +33,7 @@ namespace XtraLiteTemplates.NUnit
 
     public class TestBase
     {
-        protected void AssertArgumentNullException(String argument, Action action)
+        protected void ExpectArgumentNullException(String argument, Action action)
         {
             try
             {
@@ -48,7 +48,7 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
-        protected void AssertArgumentEmptyException(String argument, Action action)
+        protected void ExpectArgumentEmptyException(String argument, Action action)
         {
             try
             {
@@ -72,7 +72,7 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
-        protected void AssertArgumentsEqualException(String argument1, String argument2, Action action)
+        protected void ExpectArgumentsEqualException(String argument1, String argument2, Action action)
         {
             try
             {
@@ -87,7 +87,7 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
-        protected void AssertArgumentLessThanOrEqualException<T>(String argument, T than, Action action)
+        protected void ExpectArgumentLessThanOrEqualException<T>(String argument, T than, Action action)
         {
             try
             {
@@ -102,7 +102,7 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
-        protected void AssertArgumentLessThanException<T>(String argument, T than, Action action)
+        protected void ExpectArgumentLessThanException<T>(String argument, T than, Action action)
         {
             try
             {
@@ -117,7 +117,7 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
-        protected void AssertArgumentGreaterThanOrEqualException<T>(String argument, T than, Action action)
+        protected void ExpectArgumentGreaterThanOrEqualException<T>(String argument, T than, Action action)
         {
             try
             {
@@ -132,7 +132,7 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
-        protected void AssertArgumentGreaterThanException<T>(String argument, T than, Action action)
+        protected void ExpectArgumentGreaterThanException<T>(String argument, T than, Action action)
         {
             try
             {
@@ -147,7 +147,7 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
-        protected void AssertArgumentConditionNotTrueException(String condition, Action action)
+        protected void ExpectArgumentConditionNotTrueException(String condition, Action action)
         {
             try
             {

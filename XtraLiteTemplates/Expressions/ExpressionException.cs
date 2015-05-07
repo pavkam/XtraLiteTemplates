@@ -69,25 +69,22 @@ namespace XtraLiteTemplates.Expressions
             throw new ExpressionException("Unexpected group end symbol '{0}'. No matching group found.", endSymbol);
         }
 
+
+
         internal static void OperatorAlreadyRegistered(Operator @operator)
         {
             Debug.Assert(@operator != null);
             throw new InvalidOperationException(String.Format("Operator identified by symbol '{0}' has already been registered with expression.", @operator));
         }
 
-        internal static void CannotAddMoreOperatorsExpressionStarted()
+        internal static void CannotRegisterOperatorsForStartedExpression()
         {
-            throw new InvalidOperationException("Cannot register operators while the expression is being built. Operators must be registered before the first expression node is created.");
+            throw new InvalidOperationException("Operator registration must be performed before construction.");
         }
 
-        internal static void CannotCloseExpressionNotYetStarted()
+        internal static void CannotModifyAConstructedExpression()
         {
-            throw new InvalidOperationException("Cannot finalize the expression. No actual data was fed into it.");
-        }
-
-        internal static void CannotFeedMoreToExpressionClosed()
-        {
-            throw new ExpressionException("The expression has been finalized. Cannot feed in more data into it.");
+            throw new InvalidOperationException("Cannot modify a contructed expression.");
         }
 
         internal static void CannotCloseExpressionInvalidState(Operator @operator)
@@ -96,9 +93,9 @@ namespace XtraLiteTemplates.Expressions
             throw new ExpressionException("Expression cannot be finalized, it is not balanced. End operator is '{0}'.", @operator);
         }
 
-        internal static void CannotUseExpressionNotClosed()
+        internal static void CannotEvaluateUnconstructedExpression()
         {
-            throw new InvalidOperationException("Expression has not been finalized.");
+            throw new InvalidOperationException("Expression has not been contructed.");
         }
     }
 }

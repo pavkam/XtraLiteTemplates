@@ -93,13 +93,13 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorSubscript()
         {
-            AssertArgumentEmptyException("symbol", () => new SubscriptOperator(null, ")"));
-            AssertArgumentEmptyException("terminator", () => new SubscriptOperator("(", null));
-            AssertArgumentEmptyException("symbol", () => new SubscriptOperator(null, null));
-            AssertArgumentEmptyException("symbol", () => new SubscriptOperator(String.Empty, ")"));
-            AssertArgumentEmptyException("terminator", () => new SubscriptOperator("(", String.Empty));
-            AssertArgumentEmptyException("symbol", () => new SubscriptOperator(String.Empty, String.Empty));
-            AssertArgumentsEqualException("symbol", "terminator", () => new SubscriptOperator("same", "same"));
+            ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(null, ")"));
+            ExpectArgumentEmptyException("terminator", () => new SubscriptOperator("(", null));
+            ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(null, null));
+            ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(String.Empty, ")"));
+            ExpectArgumentEmptyException("terminator", () => new SubscriptOperator("(", String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(String.Empty, String.Empty));
+            ExpectArgumentsEqualException("symbol", "terminator", () => new SubscriptOperator("same", "same"));
 
             Assert.NotNull(SubscriptOperator.CStyle);
             Assert.AreEqual("(", SubscriptOperator.CStyle.Symbol);
@@ -123,8 +123,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorAnd()
         {
-            AssertArgumentEmptyException("symbol", () => new AndOperator(null));
-            AssertArgumentEmptyException("symbol", () => new AndOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new AndOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new AndOperator(String.Empty));
 
             Assert.NotNull(AndOperator.CStyle);
             Assert.AreEqual("&", AndOperator.CStyle.Symbol);
@@ -153,8 +153,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorOr()
         {
-            AssertArgumentEmptyException("symbol", () => new OrOperator(null));
-            AssertArgumentEmptyException("symbol", () => new OrOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new OrOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new OrOperator(String.Empty));
 
             Assert.NotNull(OrOperator.CStyle);
             Assert.AreEqual("|", OrOperator.CStyle.Symbol);
@@ -183,8 +183,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorXor()
         {
-            AssertArgumentEmptyException("symbol", () => new XorOperator(null));
-            AssertArgumentEmptyException("symbol", () => new XorOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new XorOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new XorOperator(String.Empty));
 
             Assert.NotNull(XorOperator.CStyle);
             Assert.AreEqual("^", XorOperator.CStyle.Symbol);
@@ -209,8 +209,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorShiftLeft()
         {
-            AssertArgumentEmptyException("symbol", () => new ShiftLeftOperator(null));
-            AssertArgumentEmptyException("symbol", () => new ShiftLeftOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new ShiftLeftOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new ShiftLeftOperator(String.Empty));
 
             Assert.NotNull(ShiftLeftOperator.CStyle);
             Assert.AreEqual("<<", ShiftLeftOperator.CStyle.Symbol);
@@ -234,8 +234,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorShiftRight()
         {
-            AssertArgumentEmptyException("symbol", () => new ShiftRightOperator(null));
-            AssertArgumentEmptyException("symbol", () => new ShiftRightOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new ShiftRightOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new ShiftRightOperator(String.Empty));
 
             Assert.NotNull(ShiftRightOperator.CStyle);
             Assert.AreEqual(">>", ShiftRightOperator.CStyle.Symbol);
@@ -259,8 +259,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorNot()
         {
-            AssertArgumentEmptyException("symbol", () => new NotOperator(null));
-            AssertArgumentEmptyException("symbol", () => new NotOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new NotOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new NotOperator(String.Empty));
 
             Assert.NotNull(NotOperator.CStyle);
             Assert.AreEqual("!", NotOperator.CStyle.Symbol);
@@ -286,8 +286,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorSubtract()
         {
-            AssertArgumentEmptyException("symbol", () => new SubtractOperator(null));
-            AssertArgumentEmptyException("symbol", () => new SubtractOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new SubtractOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new SubtractOperator(String.Empty));
 
             Assert.NotNull(SubtractOperator.CStyle);
             Assert.AreEqual("-", SubtractOperator.CStyle.Symbol);
@@ -314,8 +314,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorSum()
         {
-            AssertArgumentEmptyException("symbol", () => new SumOperator(null));
-            AssertArgumentEmptyException("symbol", () => new SumOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new SumOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new SumOperator(String.Empty));
 
             Assert.NotNull(SumOperator.CStyle);
             Assert.AreEqual("+", SumOperator.CStyle.Symbol);
@@ -343,8 +343,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorDivide()
         {
-            AssertArgumentEmptyException("symbol", () => new DivideOperator(null));
-            AssertArgumentEmptyException("symbol", () => new DivideOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new DivideOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new DivideOperator(String.Empty));
 
             Assert.NotNull(DivideOperator.CStyle);
             Assert.AreEqual("/", DivideOperator.CStyle.Symbol);
@@ -371,8 +371,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorModulo()
         {
-            AssertArgumentEmptyException("symbol", () => new ModuloOperator(null));
-            AssertArgumentEmptyException("symbol", () => new ModuloOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new ModuloOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new ModuloOperator(String.Empty));
 
             Assert.NotNull(ModuloOperator.CStyle);
             Assert.AreEqual("%", ModuloOperator.CStyle.Symbol);
@@ -396,8 +396,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorMultiply()
         {
-            AssertArgumentEmptyException("symbol", () => new MultiplyOperator(null));
-            AssertArgumentEmptyException("symbol", () => new MultiplyOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new MultiplyOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new MultiplyOperator(String.Empty));
 
             Assert.NotNull(MultiplyOperator.CStyle);
             Assert.AreEqual("*", MultiplyOperator.CStyle.Symbol);
@@ -425,8 +425,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorNegate()
         {
-            AssertArgumentEmptyException("symbol", () => new NegateOperator(null));
-            AssertArgumentEmptyException("symbol", () => new NegateOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new NegateOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new NegateOperator(String.Empty));
 
             Assert.NotNull(NegateOperator.CStyle);
             Assert.AreEqual("-", NegateOperator.CStyle.Symbol);
@@ -451,8 +451,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorNeutral()
         {
-            AssertArgumentEmptyException("symbol", () => new NeutralOperator(null));
-            AssertArgumentEmptyException("symbol", () => new NeutralOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new NeutralOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new NeutralOperator(String.Empty));
 
             Assert.NotNull(NeutralOperator.CStyle);
             Assert.AreEqual("+", NeutralOperator.CStyle.Symbol);
@@ -479,8 +479,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorEquals()
         {
-            AssertArgumentEmptyException("symbol", () => new EqualsOperator(null));
-            AssertArgumentEmptyException("symbol", () => new EqualsOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new EqualsOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new EqualsOperator(String.Empty));
 
             Assert.NotNull(EqualsOperator.CStyle);
             Assert.AreEqual("==", EqualsOperator.CStyle.Symbol);
@@ -519,8 +519,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorNotEquals()
         {
-            AssertArgumentEmptyException("symbol", () => new NotEqualsOperator(null));
-            AssertArgumentEmptyException("symbol", () => new NotEqualsOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new NotEqualsOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new NotEqualsOperator(String.Empty));
 
             Assert.NotNull(NotEqualsOperator.CStyle);
             Assert.AreEqual("!=", NotEqualsOperator.CStyle.Symbol);
@@ -559,8 +559,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorGreaterThan()
         {
-            AssertArgumentEmptyException("symbol", () => new GreaterThanOperator(null));
-            AssertArgumentEmptyException("symbol", () => new GreaterThanOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new GreaterThanOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new GreaterThanOperator(String.Empty));
 
             Assert.NotNull(GreaterThanOperator.CStyle);
             Assert.AreEqual(">", GreaterThanOperator.CStyle.Symbol);
@@ -595,8 +595,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorGreaterThanOrEquals()
         {
-            AssertArgumentEmptyException("symbol", () => new GreaterThanOrEqualsOperator(null));
-            AssertArgumentEmptyException("symbol", () => new GreaterThanOrEqualsOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new GreaterThanOrEqualsOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new GreaterThanOrEqualsOperator(String.Empty));
 
             Assert.NotNull(GreaterThanOrEqualsOperator.CStyle);
             Assert.AreEqual(">=", GreaterThanOrEqualsOperator.CStyle.Symbol);
@@ -633,8 +633,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorLowerThan()
         {
-            AssertArgumentEmptyException("symbol", () => new LowerThanOperator(null));
-            AssertArgumentEmptyException("symbol", () => new LowerThanOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new LowerThanOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new LowerThanOperator(String.Empty));
 
             Assert.NotNull(LowerThanOperator.CStyle);
             Assert.AreEqual("<", LowerThanOperator.CStyle.Symbol);
@@ -669,8 +669,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorLowerThanOrEquals()
         {
-            AssertArgumentEmptyException("symbol", () => new LowerThanOrEqualsOperator(null));
-            AssertArgumentEmptyException("symbol", () => new LowerThanOrEqualsOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => new LowerThanOrEqualsOperator(null));
+            ExpectArgumentEmptyException("symbol", () => new LowerThanOrEqualsOperator(String.Empty));
 
             Assert.NotNull(LowerThanOrEqualsOperator.CStyle);
             Assert.AreEqual("<=", LowerThanOrEqualsOperator.CStyle.Symbol);

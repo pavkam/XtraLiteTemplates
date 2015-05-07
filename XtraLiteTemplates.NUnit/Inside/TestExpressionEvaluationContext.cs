@@ -27,44 +27,48 @@
 //
 using NUnit.Framework;
 
-namespace XtraLiteTemplates.NUnit
+namespace XtraLiteTemplates.NUnit.Inside
 {
     using System;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Linq;
+    using XtraLiteTemplates.Expressions;
 
-    [TestFixture]
-    public class TokenTests : TestBase
+    public sealed class TestExpressionEvaluationContext : IEvaluationContext
     {
-        [Test]
-        public void TestCaseContruction_1()
-        {
-            var token = new Token(Token.TokenType.Unparsed, "some_value", 100, 999);
+        private Dictionary<String, Object> m_variables;
 
-            Assert.AreEqual(100, token.CharacterIndex);
-            Assert.AreEqual(999, token.OriginalLength);
-            Assert.AreEqual(Token.TokenType.Unparsed, token.Type);
-            Assert.AreEqual("some_value", token.Value);
+        public Object HandleEvaluationError(Expressions.Operators.Operator @operator, Object operand)
+        {
+            Assert.NotNull(@operator);
+            return null;
         }
 
-        [Test]
-        public void TestCaseContruction_2()
+        public Object HandleEvaluationError(Expressions.Operators.Operator @operator, Object leftOperand, Object rightOperand)
         {
-            var token = new Token(Token.TokenType.String, null, 0, 1);
-
-            Assert.AreEqual(0, token.CharacterIndex);
-            Assert.AreEqual(1, token.OriginalLength);
-            Assert.AreEqual(Token.TokenType.String, token.Type);
-            Assert.AreEqual(String.Empty, token.Value);
+            Assert.NotNull(@operator);
+            return null;
         }
 
-        [Test]
-        public void TestCaseConstructionExceptions()
+        public Object GetVariable(String identifier)
         {
-            ExpectArgumentLessThanException("characterIndex", 0, () => new Token(Token.TokenType.Number, "100", -1, 1));
-            ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new Token(Token.TokenType.Number, "100", 1, 0));
+            Assert.IsNotEmpty(identifier);
 
-            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Identifier, null, 0, 1));
-            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Identifier, String.Empty, 0, 1));
+            Object result;
+            if (m_variables.TryGetValue(identifier, out result))
+                return result;
+            else
+                return null;
+        }
+
+        public TestExpressionEvaluationContext(IEqualityComparer<String> comparer, 
+            IReadOnlyCollection<KeyValuePair<String, Object>> variables)
+        {
+            Debug.Assert(comparer != null);
+            Debug.Assert(variables != null);
+
+            m_variables = variables.ToDictionary(k => k.Key, v => v.Value);
         }
     }
 }
-

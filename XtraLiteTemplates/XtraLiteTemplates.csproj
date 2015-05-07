@@ -31,6 +31,7 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Expressions\IEvaluationContext.cs" />
     <Compile Include="Expressions\ReferenceExpressionNode.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\OperatorExpressionNode.cs" />
