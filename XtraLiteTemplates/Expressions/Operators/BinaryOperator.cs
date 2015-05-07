@@ -38,9 +38,9 @@ namespace XtraLiteTemplates.Expressions.Operators
             Expect.GreaterThan("precedence", precedence, 1);
         }
 
-        public abstract Boolean Evaluate(Object left, Object right, EvaluationFlags evaluationFlags, out Object result);
+        public abstract Boolean Evaluate(Object left, Object right, out Object result);
 
-        public virtual Boolean EvaluateLeft(Object left, EvaluationFlags evaluationFlags, out Object result)
+        public virtual Boolean EvaluateLeft(Object left, out Object result)
         {
             result = left;
             return false;

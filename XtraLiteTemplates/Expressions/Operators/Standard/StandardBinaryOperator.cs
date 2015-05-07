@@ -37,39 +37,30 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        public override Boolean Evaluate(Object left, Object right, EvaluationFlags evaluationFlags, out Object result)
+        public override Boolean Evaluate(Object left, Object right, out Object result)
         {
-            /* Try normal operators. */
-            Int64 left_i, right_i;
-            Boolean left_is_i = TryAsInteger(left, out left_i);
-            Boolean right_is_i = TryAsInteger(right, out right_i);
-
-            if (left_is_i && right_is_i)
-                return Evaluate(left_i, right_i, out result);
-
-            Double left_f, right_f;
-            Boolean left_is_f = TryAsFloat(left, out left_f);
-            Boolean right_is_f = TryAsFloat(right, out right_f);
-
-            if (left_is_f && right_is_f)
-                return Evaluate(left_f, right_f, out result);
-
-            Boolean left_b, right_b;
-            Boolean left_is_b = TryAsBoolean(left, out left_b);
-            Boolean right_is_b = TryAsBoolean(right, out right_b);
-
-            if (left_is_b && right_is_b)
-                return Evaluate(left_b, right_b, out result);
-
-            String left_s, right_s;
-            Boolean left_is_s = TryAsString(left, out left_s);
-            Boolean right_is_s = TryAsString(right, out right_s);
-
-            if (left_is_s && right_is_s)
-                return Evaluate(left_s, right_s, out result);
-
-            /* Default to Undefined. */
             result = null;
+
+            if (left != null)
+            {
+                Int64 _leftInteger;
+                Int64 _rightInteger;
+                if (TryAsInteger(left, out _leftInteger) && TryAsInteger(right, out _rightInteger))
+                    return Evaluate(_leftInteger, _rightInteger, out result);
+                Boolean _leftBoolean;
+                Boolean _rightBoolean;
+                if (TryAsBoolean(left, out _leftBoolean) && TryAsBoolean(right, out _rightBoolean))
+                    return Evaluate(_leftBoolean, _rightBoolean, out result);
+                Double _leftFloat;
+                Double _rightFloat;
+                if (TryAsFloat(left, out _leftFloat) && TryAsFloat(right, out _rightFloat))
+                    return Evaluate(_leftFloat, _rightFloat, out result);
+                String _leftString;
+                String _rightString;
+                if (TryAsString(left, out _leftString) && TryAsString(right, out _rightString))
+                    return Evaluate(_leftString, _rightString, out result);
+            }
+
             return false;
         }
 
@@ -97,24 +88,27 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
             return false;
         }
 
-        public override Boolean EvaluateLeft(Object left, EvaluationFlags evaluationFlags, out Object result)
-        {
-            /* Try normal operators. */
-            Int64 arg_i;
-            if (TryAsInteger(left, out arg_i))
-                return EvaluateLeft(arg_i, out result);
-            Double arg_f;
-            if (TryAsFloat(left, out arg_f))
-                return EvaluateLeft(arg_f, out result);
-            Boolean arg_b;
-            if (TryAsBoolean(left, out arg_b))
-                return EvaluateLeft(arg_b, out result);
-            String arg_s;
-            if (TryAsString(left, out arg_s))
-                return EvaluateLeft(arg_f, out result);
 
-            /* Default to Undefined. */
+        public override Boolean EvaluateLeft(Object left, out Object result)
+        {
             result = null;
+
+            if (left != null)
+            {
+                Int64 _integer;
+                if (TryAsInteger(left, out _integer))
+                    return EvaluateLeft(_integer, out result);
+                Boolean _boolean;
+                if (TryAsBoolean(left, out _boolean))
+                    return EvaluateLeft(_boolean, out result);
+                Double _float;
+                if (TryAsFloat(left, out _float))
+                    return EvaluateLeft(_float, out result);
+                String _string;
+                if (TryAsString(left, out _string))
+                    return EvaluateLeft(_string, out result);
+            }
+
             return false;
         }
 

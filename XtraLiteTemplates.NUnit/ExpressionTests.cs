@@ -52,7 +52,7 @@ namespace XtraLiteTemplates.NUnit
             expression.FeedSymbol("/");
             expression.FeedConstant("he\"llo");
             expression.FeedSymbol(")");
-            expression.Close(true);
+            expression.Close();
 
             var repr = expression.ToString(ExpressionFormatStyle.Canonical);
             Assert.AreEqual("1 + 2", repr);

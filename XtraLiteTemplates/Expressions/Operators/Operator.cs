@@ -46,8 +46,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         }
 
 
-        protected static Boolean TryAsInteger(Object obj, 
-                                              Boolean treatUndefinedAsZero, Boolean allowConversion, out Int64 result)
+        protected static Boolean TryAsInteger(Object obj, out Int64 result)
         {
             var success = true;
             result = default(Int64);
@@ -68,23 +67,13 @@ namespace XtraLiteTemplates.Expressions.Operators
                 result = (Int64)obj;
             else if (obj is UInt64)
                 result = (Int64)obj;
-            else if (obj == null)
-                success = treatUndefinedAsZero;
-            else if (allowConversion)
-            {
-                Double _float;
-                success = TryAsFloat(obj, out _float, treatUndefinedAsZero, allowConversion);
-                if (success)
-                    result = Convert.ToInt64(_float);
-            }
             else
                 success = false;
 
             return success;
         }
 
-        protected static Boolean TryAsFloat(Object obj, 
-                                            Boolean treatUndefinedAsZero, Boolean allowConversion, out Double result)
+        protected static Boolean TryAsFloat(Object obj, out Double result)
         {
             var success = true;
             result = default(Double);
@@ -109,60 +98,35 @@ namespace XtraLiteTemplates.Expressions.Operators
                 result = (Single)obj;
             else if (obj is Double)
                 result = (Double)obj;
-            else if (obj == null)
-                success = treatUndefinedAsZero;
-            else if (allowConversion)
-            {
-                if (obj is Decimal)
-                    result = Convert.ToDouble((Decimal)obj);
-                else
-                    success = Double.TryParse(obj.ToString(), out result);
-            }
+            else if (obj is Decimal)
+                result = Convert.ToDouble((Decimal)obj);
             else
                 success = false;
 
             return success;
         }
 
-        protected static Boolean TryAsBoolean(Object obj, 
-                                              Boolean treatUndefinedAsZero, Boolean allowConversion, out Boolean result)
+        protected static Boolean TryAsBoolean(Object obj, out Boolean result)
         {
             var success = true;
             result = default(Boolean);
 
             if (obj is Boolean)
                 result = (Boolean)obj;
-            else if (obj == null)
-                success = treatUndefinedAsZero;
-            else if (allowConversion)
-            {
-                Int64 _integer;
-                success = TryAsInteger(obj, out _integer, treatUndefinedAsZero, allowConversion);
-                if (success)
-                    result = _integer != 0;
-            }
             else
                 success = false;
 
             return success;
         }
 
-        protected static Boolean TryAsString(Object obj, 
-                                             Boolean treatUndefinedAsZero, Boolean allowConversion, out String result)
+        protected static Boolean TryAsString(Object obj, out String result)
         {
             var success = true;
             result = String.Empty;
 
             if (obj is String)
                 result = (String)obj;
-            else if (obj == null)
-                success = treatUndefinedAsZero;
-            else if (allowConversion)
-            {
-                var _chars = obj as Char[];
-                result = _chars != null ? new String(_chars) : obj.ToString();
-            }
-            else
+            else 
                 success = false;
 
             return success;

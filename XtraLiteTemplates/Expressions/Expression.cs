@@ -96,6 +96,7 @@ namespace XtraLiteTemplates.Expressions
             m_current = node;
         }
 
+
         private ExpressionNode Reduce(UnaryOperatorExpressionNode node)
         {
             Debug.Assert(node != null);
@@ -106,9 +107,7 @@ namespace XtraLiteTemplates.Expressions
             if (childNode != null)
             {
                 Object result;
-                if (!node.Operator.Evaluate(childNode.Operand, out result))
-                    ExpressionException.CannotEvaluateOperator(node.Operator, childNode.Operand);
-                else
+                if (node.Operator.Evaluate(childNode.Operand, out result))
                     return new ConstantExpressionNode(node.Parent, result);
             }
 
@@ -126,9 +125,7 @@ namespace XtraLiteTemplates.Expressions
             if (childNode != null)
             {
                 Object result;
-                if (!node.Operator.Evaluate(childNode.Operand, out result))
-                    ExpressionException.CannotEvaluateOperator(node.Operator, childNode.Operand);
-                else
+                if (node.Operator.Evaluate(childNode.Operand, out result))
                     return new ConstantExpressionNode(node.Parent, result);
             }
 
@@ -156,9 +153,7 @@ namespace XtraLiteTemplates.Expressions
             if (leftNode != null && rightNode != null)
             {
                 Object result;
-                if (!node.Operator.Evaluate(leftNode.Operand, rightNode.Operand, out result))
-                    ExpressionException.CannotEvaluateOperator(node.Operator, leftNode.Operand);
-                else
+                if (node.Operator.Evaluate(leftNode.Operand, rightNode.Operand, out result))
                     return new ConstantExpressionNode(node.Parent, result);
             } 
             
@@ -192,6 +187,7 @@ namespace XtraLiteTemplates.Expressions
 
             return node;
         }
+
 
         public Boolean Closed
         {
@@ -238,7 +234,6 @@ namespace XtraLiteTemplates.Expressions
             : this(StringComparer.CurrentCultureIgnoreCase)
         {
         }
-
 
         public Expression RegisterOperator(Operator @operator)
         {
@@ -297,8 +292,6 @@ namespace XtraLiteTemplates.Expressions
 
             return this;
         }
-
-
 
         public Expression FeedConstant(Object constant)
         {
@@ -438,7 +431,7 @@ namespace XtraLiteTemplates.Expressions
             return this;
         }
 
-        public Expression Close(Boolean reduce)
+        public Expression Close()
         {
             if (!Started)
                 ExpressionException.CannotCloseExpressionNotYetStarted();
@@ -457,18 +450,11 @@ namespace XtraLiteTemplates.Expressions
                     m_root = m_root.Parent;
 
                 /* Reduce the expression if so was desired. */
-                if (reduce)
-                    m_root = Reduce(m_root);
+                m_root = Reduce(m_root);
             }
 
             return this;
         }
-
-        public Expression Close()
-        {
-            return Close(true);
-        }
-
 
         public override String ToString()
         {
@@ -484,8 +470,6 @@ namespace XtraLiteTemplates.Expressions
 
             return m_root.ToString(style);
         }
-
-
 
         public static Expression CreateStandardCStyle()
         {
