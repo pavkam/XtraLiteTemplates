@@ -36,15 +36,23 @@ namespace XtraLiteTemplates.Expressions.Operators
 
         public Int32 Precedence { get; private set; }
 
-        protected Operator(String symbol, Int32 precedence)
+        public OperatorApplicability Applicability { get; private set; }
+
+        protected Operator(String symbol, Int32 precedence, OperatorApplicability applicability)
         {
             Expect.NotEmpty("symbol", symbol);
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
+            Expect.GreaterThan("applicability", (int)applicability, 0);
 
+            Applicability = applicability;
             Symbol = symbol;
             Precedence = precedence;
         }
 
+        protected Operator(String symbol, Int32 precedence)
+            : this(symbol, precedence, OperatorApplicability.Anything)
+        {
+        }
 
         protected static Boolean TryAsInteger(Object obj, out Int64 result)
         {

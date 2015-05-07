@@ -52,12 +52,6 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
             result = left << (Int32)right;
             return true;
         }
-
-        protected override Boolean EvaluateLeft(Int64 left, out Object result)
-        {
-            result = left;
-            return left == 0;
-        }
     }
 }
 

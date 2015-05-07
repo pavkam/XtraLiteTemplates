@@ -90,6 +90,21 @@ namespace XtraLiteTemplates.NUnit
         }
 
 
+        private void AssertUnsupportedLeftEvaluation<L>(BinaryOperator @operator)
+        {
+            Object result;
+            Assert.IsFalse(@operator.EvaluateLeft(default(L), out result));
+        }
+
+        private void AssertUnsupportedAnyLeftEvaluation(BinaryOperator @operator)
+        {
+            AssertUnsupportedLeftEvaluation<Int64>(@operator);
+            AssertUnsupportedLeftEvaluation<Boolean>(@operator);
+            AssertUnsupportedLeftEvaluation<Double>(@operator);
+            AssertUnsupportedLeftEvaluation<String>(@operator);
+        }
+
+
         [Test]
         public void TestCaseStandardOperatorSubscript()
         {
@@ -113,6 +128,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("start", op.Symbol);
             Assert.AreEqual("end", op.Terminator);
             Assert.AreEqual(Int32.MaxValue, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 100L, 100L);
             AssertEvaluation<Double>(op, 100.00, 100.00);
@@ -135,6 +151,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new AndOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(8, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 0xEEAABBFF, 0xFF00FF00, 0xEE00BB00);
             AssertEvaluation<Int64>(op, 0xFFFFFFFFFFFF, 0, 0);
@@ -148,6 +165,10 @@ namespace XtraLiteTemplates.NUnit
 
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Double>(op);
+
+            Object result;
+            Assert.IsFalse(op.EvaluateLeft(true, out result));
+            Assert.IsTrue(op.EvaluateLeft(false, out result) && result.Equals(false));
         }
 
         [Test]
@@ -165,6 +186,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new OrOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(10, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 0xAA00BB00CC, 0x00DD00EE00, 0xAADDBBEECC);
             AssertEvaluation<Int64>(op, 0xFFFFFFFFFFFF, 0, 0xFFFFFFFFFFFF);
@@ -178,6 +200,10 @@ namespace XtraLiteTemplates.NUnit
 
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Double>(op);
+
+            Object result;
+            Assert.IsFalse(op.EvaluateLeft(false, out result));
+            Assert.IsTrue(op.EvaluateLeft(true, out result) && result.Equals(true));
         }
 
         [Test]
@@ -195,6 +221,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new XorOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(9, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 0xAA00BB00CC, 0x00DD00EE00, 0xAADDBBEECC);
             AssertEvaluation<Int64>(op, 0xFFFFFFFFFFFF, 0, 0xFFFFFFFFFFFF);
@@ -204,6 +231,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Double>(op);
             AssertUnsupportedEvaluation<Boolean>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -221,6 +250,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new ShiftLeftOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(5, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 0xFF, 4L, 0x0FF0);
             AssertEvaluation<Int64>(op, 0x10, 64, 0x10);
@@ -229,6 +259,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Boolean>(op);
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Double>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -246,6 +278,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new ShiftRightOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(5, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 0xFFAA, 4L, 0x0FFA);
             AssertEvaluation<Int64>(op, 0x10, 64, 0x10);
@@ -254,6 +287,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Boolean>(op);
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Double>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -271,6 +306,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new NotOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(1, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 1, ~1L);
             AssertEvaluation<Int64>(op, 0, ~0L);
@@ -280,7 +316,7 @@ namespace XtraLiteTemplates.NUnit
             AssertEvaluation<Boolean>(op, false, true);
 
             AssertUnsupportedEvaluation<String>(op);
-            AssertUnsupportedEvaluation<Double>(op);
+            AssertUnsupportedEvaluation<Double>(op);            
         }
 
         [Test]
@@ -298,6 +334,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new SubtractOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(4, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 0, 100, -100);
             AssertEvaluation<Int64>(op, 0, 0, 0);
@@ -309,6 +346,8 @@ namespace XtraLiteTemplates.NUnit
 
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Boolean>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -326,6 +365,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new SumOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(4, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 0, 100, 100);
             AssertEvaluation<Int64>(op, 0, 0, 0);
@@ -338,6 +378,8 @@ namespace XtraLiteTemplates.NUnit
             AssertEvaluation<String>(op, "Hello ", "World", "Hello World");
 
             AssertUnsupportedEvaluation<Boolean>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -355,6 +397,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new DivideOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 1, 2, 0);
             AssertEvaluation<Int64>(op, -5, 3, -1);
@@ -366,6 +409,8 @@ namespace XtraLiteTemplates.NUnit
 
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Boolean>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -383,6 +428,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new ModuloOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 1, 2, 1);
             AssertEvaluation<Int64>(op, -5, 3, -2);
@@ -391,6 +437,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Double>(op);
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Boolean>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -408,6 +456,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new MultiplyOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 1, 2, 2);
             AssertEvaluation<Int64>(op, -5, 3, -15);
@@ -420,6 +469,8 @@ namespace XtraLiteTemplates.NUnit
 
             AssertUnsupportedEvaluation<String>(op);
             AssertUnsupportedEvaluation<Boolean>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -437,6 +488,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new NegateOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(1, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, 1, -1);
             AssertEvaluation<Int64>(op, 0, 0);
@@ -463,6 +515,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new NeutralOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(1, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64>(op, Int64.MinValue, Int64.MinValue);
             AssertEvaluation<Int64>(op, Int64.MaxValue, Int64.MaxValue);
@@ -491,6 +544,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new EqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(7, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, true);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, 0, false);
@@ -514,6 +568,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Boolean, Int64>(op);
             AssertUnsupportedEvaluation<Boolean, String>(op);
             AssertUnsupportedEvaluation<Boolean, Double>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -531,6 +587,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new NotEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(7, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, false);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, 0, true);
@@ -554,6 +611,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Boolean, Int64>(op);
             AssertUnsupportedEvaluation<Boolean, String>(op);
             AssertUnsupportedEvaluation<Boolean, Double>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -571,6 +630,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new GreaterThanOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, false);
             AssertEvaluation<Int64, Boolean>(op, 0, Int64.MinValue, true);
@@ -590,6 +650,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Boolean, Int64>(op);
             AssertUnsupportedEvaluation<Boolean, String>(op);
             AssertUnsupportedEvaluation<Boolean, Double>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -607,6 +669,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new GreaterThanOrEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, true);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, Int64.MaxValue, false);
@@ -628,6 +691,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Boolean, Int64>(op);
             AssertUnsupportedEvaluation<Boolean, String>(op);
             AssertUnsupportedEvaluation<Boolean, Double>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -645,6 +710,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new LowerThanOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, false);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, 0, true);
@@ -664,6 +730,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Boolean, Int64>(op);
             AssertUnsupportedEvaluation<Boolean, String>(op);
             AssertUnsupportedEvaluation<Boolean, Double>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
 
         [Test]
@@ -681,6 +749,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new LowerThanOrEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
+            Assert.AreEqual(OperatorApplicability.Anything, op.Applicability);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, true);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, Int64.MaxValue, true);
@@ -702,6 +771,8 @@ namespace XtraLiteTemplates.NUnit
             AssertUnsupportedEvaluation<Boolean, Int64>(op);
             AssertUnsupportedEvaluation<Boolean, String>(op);
             AssertUnsupportedEvaluation<Boolean, Double>(op);
+
+            AssertUnsupportedAnyLeftEvaluation(op);
         }
     }
 }

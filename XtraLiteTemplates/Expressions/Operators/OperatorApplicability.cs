@@ -26,38 +26,17 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions.Operators.Standard
+namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
 
-    public sealed class DivideOperator : StandardBinaryOperator
+    [Flags]
+    public enum OperatorApplicability
     {
-        public static BinaryOperator CStyle { get; private set; }
-
-        public static BinaryOperator PascalStyle { get; private set; }
-
-        static DivideOperator()
-        {
-            CStyle = new DivideOperator("/");
-            PascalStyle = CStyle;
-        }
-
-        public DivideOperator(String symbol)
-            : base(symbol, 3)
-        {
-        }
-
-        protected override Boolean Evaluate(Int64 left, Int64 right, out Object result)
-        {
-            result = left / right;
-            return true;
-        }
-    
-        protected override Boolean Evaluate(Double left, Double right, out Object result)
-        {
-            result = left / right;
-            return true;
-        }
+        Anything = Constants | References | Expressions,
+        Constants = 1,
+        References = 2,
+        Expressions = 4,
     }
 }
 

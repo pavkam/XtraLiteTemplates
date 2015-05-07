@@ -53,22 +53,10 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
             return true;
         }
 
-        protected override Boolean EvaluateLeft(Int64 left, out Object result)
-        {
-            result = left;
-            return left == 0;
-        }
-
         protected override Boolean Evaluate(Double left, Double right, out Object result)
         {
             result = left * right;
             return true;
-        }
-
-        protected override Boolean EvaluateLeft(Double left, out Object result)
-        {
-            result = 0;
-            return left <= Double.Epsilon;
         }
     }
 }
