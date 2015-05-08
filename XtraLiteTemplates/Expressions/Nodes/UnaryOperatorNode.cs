@@ -28,21 +28,38 @@
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
+    using System;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal abstract class OperatorExpressionNode : ExpressionNode
+    internal sealed class UnaryOperatorNode : OperatorNode
     {
-        public Operator Operator { get; private set; }
-
-        public ExpressionNode RightNode { get; internal set; }
-
-        internal OperatorExpressionNode(ExpressionNode parent, Operator @operator)
-            : base(parent)
+        public new UnaryOperator Operator
         {
-            Debug.Assert(@operator != null);
+            get
+            {
+                return base.Operator as UnaryOperator;
+            }
+        }
 
-            Operator = @operator;
+        public UnaryOperatorNode(ExpressionNode parent, UnaryOperator @operator)
+            : base(parent, @operator)
+        {
+        }
+
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
+
+            String result = null;
+
+            if (style == ExpressionFormatStyle.Canonical)
+                result = String.Format("{0}{{{1}}}", Operator, childAsString);
+            else
+                result = String.Format("{0}{1}", Operator, childAsString);
+
+            Debug.Assert(result != null);
+            return result;
         }
     }
 }

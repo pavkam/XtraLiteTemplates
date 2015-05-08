@@ -33,7 +33,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
     public abstract class StandardUnaryOperator : UnaryOperator
     {
         protected StandardUnaryOperator(String symbol)
-            : base(symbol)
+            : base(symbol, false)
         {
         }
 

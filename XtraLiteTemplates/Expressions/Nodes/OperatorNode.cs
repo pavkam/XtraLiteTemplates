@@ -32,34 +32,44 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal sealed class UnaryOperatorExpressionNode : OperatorExpressionNode
+    internal abstract class OperatorNode : ExpressionNode
     {
-        public new UnaryOperator Operator
+        public Operator Operator { get; private set; }
+
+        public ExpressionNode RightNode { get; internal set; }
+
+        internal OperatorNode(ExpressionNode parent, Operator @operator)
+            : base(parent)
         {
-            get
+            Debug.Assert(@operator != null);
+
+            Operator = @operator;
+        }
+
+        public override Func<IEvaluationContext, Object> Build()
+        {
+            var childFunc = RightNode.Build();
+            return (context) =>
             {
-                return base.Operator as UnaryOperator;
-            }
+                Object operand = childFunc(context);
+                Object result;
+                if (!Operator.Evaluate(operand, out result))
+                    result = context.HandleEvaluationError(Operator, operand);
+                return result;
+            };
         }
 
-        public UnaryOperatorExpressionNode(ExpressionNode parent, UnaryOperator @operator)
-            : base(parent, @operator)
+        public override ExpressionNode Reduce()
         {
-        }
+            /* Right side. */
+            RightNode = RightNode as LeafNode ?? RightNode.Reduce();
+            var leafRight = RightNode as LeafNode;
+            Object reducedOperand;
 
-        public override String ToString(ExpressionFormatStyle style)
-        {
-            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
-
-            String result = null;
-
-            if (style == ExpressionFormatStyle.Canonical)
-                result = String.Format("{0}{{{1}}}", Operator, childAsString);
+            if (leafRight != null && leafRight.Reducible && Operator.Evaluate(leafRight.Operand, out reducedOperand))
+                return new LeafNode(Parent, reducedOperand);
             else
-                result = String.Format("{0}{1}", Operator, childAsString);
-
-            Debug.Assert(result != null);
-            return result;
+                return this;
         }
     }
 }

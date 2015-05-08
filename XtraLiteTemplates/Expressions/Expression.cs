@@ -41,173 +41,12 @@ namespace XtraLiteTemplates.Expressions
         private ExpressionNode m_root;
         private List<Operator> m_supportedOperators;
         private Func<IEvaluationContext, Object> m_function;
-        private Stack<GroupOperatorExpressionNode> m_openGroups;
+        private Stack<GroupNode> m_openGroups;
         private Dictionary<String, UnaryOperator> m_unaryOperators;
         private Dictionary<String, BinaryOperator> m_binaryOperators;
         private Dictionary<String, GroupOperator> m_startGroupOperators;
         private Dictionary<String, GroupOperator> m_endGroupOperators;
 
-
-        private ExpressionNode Reduce(UnaryOperatorExpressionNode node)
-        {
-            Debug.Assert(node != null);
-
-            node.RightNode = Reduce(node.RightNode);
-
-            var childNode = node.RightNode as ConstantExpressionNode;
-            if (childNode != null)
-            {
-                Object result;
-                if (node.Operator.Evaluate(childNode.Operand, out result))
-                    return new ConstantExpressionNode(node.Parent, result);
-            }
-
-            return node;
-        }
-
-        private ExpressionNode Reduce(GroupOperatorExpressionNode node)
-        {
-            Debug.Assert(node != null);
-
-            /* Cannot be redured of reference detected. */
-            node.RightNode = Reduce(node.RightNode);
-
-            var childNode = node.RightNode as ConstantExpressionNode;
-            if (childNode != null)
-            {
-                Object result;
-                if (node.Operator.Evaluate(childNode.Operand, out result))
-                    return new ConstantExpressionNode(node.Parent, result);
-            }
-
-            return node;
-        }
-
-        private ExpressionNode Reduce(BinaryOperatorExpressionNode node)
-        {
-            Debug.Assert(node != null);
-
-            node.LeftNode = Reduce(node.LeftNode);
-            node.RightNode = Reduce(node.RightNode);
-
-            var leftNode = node.LeftNode as ConstantExpressionNode;
-            var rightNode = node.RightNode as ConstantExpressionNode;
-            if (leftNode != null && rightNode == null)
-            {
-                /* Left node has a value. Try to apply short-circuit logic here. Maybe skip the whole right side evaluation entirely. */
-                Object result;
-                if (node.Operator.EvaluateLeft(leftNode.Operand, out result))
-                    return new ConstantExpressionNode(node.Parent, result);
-            }
-            
-            /* Normal evaluation ensues. */
-            if (leftNode != null && rightNode != null)
-            {
-                Object result;
-                if (node.Operator.Evaluate(leftNode.Operand, rightNode.Operand, out result))
-                    return new ConstantExpressionNode(node.Parent, result);
-            } 
-            
-
-            return node;
-        }
-
-        private ExpressionNode Reduce(ExpressionNode node)
-        {
-            Debug.Assert(node != null);
-            if (node is ConstantExpressionNode || node is ReferenceExpressionNode)
-                return node;
-            else
-            {
-                var unaryNode = node as UnaryOperatorExpressionNode;
-                if (unaryNode != null)
-                    return Reduce(unaryNode);
-                else
-                {
-                    var binaryNode = node as BinaryOperatorExpressionNode;
-                    if (binaryNode != null)
-                        return Reduce(binaryNode);
-                    else
-                    {
-                        var groupNode = node as GroupOperatorExpressionNode;
-                        if (groupNode != null)
-                            return Reduce(groupNode);
-                    }
-                }
-            }
-
-            return node;
-        }
-
-        private Func<IEvaluationContext, Object> Build(ExpressionNode node)
-        {
-            Debug.Assert(node != null);
-
-            /* Build each func. */
-            var constantNode = node as ConstantExpressionNode;
-            if (constantNode != null)
-            {
-                var operand = constantNode.Operand; 
-                return (context) => operand;
-            }
-
-            var referenceNode = node as ReferenceExpressionNode;
-            if (referenceNode != null)
-            {
-                var identifier = referenceNode.Identifier;
-                return (context) => context.GetVariable(identifier);
-            }
-
-            var unaryOperatorNode = node as UnaryOperatorExpressionNode;
-            if (unaryOperatorNode != null)
-            {
-                var childFunc = Build(unaryOperatorNode.RightNode);
-                var @operator = unaryOperatorNode.Operator;
-                return (context) =>
-                {
-                    Object operand = childFunc(context);
-                    Object result;
-                    if (!@operator.Evaluate(operand, out result))
-                        result = context.HandleEvaluationError(@operator, operand);
-                    return result;
-                };
-            }
-
-            var groupOperatorNode = node as GroupOperatorExpressionNode;
-            if (groupOperatorNode != null)
-            {
-                var childFunc = Build(groupOperatorNode.RightNode);
-                var @operator = groupOperatorNode.Operator;
-                return (context) =>
-                {
-                    Object operand = childFunc(context);
-                    Object result;
-                    if (!@operator.Evaluate(operand, out result))
-                        result = context.HandleEvaluationError(@operator, operand);
-                    return result;
-                };
-            }
-
-            var binaryOperatorNode = node as BinaryOperatorExpressionNode;
-            if (binaryOperatorNode != null)
-            {
-                var leftFunc = Build(binaryOperatorNode.LeftNode);
-                var rightFunc = Build(binaryOperatorNode.RightNode);
-                var @operator = binaryOperatorNode.Operator;
-                return (context) =>
-                {
-                    Object leftOperand = leftFunc(context);
-                    Object rightOperand = rightFunc(context);
-                    Object result;
-                    if (!@operator.Evaluate(leftOperand, rightOperand, out result))
-                        result = context.HandleEvaluationError(@operator, leftOperand, rightOperand);
-                    return result;
-                };
-            }
-
-            Debug.Assert(false, "Unreachable location.");
-            return null;
-        }
 
         public Boolean Constructed
         {
@@ -231,9 +70,9 @@ namespace XtraLiteTemplates.Expressions
 
             return 
                 m_unaryOperators.ContainsKey(symbol) ||
-            m_binaryOperators.ContainsKey(symbol) ||
-            m_startGroupOperators.ContainsKey(symbol) ||
-            m_endGroupOperators.ContainsKey(symbol);
+                m_binaryOperators.ContainsKey(symbol) ||
+                m_startGroupOperators.ContainsKey(symbol) ||
+                m_endGroupOperators.ContainsKey(symbol);
         }
 
         public IReadOnlyList<Operator> SupportedOperators
@@ -256,7 +95,7 @@ namespace XtraLiteTemplates.Expressions
             m_startGroupOperators = new Dictionary<String, GroupOperator>();
             m_endGroupOperators = new Dictionary<String, GroupOperator>();
             m_supportedOperators = new List<Operator>();
-            m_openGroups = new Stack<GroupOperatorExpressionNode>();
+            m_openGroups = new Stack<GroupNode>();
 
             Comparer = comparer;
         }
@@ -333,9 +172,9 @@ namespace XtraLiteTemplates.Expressions
             {
                 return
                     (m_current == null) ||
-                    (m_current is UnaryOperatorExpressionNode) ||
-                    (m_current is BinaryOperatorExpressionNode) ||
-                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).RightNode == null);
+                    (m_current is UnaryOperatorNode) ||
+                    (m_current is BinaryOperatorNode) ||
+                    (m_current is GroupNode && ((GroupNode)m_current).RightNode == null);
             }
         }
 
@@ -344,9 +183,9 @@ namespace XtraLiteTemplates.Expressions
             get
             {
                 return
-                    (m_current is ConstantExpressionNode) ||
-                    (m_current is ReferenceExpressionNode) ||
-                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).RightNode != null);
+                    (m_current is LeafNode) ||
+                    (m_current is IdentifierNode) ||
+                    (m_current is GroupNode && ((GroupNode)m_current).RightNode != null);
             }
         }
 
@@ -361,7 +200,7 @@ namespace XtraLiteTemplates.Expressions
             {
                 ExpressionNode continuationNode = null;
                 if (isLiteral)
-                    continuationNode = new ConstantExpressionNode(m_current, term);
+                    continuationNode = new LeafNode(m_current, term);
                 else
                 {
                     String _symbol = (String)term;
@@ -369,23 +208,23 @@ namespace XtraLiteTemplates.Expressions
                     /* Good cases. */
                     UnaryOperator _unaryOperator;
                     if (m_unaryOperators.TryGetValue(_symbol, out _unaryOperator))
-                        continuationNode = new UnaryOperatorExpressionNode(m_current, _unaryOperator);
+                        continuationNode = new UnaryOperatorNode(m_current, _unaryOperator);
 
                     GroupOperator _groupOperator;
                     if (m_startGroupOperators.TryGetValue(_symbol, out _groupOperator))
                     {
-                        continuationNode = new GroupOperatorExpressionNode(m_current, _groupOperator);
-                        m_openGroups.Push((GroupOperatorExpressionNode)continuationNode);
+                        continuationNode = new GroupNode(m_current, _groupOperator);
+                        m_openGroups.Push((GroupNode)continuationNode);
                     }
 
                     /* Invalid cases. */
                     if (continuationNode == null && !m_endGroupOperators.ContainsKey(_symbol) && !m_binaryOperators.ContainsKey(_symbol))
-                        continuationNode = new ReferenceExpressionNode(m_current, _symbol);
+                        continuationNode = new IdentifierNode(m_current, _symbol);
                 }
 
                 if (continuationNode != null)
                 {
-                    var operatorNode = m_current as OperatorExpressionNode;
+                    var operatorNode = m_current as OperatorNode;
                     if (operatorNode != null)
                     {
                         Debug.Assert(operatorNode.RightNode == null);
@@ -422,16 +261,16 @@ namespace XtraLiteTemplates.Expressions
 
                         /* Go up the tree while the precedence allows. */
                         while (leftNode.Parent != null &&
-                            ((OperatorExpressionNode)leftNode.Parent).Operator.Precedence <= _binaryOperator.Precedence)
+                            ((OperatorNode)leftNode.Parent).Operator.Precedence <= _binaryOperator.Precedence)
                             leftNode = leftNode.Parent;
 
-                        m_current = new BinaryOperatorExpressionNode(leftNode.Parent, _binaryOperator)
+                        m_current = new BinaryOperatorNode(leftNode.Parent, _binaryOperator)
                         {
                             LeftNode = leftNode,
                         };
 
                         /* Re-jig the tree. */
-                        var parentOperatorNode = leftNode.Parent as OperatorExpressionNode;
+                        var parentOperatorNode = leftNode.Parent as OperatorNode;
                         if (parentOperatorNode != null)
                             parentOperatorNode.RightNode = m_current;
                        
@@ -477,8 +316,8 @@ namespace XtraLiteTemplates.Expressions
                     ExpressionException.CannotConstructExpressionInvalidState();
 
                 /* Reduce the expression if so was desired. */
-                m_root = Reduce(m_root);
-                m_function = Build(m_root);
+                m_root = m_root.Reduce();
+                m_function = m_root.Build();
             }
         }
 
@@ -511,6 +350,7 @@ namespace XtraLiteTemplates.Expressions
             var expression = new Expression(StringComparer.Ordinal);
 
             expression.RegisterOperator(SubscriptOperator.CStyle);
+            expression.RegisterOperator(MemberAccessOperator.CStyle);
 
             expression.RegisterOperator(OrOperator.CStyle);
             expression.RegisterOperator(AndOperator.CStyle);
@@ -542,6 +382,7 @@ namespace XtraLiteTemplates.Expressions
             var expression = new Expression(StringComparer.OrdinalIgnoreCase);
 
             expression.RegisterOperator(SubscriptOperator.PascalStyle);
+            expression.RegisterOperator(MemberAccessOperator.PascalStyle);
 
             expression.RegisterOperator(OrOperator.PascalStyle);
             expression.RegisterOperator(AndOperator.PascalStyle);

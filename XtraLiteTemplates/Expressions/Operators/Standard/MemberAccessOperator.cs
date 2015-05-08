@@ -26,40 +26,45 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions.Nodes
+namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
-    using System.IO;
+    using System.Reflection;
 
-    internal sealed class ConstantExpressionNode : ExpressionNode
+    public sealed class MemberAccessOperator : BinaryOperator
     {
-        public Object Operand { get; private set; }
+        public static BinaryOperator CStyle { get; private set; }
 
-        public ConstantExpressionNode(ExpressionNode parent, Object operand)
-            : base(parent)
+        public static BinaryOperator PascalStyle { get; private set; }
+
+        static MemberAccessOperator()
         {
-            Operand = operand;
+            CStyle = new MemberAccessOperator(".");
+            PascalStyle = CStyle;
         }
 
-        public override String ToString(ExpressionFormatStyle style)
+        public MemberAccessOperator(String symbol)
+            : base(symbol, 0, false, true)
         {
-            if (Operand == null)
-                return "undefined";
-            else if (Operand is String)
+        }
+
+        public override Boolean Evaluate(Object left, Object right, out Object result)
+        {
+            var memberName = right as String;
+            if (left != null && memberName != null)
             {
-                using (var writer = new StringWriter())
+                var property = left.GetType().GetProperty(memberName, BindingFlags.Public |
+                    BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.GetProperty);
+
+                if (property != null && property.CanRead)
                 {
-                    using (var provider = CodeDomProvider.CreateProvider("CSharp"))
-                    {
-                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand), writer, null);
-                        return writer.ToString();
-                    }
+                    result = property.GetValue(left);
+                    return true;
                 }
             }
-            else
-                return Operand.ToString();
+
+            result = null;
+            return false;
         }
     }
 }

@@ -26,17 +26,43 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions.Operators
+namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
+    using System.Diagnostics;
+    using XtraLiteTemplates.Expressions.Operators;
 
-    [Flags]
-    public enum OperatorApplicability
+    internal sealed class GroupNode : OperatorNode
     {
-        Anything = Constants | References | Expressions,
-        Constants = 1,
-        References = 2,
-        Expressions = 4,
+        public new GroupOperator Operator
+        {
+            get
+            {
+                return base.Operator as GroupOperator;
+            }
+        }
+
+        internal GroupNode(ExpressionNode parent, GroupOperator @operator)
+            : base(parent, @operator)
+        {
+        }
+
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
+
+            String result = null;
+
+            if (style == ExpressionFormatStyle.Arithmetic)
+                result = String.Format("{0} {1} {2}", Operator.Symbol, childAsString, Operator.Terminator);
+            else if (style == ExpressionFormatStyle.Polish)
+                result = String.Format("{0}{1}{2}", Operator.Symbol, childAsString, Operator.Terminator);
+            else if (style == ExpressionFormatStyle.Canonical)
+                result = String.Format("{0}{{{1}}}", Operator, childAsString);
+
+            Debug.Assert(result != null);
+            return result;
+        }
     }
 }
 

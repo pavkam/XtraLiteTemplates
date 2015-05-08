@@ -32,15 +32,19 @@ namespace XtraLiteTemplates.Expressions.Operators
 
     public abstract class BinaryOperator : Operator
     {
-        protected BinaryOperator(String symbol, Int32 precedence)
-            : base(symbol, precedence)
+        public Boolean ExpectLhsIdentifier { get; private set; }
+
+        protected BinaryOperator(String symbol, Int32 precedence,
+            Boolean expectLhsIdentifier, Boolean expectRhsIdentifier)
+            : base(symbol, precedence, expectRhsIdentifier)
         {
-            Expect.GreaterThan("precedence", precedence, 1);
+            Expect.GreaterThanOrEqual("precedence", precedence, 0);
+            ExpectLhsIdentifier = expectLhsIdentifier;
         }
 
         public abstract Boolean Evaluate(Object left, Object right, out Object result);
 
-        public virtual Boolean EvaluateLeft(Object left, out Object result)
+        public override Boolean Evaluate(Object left, out Object result)
         {
             result = left;
             return false;

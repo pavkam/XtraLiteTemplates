@@ -33,7 +33,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
     public abstract class StandardBinaryOperator : BinaryOperator
     {
         protected StandardBinaryOperator(String symbol, Int32 precedence)
-            : base(symbol, precedence)
+            : base(symbol, precedence, false, false)
         {
         }
 
@@ -89,7 +89,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         }
 
 
-        public override Boolean EvaluateLeft(Object left, out Object result)
+        public override Boolean Evaluate(Object left, out Object result)
         {
             result = null;
 

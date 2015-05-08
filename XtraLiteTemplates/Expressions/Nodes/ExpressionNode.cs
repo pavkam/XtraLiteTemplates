@@ -40,6 +40,13 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Parent = parent;
         }
 
+        public virtual ExpressionNode Reduce()
+        {
+            return this;
+        }
+
+        public abstract Func<IEvaluationContext, Object> Build();
+
         public abstract String ToString(ExpressionFormatStyle style);
 
         public override String ToString()

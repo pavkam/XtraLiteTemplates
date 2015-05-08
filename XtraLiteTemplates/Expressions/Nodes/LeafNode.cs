@@ -29,39 +29,50 @@
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
-    using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
+    using System.CodeDom;
+    using System.CodeDom.Compiler;
+    using System.IO;
 
-    internal sealed class GroupOperatorExpressionNode : OperatorExpressionNode
+    internal class LeafNode : ExpressionNode
     {
-        public new GroupOperator Operator
-        {
-            get
-            {
-                return base.Operator as GroupOperator;
-            }
-        }
+        public Object Operand { get; private set; }
 
-        internal GroupOperatorExpressionNode(ExpressionNode parent, GroupOperator @operator)
-            : base(parent, @operator)
+        public LeafNode(ExpressionNode parent, Object operand)
+            : base(parent)
         {
+            Operand = operand;
         }
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
+            if (Operand == null)
+                return "undefined";
+            else if (Operand is String)
+            {
+                using (var writer = new StringWriter())
+                {
+                    using (var provider = CodeDomProvider.CreateProvider("CSharp"))
+                    {
+                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand), writer, null);
+                        return writer.ToString();
+                    }
+                }
+            }
+            else
+                return Operand.ToString();
+        }
 
-            String result = null;
+        public override Func<IEvaluationContext, Object> Build()
+        {
+            return (context) => Operand;
+        }
 
-            if (style == ExpressionFormatStyle.Arithmetic)
-                result = String.Format("{0} {1} {2}", Operator.Symbol, childAsString, Operator.Terminator);
-            else if (style == ExpressionFormatStyle.Polish)
-                result = String.Format("{0}{1}{2}", Operator.Symbol, childAsString, Operator.Terminator);
-            else if (style == ExpressionFormatStyle.Canonical)
-                result = String.Format("{0}{{{1}}}", Operator, childAsString);
-
-            Debug.Assert(result != null);
-            return result;
+        public virtual Boolean Reducible
+        {
+            get
+            {
+                return true;
+            }
         }
     }
 }

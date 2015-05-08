@@ -32,10 +32,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Expressions\IEvaluationContext.cs" />
-    <Compile Include="Expressions\Operators\OperatorApplicability.cs" />
-    <Compile Include="Expressions\Nodes\ReferenceExpressionNode.cs" />
+    <Compile Include="Expressions\Nodes\IdentifierNode.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
-    <Compile Include="Expressions\Nodes\OperatorExpressionNode.cs" />
+    <Compile Include="Expressions\Nodes\OperatorNode.cs" />
+    <Compile Include="Expressions\Operators\Standard\MemberAccessOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\SubscriptOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\ShiftRightOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\ShiftLeftOperator.cs" />
@@ -61,15 +61,15 @@
     <Compile Include="Expect.cs" />
     <Compile Include="ITokenizer.cs" />
     <Compile Include="Expressions\Nodes\ExpressionNode.cs" />
-    <Compile Include="Expressions\Nodes\ConstantExpressionNode.cs" />
-    <Compile Include="Expressions\Nodes\UnaryOperatorExpressionNode.cs" />
-    <Compile Include="Expressions\Nodes\BinaryOperatorExpressionNode.cs" />
+    <Compile Include="Expressions\Nodes\LeafNode.cs" />
+    <Compile Include="Expressions\Nodes\UnaryOperatorNode.cs" />
+    <Compile Include="Expressions\Nodes\BinaryOperatorNode.cs" />
     <Compile Include="Expressions\Operators\UnaryOperator.cs" />
     <Compile Include="Expressions\Operators\BinaryOperator.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\ExpressionException.cs" />
     <Compile Include="Expressions\Operators\GroupOperator.cs" />
-    <Compile Include="Expressions\Nodes\GroupOperatorExpressionNode.cs" />
+    <Compile Include="Expressions\Nodes\GroupNode.cs" />
     <Compile Include="Expressions\Operators\Operator.cs" />
     <Compile Include="Expressions\Operators\Standard\NeutralOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\NegateOperator.cs" />

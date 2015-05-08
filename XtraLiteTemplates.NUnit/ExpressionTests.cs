@@ -156,6 +156,7 @@ namespace XtraLiteTemplates.NUnit
                 { "c", 0 },
                 { "d", 1 },
                 { "e", 2 },
+                { "s", "Hello World" },
             };
 
             return new TestExpressionEvaluationContext(gatherErrors, e.Comparer, variables);
@@ -468,15 +469,25 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseMemberAccess_Level1()
+        {
+            var expression = CreateTestExpression("s . 'length' + 10");
+            var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
+
+            Assert.AreEqual(21, result);
+        }
+
+        [Test]
         public void TestCaseCreateMethod_CStyle()
         {
             var expression = Expression.CreateStandardCStyle();
             var allOperators = new HashSet<Operator>(expression.SupportedOperators);
 
             Assert.AreEqual(StringComparer.Ordinal, expression.Comparer);
-            Assert.AreEqual(18, allOperators.Count);
+            Assert.AreEqual(19, allOperators.Count);
 
             allOperators.Remove(SubscriptOperator.CStyle);
+            allOperators.Remove(MemberAccessOperator.CStyle);
             allOperators.Remove(OrOperator.CStyle);
             allOperators.Remove(AndOperator.CStyle);
             allOperators.Remove(NotOperator.CStyle);
@@ -507,9 +518,10 @@ namespace XtraLiteTemplates.NUnit
             var allOperators = new HashSet<Operator>(expression.SupportedOperators);
 
             Assert.AreEqual(StringComparer.OrdinalIgnoreCase, expression.Comparer);
-            Assert.AreEqual(18, allOperators.Count);
+            Assert.AreEqual(19, allOperators.Count);
 
             allOperators.Remove(SubscriptOperator.PascalStyle);
+            allOperators.Remove(MemberAccessOperator.PascalStyle);
             allOperators.Remove(OrOperator.PascalStyle);
             allOperators.Remove(AndOperator.PascalStyle);
             allOperators.Remove(NotOperator.PascalStyle);

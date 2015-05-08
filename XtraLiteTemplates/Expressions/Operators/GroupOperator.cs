@@ -35,7 +35,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         public String Terminator { get; private set; }
 
         protected GroupOperator(String symbol, String terminator)
-            : base(symbol, Int32.MaxValue)
+            : base(symbol, Int32.MaxValue, false)
         {
             Expect.NotEmpty("terminator", terminator);
             Expect.NotEqual("symbol", "terminator", symbol, terminator);
@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.Expressions.Operators
             Terminator = terminator;
         }
 
-        public virtual Boolean Evaluate(Object arg, out Object result)
+        public override Boolean Evaluate(Object arg, out Object result)
         {
             result = arg;
             return true;

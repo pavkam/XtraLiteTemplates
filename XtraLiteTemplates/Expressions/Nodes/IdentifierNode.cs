@@ -34,15 +34,30 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using System.IO;
 
-    internal sealed class ReferenceExpressionNode : ExpressionNode
+    internal sealed class IdentifierNode : LeafNode
     {
-        public String Identifier { get; private set; }
+        public String Identifier 
+        {
+            get { return (String)base.Operand; }
+        }
 
-        public ReferenceExpressionNode(ExpressionNode parent, String identifier)
-            : base(parent)
+        public IdentifierNode(ExpressionNode parent, String identifier)
+            : base(parent, identifier)
         {
             Debug.Assert(!String.IsNullOrEmpty(identifier));
-            Identifier = identifier;
+        }
+
+        public override Func<IEvaluationContext, Object> Build()
+        {
+            return (context) => context.GetVariable(Identifier);
+        }
+
+        public override Boolean Reducible
+        {
+            get
+            {
+                return false;
+            }
         }
 
         public override String ToString(ExpressionFormatStyle style)

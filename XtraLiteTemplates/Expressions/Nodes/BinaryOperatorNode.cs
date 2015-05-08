@@ -32,7 +32,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal sealed class BinaryOperatorExpressionNode : OperatorExpressionNode
+    internal sealed class BinaryOperatorNode : OperatorNode
     {
         public new BinaryOperator Operator
         {
@@ -44,9 +44,51 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public ExpressionNode LeftNode { get; internal set; }
 
-        internal BinaryOperatorExpressionNode(ExpressionNode parent, BinaryOperator @operator)
+        internal BinaryOperatorNode(ExpressionNode parent, BinaryOperator @operator)
             : base(parent, @operator)
         {
+        }
+
+        public override ExpressionNode Reduce()
+        {
+            /* Left side. */
+            LeftNode = LeftNode as LeafNode ?? LeftNode.Reduce();
+            RightNode = RightNode as LeafNode ?? RightNode.Reduce();
+
+            var leafLeft = LeftNode as LeafNode;
+            Object reducedOperand;
+            if (leafLeft != null && leafLeft.Reducible)
+            {
+                if (Operator.Evaluate(leafLeft.Operand, out reducedOperand))
+                    return new LeafNode(Parent, reducedOperand);
+
+                /* Right side. */
+                var leafRight = RightNode as LeafNode;
+                if (leafRight != null && leafRight.Reducible && Operator.Evaluate(leafLeft.Operand, leafRight.Operand, out reducedOperand))
+                    return new LeafNode(Parent, reducedOperand);
+            }
+
+            return this;
+        }
+
+        public override Func<IEvaluationContext, Object> Build()
+        {
+            var leftFunc = LeftNode.Build();
+            var rightFunc = RightNode.Build();
+            return (context) =>
+            {
+                Object result;
+                Object leftOperand = leftFunc(context);
+                if (!Operator.Evaluate(leftOperand, out result))
+                {
+                    Object rightOperand = rightFunc(context);
+
+                    if (!Operator.Evaluate(leftOperand, rightOperand, out result))
+                        result = context.HandleEvaluationError(Operator, leftOperand, rightOperand);
+                }
+                return result;
+            };
+
         }
 
         public override String ToString(ExpressionFormatStyle style)
