@@ -40,66 +40,11 @@ namespace XtraLiteTemplates.Expressions
         private ExpressionNode m_root;
         private List<Operator> m_supportedOperators;
         private Func<IEvaluationContext, Object> m_function;
-        private Int32 m_groupLevel;
+        private Stack<GroupOperatorExpressionNode> m_openGroups;
         private Dictionary<String, UnaryOperator> m_unaryOperators;
         private Dictionary<String, BinaryOperator> m_binaryOperators;
         private Dictionary<String, GroupOperator> m_startGroupOperators;
         private Dictionary<String, GroupOperator> m_endGroupOperators;
-
-        private Boolean ContinuationExpected
-        {
-            get
-            {
-                return
-                    (m_current == null) ||
-                    (m_current is UnaryOperatorExpressionNode) ||
-                    (m_current is BinaryOperatorExpressionNode) ||
-                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null);
-            }
-        }
-
-        private void AppendChild(Object value, Boolean isReference)
-        {
-            Debug.Assert(!isReference || value is String);
-
-            ExpressionNode node = isReference ?
-                (ExpressionNode)(new ReferenceExpressionNode(m_current, (String)value)) :
-                new ConstantExpressionNode(m_current, value);
-
-            if (!ContinuationExpected)
-                ExpressionException.InvalidExpressionTerm(value);
-
-            if (m_current != null)
-            {
-                var unaryOperator = m_current as UnaryOperatorExpressionNode;
-                if (unaryOperator != null)
-                {
-                    Debug.Assert(unaryOperator.Child == null);
-                    unaryOperator.Child = node;
-                }
-                else
-                {
-                    var groupOperator = m_current as GroupOperatorExpressionNode;
-                    if (groupOperator != null)
-                        groupOperator.Child = node;
-                    else
-                    {
-                        var binaryOperator = m_current as BinaryOperatorExpressionNode;
-                        if (binaryOperator != null)
-                        {
-                            Debug.Assert(binaryOperator.LeftNode != null);
-                            Debug.Assert(binaryOperator.RightNode == null);
-
-                            binaryOperator.RightNode = node;
-                        }
-                    }
-                }
-            }
-
-            m_current = node;
-            if (m_root == null)
-                m_root = m_current;
-        }
 
 
         private ExpressionNode Reduce(UnaryOperatorExpressionNode node)
@@ -193,8 +138,6 @@ namespace XtraLiteTemplates.Expressions
             return node;
         }
 
-
-
         private Func<IEvaluationContext, Object> Build(ExpressionNode node)
         {
             Debug.Assert(node != null);
@@ -265,7 +208,6 @@ namespace XtraLiteTemplates.Expressions
             return null;
         }
 
-
         public Boolean Constructed
         {
             get
@@ -313,6 +255,7 @@ namespace XtraLiteTemplates.Expressions
             m_startGroupOperators = new Dictionary<String, GroupOperator>();
             m_endGroupOperators = new Dictionary<String, GroupOperator>();
             m_supportedOperators = new List<Operator>();
+            m_openGroups = new Stack<GroupOperatorExpressionNode>();
 
             Comparer = comparer;
         }
@@ -381,13 +324,160 @@ namespace XtraLiteTemplates.Expressions
             return this;
         }
 
-        public Expression FeedConstant(Object constant)
+
+
+        private Boolean GroupStartOrUnaryOperatorOrLiteralExpected
+        {
+            get
+            {
+                return
+                    (m_current == null) ||
+                    (m_current is UnaryOperatorExpressionNode) ||
+                    (m_current is BinaryOperatorExpressionNode) ||
+                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null);
+            }
+        }
+
+        private Boolean GroupEndOrBinaryOperatorExpected
+        {
+            get
+            {
+                return
+                    (m_current is ConstantExpressionNode) ||
+                    (m_current is ReferenceExpressionNode) ||
+                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child != null);
+            }
+        }
+
+        private void FeedTerm(Object term, Boolean isLiteral)
+        {
+            Debug.Assert(isLiteral || term is String);
+
+            if (Constructed)
+                ExpressionException.CannotModifyAConstructedExpression();
+
+            if (GroupStartOrUnaryOperatorOrLiteralExpected)
+            {
+                ExpressionNode continuationNode = null;
+                if (isLiteral)
+                    continuationNode = new ConstantExpressionNode(m_current, term);
+                else
+                {
+                    String _symbol = (String)term;
+
+                    /* Good cases. */
+                    UnaryOperator _unaryOperator;
+                    if (m_unaryOperators.TryGetValue(_symbol, out _unaryOperator))
+                        continuationNode = new UnaryOperatorExpressionNode(m_current, _unaryOperator);
+
+                    GroupOperator _groupOperator;
+                    if (m_startGroupOperators.TryGetValue(_symbol, out _groupOperator))
+                    {
+                        continuationNode = new GroupOperatorExpressionNode(m_current, _groupOperator);
+                        m_openGroups.Push((GroupOperatorExpressionNode)continuationNode);
+                    }
+
+                    /* Invalid cases. */
+                    if (continuationNode == null && !m_endGroupOperators.ContainsKey(_symbol) && !m_binaryOperators.ContainsKey(_symbol))
+                        continuationNode = new ReferenceExpressionNode(m_current, _symbol);
+                }
+
+                if (continuationNode != null)
+                {
+                    var _unaryOperatorNode = m_current as UnaryOperatorExpressionNode;
+                    if (_unaryOperatorNode != null)
+                    {
+                        Debug.Assert(_unaryOperatorNode.Child == null);
+                        _unaryOperatorNode.Child = continuationNode;
+                    }
+
+                    var _binaryOperatorNode = m_current as BinaryOperatorExpressionNode;
+                    if (_binaryOperatorNode != null)
+                    {
+                        Debug.Assert(_binaryOperatorNode.RightNode == null);
+                        Debug.Assert(_binaryOperatorNode.LeftNode != null);
+
+                        _binaryOperatorNode.RightNode = continuationNode;
+                    }
+
+                    var _groupOperatorNode = m_current as GroupOperatorExpressionNode;
+                    if (_groupOperatorNode != null)
+                    {
+                        Debug.Assert(_groupOperatorNode.Child == null);
+                        _groupOperatorNode.Child = continuationNode;
+                    }
+
+                    m_current = continuationNode;
+                    m_root = m_root ?? m_current;
+
+                    return;
+                }
+            }
+            else if (GroupEndOrBinaryOperatorExpected)
+            {
+                if (!isLiteral)
+                {
+                    String _symbol = (String)term;
+
+                    GroupOperator _groupOperator;
+                    if (m_endGroupOperators.TryGetValue(_symbol, out _groupOperator))
+                    {
+                        var _currentlyOpenGroupNode = m_openGroups.Count > 0 ? m_openGroups.Pop() : null;
+                        if (_currentlyOpenGroupNode != null && _currentlyOpenGroupNode.Operator == _groupOperator)
+                        {
+                            m_current = _currentlyOpenGroupNode;
+                            return;
+                        }
+                    }
+
+                    BinaryOperator _binaryOperator;
+                    if (m_binaryOperators.TryGetValue(_symbol, out _binaryOperator))
+                    {
+                        var leftNode = m_current;
+
+                        /* Go up the tree while the precedence allows. */
+                        while (leftNode.Parent != null &&
+                            ((OperatorExpressionNode)leftNode.Parent).Operator.Precedence <= _binaryOperator.Precedence)
+                            leftNode = leftNode.Parent;
+
+                        m_current = new BinaryOperatorExpressionNode(leftNode.Parent, _binaryOperator)
+                        {
+                            LeftNode = leftNode,
+                        };
+
+                        /* Re-jig the tree. */
+                        var _binaryNode = leftNode.Parent as BinaryOperatorExpressionNode;
+                        if (_binaryNode != null)
+                            _binaryNode.RightNode = m_current;
+
+                        var _groupNode = leftNode.Parent as GroupOperatorExpressionNode;
+                        if (_groupNode != null)
+                            _groupNode.Child = m_current;
+
+                        var _unaryNode = leftNode.Parent as UnaryOperatorExpressionNode;
+                        if (_unaryNode != null)
+                            _unaryNode.Child = m_current;
+
+                        leftNode.Parent = m_current;
+                        if (m_root == leftNode)
+                            m_root = m_current;
+                        if (m_openGroups.Count > 0 && m_openGroups.Peek().Child == leftNode)
+                            m_openGroups.Peek().Child = m_current;
+
+                        return;
+                    }
+                }
+            }
+
+            ExpressionException.InvalidExpressionTerm(term);
+        }
+
+        public Expression FeedLiteral(Object literal)
         {
             if (Constructed)
                 ExpressionException.CannotModifyAConstructedExpression();
 
-            AppendChild(constant, false);
-
+            FeedTerm(literal, true);
             return this;
         }
 
@@ -398,131 +488,7 @@ namespace XtraLiteTemplates.Expressions
             if (Constructed)
                 ExpressionException.CannotModifyAConstructedExpression();
 
-            if (!IsSupportedOperator(symbol))
-            {
-                /* Consider this to be a reference. */
-                AppendChild(symbol, true);
-            }
-            else
-            {
-                /* Identify the previous node first, and based on that decide what type of operator to expect. */
-                if (ContinuationExpected)
-                {
-                    var unary = m_current as UnaryOperatorExpressionNode;
-                    var binary = m_current as BinaryOperatorExpressionNode;
-                    var group = m_current as GroupOperatorExpressionNode;
-
-                    Debug.Assert(unary == null || unary.Child == null);
-                    Debug.Assert(binary == null || binary.RightNode == null);
-                    Debug.Assert(binary == null || binary.LeftNode != null);
-
-                    /* Binary operations only can be applied here. */
-                    GroupOperator matchingGroup;
-                    if (m_startGroupOperators.TryGetValue(symbol, out matchingGroup))
-                    {
-                        /* This be a group-start symbol. Find the matching group. */
-                        m_current = new GroupOperatorExpressionNode(m_current, matchingGroup);
-                        m_groupLevel++;
-                    }
-                    else
-                    {
-                        /* Only unary operators are allowed. */
-                        UnaryOperator matchingUnary;
-                        if (!m_unaryOperators.TryGetValue(symbol, out matchingUnary))
-                            ExpressionException.InvalidExpressionTerm(symbol);
-
-                        m_current = new UnaryOperatorExpressionNode(m_current, matchingUnary);
-                    }
-
-                    /* Attach the node. */
-                    if (unary != null)
-                        unary.Child = m_current;
-                    else if (group != null)
-                        group.Child = m_current;
-                    else if (binary != null)
-                        binary.RightNode = m_current;
-                }
-                else if (m_current is ConstantExpressionNode || m_current is ReferenceExpressionNode || m_current is GroupOperatorExpressionNode)
-                {
-                    if (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null)
-                        ExpressionException.InvalidExpressionTerm(symbol);
-
-                    /* Binary operations only can be applied here. */
-                    GroupOperator matchingGroup;
-                    if (m_endGroupOperators.TryGetValue(symbol, out matchingGroup))
-                    {
-                        /* This be a group-end symbol. Find the matching group. */
-                        GroupOperatorExpressionNode group = null;
-                        var _current = m_current;
-                        while (_current.Parent != null)
-                        {
-                            _current = _current.Parent;
-                            group = _current as GroupOperatorExpressionNode;
-                            if (group != null)
-                                break;
-                        }
-
-                        if (group == null || group.Operator.Terminator != symbol)
-                            ExpressionException.InvalidExpressionTerm(symbol);
-                        else
-                        {
-                            /* Find root of the group. */
-                            var root = m_current;
-                            while (root.Parent != group)
-                                root = root.Parent;
-
-                            group.Child = root;
-
-                            m_current = group;
-                            m_groupLevel--;
-                        }
-                    }
-                    else
-                    {
-                        /* Binary operations only can be applied here. */
-                        BinaryOperator matchingBinary;
-                        if (!m_binaryOperators.TryGetValue(symbol, out matchingBinary))
-                            ExpressionException.InvalidExpressionTerm(symbol);
-
-                        /* Apply precendence levels here. Go up the tree while the precendence is greater or equal. */
-                        ExpressionNode left = m_current, parent = m_current.Parent;
-                        while (left.Parent != null)
-                        {
-                            Int32 prec = ((OperatorExpressionNode)left.Parent).Operator.Precedence;
-                            if (prec > matchingBinary.Precedence)
-                                break;
-
-                            left = left.Parent;
-                            parent = left.Parent;
-                        }
-
-                        m_current = new BinaryOperatorExpressionNode(parent, matchingBinary)
-                        {
-                            LeftNode = left,
-                        };
-
-                        var _binaryNode = left.Parent as BinaryOperatorExpressionNode;
-                        var _groupNode = left.Parent as GroupOperatorExpressionNode;
-                        var _unaryNode = left.Parent as UnaryOperatorExpressionNode;
-                        if (_binaryNode != null)
-                            _binaryNode.RightNode = m_current;
-                        else if (_groupNode != null)
-                            _groupNode.Child = m_current;
-                        else if (_unaryNode != null)
-                            _unaryNode.Child = m_current;
-
-                        left.Parent = m_current;
-                    }
-                }
-                else
-                    Debug.Assert(false);
-
-                if (m_root == null)
-                    m_root = m_current;
-                else if (m_root.Parent != null)
-                    m_root = m_root.Parent;
-            }
-
+            FeedTerm(symbol, false);
             return this;
         }
 
@@ -530,7 +496,7 @@ namespace XtraLiteTemplates.Expressions
         {
             if (!Constructed)
             {
-                if (ContinuationExpected || m_groupLevel > 0)
+                if (GroupStartOrUnaryOperatorOrLiteralExpected || m_openGroups.Count > 0)
                     ExpressionException.CannotConstructExpressionInvalidState();
 
                 /* Reduce the expression if so was desired. */

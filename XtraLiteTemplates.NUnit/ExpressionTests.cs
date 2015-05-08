@@ -132,13 +132,13 @@ namespace XtraLiteTemplates.NUnit
                 Boolean _boolean;
 
                 if (Int64.TryParse(term, out _integer))
-                    result.FeedConstant(_integer);
+                    result.FeedLiteral(_integer);
                 else if (Double.TryParse(term, out _float))
-                    result.FeedConstant(_float);
+                    result.FeedLiteral(_float);
                 else if (Boolean.TryParse(term, out _boolean))
-                    result.FeedConstant(_boolean);
+                    result.FeedLiteral(_boolean);
                 else if (term.StartsWith("'") && term.EndsWith("'"))
-                    result.FeedConstant(term.Substring(1, term.Length - 2));
+                    result.FeedLiteral(term.Substring(1, term.Length - 2));
                 else
                     result.FeedSymbol(term);
             }
@@ -269,7 +269,7 @@ namespace XtraLiteTemplates.NUnit
 
             expression1.RegisterOperator(SumOperator.CStyle);
 
-            expression1.FeedConstant(1);
+            expression1.FeedLiteral(1);
             Assert.IsTrue(expression1.Started);
             Assert.IsFalse(expression1.Constructed);
 
@@ -282,7 +282,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.IsTrue(expression1.Started);
             Assert.IsTrue(expression1.Constructed);
 
-            ExpectCannotModifyAConstructedExpressionException(() => expression1.FeedConstant(2));
+            ExpectCannotModifyAConstructedExpressionException(() => expression1.FeedLiteral(2));
             ExpectCannotModifyAConstructedExpressionException(() => expression1.FeedSymbol("abracadabra"));
 
             /* Should run fine. */
@@ -346,24 +346,24 @@ namespace XtraLiteTemplates.NUnit
             ExpectInvalidExpressionTermException("*", () => expression.FeedSymbol("*"));
             ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
 
-            expression.FeedConstant("Hello");
+            expression.FeedLiteral("Hello");
             ExpectInvalidExpressionTermException("!", () => expression.FeedSymbol("!"));
             ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
-            ExpectInvalidExpressionTermException("World", () => expression.FeedConstant("World"));
+            ExpectInvalidExpressionTermException("World", () => expression.FeedLiteral("World"));
             ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
 
             expression.FeedSymbol("+");
             ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
             expression.FeedSymbol("(");
             ExpectInvalidExpressionTermException("/", () => expression.FeedSymbol("/"));
-            expression.FeedConstant(100);
-            ExpectInvalidExpressionTermException(200, () => expression.FeedConstant(200));
+            expression.FeedLiteral(100);
+            ExpectInvalidExpressionTermException(200, () => expression.FeedLiteral(200));
             ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
             expression.FeedSymbol(")");
             ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
             ExpectInvalidExpressionTermException("!", () => expression.FeedSymbol("!"));
             ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
-            ExpectInvalidExpressionTermException(true, () => expression.FeedConstant(true));
+            ExpectInvalidExpressionTermException(true, () => expression.FeedLiteral(true));
         }
 
         [Test]
@@ -375,7 +375,7 @@ namespace XtraLiteTemplates.NUnit
             ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
             expression.FeedSymbol("-");
             ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
-            expression.FeedConstant(10);
+            expression.FeedLiteral(10);
             expression.FeedSymbol("*");
             expression.FeedSymbol("(");
             ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
@@ -385,7 +385,7 @@ namespace XtraLiteTemplates.NUnit
             ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
             expression.FeedSymbol("-");
             ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
-            expression.FeedConstant(10);
+            expression.FeedLiteral(10);
             ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
             expression.FeedSymbol(")");
 
@@ -451,13 +451,13 @@ namespace XtraLiteTemplates.NUnit
             expression.FeedSymbol("!");
             var def2 = expression.ToString();
 
-            expression.FeedConstant("a");
+            expression.FeedLiteral("a");
             var def3 = expression.ToString();
 
             expression.FeedSymbol("+");
             var def4 = expression.ToString();
 
-            expression.FeedConstant("5");
+            expression.FeedLiteral("5");
             var def5 = expression.ToString();
 
             Assert.AreEqual("??", def1);
