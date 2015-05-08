@@ -26,28 +26,45 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
     using System.Diagnostics;
-    using System.IO;
+    using XtraLiteTemplates.Expressions.Operators;
 
-    internal sealed class ReferenceExpressionNode : ExpressionNode
+    internal sealed class BinaryOperatorExpressionNode : OperatorExpressionNode
     {
-        public String Identifier { get; private set; }
-
-        public ReferenceExpressionNode(ExpressionNode parent, String identifier)
-            : base(parent)
+        public new BinaryOperator Operator
         {
-            Debug.Assert(!String.IsNullOrEmpty(identifier));
-            Identifier = identifier;
+            get
+            {
+                return base.Operator as BinaryOperator;
+            }
+        }
+
+        public ExpressionNode LeftNode { get; internal set; }
+
+        internal BinaryOperatorExpressionNode(ExpressionNode parent, BinaryOperator @operator)
+            : base(parent, @operator)
+        {
         }
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            return String.Format("@{0}", Identifier);
+            var leftAsString = LeftNode != null ? LeftNode.ToString(style) : "??";
+            var rightAsString = RightNode != null ? RightNode.ToString(style) : "??";
+
+            String result = null;
+
+            if (style == ExpressionFormatStyle.Arithmetic)
+                result = String.Format("{0} {1} {2}", leftAsString, Operator, rightAsString);
+            else if (style == ExpressionFormatStyle.Polish)
+                result = String.Format("{0} {1} {2}", Operator, leftAsString, rightAsString);
+            else if (style == ExpressionFormatStyle.Canonical)
+                result = String.Format("{0}{{{1},{2}}}", Operator, leftAsString, rightAsString);
+
+            Debug.Assert(result != null);
+            return result;
         }
     }
 }

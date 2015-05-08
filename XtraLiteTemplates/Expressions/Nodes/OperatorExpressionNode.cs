@@ -26,47 +26,23 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal sealed class BinaryOperatorExpressionNode : OperatorExpressionNode
+    internal abstract class OperatorExpressionNode : ExpressionNode
     {
-        public new BinaryOperator Operator
-        {
-            get
-            {
-                return base.Operator as BinaryOperator;
-            }
-        }
-
-        public ExpressionNode LeftNode { get; internal set; }
+        public Operator Operator { get; private set; }
 
         public ExpressionNode RightNode { get; internal set; }
 
-        internal BinaryOperatorExpressionNode(ExpressionNode parent, BinaryOperator @operator)
-            : base(parent, @operator)
+        internal OperatorExpressionNode(ExpressionNode parent, Operator @operator)
+            : base(parent)
         {
-        }
+            Debug.Assert(@operator != null);
 
-        public override String ToString(ExpressionFormatStyle style)
-        {
-            var leftAsString = LeftNode != null ? LeftNode.ToString(style) : "??";
-            var rightAsString = RightNode != null ? RightNode.ToString(style) : "??";
-
-            String result = null;
-
-            if (style == ExpressionFormatStyle.Arithmetic)
-                result = String.Format("{0} {1} {2}", leftAsString, Operator, rightAsString);
-            else if (style == ExpressionFormatStyle.Polish)
-                result = String.Format("{0} {1} {2}", Operator, leftAsString, rightAsString);
-            else if (style == ExpressionFormatStyle.Canonical)
-                result = String.Format("{0}{{{1},{2}}}", Operator, leftAsString, rightAsString);
-
-            Debug.Assert(result != null);
-            return result;
+            Operator = @operator;
         }
     }
 }

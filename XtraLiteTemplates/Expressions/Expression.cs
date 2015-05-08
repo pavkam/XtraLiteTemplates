@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.Expressions
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using XtraLiteTemplates.Expressions.Nodes;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Expressions.Operators.Standard;
 
@@ -51,9 +52,9 @@ namespace XtraLiteTemplates.Expressions
         {
             Debug.Assert(node != null);
 
-            node.Child = Reduce(node.Child);
+            node.RightNode = Reduce(node.RightNode);
 
-            var childNode = node.Child as ConstantExpressionNode;
+            var childNode = node.RightNode as ConstantExpressionNode;
             if (childNode != null)
             {
                 Object result;
@@ -69,9 +70,9 @@ namespace XtraLiteTemplates.Expressions
             Debug.Assert(node != null);
 
             /* Cannot be redured of reference detected. */
-            node.Child = Reduce(node.Child);
+            node.RightNode = Reduce(node.RightNode);
 
-            var childNode = node.Child as ConstantExpressionNode;
+            var childNode = node.RightNode as ConstantExpressionNode;
             if (childNode != null)
             {
                 Object result;
@@ -160,7 +161,7 @@ namespace XtraLiteTemplates.Expressions
             var unaryOperatorNode = node as UnaryOperatorExpressionNode;
             if (unaryOperatorNode != null)
             {
-                var childFunc = Build(unaryOperatorNode.Child);
+                var childFunc = Build(unaryOperatorNode.RightNode);
                 var @operator = unaryOperatorNode.Operator;
                 return (context) =>
                 {
@@ -175,7 +176,7 @@ namespace XtraLiteTemplates.Expressions
             var groupOperatorNode = node as GroupOperatorExpressionNode;
             if (groupOperatorNode != null)
             {
-                var childFunc = Build(groupOperatorNode.Child);
+                var childFunc = Build(groupOperatorNode.RightNode);
                 var @operator = groupOperatorNode.Operator;
                 return (context) =>
                 {
@@ -334,7 +335,7 @@ namespace XtraLiteTemplates.Expressions
                     (m_current == null) ||
                     (m_current is UnaryOperatorExpressionNode) ||
                     (m_current is BinaryOperatorExpressionNode) ||
-                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child == null);
+                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).RightNode == null);
             }
         }
 
@@ -345,7 +346,7 @@ namespace XtraLiteTemplates.Expressions
                 return
                     (m_current is ConstantExpressionNode) ||
                     (m_current is ReferenceExpressionNode) ||
-                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).Child != null);
+                    (m_current is GroupOperatorExpressionNode && ((GroupOperatorExpressionNode)m_current).RightNode != null);
             }
         }
 
@@ -384,27 +385,11 @@ namespace XtraLiteTemplates.Expressions
 
                 if (continuationNode != null)
                 {
-                    var _unaryOperatorNode = m_current as UnaryOperatorExpressionNode;
-                    if (_unaryOperatorNode != null)
+                    var operatorNode = m_current as OperatorExpressionNode;
+                    if (operatorNode != null)
                     {
-                        Debug.Assert(_unaryOperatorNode.Child == null);
-                        _unaryOperatorNode.Child = continuationNode;
-                    }
-
-                    var _binaryOperatorNode = m_current as BinaryOperatorExpressionNode;
-                    if (_binaryOperatorNode != null)
-                    {
-                        Debug.Assert(_binaryOperatorNode.RightNode == null);
-                        Debug.Assert(_binaryOperatorNode.LeftNode != null);
-
-                        _binaryOperatorNode.RightNode = continuationNode;
-                    }
-
-                    var _groupOperatorNode = m_current as GroupOperatorExpressionNode;
-                    if (_groupOperatorNode != null)
-                    {
-                        Debug.Assert(_groupOperatorNode.Child == null);
-                        _groupOperatorNode.Child = continuationNode;
+                        Debug.Assert(operatorNode.RightNode == null);
+                        operatorNode.RightNode = continuationNode;
                     }
 
                     m_current = continuationNode;
@@ -446,23 +431,15 @@ namespace XtraLiteTemplates.Expressions
                         };
 
                         /* Re-jig the tree. */
-                        var _binaryNode = leftNode.Parent as BinaryOperatorExpressionNode;
-                        if (_binaryNode != null)
-                            _binaryNode.RightNode = m_current;
-
-                        var _groupNode = leftNode.Parent as GroupOperatorExpressionNode;
-                        if (_groupNode != null)
-                            _groupNode.Child = m_current;
-
-                        var _unaryNode = leftNode.Parent as UnaryOperatorExpressionNode;
-                        if (_unaryNode != null)
-                            _unaryNode.Child = m_current;
-
+                        var parentOperatorNode = leftNode.Parent as OperatorExpressionNode;
+                        if (parentOperatorNode != null)
+                            parentOperatorNode.RightNode = m_current;
+                       
                         leftNode.Parent = m_current;
                         if (m_root == leftNode)
                             m_root = m_current;
-                        if (m_openGroups.Count > 0 && m_openGroups.Peek().Child == leftNode)
-                            m_openGroups.Peek().Child = m_current;
+                        if (m_openGroups.Count > 0 && m_openGroups.Peek().RightNode == leftNode)
+                            m_openGroups.Peek().RightNode = m_current;
 
                         return;
                     }

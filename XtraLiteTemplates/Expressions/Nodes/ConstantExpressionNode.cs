@@ -26,21 +26,40 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
+    using System;
+    using System.CodeDom;
+    using System.CodeDom.Compiler;
+    using System.IO;
 
-    internal abstract class OperatorExpressionNode : ExpressionNode
+    internal sealed class ConstantExpressionNode : ExpressionNode
     {
-        public Operator Operator { get; private set; }
+        public Object Operand { get; private set; }
 
-        internal OperatorExpressionNode(ExpressionNode parent, Operator @operator)
+        public ConstantExpressionNode(ExpressionNode parent, Object operand)
             : base(parent)
         {
-            Debug.Assert(@operator != null);
+            Operand = operand;
+        }
 
-            Operator = @operator;
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            if (Operand == null)
+                return "undefined";
+            else if (Operand is String)
+            {
+                using (var writer = new StringWriter())
+                {
+                    using (var provider = CodeDomProvider.CreateProvider("CSharp"))
+                    {
+                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand), writer, null);
+                        return writer.ToString();
+                    }
+                }
+            }
+            else
+                return Operand.ToString();
         }
     }
 }

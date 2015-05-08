@@ -26,25 +26,40 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
-    using System.Collections.Generic;
+    using System.Diagnostics;
+    using XtraLiteTemplates.Expressions.Operators;
 
-    internal abstract class ExpressionNode
+    internal sealed class UnaryOperatorExpressionNode : OperatorExpressionNode
     {
-        public ExpressionNode Parent { get; internal set; }
-
-        protected ExpressionNode(ExpressionNode parent)
+        public new UnaryOperator Operator
         {
-            Parent = parent;
+            get
+            {
+                return base.Operator as UnaryOperator;
+            }
         }
 
-        public abstract String ToString(ExpressionFormatStyle style);
-
-        public override String ToString()
+        public UnaryOperatorExpressionNode(ExpressionNode parent, UnaryOperator @operator)
+            : base(parent, @operator)
         {
-            return ToString(ExpressionFormatStyle.Arithmetic);
+        }
+
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
+
+            String result = null;
+
+            if (style == ExpressionFormatStyle.Canonical)
+                result = String.Format("{0}{{{1}}}", Operator, childAsString);
+            else
+                result = String.Format("{0}{1}", Operator, childAsString);
+
+            Debug.Assert(result != null);
+            return result;
         }
     }
 }

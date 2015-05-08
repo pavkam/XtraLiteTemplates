@@ -26,44 +26,28 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
+    using System.CodeDom;
+    using System.CodeDom.Compiler;
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
+    using System.IO;
 
-    internal sealed class GroupOperatorExpressionNode : OperatorExpressionNode
+    internal sealed class ReferenceExpressionNode : ExpressionNode
     {
-        public new GroupOperator Operator
-        {
-            get
-            {
-                return base.Operator as GroupOperator;
-            }
-        }
+        public String Identifier { get; private set; }
 
-        public ExpressionNode Child { get; internal set; }
-
-        internal GroupOperatorExpressionNode(ExpressionNode parent, GroupOperator @operator)
-            : base(parent, @operator)
+        public ReferenceExpressionNode(ExpressionNode parent, String identifier)
+            : base(parent)
         {
+            Debug.Assert(!String.IsNullOrEmpty(identifier));
+            Identifier = identifier;
         }
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            var childAsString = Child != null ? Child.ToString(style) : "??";
-
-            String result = null;
-
-            if (style == ExpressionFormatStyle.Arithmetic)
-                result = String.Format("{0} {1} {2}", Operator.Symbol, childAsString, Operator.Terminator);
-            else if (style == ExpressionFormatStyle.Polish)
-                result = String.Format("{0}{1}{2}", Operator.Symbol, childAsString, Operator.Terminator);
-            else if (style == ExpressionFormatStyle.Canonical)
-                result = String.Format("{0}{{{1}}}", Operator, childAsString);
-
-            Debug.Assert(result != null);
-            return result;
+            return String.Format("@{0}", Identifier);
         }
     }
 }

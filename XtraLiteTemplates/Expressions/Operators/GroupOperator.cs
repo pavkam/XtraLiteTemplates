@@ -30,7 +30,7 @@ namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
 
-    public  class GroupOperator : Operator
+    public class GroupOperator : Operator
     {
         public String Terminator { get; private set; }
 

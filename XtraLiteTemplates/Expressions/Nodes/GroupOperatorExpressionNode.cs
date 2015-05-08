@@ -26,40 +26,42 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
-    using System.IO;
+    using System.Diagnostics;
+    using XtraLiteTemplates.Expressions.Operators;
 
-    internal sealed class ConstantExpressionNode : ExpressionNode
+    internal sealed class GroupOperatorExpressionNode : OperatorExpressionNode
     {
-        public Object Operand { get; private set; }
-
-        public ConstantExpressionNode(ExpressionNode parent, Object operand)
-            : base(parent)
+        public new GroupOperator Operator
         {
-            Operand = operand;
+            get
+            {
+                return base.Operator as GroupOperator;
+            }
+        }
+
+        internal GroupOperatorExpressionNode(ExpressionNode parent, GroupOperator @operator)
+            : base(parent, @operator)
+        {
         }
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            if (Operand == null)
-                return "undefined";
-            else if (Operand is String)
-            {
-                using (var writer = new StringWriter())
-                {
-                    using (var provider = CodeDomProvider.CreateProvider("CSharp"))
-                    {
-                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand), writer, null);
-                        return writer.ToString();
-                    }
-                }
-            }
-            else
-                return Operand.ToString();
+            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
+
+            String result = null;
+
+            if (style == ExpressionFormatStyle.Arithmetic)
+                result = String.Format("{0} {1} {2}", Operator.Symbol, childAsString, Operator.Terminator);
+            else if (style == ExpressionFormatStyle.Polish)
+                result = String.Format("{0}{1}{2}", Operator.Symbol, childAsString, Operator.Terminator);
+            else if (style == ExpressionFormatStyle.Canonical)
+                result = String.Format("{0}{{{1}}}", Operator, childAsString);
+
+            Debug.Assert(result != null);
+            return result;
         }
     }
 }
