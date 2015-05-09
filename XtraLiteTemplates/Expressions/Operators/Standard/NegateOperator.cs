@@ -32,14 +32,11 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class NegateOperator : StandardUnaryOperator
     {
-        public static UnaryOperator CStyle { get; private set; }
-
-        public static UnaryOperator PascalStyle { get; private set; }
+        public static UnaryOperator Standard { get; private set; }
 
         static NegateOperator()
         {
-            CStyle = new NegateOperator("-");
-            PascalStyle = CStyle;
+            Standard = new NegateOperator("-");
         }
 
         public NegateOperator(String symbol)

@@ -32,14 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class NotEqualsOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator C { get; private set; }
 
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Pascal { get; private set; }
 
         static NotEqualsOperator()
         {
-            CStyle = new NotEqualsOperator("!=");
-            PascalStyle = new NotEqualsOperator("<>");
+            C = new NotEqualsOperator("!=");
+            Pascal = new NotEqualsOperator("<>");
         }
 
         public NotEqualsOperator(String symbol)

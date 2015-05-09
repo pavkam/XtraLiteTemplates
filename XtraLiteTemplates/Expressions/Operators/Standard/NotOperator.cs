@@ -32,14 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class NotOperator : StandardUnaryOperator
     {
-        public static UnaryOperator CStyle { get; private set; }
+        public static UnaryOperator C { get; private set; }
 
-        public static UnaryOperator PascalStyle { get; private set; }
+        public static UnaryOperator Pascal { get; private set; }
 
         static NotOperator()
         {
-            CStyle = new NotOperator("!");
-            PascalStyle = new NotOperator("not");
+            C = new NotOperator("!");
+            Pascal = new NotOperator("not");
         }
 
         public NotOperator(String symbol)

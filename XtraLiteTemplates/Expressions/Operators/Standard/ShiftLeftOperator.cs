@@ -32,14 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class ShiftLeftOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator C { get; private set; }
 
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Pascal { get; private set; }
 
         static ShiftLeftOperator()
         {
-            CStyle = new ShiftLeftOperator("<<");
-            PascalStyle = new ShiftLeftOperator("shl");
+            C = new ShiftLeftOperator("<<");
+            Pascal = new ShiftLeftOperator("shl");
         }
 
         public ShiftLeftOperator(String symbol)

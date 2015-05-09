@@ -32,14 +32,11 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class GreaterThanOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
-
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Standard { get; private set; }
 
         static GreaterThanOperator()
         {
-            CStyle = new GreaterThanOperator(">");
-            PascalStyle = CStyle;
+            Standard = new GreaterThanOperator(">");
         }
 
         public GreaterThanOperator(String symbol)

@@ -32,14 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class AndOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator C { get; private set; }
 
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Pascal { get; private set; }
 
         static AndOperator()
         {
-            CStyle = new AndOperator("&");
-            PascalStyle = new AndOperator("and");
+            C = new AndOperator("&");
+            Pascal = new AndOperator("and");
         }
 
         public AndOperator(String symbol)

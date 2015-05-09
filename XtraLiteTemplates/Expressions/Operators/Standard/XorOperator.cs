@@ -32,14 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class XorOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator C { get; private set; }
 
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Pascal { get; private set; }
 
         static XorOperator()
         {
-            CStyle = new XorOperator("^");
-            PascalStyle = new XorOperator("xor");
+            C = new XorOperator("^");
+            Pascal = new XorOperator("xor");
         }
 
         public XorOperator(String symbol)

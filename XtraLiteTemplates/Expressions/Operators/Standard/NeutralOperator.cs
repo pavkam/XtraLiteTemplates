@@ -32,14 +32,12 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class NeutralOperator : StandardUnaryOperator
     {
-        public static UnaryOperator CStyle { get; private set; }
+        public static UnaryOperator Standard { get; private set; }
 
-        public static UnaryOperator PascalStyle { get; private set; }
 
         static NeutralOperator()
         {
-            CStyle = new NeutralOperator("+");
-            PascalStyle = CStyle;
+            Standard = new NeutralOperator("+");
         }
 
         public NeutralOperator(String symbol)

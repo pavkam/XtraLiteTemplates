@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.NUnit
     [TestFixture]
     public class ExpressionOperatorTests : TestBase
     {
-        private void AssertEvaluation<T>(GroupOperator @operator, T arg, T expected)
+        private void AssertEvaluation<T>(SubscriptOperator @operator, T arg, T expected)
         {
             Object result;
             Assert.IsTrue(@operator.Evaluate(arg, out result));
@@ -116,13 +116,9 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(String.Empty, String.Empty));
             ExpectArgumentsEqualException("symbol", "terminator", () => new SubscriptOperator("same", "same"));
 
-            Assert.NotNull(SubscriptOperator.CStyle);
-            Assert.AreEqual("(", SubscriptOperator.CStyle.Symbol);
-            Assert.AreEqual(")", SubscriptOperator.CStyle.Terminator);
-
-            Assert.NotNull(SubscriptOperator.PascalStyle);
-            Assert.AreEqual("(", SubscriptOperator.PascalStyle.Symbol);
-            Assert.AreEqual(")", SubscriptOperator.PascalStyle.Terminator);
+            Assert.NotNull(SubscriptOperator.Standard);
+            Assert.AreEqual("(", SubscriptOperator.Standard.Symbol);
+            Assert.AreEqual(")", SubscriptOperator.Standard.Terminator);
 
             var op = new SubscriptOperator("start", "end");
             Assert.AreEqual("start", op.Symbol);
@@ -142,11 +138,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new AndOperator(null));
             ExpectArgumentEmptyException("symbol", () => new AndOperator(String.Empty));
 
-            Assert.NotNull(AndOperator.CStyle);
-            Assert.AreEqual("&", AndOperator.CStyle.Symbol);
+            Assert.NotNull(AndOperator.C);
+            Assert.AreEqual("&", AndOperator.C.Symbol);
 
-            Assert.NotNull(AndOperator.PascalStyle);
-            Assert.AreEqual("and", AndOperator.PascalStyle.Symbol);
+            Assert.NotNull(AndOperator.Pascal);
+            Assert.AreEqual("and", AndOperator.Pascal.Symbol);
 
             var op = new AndOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -179,11 +175,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new OrOperator(null));
             ExpectArgumentEmptyException("symbol", () => new OrOperator(String.Empty));
 
-            Assert.NotNull(OrOperator.CStyle);
-            Assert.AreEqual("|", OrOperator.CStyle.Symbol);
+            Assert.NotNull(OrOperator.C);
+            Assert.AreEqual("|", OrOperator.C.Symbol);
 
-            Assert.NotNull(OrOperator.PascalStyle);
-            Assert.AreEqual("or", OrOperator.PascalStyle.Symbol);
+            Assert.NotNull(OrOperator.Pascal);
+            Assert.AreEqual("or", OrOperator.Pascal.Symbol);
 
             var op = new OrOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -216,11 +212,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new XorOperator(null));
             ExpectArgumentEmptyException("symbol", () => new XorOperator(String.Empty));
 
-            Assert.NotNull(XorOperator.CStyle);
-            Assert.AreEqual("^", XorOperator.CStyle.Symbol);
+            Assert.NotNull(XorOperator.C);
+            Assert.AreEqual("^", XorOperator.C.Symbol);
 
-            Assert.NotNull(XorOperator.PascalStyle);
-            Assert.AreEqual("xor", XorOperator.PascalStyle.Symbol);
+            Assert.NotNull(XorOperator.Pascal);
+            Assert.AreEqual("xor", XorOperator.Pascal.Symbol);
 
             var op = new XorOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -247,11 +243,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new ShiftLeftOperator(null));
             ExpectArgumentEmptyException("symbol", () => new ShiftLeftOperator(String.Empty));
 
-            Assert.NotNull(ShiftLeftOperator.CStyle);
-            Assert.AreEqual("<<", ShiftLeftOperator.CStyle.Symbol);
+            Assert.NotNull(ShiftLeftOperator.C);
+            Assert.AreEqual("<<", ShiftLeftOperator.C.Symbol);
 
-            Assert.NotNull(ShiftLeftOperator.PascalStyle);
-            Assert.AreEqual("shl", ShiftLeftOperator.PascalStyle.Symbol);
+            Assert.NotNull(ShiftLeftOperator.Pascal);
+            Assert.AreEqual("shl", ShiftLeftOperator.Pascal.Symbol);
 
             var op = new ShiftLeftOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -277,11 +273,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new ShiftRightOperator(null));
             ExpectArgumentEmptyException("symbol", () => new ShiftRightOperator(String.Empty));
 
-            Assert.NotNull(ShiftRightOperator.CStyle);
-            Assert.AreEqual(">>", ShiftRightOperator.CStyle.Symbol);
+            Assert.NotNull(ShiftRightOperator.C);
+            Assert.AreEqual(">>", ShiftRightOperator.C.Symbol);
 
-            Assert.NotNull(ShiftRightOperator.PascalStyle);
-            Assert.AreEqual("shr", ShiftRightOperator.PascalStyle.Symbol);
+            Assert.NotNull(ShiftRightOperator.Pascal);
+            Assert.AreEqual("shr", ShiftRightOperator.Pascal.Symbol);
 
             var op = new ShiftRightOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -307,11 +303,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new NotOperator(null));
             ExpectArgumentEmptyException("symbol", () => new NotOperator(String.Empty));
 
-            Assert.NotNull(NotOperator.CStyle);
-            Assert.AreEqual("!", NotOperator.CStyle.Symbol);
+            Assert.NotNull(NotOperator.C);
+            Assert.AreEqual("!", NotOperator.C.Symbol);
 
-            Assert.NotNull(NotOperator.PascalStyle);
-            Assert.AreEqual("not", NotOperator.PascalStyle.Symbol);
+            Assert.NotNull(NotOperator.Pascal);
+            Assert.AreEqual("not", NotOperator.Pascal.Symbol);
 
             var op = new NotOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -335,11 +331,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new SubtractOperator(null));
             ExpectArgumentEmptyException("symbol", () => new SubtractOperator(String.Empty));
 
-            Assert.NotNull(SubtractOperator.CStyle);
-            Assert.AreEqual("-", SubtractOperator.CStyle.Symbol);
-
-            Assert.NotNull(SubtractOperator.PascalStyle);
-            Assert.AreEqual("-", SubtractOperator.PascalStyle.Symbol);
+            Assert.NotNull(SubtractOperator.Standard);
+            Assert.AreEqual("-", SubtractOperator.Standard.Symbol);
 
             var op = new SubtractOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -368,11 +361,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new SumOperator(null));
             ExpectArgumentEmptyException("symbol", () => new SumOperator(String.Empty));
 
-            Assert.NotNull(SumOperator.CStyle);
-            Assert.AreEqual("+", SumOperator.CStyle.Symbol);
-
-            Assert.NotNull(SumOperator.PascalStyle);
-            Assert.AreEqual("+", SumOperator.PascalStyle.Symbol);
+            Assert.NotNull(SumOperator.Standard);
+            Assert.AreEqual("+", SumOperator.Standard.Symbol);
 
             var op = new SumOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -402,11 +392,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new DivideOperator(null));
             ExpectArgumentEmptyException("symbol", () => new DivideOperator(String.Empty));
 
-            Assert.NotNull(DivideOperator.CStyle);
-            Assert.AreEqual("/", DivideOperator.CStyle.Symbol);
-
-            Assert.NotNull(DivideOperator.PascalStyle);
-            Assert.AreEqual("/", DivideOperator.PascalStyle.Symbol);
+            Assert.NotNull(DivideOperator.Standard);
+            Assert.AreEqual("/", DivideOperator.Standard.Symbol);
 
             var op = new DivideOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -435,11 +422,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new ModuloOperator(null));
             ExpectArgumentEmptyException("symbol", () => new ModuloOperator(String.Empty));
 
-            Assert.NotNull(ModuloOperator.CStyle);
-            Assert.AreEqual("%", ModuloOperator.CStyle.Symbol);
+            Assert.NotNull(ModuloOperator.C);
+            Assert.AreEqual("%", ModuloOperator.C.Symbol);
 
-            Assert.NotNull(ModuloOperator.PascalStyle);
-            Assert.AreEqual("mod", ModuloOperator.PascalStyle.Symbol);
+            Assert.NotNull(ModuloOperator.Pascal);
+            Assert.AreEqual("mod", ModuloOperator.Pascal.Symbol);
 
             var op = new ModuloOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -465,11 +452,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new MultiplyOperator(null));
             ExpectArgumentEmptyException("symbol", () => new MultiplyOperator(String.Empty));
 
-            Assert.NotNull(MultiplyOperator.CStyle);
-            Assert.AreEqual("*", MultiplyOperator.CStyle.Symbol);
-
-            Assert.NotNull(MultiplyOperator.PascalStyle);
-            Assert.AreEqual("*", MultiplyOperator.PascalStyle.Symbol);
+            Assert.NotNull(MultiplyOperator.Standard);
+            Assert.AreEqual("*", MultiplyOperator.Standard.Symbol);
 
             var op = new MultiplyOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -499,11 +483,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new NegateOperator(null));
             ExpectArgumentEmptyException("symbol", () => new NegateOperator(String.Empty));
 
-            Assert.NotNull(NegateOperator.CStyle);
-            Assert.AreEqual("-", NegateOperator.CStyle.Symbol);
-
-            Assert.NotNull(NegateOperator.PascalStyle);
-            Assert.AreEqual("-", NegateOperator.PascalStyle.Symbol);
+            Assert.NotNull(NegateOperator.Standard);
+            Assert.AreEqual("-", NegateOperator.Standard.Symbol);
 
             var op = new NegateOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -526,11 +507,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new NeutralOperator(null));
             ExpectArgumentEmptyException("symbol", () => new NeutralOperator(String.Empty));
 
-            Assert.NotNull(NeutralOperator.CStyle);
-            Assert.AreEqual("+", NeutralOperator.CStyle.Symbol);
-
-            Assert.NotNull(NeutralOperator.PascalStyle);
-            Assert.AreEqual("+", NeutralOperator.PascalStyle.Symbol);
+            Assert.NotNull(NeutralOperator.Standard);
+            Assert.AreEqual("+", NeutralOperator.Standard.Symbol);
 
             var op = new NeutralOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -555,11 +533,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new EqualsOperator(null));
             ExpectArgumentEmptyException("symbol", () => new EqualsOperator(String.Empty));
 
-            Assert.NotNull(EqualsOperator.CStyle);
-            Assert.AreEqual("==", EqualsOperator.CStyle.Symbol);
+            Assert.NotNull(EqualsOperator.C);
+            Assert.AreEqual("==", EqualsOperator.C.Symbol);
 
-            Assert.NotNull(EqualsOperator.PascalStyle);
-            Assert.AreEqual("=", EqualsOperator.PascalStyle.Symbol);
+            Assert.NotNull(EqualsOperator.Pascal);
+            Assert.AreEqual("=", EqualsOperator.Pascal.Symbol);
 
             var op = new EqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -600,11 +578,11 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new NotEqualsOperator(null));
             ExpectArgumentEmptyException("symbol", () => new NotEqualsOperator(String.Empty));
 
-            Assert.NotNull(NotEqualsOperator.CStyle);
-            Assert.AreEqual("!=", NotEqualsOperator.CStyle.Symbol);
+            Assert.NotNull(NotEqualsOperator.C);
+            Assert.AreEqual("!=", NotEqualsOperator.C.Symbol);
 
-            Assert.NotNull(NotEqualsOperator.PascalStyle);
-            Assert.AreEqual("<>", NotEqualsOperator.PascalStyle.Symbol);
+            Assert.NotNull(NotEqualsOperator.Pascal);
+            Assert.AreEqual("<>", NotEqualsOperator.Pascal.Symbol);
 
             var op = new NotEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -645,11 +623,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new GreaterThanOperator(null));
             ExpectArgumentEmptyException("symbol", () => new GreaterThanOperator(String.Empty));
 
-            Assert.NotNull(GreaterThanOperator.CStyle);
-            Assert.AreEqual(">", GreaterThanOperator.CStyle.Symbol);
-
-            Assert.NotNull(GreaterThanOperator.PascalStyle);
-            Assert.AreEqual(">", GreaterThanOperator.PascalStyle.Symbol);
+            Assert.NotNull(GreaterThanOperator.Standard);
+            Assert.AreEqual(">", GreaterThanOperator.Standard.Symbol);
 
             var op = new GreaterThanOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -686,11 +661,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new GreaterThanOrEqualsOperator(null));
             ExpectArgumentEmptyException("symbol", () => new GreaterThanOrEqualsOperator(String.Empty));
 
-            Assert.NotNull(GreaterThanOrEqualsOperator.CStyle);
-            Assert.AreEqual(">=", GreaterThanOrEqualsOperator.CStyle.Symbol);
-
-            Assert.NotNull(GreaterThanOrEqualsOperator.PascalStyle);
-            Assert.AreEqual(">=", GreaterThanOrEqualsOperator.PascalStyle.Symbol);
+            Assert.NotNull(GreaterThanOrEqualsOperator.Standard);
+            Assert.AreEqual(">=", GreaterThanOrEqualsOperator.Standard.Symbol);
 
             var op = new GreaterThanOrEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -729,11 +701,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new LowerThanOperator(null));
             ExpectArgumentEmptyException("symbol", () => new LowerThanOperator(String.Empty));
 
-            Assert.NotNull(LowerThanOperator.CStyle);
-            Assert.AreEqual("<", LowerThanOperator.CStyle.Symbol);
-
-            Assert.NotNull(LowerThanOperator.PascalStyle);
-            Assert.AreEqual("<", LowerThanOperator.PascalStyle.Symbol);
+            Assert.NotNull(LowerThanOperator.Standard);
+            Assert.AreEqual("<", LowerThanOperator.Standard.Symbol);
 
             var op = new LowerThanOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -770,11 +739,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new LowerThanOrEqualsOperator(null));
             ExpectArgumentEmptyException("symbol", () => new LowerThanOrEqualsOperator(String.Empty));
 
-            Assert.NotNull(LowerThanOrEqualsOperator.CStyle);
-            Assert.AreEqual("<=", LowerThanOrEqualsOperator.CStyle.Symbol);
-
-            Assert.NotNull(LowerThanOrEqualsOperator.PascalStyle);
-            Assert.AreEqual("<=", LowerThanOrEqualsOperator.PascalStyle.Symbol);
+            Assert.NotNull(LowerThanOrEqualsOperator.Standard);
+            Assert.AreEqual("<=", LowerThanOrEqualsOperator.Standard.Symbol);
 
             var op = new LowerThanOrEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
@@ -814,13 +780,13 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("symbol", () => new MemberAccessOperator(String.Empty, StringComparer.Ordinal));
             ExpectArgumentNullException("comparer", () => new MemberAccessOperator(".", null));
 
-            Assert.NotNull(MemberAccessOperator.CStyle);
-            Assert.AreEqual(".", MemberAccessOperator.CStyle.Symbol);
-            Assert.AreEqual(StringComparer.Ordinal, MemberAccessOperator.CStyle.Comparer);
+            Assert.NotNull(MemberAccessOperator.C);
+            Assert.AreEqual(".", MemberAccessOperator.C.Symbol);
+            Assert.AreEqual(StringComparer.Ordinal, MemberAccessOperator.C.Comparer);
 
-            Assert.NotNull(MemberAccessOperator.PascalStyle);
-            Assert.AreEqual(".", MemberAccessOperator.PascalStyle.Symbol);
-            Assert.AreEqual(StringComparer.OrdinalIgnoreCase, MemberAccessOperator.PascalStyle.Comparer);
+            Assert.NotNull(MemberAccessOperator.Pascal);
+            Assert.AreEqual(".", MemberAccessOperator.Pascal.Symbol);
+            Assert.AreEqual(StringComparer.OrdinalIgnoreCase, MemberAccessOperator.Pascal.Comparer);
 
             var op = new MemberAccessOperator("operator", StringComparer.InvariantCultureIgnoreCase);
             Assert.AreEqual("operator", op.Symbol);

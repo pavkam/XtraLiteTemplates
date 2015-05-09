@@ -32,14 +32,11 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class DivideOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
-
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Standard { get; private set; }
 
         static DivideOperator()
         {
-            CStyle = new DivideOperator("/");
-            PascalStyle = CStyle;
+            Standard = new DivideOperator("/");
         }
 
         public DivideOperator(String symbol)
@@ -52,7 +49,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
             result = left / right;
             return true;
         }
-    
+
         protected override Boolean Evaluate(Double left, Double right, out Object result)
         {
             result = left / right;

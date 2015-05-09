@@ -35,7 +35,6 @@
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\Nodes\OperatorNode.cs" />
     <Compile Include="Expressions\Operators\Standard\MemberAccessOperator.cs" />
-    <Compile Include="Expressions\Operators\Standard\SubscriptOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\ShiftRightOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\ShiftLeftOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\GreaterThanOrEqualsOperator.cs" />
@@ -67,7 +66,6 @@
     <Compile Include="Expressions\Operators\BinaryOperator.cs" />
     <Compile Include="Expressions\Expression.cs" />
     <Compile Include="Expressions\ExpressionException.cs" />
-    <Compile Include="Expressions\Operators\GroupOperator.cs" />
     <Compile Include="Expressions\Nodes\GroupNode.cs" />
     <Compile Include="Expressions\Operators\Operator.cs" />
     <Compile Include="Expressions\Operators\Standard\NeutralOperator.cs" />
@@ -75,6 +73,7 @@
     <Compile Include="Expressions\Operators\Standard\NotOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\SumOperator.cs" />
     <Compile Include="Expressions\Operators\Associativity.cs" />
+    <Compile Include="Expressions\Operators\SubscriptOperator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />

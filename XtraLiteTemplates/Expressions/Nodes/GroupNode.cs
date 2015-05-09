@@ -34,15 +34,15 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
     internal sealed class GroupNode : OperatorNode
     {
-        public new GroupOperator Operator
+        public new SubscriptOperator Operator
         {
             get
             {
-                return base.Operator as GroupOperator;
+                return base.Operator as SubscriptOperator;
             }
         }
 
-        internal GroupNode(ExpressionNode parent, GroupOperator @operator)
+        internal GroupNode(ExpressionNode parent, SubscriptOperator @operator)
             : base(parent, @operator)
         {
         }

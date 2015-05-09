@@ -32,14 +32,11 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class SumOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
-
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Standard { get; private set; }
 
         static SumOperator()
         {
-            CStyle = new SumOperator("+");
-            PascalStyle = CStyle;
+            Standard = new SumOperator("+");
         }
 
         public SumOperator(String symbol)

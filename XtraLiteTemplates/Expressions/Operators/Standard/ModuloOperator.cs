@@ -32,14 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class ModuloOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator C { get; private set; }
 
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Pascal { get; private set; }
 
         static ModuloOperator()
         {
-            CStyle = new ModuloOperator("%");
-            PascalStyle = new ModuloOperator("mod");
+            C = new ModuloOperator("%");
+            Pascal = new ModuloOperator("mod");
         }
 
         public ModuloOperator(String symbol)

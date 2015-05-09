@@ -159,7 +159,7 @@ namespace XtraLiteTemplates.NUnit
             Debug.Assert(!String.IsNullOrEmpty(exprString));
             var split = exprString.Split(' ');
 
-            Expression result = Expression.CreateStandardCStyle();
+            Expression result = Expression.CreateStandardC();
             foreach (var term in split)
             {
                 Int64 _integer;
@@ -218,23 +218,23 @@ namespace XtraLiteTemplates.NUnit
             var expression = new Expression();
 
             /* Unary */
-            expression.RegisterOperator(NeutralOperator.PascalStyle);
+            expression.RegisterOperator(NeutralOperator.Standard);
             Assert.AreEqual(1, expression.SupportedOperators.Count);
-            Assert.AreEqual(NeutralOperator.PascalStyle, expression.SupportedOperators[0]);
-            Assert.IsTrue(expression.IsSupportedOperator(NeutralOperator.PascalStyle.Symbol));
+            Assert.AreEqual(NeutralOperator.Standard, expression.SupportedOperators[0]);
+            Assert.IsTrue(expression.IsSupportedOperator(NeutralOperator.Standard.Symbol));
 
             /* Binary */
-            expression.RegisterOperator(SumOperator.PascalStyle);
+            expression.RegisterOperator(SumOperator.Standard);
             Assert.AreEqual(2, expression.SupportedOperators.Count);
-            Assert.AreEqual(SumOperator.PascalStyle, expression.SupportedOperators[1]);
-            Assert.IsTrue(expression.IsSupportedOperator(SumOperator.PascalStyle.Symbol));
+            Assert.AreEqual(SumOperator.Standard, expression.SupportedOperators[1]);
+            Assert.IsTrue(expression.IsSupportedOperator(SumOperator.Standard.Symbol));
 
             /* Group */
-            expression.RegisterOperator(SubscriptOperator.PascalStyle);
+            expression.RegisterOperator(SubscriptOperator.Standard);
             Assert.AreEqual(3, expression.SupportedOperators.Count);
-            Assert.AreEqual(SubscriptOperator.PascalStyle, expression.SupportedOperators[2]);
-            Assert.IsTrue(expression.IsSupportedOperator(SubscriptOperator.PascalStyle.Symbol));
-            Assert.IsTrue(expression.IsSupportedOperator(SubscriptOperator.PascalStyle.Terminator));
+            Assert.AreEqual(SubscriptOperator.Standard, expression.SupportedOperators[2]);
+            Assert.IsTrue(expression.IsSupportedOperator(SubscriptOperator.Standard.Symbol));
+            Assert.IsTrue(expression.IsSupportedOperator(SubscriptOperator.Standard.Terminator));
 
             ExpectArgumentEmptyException("symbol", () => expression.IsSupportedOperator(null));
             ExpectArgumentEmptyException("symbol", () => expression.IsSupportedOperator(String.Empty));
@@ -303,7 +303,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.IsFalse(expression1.Constructed);
             ExpectCannotConstructExpressionInvalidStateException(() => expression1.Construct());
 
-            expression1.RegisterOperator(SumOperator.CStyle);
+            expression1.RegisterOperator(SumOperator.Standard);
 
             expression1.FeedLiteral(1);
             Assert.IsTrue(expression1.Started);
@@ -311,7 +311,7 @@ namespace XtraLiteTemplates.NUnit
 
             var context = CreateStandardTestEvaluationContext(expression1);
 
-            ExpectCannotRegisterOperatorsForStartedExpressionException(() => expression1.RegisterOperator(SumOperator.CStyle));
+            ExpectCannotRegisterOperatorsForStartedExpressionException(() => expression1.RegisterOperator(SumOperator.Standard));
             ExpectCannotEvaluateUnconstructedExpressionException(() => expression1.Evaluate(context));
 
             expression1.Construct();
@@ -369,7 +369,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluation_EmptyGroup()
         {
-            var expression = Expression.CreateStandardCStyle();
+            var expression = Expression.CreateStandardC();
 
             expression.FeedSymbol("(");            
             ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
@@ -378,7 +378,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseFeedingErrors()
         {
-            var expression = Expression.CreateStandardCStyle();
+            var expression = Expression.CreateStandardC();
             ExpectInvalidExpressionTermException("*", () => expression.FeedSymbol("*"));
             ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
 
@@ -405,7 +405,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseBalancingErrors()
         {
-            var expression = Expression.CreateStandardCStyle();
+            var expression = Expression.CreateStandardC();
 
             expression.FeedSymbol("+");
             ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
@@ -481,7 +481,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseCaseToString_2()
         {
-            var expression = Expression.CreateStandardCStyle();
+            var expression = Expression.CreateStandardC();
             var def1 = expression.ToString();
 
             expression.FeedSymbol("!");
@@ -612,7 +612,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            expression.RegisterOperator(SumOperator.PascalStyle);
+            expression.RegisterOperator(SumOperator.Standard);
             expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
 
             expression.FeedSymbol("symbol_1");
@@ -631,7 +631,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            expression.RegisterOperator(SumOperator.PascalStyle);
+            expression.RegisterOperator(SumOperator.Standard);
             expression.RegisterOperator(new LhsIdentTestOperator(".", 100));
 
             expression.FeedSymbol("symbol_1");
@@ -646,8 +646,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            expression.RegisterOperator(MultiplyOperator.CStyle);
-            expression.RegisterOperator(AndOperator.CStyle);
+            expression.RegisterOperator(MultiplyOperator.Standard);
+            expression.RegisterOperator(AndOperator.C);
             expression.RegisterOperator(new LhsRhsIdentTestOperator("."));
 
             expression.FeedSymbol("a");
@@ -738,7 +738,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseMemberAccess4()
         {
-            var expression = Expression.CreateStandardCStyle();
+            var expression = Expression.CreateStandardC();
 
             expression.FeedSymbol("!");
             expression.FeedSymbol("variable");
@@ -772,35 +772,51 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseFunction1()
+        {
+            var expression = Expression.CreateStandardC();
+
+            expression.FeedSymbol("function");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("internal");
+            expression.FeedSymbol(")");
+
+            expression.Construct();
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("function(){internal}", canonical);
+        }
+
+        [Test]
         public void TestCaseCreateMethodCStyle()
         {
-            var expression = Expression.CreateStandardCStyle();
+            var expression = Expression.CreateStandardC();
             var allOperators = new HashSet<Operator>(expression.SupportedOperators);
 
             Assert.AreEqual(StringComparer.Ordinal, expression.Comparer);
             Assert.AreEqual(19, allOperators.Count);
 
-            allOperators.Remove(SubscriptOperator.CStyle);
-            allOperators.Remove(MemberAccessOperator.CStyle);
-            allOperators.Remove(OrOperator.CStyle);
-            allOperators.Remove(AndOperator.CStyle);
-            allOperators.Remove(NotOperator.CStyle);
-            allOperators.Remove(ShiftLeftOperator.CStyle);
-            allOperators.Remove(ShiftRightOperator.CStyle);
-            allOperators.Remove(XorOperator.CStyle);
-            allOperators.Remove(EqualsOperator.CStyle);
-            allOperators.Remove(NotEqualsOperator.CStyle);
-            allOperators.Remove(GreaterThanOperator.CStyle);
-            allOperators.Remove(GreaterThanOrEqualsOperator.CStyle);
-            allOperators.Remove(LowerThanOperator.CStyle);
-            allOperators.Remove(LowerThanOrEqualsOperator.CStyle);
-            allOperators.Remove(NeutralOperator.CStyle);
-            allOperators.Remove(NegateOperator.CStyle);
-            allOperators.Remove(ModuloOperator.CStyle);
-            allOperators.Remove(DivideOperator.CStyle);
-            allOperators.Remove(MultiplyOperator.CStyle);
-            allOperators.Remove(SubtractOperator.CStyle);
-            allOperators.Remove(SumOperator.CStyle);
+            allOperators.Remove(SubscriptOperator.Standard);
+            allOperators.Remove(MemberAccessOperator.C);
+            allOperators.Remove(OrOperator.C);
+            allOperators.Remove(AndOperator.C);
+            allOperators.Remove(NotOperator.C);
+            allOperators.Remove(ShiftLeftOperator.C);
+            allOperators.Remove(ShiftRightOperator.C);
+            allOperators.Remove(XorOperator.C);
+            allOperators.Remove(EqualsOperator.C);
+            allOperators.Remove(NotEqualsOperator.C);
+            allOperators.Remove(GreaterThanOperator.Standard);
+            allOperators.Remove(GreaterThanOrEqualsOperator.Standard);
+            allOperators.Remove(LowerThanOperator.Standard);
+            allOperators.Remove(LowerThanOrEqualsOperator.Standard);
+            allOperators.Remove(NeutralOperator.Standard);
+            allOperators.Remove(NegateOperator.Standard);
+            allOperators.Remove(ModuloOperator.C);
+            allOperators.Remove(DivideOperator.Standard);
+            allOperators.Remove(MultiplyOperator.Standard);
+            allOperators.Remove(SubtractOperator.Standard);
+            allOperators.Remove(SumOperator.Standard);
 
             Assert.AreEqual(0, allOperators.Count);
         }
@@ -808,33 +824,33 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseCreateMethodPascalStyle()
         {
-            var expression = Expression.CreateStandardPascalStyle();
+            var expression = Expression.CreateStandardPascal();
             var allOperators = new HashSet<Operator>(expression.SupportedOperators);
 
             Assert.AreEqual(StringComparer.OrdinalIgnoreCase, expression.Comparer);
             Assert.AreEqual(19, allOperators.Count);
 
-            allOperators.Remove(SubscriptOperator.PascalStyle);
-            allOperators.Remove(MemberAccessOperator.PascalStyle);
-            allOperators.Remove(OrOperator.PascalStyle);
-            allOperators.Remove(AndOperator.PascalStyle);
-            allOperators.Remove(NotOperator.PascalStyle);
-            allOperators.Remove(ShiftLeftOperator.PascalStyle);
-            allOperators.Remove(ShiftRightOperator.PascalStyle);
-            allOperators.Remove(XorOperator.PascalStyle);
-            allOperators.Remove(EqualsOperator.PascalStyle);
-            allOperators.Remove(NotEqualsOperator.PascalStyle);
-            allOperators.Remove(GreaterThanOperator.PascalStyle);
-            allOperators.Remove(GreaterThanOrEqualsOperator.PascalStyle);
-            allOperators.Remove(LowerThanOperator.PascalStyle);
-            allOperators.Remove(LowerThanOrEqualsOperator.PascalStyle);
-            allOperators.Remove(NeutralOperator.PascalStyle);
-            allOperators.Remove(NegateOperator.PascalStyle);
-            allOperators.Remove(ModuloOperator.PascalStyle);
-            allOperators.Remove(DivideOperator.PascalStyle);
-            allOperators.Remove(MultiplyOperator.PascalStyle);
-            allOperators.Remove(SubtractOperator.PascalStyle);
-            allOperators.Remove(SumOperator.PascalStyle);
+            allOperators.Remove(SubscriptOperator.Standard);
+            allOperators.Remove(MemberAccessOperator.Pascal);
+            allOperators.Remove(OrOperator.Pascal);
+            allOperators.Remove(AndOperator.Pascal);
+            allOperators.Remove(NotOperator.Pascal);
+            allOperators.Remove(ShiftLeftOperator.Pascal);
+            allOperators.Remove(ShiftRightOperator.Pascal);
+            allOperators.Remove(XorOperator.Pascal);
+            allOperators.Remove(EqualsOperator.Pascal);
+            allOperators.Remove(NotEqualsOperator.Pascal);
+            allOperators.Remove(GreaterThanOperator.Standard);
+            allOperators.Remove(GreaterThanOrEqualsOperator.Standard);
+            allOperators.Remove(LowerThanOperator.Standard);
+            allOperators.Remove(LowerThanOrEqualsOperator.Standard);
+            allOperators.Remove(NeutralOperator.Standard);
+            allOperators.Remove(NegateOperator.Standard);
+            allOperators.Remove(ModuloOperator.Pascal);
+            allOperators.Remove(DivideOperator.Standard);
+            allOperators.Remove(MultiplyOperator.Standard);
+            allOperators.Remove(SubtractOperator.Standard);
+            allOperators.Remove(SumOperator.Standard);
 
             Assert.AreEqual(0, allOperators.Count);
         }

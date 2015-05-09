@@ -32,14 +32,11 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class SubtractOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
-
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Standard { get; private set; }
 
         static SubtractOperator()
         {
-            CStyle = new SubtractOperator("-");
-            PascalStyle = CStyle;
+            Standard = new SubtractOperator("-");
         }
 
         public SubtractOperator(String symbol)

@@ -35,16 +35,16 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class MemberAccessOperator : BinaryOperator
     {
-        public static MemberAccessOperator CStyle { get; private set; }
+        public static MemberAccessOperator C { get; private set; }
 
-        public static MemberAccessOperator PascalStyle { get; private set; }
+        public static MemberAccessOperator Pascal { get; private set; }
 
         public IEqualityComparer<String> Comparer { get; private set; }
 
         static MemberAccessOperator()
         {
-            CStyle = new MemberAccessOperator(".", StringComparer.Ordinal);
-            PascalStyle = new MemberAccessOperator(".", StringComparer.OrdinalIgnoreCase);
+            C = new MemberAccessOperator(".", StringComparer.Ordinal);
+            Pascal = new MemberAccessOperator(".", StringComparer.OrdinalIgnoreCase);
         }
 
         public MemberAccessOperator(String symbol, IEqualityComparer<String> comparer)

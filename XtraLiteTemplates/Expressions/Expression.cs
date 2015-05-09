@@ -44,8 +44,8 @@ namespace XtraLiteTemplates.Expressions
         private Stack<GroupNode> m_openGroups;
         private Dictionary<String, UnaryOperator> m_unaryOperators;
         private Dictionary<String, BinaryOperator> m_binaryOperators;
-        private Dictionary<String, GroupOperator> m_startGroupOperators;
-        private Dictionary<String, GroupOperator> m_endGroupOperators;
+        private Dictionary<String, SubscriptOperator> m_startGroupOperators;
+        private Dictionary<String, SubscriptOperator> m_endGroupOperators;
 
 
         public Boolean Constructed
@@ -92,8 +92,8 @@ namespace XtraLiteTemplates.Expressions
 
             m_unaryOperators = new Dictionary<String, UnaryOperator>(comparer);
             m_binaryOperators = new Dictionary<String, BinaryOperator>(comparer);
-            m_startGroupOperators = new Dictionary<String, GroupOperator>();
-            m_endGroupOperators = new Dictionary<String, GroupOperator>();
+            m_startGroupOperators = new Dictionary<String, SubscriptOperator>();
+            m_endGroupOperators = new Dictionary<String, SubscriptOperator>();
             m_supportedOperators = new List<Operator>();
             m_openGroups = new Stack<GroupNode>();
 
@@ -139,9 +139,9 @@ namespace XtraLiteTemplates.Expressions
 
                 m_binaryOperators.Add(@operator.Symbol, binaryOperator);
             }
-            else if (@operator is GroupOperator)
+            else if (@operator is SubscriptOperator)
             {
-                var groupOperator = (GroupOperator)@operator;
+                var groupOperator = (SubscriptOperator)@operator;
                 if (m_unaryOperators.ContainsKey(groupOperator.Symbol) ||
                     m_unaryOperators.ContainsKey(groupOperator.Terminator) ||
                     m_binaryOperators.ContainsKey(groupOperator.Symbol) ||
@@ -163,8 +163,6 @@ namespace XtraLiteTemplates.Expressions
             m_supportedOperators.Add(@operator);
             return this;
         }
-
-
 
         private Boolean GroupStartOrUnaryOperatorOrLiteralExpected
         {
@@ -210,7 +208,7 @@ namespace XtraLiteTemplates.Expressions
                     if (m_unaryOperators.TryGetValue(_symbol, out _unaryOperator))
                         continuationNode = new UnaryOperatorNode(m_current, _unaryOperator);
 
-                    GroupOperator _groupOperator;
+                    SubscriptOperator _groupOperator;
                     if (m_startGroupOperators.TryGetValue(_symbol, out _groupOperator))
                     {
                         continuationNode = new GroupNode(m_current, _groupOperator);
@@ -251,7 +249,7 @@ namespace XtraLiteTemplates.Expressions
                 {
                     var _symbol = (String)term;
 
-                    GroupOperator _groupOperator;
+                    SubscriptOperator _groupOperator;
                     if (m_endGroupOperators.TryGetValue(_symbol, out _groupOperator))
                     {
                         var _currentlyOpenGroupNode = m_openGroups.Count > 0 ? m_openGroups.Pop() : null;
@@ -261,7 +259,16 @@ namespace XtraLiteTemplates.Expressions
                             return;
                         }
                     }
+                    /*
+                    if (m_current is LeafNode && ((LeafNode)m_current).Evaluation == LeafNode.EvaluationType.Variable &&
+                        m_startGroupOperators.TryGetValue(_symbol, out _groupOperator) && _groupOperator.Function)
+                    {
+                        m_openGroups.Push(_groupOperator);
 
+                        m_current = _currentlyOpenGroupNode;
+                        return;
+                    }
+*/
                     BinaryOperator _binaryOperator;
                     if (m_binaryOperators.TryGetValue(_symbol, out _binaryOperator))
                     {
@@ -371,66 +378,66 @@ namespace XtraLiteTemplates.Expressions
                 return m_root.ToString(style);
         }
 
-        public static Expression CreateStandardCStyle()
+        public static Expression CreateStandardC()
         {
             var expression = new Expression(StringComparer.Ordinal);
 
-            expression.RegisterOperator(SubscriptOperator.CStyle);
-            expression.RegisterOperator(MemberAccessOperator.CStyle);
+            expression.RegisterOperator(SubscriptOperator.Standard);
+            expression.RegisterOperator(MemberAccessOperator.C);
 
-            expression.RegisterOperator(OrOperator.CStyle);
-            expression.RegisterOperator(AndOperator.CStyle);
-            expression.RegisterOperator(NotOperator.CStyle);
-            expression.RegisterOperator(ShiftLeftOperator.CStyle);
-            expression.RegisterOperator(ShiftRightOperator.CStyle);
-            expression.RegisterOperator(XorOperator.CStyle);
+            expression.RegisterOperator(OrOperator.C);
+            expression.RegisterOperator(AndOperator.C);
+            expression.RegisterOperator(NotOperator.C);
+            expression.RegisterOperator(ShiftLeftOperator.C);
+            expression.RegisterOperator(ShiftRightOperator.C);
+            expression.RegisterOperator(XorOperator.C);
 
-            expression.RegisterOperator(EqualsOperator.CStyle);
-            expression.RegisterOperator(NotEqualsOperator.CStyle);
-            expression.RegisterOperator(GreaterThanOperator.CStyle);
-            expression.RegisterOperator(GreaterThanOrEqualsOperator.CStyle);
-            expression.RegisterOperator(LowerThanOperator.CStyle);
-            expression.RegisterOperator(LowerThanOrEqualsOperator.CStyle);
+            expression.RegisterOperator(EqualsOperator.C);
+            expression.RegisterOperator(NotEqualsOperator.C);
+            expression.RegisterOperator(GreaterThanOperator.Standard);
+            expression.RegisterOperator(GreaterThanOrEqualsOperator.Standard);
+            expression.RegisterOperator(LowerThanOperator.Standard);
+            expression.RegisterOperator(LowerThanOrEqualsOperator.Standard);
 
-            expression.RegisterOperator(NeutralOperator.CStyle);
-            expression.RegisterOperator(NegateOperator.CStyle);
-            expression.RegisterOperator(ModuloOperator.CStyle);
-            expression.RegisterOperator(DivideOperator.CStyle);
-            expression.RegisterOperator(MultiplyOperator.CStyle);
-            expression.RegisterOperator(SubtractOperator.CStyle);
-            expression.RegisterOperator(SumOperator.CStyle);
+            expression.RegisterOperator(NeutralOperator.Standard);
+            expression.RegisterOperator(NegateOperator.Standard);
+            expression.RegisterOperator(ModuloOperator.C);
+            expression.RegisterOperator(DivideOperator.Standard);
+            expression.RegisterOperator(MultiplyOperator.Standard);
+            expression.RegisterOperator(SubtractOperator.Standard);
+            expression.RegisterOperator(SumOperator.Standard);
 
             return expression;
         }
 
-        public static Expression CreateStandardPascalStyle()
+        public static Expression CreateStandardPascal()
         {
             var expression = new Expression(StringComparer.OrdinalIgnoreCase);
 
-            expression.RegisterOperator(SubscriptOperator.PascalStyle);
-            expression.RegisterOperator(MemberAccessOperator.PascalStyle);
+            expression.RegisterOperator(SubscriptOperator.Standard);
+            expression.RegisterOperator(MemberAccessOperator.Pascal);
 
-            expression.RegisterOperator(OrOperator.PascalStyle);
-            expression.RegisterOperator(AndOperator.PascalStyle);
-            expression.RegisterOperator(NotOperator.PascalStyle);
-            expression.RegisterOperator(ShiftLeftOperator.PascalStyle);
-            expression.RegisterOperator(ShiftRightOperator.PascalStyle);
-            expression.RegisterOperator(XorOperator.PascalStyle);
+            expression.RegisterOperator(OrOperator.Pascal);
+            expression.RegisterOperator(AndOperator.Pascal);
+            expression.RegisterOperator(NotOperator.Pascal);
+            expression.RegisterOperator(ShiftLeftOperator.Pascal);
+            expression.RegisterOperator(ShiftRightOperator.Pascal);
+            expression.RegisterOperator(XorOperator.Pascal);
 
-            expression.RegisterOperator(EqualsOperator.PascalStyle);
-            expression.RegisterOperator(NotEqualsOperator.PascalStyle);
-            expression.RegisterOperator(GreaterThanOperator.PascalStyle);
-            expression.RegisterOperator(GreaterThanOrEqualsOperator.PascalStyle);
-            expression.RegisterOperator(LowerThanOperator.PascalStyle);
-            expression.RegisterOperator(LowerThanOrEqualsOperator.PascalStyle);
+            expression.RegisterOperator(EqualsOperator.Pascal);
+            expression.RegisterOperator(NotEqualsOperator.Pascal);
+            expression.RegisterOperator(GreaterThanOperator.Standard);
+            expression.RegisterOperator(GreaterThanOrEqualsOperator.Standard);
+            expression.RegisterOperator(LowerThanOperator.Standard);
+            expression.RegisterOperator(LowerThanOrEqualsOperator.Standard);
 
-            expression.RegisterOperator(NeutralOperator.PascalStyle);
-            expression.RegisterOperator(NegateOperator.PascalStyle);
-            expression.RegisterOperator(ModuloOperator.PascalStyle);
-            expression.RegisterOperator(DivideOperator.PascalStyle);
-            expression.RegisterOperator(MultiplyOperator.PascalStyle);
-            expression.RegisterOperator(SubtractOperator.PascalStyle);
-            expression.RegisterOperator(SumOperator.PascalStyle);
+            expression.RegisterOperator(NeutralOperator.Standard);
+            expression.RegisterOperator(NegateOperator.Standard);
+            expression.RegisterOperator(ModuloOperator.Pascal);
+            expression.RegisterOperator(DivideOperator.Standard);
+            expression.RegisterOperator(MultiplyOperator.Standard);
+            expression.RegisterOperator(SubtractOperator.Standard);
+            expression.RegisterOperator(SumOperator.Standard);
 
             return expression;
         }

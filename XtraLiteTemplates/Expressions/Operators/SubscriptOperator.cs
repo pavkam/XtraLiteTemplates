@@ -26,25 +26,51 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions.Operators.Standard
+namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
 
-    public sealed class SubscriptOperator : GroupOperator
+    public class SubscriptOperator : Operator
     {
-        public static GroupOperator CStyle { get; private set; }
-
-        public static GroupOperator PascalStyle { get; private set; }
+        public static SubscriptOperator Standard { get; private set; }
 
         static SubscriptOperator()
         {
-            CStyle = new SubscriptOperator("(", ")");
-            PascalStyle = CStyle;
+            Standard = new SubscriptOperator("(", ")");
         }
 
+        public String Terminator { get; private set; }
+
         public SubscriptOperator(String symbol, String terminator)
-            : base(symbol, terminator)
+            : base(symbol, Int32.MaxValue, false)
         {
+            Expect.NotEmpty("terminator", terminator);
+            Expect.NotEqual("symbol", "terminator", symbol, terminator);
+
+            Terminator = terminator;
+        }
+
+        public override Boolean Evaluate(Object arg, out Object result)
+        {
+            result = arg;
+            return true;
+        }
+
+        public override String ToString()
+        {
+            return String.Format("{0}{1}", Symbol, Terminator);
+        }
+
+        public override Boolean Equals(Object obj)
+        {
+            var objc = obj as SubscriptOperator;
+            return 
+                objc != null && objc.Symbol == Symbol && objc.Terminator == Terminator;
+        }
+
+        public override Int32 GetHashCode()
+        {
+            return Symbol.GetHashCode() ^ Terminator.GetHashCode();
         }
     }
 }

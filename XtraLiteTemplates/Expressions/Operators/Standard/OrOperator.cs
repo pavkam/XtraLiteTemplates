@@ -32,14 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class OrOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator C { get; private set; }
 
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Pascal { get; private set; }
 
         static OrOperator()
         {
-            CStyle = new OrOperator("|");
-            PascalStyle = new OrOperator("or");
+            C = new OrOperator("|");
+            Pascal = new OrOperator("or");
         }
 
         public OrOperator(String symbol)

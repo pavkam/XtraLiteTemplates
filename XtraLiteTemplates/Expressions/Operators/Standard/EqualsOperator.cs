@@ -32,14 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class EqualsOperator : StandardBinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
+        public static BinaryOperator C { get; private set; }
 
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static BinaryOperator Pascal { get; private set; }
 
         static EqualsOperator()
         {
-            CStyle = new EqualsOperator("==");
-            PascalStyle = new EqualsOperator("=");
+            C = new EqualsOperator("==");
+            Pascal = new EqualsOperator("=");
         }
 
         public EqualsOperator(String symbol)
