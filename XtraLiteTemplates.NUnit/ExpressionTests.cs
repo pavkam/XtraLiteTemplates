@@ -772,22 +772,6 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseFunction1()
-        {
-            var expression = Expression.CreateStandardC();
-
-            expression.FeedSymbol("function");
-            expression.FeedSymbol("(");
-            expression.FeedSymbol("internal");
-            expression.FeedSymbol(")");
-
-            expression.Construct();
-
-            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
-            Assert.AreEqual("function(){internal}", canonical);
-        }
-
-        [Test]
         public void TestCaseCreateMethodCStyle()
         {
             var expression = Expression.CreateStandardC();

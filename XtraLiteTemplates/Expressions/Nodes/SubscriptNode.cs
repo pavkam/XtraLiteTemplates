@@ -32,7 +32,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal sealed class GroupNode : OperatorNode
+    internal sealed class SubscriptNode : OperatorNode
     {
         public new SubscriptOperator Operator
         {
@@ -42,7 +42,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
-        internal GroupNode(ExpressionNode parent, SubscriptOperator @operator)
+        internal SubscriptNode(ExpressionNode parent, SubscriptOperator @operator)
             : base(parent, @operator)
         {
         }

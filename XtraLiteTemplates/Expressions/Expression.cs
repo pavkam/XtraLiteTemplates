@@ -41,7 +41,7 @@ namespace XtraLiteTemplates.Expressions
         private ExpressionNode m_root;
         private List<Operator> m_supportedOperators;
         private Func<IEvaluationContext, Object> m_function;
-        private Stack<GroupNode> m_openGroups;
+        private Stack<SubscriptNode> m_openGroups;
         private Dictionary<String, UnaryOperator> m_unaryOperators;
         private Dictionary<String, BinaryOperator> m_binaryOperators;
         private Dictionary<String, SubscriptOperator> m_startGroupOperators;
@@ -95,7 +95,7 @@ namespace XtraLiteTemplates.Expressions
             m_startGroupOperators = new Dictionary<String, SubscriptOperator>();
             m_endGroupOperators = new Dictionary<String, SubscriptOperator>();
             m_supportedOperators = new List<Operator>();
-            m_openGroups = new Stack<GroupNode>();
+            m_openGroups = new Stack<SubscriptNode>();
 
             Comparer = comparer;
         }
@@ -172,7 +172,7 @@ namespace XtraLiteTemplates.Expressions
                     (m_current == null) ||
                 (m_current is UnaryOperatorNode) ||
                 (m_current is BinaryOperatorNode) ||
-                (m_current is GroupNode && ((GroupNode)m_current).RightNode == null);
+                (m_current is SubscriptNode && ((SubscriptNode)m_current).RightNode == null);
             }
         }
 
@@ -182,7 +182,7 @@ namespace XtraLiteTemplates.Expressions
             {
                 return
                     (m_current is LeafNode) ||
-                (m_current is GroupNode && ((GroupNode)m_current).RightNode != null);
+                (m_current is SubscriptNode && ((SubscriptNode)m_current).RightNode != null);
             }
         }
 
@@ -211,8 +211,8 @@ namespace XtraLiteTemplates.Expressions
                     SubscriptOperator _groupOperator;
                     if (m_startGroupOperators.TryGetValue(_symbol, out _groupOperator))
                     {
-                        continuationNode = new GroupNode(m_current, _groupOperator);
-                        m_openGroups.Push((GroupNode)continuationNode);
+                        continuationNode = new SubscriptNode(m_current, _groupOperator);
+                        m_openGroups.Push((SubscriptNode)continuationNode);
                     }
 
                     /* Invalid cases. */
