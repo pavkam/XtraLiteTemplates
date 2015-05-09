@@ -32,20 +32,37 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.CodeDom;
     using System.CodeDom.Compiler;
     using System.IO;
+    using System.Diagnostics;
 
     internal class LeafNode : ExpressionNode
     {
+        public enum EvaluationType
+        {
+            Literal,
+            Variable,
+            Indentifier,
+        }
+
         public Object Operand { get; private set; }
 
-        public LeafNode(ExpressionNode parent, Object operand)
+        public EvaluationType Evaluation { get; private set; }
+
+        public LeafNode(ExpressionNode parent, Object operand, EvaluationType type)
             : base(parent)
         {
+            Debug.Assert(type == EvaluationType.Literal || operand is String);
+
             Operand = operand;
+            Evaluation = type;
         }
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            if (Operand == null)
+            if (Evaluation == EvaluationType.Indentifier)
+                return (String)Operand;
+            else if (Evaluation == EvaluationType.Variable)
+                return String.Format("@{0}", Operand);
+            else if (Operand == null)
                 return "undefined";
             else if (Operand is String)
             {
@@ -64,15 +81,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public override Func<IEvaluationContext, Object> Build()
         {
-            return (context) => Operand;
-        }
-
-        public virtual Boolean Reducible
-        {
-            get
-            {
-                return true;
-            }
+            if (Evaluation == EvaluationType.Variable)
+                return (IEvaluationContext context) => context.GetVariable((String)Operand);
+            else
+                return (IEvaluationContext context) => Operand;
         }
     }
 }

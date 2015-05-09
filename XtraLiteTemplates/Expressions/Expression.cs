@@ -70,9 +70,9 @@ namespace XtraLiteTemplates.Expressions
 
             return 
                 m_unaryOperators.ContainsKey(symbol) ||
-                m_binaryOperators.ContainsKey(symbol) ||
-                m_startGroupOperators.ContainsKey(symbol) ||
-                m_endGroupOperators.ContainsKey(symbol);
+            m_binaryOperators.ContainsKey(symbol) ||
+            m_startGroupOperators.ContainsKey(symbol) ||
+            m_endGroupOperators.ContainsKey(symbol);
         }
 
         public IReadOnlyList<Operator> SupportedOperators
@@ -172,9 +172,9 @@ namespace XtraLiteTemplates.Expressions
             {
                 return
                     (m_current == null) ||
-                    (m_current is UnaryOperatorNode) ||
-                    (m_current is BinaryOperatorNode) ||
-                    (m_current is GroupNode && ((GroupNode)m_current).RightNode == null);
+                (m_current is UnaryOperatorNode) ||
+                (m_current is BinaryOperatorNode) ||
+                (m_current is GroupNode && ((GroupNode)m_current).RightNode == null);
             }
         }
 
@@ -184,10 +184,10 @@ namespace XtraLiteTemplates.Expressions
             {
                 return
                     (m_current is LeafNode) ||
-                    (m_current is IdentifierNode) ||
-                    (m_current is GroupNode && ((GroupNode)m_current).RightNode != null);
+                (m_current is GroupNode && ((GroupNode)m_current).RightNode != null);
             }
         }
+
 
         private void FeedTerm(Object term, Boolean isLiteral)
         {
@@ -200,10 +200,10 @@ namespace XtraLiteTemplates.Expressions
             {
                 ExpressionNode continuationNode = null;
                 if (isLiteral)
-                    continuationNode = new LeafNode(m_current, term);
+                    continuationNode = new LeafNode(m_current, term, LeafNode.EvaluationType.Literal);
                 else
                 {
-                    String _symbol = (String)term;
+                    var _symbol = (String)term;
 
                     /* Good cases. */
                     UnaryOperator _unaryOperator;
@@ -219,7 +219,11 @@ namespace XtraLiteTemplates.Expressions
 
                     /* Invalid cases. */
                     if (continuationNode == null && !m_endGroupOperators.ContainsKey(_symbol) && !m_binaryOperators.ContainsKey(_symbol))
-                        continuationNode = new IdentifierNode(m_current, _symbol);
+                    {
+                        var evaluationType = m_current != null && ((OperatorNode)m_current).Operator.ExpectRhsIdentifier ? 
+                            LeafNode.EvaluationType.Indentifier : LeafNode.EvaluationType.Variable;
+                        continuationNode = new LeafNode(m_current, _symbol, evaluationType);
+                    }
                 }
 
                 if (continuationNode != null)
@@ -228,6 +232,10 @@ namespace XtraLiteTemplates.Expressions
                     if (operatorNode != null)
                     {
                         Debug.Assert(operatorNode.RightNode == null);
+
+                        if (operatorNode.Operator.ExpectRhsIdentifier && (isLiteral || !(continuationNode is LeafNode)))
+                            ExpressionException.UnexpectedExpressionTerm(term);
+                        
                         operatorNode.RightNode = continuationNode;
                     }
 
@@ -241,7 +249,7 @@ namespace XtraLiteTemplates.Expressions
             {
                 if (!isLiteral)
                 {
-                    String _symbol = (String)term;
+                    var _symbol = (String)term;
 
                     GroupOperator _groupOperator;
                     if (m_endGroupOperators.TryGetValue(_symbol, out _groupOperator))
@@ -261,7 +269,7 @@ namespace XtraLiteTemplates.Expressions
 
                         /* Go up the tree while the precedence allows. */
                         while (leftNode.Parent != null &&
-                            ((OperatorNode)leftNode.Parent).Operator.Precedence <= _binaryOperator.Precedence)
+                               ((OperatorNode)leftNode.Parent).Operator.Precedence <= _binaryOperator.Precedence)
                             leftNode = leftNode.Parent;
 
                         m_current = new BinaryOperatorNode(leftNode.Parent, _binaryOperator)

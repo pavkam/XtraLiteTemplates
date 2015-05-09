@@ -66,8 +66,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
             var leafRight = RightNode as LeafNode;
             Object reducedOperand;
 
-            if (leafRight != null && leafRight.Reducible && Operator.Evaluate(leafRight.Operand, out reducedOperand))
-                return new LeafNode(Parent, reducedOperand);
+            if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal &&
+                Operator.Evaluate(leafRight.Operand, out reducedOperand))
+                return new LeafNode(Parent, reducedOperand, LeafNode.EvaluationType.Literal);
             else
                 return this;
         }

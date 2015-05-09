@@ -50,6 +50,11 @@ namespace XtraLiteTemplates.Expressions
             throw new ExpressionException("Invalid expression term: '{0}'.", term);
         }
 
+        internal static void UnexpectedExpressionTerm(Object term)
+        {
+            throw new ExpressionException("Unexpected expression term: '{0}'.", term);
+        }
+
         internal static void OperatorAlreadyRegistered(Operator @operator)
         {
             Debug.Assert(@operator != null);

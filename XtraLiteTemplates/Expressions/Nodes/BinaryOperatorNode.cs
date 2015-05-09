@@ -57,15 +57,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
             var leafLeft = LeftNode as LeafNode;
             Object reducedOperand;
-            if (leafLeft != null && leafLeft.Reducible)
+            if (leafLeft != null && leafLeft.Evaluation == LeafNode.EvaluationType.Literal)
             {
                 if (Operator.Evaluate(leafLeft.Operand, out reducedOperand))
-                    return new LeafNode(Parent, reducedOperand);
+                    return new LeafNode(Parent, reducedOperand, LeafNode.EvaluationType.Literal);
 
                 /* Right side. */
                 var leafRight = RightNode as LeafNode;
-                if (leafRight != null && leafRight.Reducible && Operator.Evaluate(leafLeft.Operand, leafRight.Operand, out reducedOperand))
-                    return new LeafNode(Parent, reducedOperand);
+                if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal &&
+                    Operator.Evaluate(leafLeft.Operand, leafRight.Operand, out reducedOperand))
+                    return new LeafNode(Parent, reducedOperand, LeafNode.EvaluationType.Literal);
             }
 
             return this;

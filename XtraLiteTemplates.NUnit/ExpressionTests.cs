@@ -105,6 +105,19 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
+        private static void ExpectUnexpectedExpressionTermException(Object term, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ExpressionException), e);
+                Assert.AreEqual(String.Format("Unexpected expression term: '{0}'.", term), e.Message);
+            }
+        }
+
         private static void ExpectCannotConstructExpressionInvalidStateException(Action action)
         {
             try
@@ -117,9 +130,9 @@ namespace XtraLiteTemplates.NUnit
                 Assert.AreEqual("Unbalanced expressions cannot be finalized.", e.Message);
             }
         }
-        
 
-        private Expression CreateTestExpression(String exprString)
+
+        private static Expression CreateTestExpression(String exprString)
         {
             Debug.Assert(!String.IsNullOrEmpty(exprString));
             var split = exprString.Split(' ');
@@ -137,7 +150,7 @@ namespace XtraLiteTemplates.NUnit
                     result.FeedLiteral(_float);
                 else if (Boolean.TryParse(term, out _boolean))
                     result.FeedLiteral(_boolean);
-                else if (term.StartsWith("'") && term.EndsWith("'"))
+                else if (term.StartsWith("'", StringComparison.Ordinal) && term.EndsWith("'", StringComparison.Ordinal))
                     result.FeedLiteral(term.Substring(1, term.Length - 2));
                 else
                     result.FeedSymbol(term);
@@ -469,16 +482,54 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseMemberAccess_Level1()
+        public void TestCaseMemberAccess1()
         {
-            var expression = CreateTestExpression("s . 'length' + 10");
+            var expression = CreateTestExpression("s . length + 10");
             var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
+
+            ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
 
             Assert.AreEqual(21, result);
         }
 
         [Test]
-        public void TestCaseCreateMethod_CStyle()
+        public void TestCaseMemberAccess2()
+        {
+            var expression = Expression.CreateStandardCStyle();
+
+            expression.FeedSymbol("!");
+            expression.FeedSymbol("variable");
+            expression.FeedSymbol(".");
+
+            ExpectUnexpectedExpressionTermException("+", () => expression.FeedSymbol("+"));
+            ExpectUnexpectedExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectUnexpectedExpressionTermException("length", () => expression.FeedLiteral("length"));
+            ExpectUnexpectedExpressionTermException(1, () => expression.FeedLiteral(1));
+            ExpectUnexpectedExpressionTermException(1.00, () => expression.FeedLiteral(1.00));
+            ExpectUnexpectedExpressionTermException(false, () => expression.FeedLiteral(false));
+            ExpectUnexpectedExpressionTermException(null, () => expression.FeedLiteral(null));
+
+            expression.FeedSymbol("length");
+            expression.FeedSymbol(".");
+
+            ExpectUnexpectedExpressionTermException("+", () => expression.FeedSymbol("+"));
+            ExpectUnexpectedExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectUnexpectedExpressionTermException("some_else", () => expression.FeedLiteral("some_else"));
+            ExpectUnexpectedExpressionTermException(1, () => expression.FeedLiteral(1));
+            ExpectUnexpectedExpressionTermException(1.00, () => expression.FeedLiteral(1.00));
+            ExpectUnexpectedExpressionTermException(false, () => expression.FeedLiteral(false));
+            ExpectUnexpectedExpressionTermException(null, () => expression.FeedLiteral(null));
+
+            expression.FeedSymbol("some_else");
+            expression.FeedSymbol("*");
+            expression.FeedLiteral(100);
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("*{!{.{.{@variable,length},some_else}},100}", canonical);
+        }
+
+        [Test]
+        public void TestCaseCreateMethodCStyle()
         {
             var expression = Expression.CreateStandardCStyle();
             var allOperators = new HashSet<Operator>(expression.SupportedOperators);
@@ -512,7 +563,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseCreateMethod_PascalStyle()
+        public void TestCaseCreateMethodPascalStyle()
         {
             var expression = Expression.CreateStandardPascalStyle();
             var allOperators = new HashSet<Operator>(expression.SupportedOperators);
