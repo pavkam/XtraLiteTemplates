@@ -1,15 +1,24 @@
 ﻿<Properties StartupItem="XtraLiteTemplates/XtraLiteTemplates/XtraLiteTemplates.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/StandardUnaryOperator.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates.NUnit/Inside/LhsIdentTestOperator.cs">
     <Files>
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Operator.cs" Line="171" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/StandardBinaryOperator.cs" Line="100" Column="110" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs" Line="493" Column="10" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/StandardUnaryOperator.cs" Line="67" Column="10" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/UnaryOperator.cs" Line="40" Column="52" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/BinaryOperator.cs" Line="39" Column="10" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/EvaluationFlags.cs" Line="34" Column="32" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/GroupOperator.cs" Line="40" Column="22" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Operator.cs" Line="1" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/StandardBinaryOperator.cs" Line="1" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs" Line="282" Column="34" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/StandardUnaryOperator.cs" Line="73" Column="10" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/UnaryOperator.cs" Line="1" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/BinaryOperator.cs" Line="1" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/GroupOperator.cs" Line="1" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/ExpressionException.cs" Line="52" Column="9" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/ExpressionTests.cs" Line="491" Column="10" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Nodes/LeafNode.cs" Line="87" Column="24" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Nodes/OperatorNode.cs" Line="72" Column="17" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Nodes/BinaryOperatorNode.cs" Line="86" Column="21" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/MemberAccessOperator.cs" Line="40" Column="43" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Nodes/ExpressionNode.cs" Line="1" Column="1" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/ExpressionOperatorTests.cs" Line="607" Column="20" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/Inside/LhsIdentTestOperator.cs" Line="44" Column="20" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/Inside/TestExpressionEvaluationContext.cs" Line="30" Column="41" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.NUnit.TestPad">
@@ -17,9 +26,7 @@
           <Node name="XtraLiteTemplates" expanded="True" selected="True">
             <Node name="XtraLiteTemplates.NUnit" expanded="True">
               <Node name="XtraLiteTemplates" expanded="True">
-                <Node name="NUnit" expanded="True">
-                  <Node name="ExpressionTests" expanded="True" />
-                </Node>
+                <Node name="NUnit" expanded="True" />
               </Node>
             </Node>
           </Node>

@@ -265,12 +265,23 @@ namespace XtraLiteTemplates.Expressions
                     BinaryOperator _binaryOperator;
                     if (m_binaryOperators.TryGetValue(_symbol, out _binaryOperator))
                     {
+                        if (_binaryOperator.ExpectLhsIdentifier)
+                        {
+                            var currentLeafNode = m_current as LeafNode;
+                            if (currentLeafNode != null && currentLeafNode.Evaluation == LeafNode.EvaluationType.Literal)
+                                ExpressionException.UnexpectedExpressionTerm(_symbol);
+                            else if (currentLeafNode != null && currentLeafNode.Evaluation == LeafNode.EvaluationType.Variable)
+                                currentLeafNode.ConvertToIdentifier();
+                        }
+
                         var leftNode = m_current;
 
                         /* Go up the tree while the precedence allows. */
                         while (leftNode.Parent != null &&
                                ((OperatorNode)leftNode.Parent).Operator.Precedence <= _binaryOperator.Precedence)
+                        {
                             leftNode = leftNode.Parent;
+                        }
 
                         m_current = new BinaryOperatorNode(leftNode.Parent, _binaryOperator)
                         {

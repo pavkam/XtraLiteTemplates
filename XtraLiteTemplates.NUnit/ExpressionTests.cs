@@ -509,6 +509,83 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseMemberLhs1a()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
+
+            expression.FeedLiteral(1);
+            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
+        }
+
+        [Test]
+        public void TestCaseMemberLhs1b()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
+
+            expression.FeedLiteral(1.00);
+            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
+        }
+
+        [Test]
+        public void TestCaseMemberLhs1c()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
+
+            expression.FeedLiteral(true);
+            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
+        }
+
+        [Test]
+        public void TestCaseMemberLhs1d()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
+
+            expression.FeedLiteral("term");
+            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
+        }
+
+        [Test]
+        public void TestCaseMemberLhs1e()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
+
+            expression.FeedSymbol("symbol_1");
+            expression.FeedSymbol(".");
+            expression.FeedLiteral("literal_1");
+            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
+
+            expression.Construct();
+        }
+
+        [Test]
+        public void TestCaseMemberLhs1f()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
+
+            expression.FeedSymbol("symbol_1");
+            expression.FeedSymbol(".");
+            expression.FeedSymbol("symbol_2");
+            expression.FeedSymbol(".");
+            expression.FeedSymbol("symbol_3");
+            expression.Construct();
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual(".{.{symbol_1,symbol_2},@symbol_3}", canonical);
+        }
+
+        [Test]
         public void TestCaseMemberAccess4()
         {
             var expression = Expression.CreateStandardCStyle();

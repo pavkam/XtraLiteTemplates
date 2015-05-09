@@ -79,6 +79,12 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 return Operand.ToString();
         }
 
+        public void ConvertToIdentifier()
+        {
+            Debug.Assert(Evaluation == EvaluationType.Variable);
+            Evaluation = EvaluationType.Indentifier;
+        }
+
         public override Func<IEvaluationContext, Object> Build()
         {
             if (Evaluation == EvaluationType.Variable)
