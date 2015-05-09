@@ -30,6 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using XtraLiteTemplates.Parsing;
 
     [TestFixture]
     public class TokenTests : TestBase

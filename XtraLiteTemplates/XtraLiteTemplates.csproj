@@ -53,11 +53,7 @@
     <Compile Include="Expressions\Operators\Standard\MultiplyOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\SubtractOperator.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tokenizer.cs" />
-    <Compile Include="Token.cs" />
-    <Compile Include="ParseException.cs" />
     <Compile Include="Expect.cs" />
-    <Compile Include="ITokenizer.cs" />
     <Compile Include="Expressions\Nodes\ExpressionNode.cs" />
     <Compile Include="Expressions\Nodes\LeafNode.cs" />
     <Compile Include="Expressions\Nodes\UnaryOperatorNode.cs" />
@@ -74,6 +70,10 @@
     <Compile Include="Expressions\Operators\Associativity.cs" />
     <Compile Include="Expressions\Operators\SubscriptOperator.cs" />
     <Compile Include="Expressions\Nodes\SubscriptNode.cs" />
+    <Compile Include="Parsing\ITokenizer.cs" />
+    <Compile Include="Parsing\ParseException.cs" />
+    <Compile Include="Parsing\Token.cs" />
+    <Compile Include="Parsing\Tokenizer.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -86,4 +86,7 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
+  <ItemGroup>
+    <Folder Include="Parsing\" />
+  </ItemGroup>
 </Project>

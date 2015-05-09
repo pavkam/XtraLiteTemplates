@@ -26,38 +26,10 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Parsing
 {
-    using System;
-    using System.Diagnostics;
-
-    public class ParseException : FormatException
+    public interface ITokenizer
     {
-        public Int32 CharacterIndex { get; private set; }
-
-        internal ParseException(Int32 characterIndex, 
-                                String format, 
-                                params Object[] args)
-            : base(String.Format(format, args))
-        {
-            Debug.Assert(characterIndex >= 0);
-
-            this.CharacterIndex = characterIndex;
-        }
-
-        internal static void UnexpectedCharacter(Int32 characterIndex, Char character)
-        {
-            throw new ParseException(characterIndex, "Unexpected character '{0}' found at position {1}.", character, characterIndex);
-        }
-
-        internal static void UnexpectedEndOfStream(Int32 characterIndex)
-        {
-            throw new ParseException(characterIndex, "Unexpected end of stream detected at position {0}.", characterIndex);
-        }
-
-        internal static void InvalidEscapeCharacter(Int32 characterIndex, Char character)
-        {
-            throw new ParseException(characterIndex, "Invalid escape character '{0}' at position {1}.", character, characterIndex);
-        }
+        Token ReadNext();
     }
 }

@@ -26,10 +26,43 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Parsing
 {
-    public interface ITokenizer
+    using System;
+
+    public sealed class Token
     {
-        Token ReadNext();
+        public enum TokenType
+        {
+            Unparsed,
+            Identifier,
+            Number,
+            String,
+            Symbol,
+            Whitespace,
+        }
+
+        public TokenType Type { get; private set; }
+
+        public String Value { get; private set; }
+
+        public Int32 CharacterIndex { get; private set; }
+
+        public Int32 OriginalLength { get; private set; }
+
+        public Token(TokenType type, String value, Int32 characterIndex, Int32 originalLength)
+        {
+            Expect.GreaterThanOrEqual("characterIndex", characterIndex, 0);
+            Expect.GreaterThan("originalLength", originalLength, 0);
+            if (type != TokenType.String)
+            {
+                Expect.NotEmpty("value", value);
+            }
+
+            this.Type = type;
+            this.Value = value ?? String.Empty;
+            this.CharacterIndex = characterIndex;
+            this.OriginalLength = originalLength;
+        }
     }
 }

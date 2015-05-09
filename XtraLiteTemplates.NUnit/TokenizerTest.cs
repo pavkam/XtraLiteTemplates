@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.IO;
+    using XtraLiteTemplates.Parsing;
 
     [TestFixture]
     public class TokenizerTest : TestBase

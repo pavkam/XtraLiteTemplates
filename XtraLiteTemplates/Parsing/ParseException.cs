@@ -26,43 +26,38 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Parsing
 {
     using System;
+    using System.Diagnostics;
 
-    public sealed class Token
+    public class ParseException : FormatException
     {
-        public enum TokenType
-        {
-            Unparsed,
-            Identifier,
-            Number,
-            String,
-            Symbol,
-            Whitespace,
-        }
-
-        public TokenType Type { get; private set; }
-
-        public String Value { get; private set; }
-
         public Int32 CharacterIndex { get; private set; }
 
-        public Int32 OriginalLength { get; private set; }
-
-        public Token(TokenType type, String value, Int32 characterIndex, Int32 originalLength)
+        internal ParseException(Int32 characterIndex, 
+                                String format, 
+                                params Object[] args)
+            : base(String.Format(format, args))
         {
-            Expect.GreaterThanOrEqual("characterIndex", characterIndex, 0);
-            Expect.GreaterThan("originalLength", originalLength, 0);
-            if (type != TokenType.String)
-            {
-                Expect.NotEmpty("value", value);
-            }
+            Debug.Assert(characterIndex >= 0);
 
-            this.Type = type;
-            this.Value = value ?? String.Empty;
             this.CharacterIndex = characterIndex;
-            this.OriginalLength = originalLength;
+        }
+
+        internal static void UnexpectedCharacter(Int32 characterIndex, Char character)
+        {
+            throw new ParseException(characterIndex, "Unexpected character '{0}' found at position {1}.", character, characterIndex);
+        }
+
+        internal static void UnexpectedEndOfStream(Int32 characterIndex)
+        {
+            throw new ParseException(characterIndex, "Unexpected end of stream detected at position {0}.", characterIndex);
+        }
+
+        internal static void InvalidEscapeCharacter(Int32 characterIndex, Char character)
+        {
+            throw new ParseException(characterIndex, "Invalid escape character '{0}' at position {1}.", character, characterIndex);
         }
     }
 }
