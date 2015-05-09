@@ -790,6 +790,43 @@ namespace XtraLiteTemplates.NUnit
 
             AssertUnsupportedAnyLeftEvaluation(op);
         }
+
+        [Test]
+        public void TestCaseStandardOperatorMemberAccess()
+        {
+            ExpectArgumentEmptyException("symbol", () => new MemberAccessOperator(null, StringComparer.Ordinal));
+            ExpectArgumentEmptyException("symbol", () => new MemberAccessOperator(String.Empty, StringComparer.Ordinal));
+            ExpectArgumentNullException("comparer", () => new MemberAccessOperator(".", null));
+
+            Assert.NotNull(MemberAccessOperator.CStyle);
+            Assert.AreEqual(".", MemberAccessOperator.CStyle.Symbol);
+            Assert.AreEqual(StringComparer.Ordinal, MemberAccessOperator.CStyle.Comparer);
+
+            Assert.NotNull(MemberAccessOperator.PascalStyle);
+            Assert.AreEqual(".", MemberAccessOperator.PascalStyle.Symbol);
+            Assert.AreEqual(StringComparer.OrdinalIgnoreCase, MemberAccessOperator.PascalStyle.Comparer);
+
+            var op = new MemberAccessOperator("operator", StringComparer.InvariantCultureIgnoreCase);
+            Assert.AreEqual("operator", op.Symbol);
+            Assert.AreEqual(0, op.Precedence);
+            Assert.AreEqual(StringComparer.InvariantCultureIgnoreCase, op.Comparer);
+            Assert.AreEqual(false, op.ExpectLhsIdentifier);
+            Assert.AreEqual(true, op.ExpectRhsIdentifier);
+
+            Object result;
+            Assert.IsFalse(op.Evaluate(null, out result));
+            Assert.IsFalse(op.Evaluate("some_string", out result));
+            Assert.IsFalse(op.Evaluate(this, out result));
+            Assert.IsFalse(op.Evaluate(10, out result));
+            Assert.IsFalse(op.Evaluate(11.00, out result));
+            Assert.IsFalse(op.Evaluate(false, out result));
+
+            Assert.IsTrue(op.Evaluate("1234567890", "Length", out result));
+            Assert.AreEqual(10, result);
+            Assert.IsTrue(op.Evaluate(Tuple.Create(100), "Item1", out result));
+            Assert.AreEqual(100, result);
+            Assert.IsFalse(op.Evaluate(100, "non_existant_property", out result));
+        }
     }
 }
 

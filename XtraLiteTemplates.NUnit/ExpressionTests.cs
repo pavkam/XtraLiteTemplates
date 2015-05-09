@@ -484,16 +484,32 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseMemberAccess1()
         {
-            var expression = CreateTestExpression("s . length + 10");
+            var expression = CreateTestExpression("s . Length + 10");
             var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
-
-            ExpectCannotConstructExpressionInvalidStateException(() => expression.Construct());
 
             Assert.AreEqual(21, result);
         }
 
         [Test]
         public void TestCaseMemberAccess2()
+        {
+            var expression = CreateTestExpression("s . length");
+            var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
+
+            Assert.IsNull(result);
+        }
+
+        [Test]
+        public void TestCaseMemberAccess3()
+        {
+            var expression = CreateTestExpression("'hello_world' . Length");
+            var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
+
+            Assert.AreEqual(11, result);
+        }
+
+        [Test]
+        public void TestCaseMemberAccess4()
         {
             var expression = Expression.CreateStandardCStyle();
 

@@ -30,34 +30,42 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
     using System.Reflection;
+    using System.Collections.Generic;
+    using System.Diagnostics;
 
     public sealed class MemberAccessOperator : BinaryOperator
     {
-        public static BinaryOperator CStyle { get; private set; }
+        public static MemberAccessOperator CStyle { get; private set; }
 
-        public static BinaryOperator PascalStyle { get; private set; }
+        public static MemberAccessOperator PascalStyle { get; private set; }
+
+        public IEqualityComparer<String> Comparer { get; private set; }
 
         static MemberAccessOperator()
         {
-            CStyle = new MemberAccessOperator(".");
-            PascalStyle = CStyle;
+            CStyle = new MemberAccessOperator(".", StringComparer.Ordinal);
+            PascalStyle = new MemberAccessOperator(".", StringComparer.OrdinalIgnoreCase);
         }
 
-        public MemberAccessOperator(String symbol)
+        public MemberAccessOperator(String symbol, IEqualityComparer<String> comparer)
             : base(symbol, 0, false, true)
         {
+            Expect.NotNull("comparer", comparer);
+            Comparer = comparer;
         }
 
         public override Boolean Evaluate(Object left, Object right, out Object result)
         {
             var memberName = right as String;
-            if (left != null && memberName != null)
-            {
-                var property = left.GetType().GetProperty(memberName, BindingFlags.Public |
-                    BindingFlags.Instance | BindingFlags.IgnoreCase | BindingFlags.GetProperty);
+            Debug.Assert(memberName != null);
 
-                if (property != null && property.CanRead)
+            if (left != null)
+            {
+                foreach (var property in left.GetType().GetProperties())
                 {
+                    if (!property.CanRead || property.GetIndexParameters().Length > 0 || !Comparer.Equals(property.Name, memberName))
+                        continue;
+                    
                     result = property.GetValue(left);
                     return true;
                 }
