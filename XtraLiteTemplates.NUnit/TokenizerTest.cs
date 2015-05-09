@@ -64,7 +64,10 @@ namespace XtraLiteTemplates.NUnit
                 {
                     Assert.AreEqual(index, (e as ParseException).CharacterIndex);
                 }
+                return;
             }
+
+            Assert.Fail();
         }
 
         private static void ExpectInvalidEscapeCharacterException(Int32 index, Char character, Action action)
@@ -81,7 +84,10 @@ namespace XtraLiteTemplates.NUnit
                 {
                     Assert.AreEqual(index, (e as ParseException).CharacterIndex);
                 }
+                return;
             }
+
+            Assert.Fail();
         }
 
         private static void ExpectUnexpectedEndOfStreamException(Int32 index, Action action)
@@ -98,7 +104,10 @@ namespace XtraLiteTemplates.NUnit
                 {
                     Assert.AreEqual(index, (e as ParseException).CharacterIndex);
                 }
+                return;
             }
+
+            Assert.Fail();
         }
 
         [Test]

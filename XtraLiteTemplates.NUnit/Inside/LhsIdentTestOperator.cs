@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     public sealed class LhsIdentTestOperator : BinaryOperator
     {
         public LhsIdentTestOperator(String symbol, Int32 precendece)
-            : base(symbol, precendece, true, false)
+            : base(symbol, precendece, Associativity.RightToLeft, true, false)
         {
         }
 

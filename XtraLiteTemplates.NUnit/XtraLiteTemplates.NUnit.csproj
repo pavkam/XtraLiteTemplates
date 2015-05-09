@@ -40,7 +40,10 @@
     <Compile Include="TokenTests.cs" />
     <Compile Include="ExpressionTests.cs" />
     <Compile Include="ExpressionOperatorTests.cs" />
+    <Compile Include="Inside\RtlAssocTestOperator.cs" />
     <Compile Include="Inside\LhsIdentTestOperator.cs" />
+    <Compile Include="Inside\LtrAssocTestOperator.cs" />
+    <Compile Include="Inside\LhsRhsIdentTestOperator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

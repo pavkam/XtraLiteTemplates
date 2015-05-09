@@ -77,7 +77,7 @@ namespace XtraLiteTemplates
                 stringEndCharacter, stringEscapeCharacter
             };
 
-            var allowedCharacterSet = !all.Any(c => Char.IsLetterOrDigit(c) || c == '_' || c == '.');
+            var allowedCharacterSet = !all.Any(c => Char.IsWhiteSpace(c) || Char.IsLetterOrDigit(c) || c == '_' || c == '.');
             Expect.IsTrue("allowed set of characters", allowedCharacterSet);
 
             this.m_textReader = reader;

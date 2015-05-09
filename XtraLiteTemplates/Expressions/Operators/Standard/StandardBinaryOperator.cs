@@ -33,7 +33,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
     public abstract class StandardBinaryOperator : BinaryOperator
     {
         protected StandardBinaryOperator(String symbol, Int32 precedence)
-            : base(symbol, precedence, false, false)
+            : base(symbol, precedence, Associativity.LeftToRight, false, false)
         {
         }
 
@@ -89,23 +89,23 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         }
 
 
-        public override Boolean Evaluate(Object left, out Object result)
+        public override Boolean Evaluate(Object arg, out Object result)
         {
             result = null;
 
-            if (left != null)
+            if (arg != null)
             {
                 Int64 _integer;
-                if (TryAsInteger(left, out _integer))
+                if (TryAsInteger(arg, out _integer))
                     return EvaluateLeft(_integer, out result);
                 Boolean _boolean;
-                if (TryAsBoolean(left, out _boolean))
+                if (TryAsBoolean(arg, out _boolean))
                     return EvaluateLeft(_boolean, out result);
                 Double _float;
-                if (TryAsFloat(left, out _float))
+                if (TryAsFloat(arg, out _float))
                     return EvaluateLeft(_float, out result);
                 String _string;
-                if (TryAsString(left, out _string))
+                if (TryAsString(arg, out _string))
                     return EvaluateLeft(_string, out result);
             }
 

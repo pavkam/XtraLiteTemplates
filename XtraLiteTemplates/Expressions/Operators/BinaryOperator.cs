@@ -34,19 +34,24 @@ namespace XtraLiteTemplates.Expressions.Operators
     {
         public Boolean ExpectLhsIdentifier { get; private set; }
 
-        protected BinaryOperator(String symbol, Int32 precedence,
-            Boolean expectLhsIdentifier, Boolean expectRhsIdentifier)
+        public Associativity Associativity { get; private set; }
+
+        protected BinaryOperator(String symbol, Int32 precedence, 
+                                 Associativity associativity,
+                                 Boolean expectLhsIdentifier, Boolean expectRhsIdentifier)
             : base(symbol, precedence, expectRhsIdentifier)
         {
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
+
             ExpectLhsIdentifier = expectLhsIdentifier;
+            Associativity = associativity;
         }
 
         public abstract Boolean Evaluate(Object left, Object right, out Object result);
 
-        public override Boolean Evaluate(Object left, out Object result)
+        public override Boolean Evaluate(Object arg, out Object result)
         {
-            result = left;
+            result = arg;
             return false;
         }
     }

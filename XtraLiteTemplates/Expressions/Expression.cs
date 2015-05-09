@@ -265,22 +265,30 @@ namespace XtraLiteTemplates.Expressions
                     BinaryOperator _binaryOperator;
                     if (m_binaryOperators.TryGetValue(_symbol, out _binaryOperator))
                     {
-                        if (_binaryOperator.ExpectLhsIdentifier)
-                        {
-                            var currentLeafNode = m_current as LeafNode;
-                            if (currentLeafNode != null && currentLeafNode.Evaluation == LeafNode.EvaluationType.Literal)
-                                ExpressionException.UnexpectedExpressionTerm(_symbol);
-                            else if (currentLeafNode != null && currentLeafNode.Evaluation == LeafNode.EvaluationType.Variable)
-                                currentLeafNode.ConvertToIdentifier();
-                        }
-
                         var leftNode = m_current;
+
+                        var comparand = _binaryOperator.Associativity == Associativity.LeftToRight ? 0 : -1;
 
                         /* Go up the tree while the precedence allows. */
                         while (leftNode.Parent != null &&
-                               ((OperatorNode)leftNode.Parent).Operator.Precedence <= _binaryOperator.Precedence)
+                               ((OperatorNode)leftNode.Parent).Operator.Precedence.CompareTo(_binaryOperator.Precedence) <= comparand)
                         {
                             leftNode = leftNode.Parent;
+                        }
+
+                        var leftNodeParentOperatorNode = leftNode.Parent as OperatorNode;
+
+                        /* Check that we do not push the RHS identifier off the parent. */
+                        if (leftNodeParentOperatorNode != null && leftNodeParentOperatorNode.Operator.ExpectRhsIdentifier)
+                            ExpressionException.UnexpectedExpressionTerm(_symbol);
+
+                        if (_binaryOperator.ExpectLhsIdentifier)
+                        {
+                            var leftLeafNode = leftNode as LeafNode;
+                            if (leftLeafNode == null || leftLeafNode.Evaluation == LeafNode.EvaluationType.Literal)
+                                ExpressionException.UnexpectedExpressionTerm(_symbol);
+                            else if (leftLeafNode.Evaluation == LeafNode.EvaluationType.Variable)
+                                leftLeafNode.ConvertToIdentifier();
                         }
 
                         m_current = new BinaryOperatorNode(leftNode.Parent, _binaryOperator)
@@ -289,9 +297,8 @@ namespace XtraLiteTemplates.Expressions
                         };
 
                         /* Re-jig the tree. */
-                        var parentOperatorNode = leftNode.Parent as OperatorNode;
-                        if (parentOperatorNode != null)
-                            parentOperatorNode.RightNode = m_current;
+                        if (leftNodeParentOperatorNode != null)
+                            leftNodeParentOperatorNode.RightNode = m_current;
                        
                         leftNode.Parent = m_current;
                         if (m_root == leftNode)

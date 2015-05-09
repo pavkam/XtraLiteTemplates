@@ -25,54 +25,24 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+using NUnit.Framework;
 
-namespace XtraLiteTemplates.Expressions.Operators.Standard
+namespace XtraLiteTemplates.NUnit.Inside
 {
     using System;
-    using System.Reflection;
-    using System.Collections.Generic;
-    using System.Diagnostics;
+    using XtraLiteTemplates.Expressions.Operators;
 
-    public sealed class MemberAccessOperator : BinaryOperator
+    public sealed class LtrAssocTestOperator : BinaryOperator
     {
-        public static MemberAccessOperator CStyle { get; private set; }
-
-        public static MemberAccessOperator PascalStyle { get; private set; }
-
-        public IEqualityComparer<String> Comparer { get; private set; }
-
-        static MemberAccessOperator()
+        public LtrAssocTestOperator(String symbol)
+            : base(symbol, 5, Associativity.LeftToRight, false, false)
         {
-            CStyle = new MemberAccessOperator(".", StringComparer.Ordinal);
-            PascalStyle = new MemberAccessOperator(".", StringComparer.OrdinalIgnoreCase);
-        }
-
-        public MemberAccessOperator(String symbol, IEqualityComparer<String> comparer)
-            : base(symbol, 0, Associativity.LeftToRight, false, true)
-        {
-            Expect.NotNull("comparer", comparer);
-            Comparer = comparer;
         }
 
         public override Boolean Evaluate(Object left, Object right, out Object result)
         {
-            var memberName = right as String;
-            Debug.Assert(memberName != null);
-
-            if (left != null)
-            {
-                foreach (var property in left.GetType().GetProperties())
-                {
-                    if (!property.CanRead || property.GetIndexParameters().Length > 0 || !Comparer.Equals(property.Name, memberName))
-                        continue;
-                    
-                    result = property.GetValue(left);
-                    return true;
-                }
-            }
-
-            result = null;
-            return false;
+            result = String.Format("{0},{1}", left, right);
+            return true;
         }
     }
 }

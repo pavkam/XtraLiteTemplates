@@ -151,6 +151,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new AndOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(8, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -187,6 +188,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new OrOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(10, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -223,6 +225,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new XorOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(9, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -253,6 +256,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new ShiftLeftOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(5, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -282,6 +286,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new ShiftRightOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(5, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -339,6 +344,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new SubtractOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(4, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -371,6 +377,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new SumOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(4, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -404,6 +411,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new DivideOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -436,6 +444,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new ModuloOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -465,6 +474,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new MultiplyOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -554,6 +564,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new EqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(7, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -598,6 +609,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new NotEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(7, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -642,6 +654,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new GreaterThanOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -682,6 +695,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new GreaterThanOrEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -724,6 +738,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new LowerThanOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -764,6 +779,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new LowerThanOrEqualsOperator("operator");
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
@@ -809,6 +825,7 @@ namespace XtraLiteTemplates.NUnit
             var op = new MemberAccessOperator("operator", StringComparer.InvariantCultureIgnoreCase);
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(0, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(StringComparer.InvariantCultureIgnoreCase, op.Comparer);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(true, op.ExpectRhsIdentifier);

@@ -45,7 +45,10 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsTrue(e.Message.StartsWith(
                         String.Format("Argument \"{0}\" cannot be null.", argument), 
                         StringComparison.CurrentCulture));
+                return;
             }
+
+            Assert.Fail();
         }
 
         protected void ExpectArgumentEmptyException(String argument, Action action)
@@ -69,7 +72,11 @@ namespace XtraLiteTemplates.NUnit
                             String.Format("Argument \"{0}\" cannot be empty.", argument), 
                             StringComparison.CurrentCulture));
                 }
+
+                return;
             }
+
+            Assert.Fail();
         }
 
         protected void ExpectArgumentsEqualException(String argument1, String argument2, Action action)
@@ -84,7 +91,10 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsTrue(e.Message.StartsWith(
                         String.Format("Arguments \"{0}\" and \"{1}\" cannot be equal.", argument1, argument2), 
                         StringComparison.CurrentCulture));
+                return;
             }
+
+            Assert.Fail();
         }
 
         protected void ExpectArgumentLessThanOrEqualException<T>(String argument, T than, Action action)
@@ -99,7 +109,10 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsTrue(e.Message.StartsWith(
                         String.Format("Argument \"{0}\" is expected to be greater than {1}.", argument, than), 
                         StringComparison.CurrentCulture));
+                return;
             }
+
+            Assert.Fail();
         }
 
         protected void ExpectArgumentLessThanException<T>(String argument, T than, Action action)
@@ -114,7 +127,10 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsTrue(e.Message.StartsWith(
                         String.Format("Argument \"{0}\" is expected to be greater than or equal to {1}.", argument, than), 
                         StringComparison.CurrentCulture));
+                return;
             }
+
+            Assert.Fail();
         }
 
         protected void ExpectArgumentGreaterThanOrEqualException<T>(String argument, T than, Action action)
@@ -129,7 +145,10 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsTrue(e.Message.StartsWith(
                         String.Format("Argument \"{0}\" is expected to be less than {1}.", argument, than), 
                         StringComparison.CurrentCulture));
+                return;
             }
+
+            Assert.Fail();
         }
 
         protected void ExpectArgumentGreaterThanException<T>(String argument, T than, Action action)
@@ -144,7 +163,10 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsTrue(e.Message.StartsWith(
                         String.Format("Argument \"{0}\" is expected to be less than or equal to {1}.", argument, than), 
                         StringComparison.CurrentCulture));
+                return;
             }
+
+            Assert.Fail();
         }
 
         protected void ExpectArgumentConditionNotTrueException(String condition, Action action)
@@ -159,7 +181,10 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsTrue(e.Message.StartsWith(
                         String.Format("Argument condition \"{0}\" failed to be validated as true.", condition), 
                         StringComparison.CurrentCulture));
+                return;
             }
+
+            Assert.Fail();
         }
     }
 }

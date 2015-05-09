@@ -50,7 +50,11 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(InvalidOperationException), e);
                 Assert.AreEqual(String.Format("Operator identified by symbol '{0}' has already been registered with expression.", @operator), e.Message);
+            
+                return;
             }
+
+            Assert.Fail();
         }
 
         private static void ExpectCannotModifyAConstructedExpressionException(Action action)
@@ -63,7 +67,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(InvalidOperationException), e);
                 Assert.AreEqual("Cannot modify a finalized expression.", e.Message);
+                return;
             }
+
+            Assert.Fail();
         }
 
         private static void ExpectCannotRegisterOperatorsForStartedExpressionException(Action action)
@@ -76,7 +83,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(InvalidOperationException), e);
                 Assert.AreEqual("Operator registration must be performed before construction.", e.Message);
+                return;
             }
+
+            Assert.Fail();
         }
 
         private static void ExpectCannotEvaluateUnconstructedExpressionException(Action action)
@@ -89,7 +99,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(InvalidOperationException), e);
                 Assert.AreEqual("Expression has not been finalized.", e.Message);
+                return;
             }
+
+            Assert.Fail();
         }
 
         private static void ExpectInvalidExpressionTermException(Object term, Action action)
@@ -102,7 +115,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
                 Assert.AreEqual(String.Format("Invalid expression term: '{0}'.", term), e.Message);
+                return;
             }
+
+            Assert.Fail();
         }
 
         private static void ExpectUnexpectedExpressionTermException(Object term, Action action)
@@ -115,7 +131,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
                 Assert.AreEqual(String.Format("Unexpected expression term: '{0}'.", term), e.Message);
+                return;
             }
+
+            Assert.Fail();
         }
 
         private static void ExpectCannotConstructExpressionInvalidStateException(Action action)
@@ -128,7 +147,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
                 Assert.AreEqual("Unbalanced expressions cannot be finalized.", e.Message);
+                return;
             }
+
+            Assert.Fail();
         }
 
 
@@ -582,7 +604,135 @@ namespace XtraLiteTemplates.NUnit
             expression.Construct();
 
             var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
-            Assert.AreEqual(".{.{symbol_1,symbol_2},@symbol_3}", canonical);
+            Assert.AreEqual(".{symbol_1,.{symbol_2,@symbol_3}}", canonical);
+        }
+
+        [Test]
+        public void TestCaseMemberLhs1g()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(SumOperator.PascalStyle);
+            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
+
+            expression.FeedSymbol("symbol_1");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("symbol_2");
+            expression.FeedSymbol(".");
+            expression.FeedSymbol("symbol_3");
+            expression.Construct();
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("+{@symbol_1,.{symbol_2,@symbol_3}}", canonical);
+        }
+
+        [Test]
+        public void TestCaseMemberLhs1h()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(SumOperator.PascalStyle);
+            expression.RegisterOperator(new LhsIdentTestOperator(".", 100));
+
+            expression.FeedSymbol("symbol_1");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("symbol_2");
+
+            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
+        }
+
+        [Test]
+        public void TestCaseMemberLhsRhsComplex()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(MultiplyOperator.CStyle);
+            expression.RegisterOperator(AndOperator.CStyle);
+            expression.RegisterOperator(new LhsRhsIdentTestOperator("."));
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol(".");
+            expression.FeedSymbol("b");
+            ExpectUnexpectedExpressionTermException("*", () => expression.FeedSymbol("*"));
+            expression.FeedSymbol("&");
+            expression.FeedSymbol("c");
+            expression.FeedSymbol(".");
+            expression.FeedSymbol("d");
+            expression.FeedSymbol("&");
+            expression.FeedSymbol("e");
+            expression.FeedSymbol("*");
+            expression.FeedSymbol("f");
+            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
+
+            expression.Construct();
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("&{&{.{a,b},.{c,d}},*{@e,@f}}", canonical);
+        }
+
+
+        [Test]
+        public void TestCaseAssociativityRtl()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new RtlAssocTestOperator("+"));
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("b");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("c");
+            expression.Construct();
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("+{@a,+{@b,@c}}", canonical);
+        }
+
+        [Test]
+        public void TestCaseAssociativityLtr()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new LtrAssocTestOperator("+"));
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("b");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("c");
+            expression.Construct();
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("+{+{@a,@b},@c}", canonical);
+        }
+
+        [Test]
+        public void TestCaseAssociativityRtlLtr()
+        {
+            var expression = new Expression();
+
+            expression.RegisterOperator(new LtrAssocTestOperator("+"));
+            expression.RegisterOperator(new RtlAssocTestOperator("*"));
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("b");
+            expression.FeedSymbol("*");
+            expression.FeedSymbol("c");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("d");
+            expression.FeedSymbol("+");
+            expression.FeedSymbol("e");
+            expression.FeedSymbol("*");
+            expression.FeedSymbol("f");
+            expression.FeedSymbol("*");
+            expression.FeedSymbol("g");
+
+            expression.Construct();
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("+{+{+{@a,*{@b,@c}},@d},*{@e,*{@f,@g}}}", canonical);
         }
 
         [Test]

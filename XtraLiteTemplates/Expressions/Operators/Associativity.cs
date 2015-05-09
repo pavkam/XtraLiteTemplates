@@ -26,54 +26,12 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions.Operators.Standard
+namespace XtraLiteTemplates.Expressions.Operators
 {
-    using System;
-    using System.Reflection;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-
-    public sealed class MemberAccessOperator : BinaryOperator
+    public enum Associativity
     {
-        public static MemberAccessOperator CStyle { get; private set; }
-
-        public static MemberAccessOperator PascalStyle { get; private set; }
-
-        public IEqualityComparer<String> Comparer { get; private set; }
-
-        static MemberAccessOperator()
-        {
-            CStyle = new MemberAccessOperator(".", StringComparer.Ordinal);
-            PascalStyle = new MemberAccessOperator(".", StringComparer.OrdinalIgnoreCase);
-        }
-
-        public MemberAccessOperator(String symbol, IEqualityComparer<String> comparer)
-            : base(symbol, 0, Associativity.LeftToRight, false, true)
-        {
-            Expect.NotNull("comparer", comparer);
-            Comparer = comparer;
-        }
-
-        public override Boolean Evaluate(Object left, Object right, out Object result)
-        {
-            var memberName = right as String;
-            Debug.Assert(memberName != null);
-
-            if (left != null)
-            {
-                foreach (var property in left.GetType().GetProperties())
-                {
-                    if (!property.CanRead || property.GetIndexParameters().Length > 0 || !Comparer.Equals(property.Name, memberName))
-                        continue;
-                    
-                    result = property.GetValue(left);
-                    return true;
-                }
-            }
-
-            result = null;
-            return false;
-        }
+        LeftToRight,
+        RightToLeft,
     }
 }
 
