@@ -35,7 +35,9 @@ namespace XtraLiteTemplates.Parsing
         public enum TokenType
         {
             Unparsed,
-            Identifier,
+            StartTag,
+            EndTag,
+            Word,
             Number,
             String,
             Symbol,

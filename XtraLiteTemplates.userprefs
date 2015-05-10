@@ -1,34 +1,9 @@
 ﻿<Properties StartupItem="XtraLiteTemplates/XtraLiteTemplates/XtraLiteTemplates.csproj">
   <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
-  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Operator.cs">
+  <MonoDevelop.Ide.Workbench ActiveDocument="XtraLiteTemplates/XtraLiteTemplates.NUnit/TokenizerTest.cs">
     <Files>
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/ExpressionTests.cs" Line="250" Column="50" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Expression.cs" Line="387" Column="13" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/ExpressionOperatorTests.cs" Line="135" Column="26" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/SubscriptOperator.cs" Line="33" Column="35" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Nodes/GroupNode.cs" Line="55" Column="13" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/AndOperator.cs" Line="37" Column="44" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/DivideOperator.cs" Line="36" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/EqualsOperator.cs" Line="37" Column="44" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/GreaterThanOperator.cs" Line="40" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/GreaterThanOrEqualsOperator.cs" Line="40" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/LowerThanOperator.cs" Line="40" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/LowerThanOrEqualsOperator.cs" Line="40" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/MemberAccessOperator.cs" Line="46" Column="14" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/ModuloOperator.cs" Line="37" Column="44" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/MultiplyOperator.cs" Line="40" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/NegateOperator.cs" Line="40" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/NeutralOperator.cs" Line="41" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/NotEqualsOperator.cs" Line="37" Column="44" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/NotOperator.cs" Line="37" Column="43" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/OrOperator.cs" Line="37" Column="44" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/ShiftLeftOperator.cs" Line="37" Column="44" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/ShiftRightOperator.cs" Line="37" Column="44" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/StandardBinaryOperator.cs" Line="40" Column="43" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/SubtractOperator.cs" Line="40" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/SumOperator.cs" Line="40" Column="1" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Standard/XorOperator.cs" Line="39" Column="29" />
-      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Expressions/Operators/Operator.cs" Line="41" Column="9" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates/Parsing/Tokenizer.cs" Line="180" Column="22" />
+      <File FileName="XtraLiteTemplates/XtraLiteTemplates.NUnit/TokenizerTest.cs" Line="313" Column="10" />
     </Files>
     <Pads>
       <Pad Id="MonoDevelop.NUnit.TestPad">
@@ -37,7 +12,9 @@
             <Node name="XtraLiteTemplates.NUnit" expanded="True">
               <Node name="XtraLiteTemplates" expanded="True">
                 <Node name="NUnit" expanded="True">
-                  <Node name="ExpressionTests" selected="True" />
+                  <Node name="TokenizerTest" expanded="True">
+                    <Node name="TestCaseUnexpectedEndOfStream_2" selected="True" />
+                  </Node>
                 </Node>
               </Node>
             </Node>
@@ -48,7 +25,8 @@
   </MonoDevelop.Ide.Workbench>
   <MonoDevelop.Ide.DebuggingService.Breakpoints>
     <BreakpointStore>
-      <Breakpoint file="/Users/aciobanu/Development/GitHub Projects/XtraLiteTemplates/XtraLiteTemplates.NUnit/ExpressionTests.cs" line="779" column="1" />
+      <Breakpoint file="/Users/aciobanu/Development/GitHub Projects/XtraLiteTemplates/XtraLiteTemplates.NUnit/TokenizerTest.cs" line="247" column="1" />
+      <Breakpoint file="/Users/aciobanu/Development/GitHub Projects/XtraLiteTemplates/XtraLiteTemplates.NUnit/TokenizerTest.cs" line="141" column="1" />
     </BreakpointStore>
   </MonoDevelop.Ide.DebuggingService.Breakpoints>
   <MonoDevelop.Ide.DebuggingService.PinnedWatches />

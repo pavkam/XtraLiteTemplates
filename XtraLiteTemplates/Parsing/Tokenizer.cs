@@ -25,6 +25,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+using System.Collections.Generic;
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -39,14 +40,14 @@ namespace XtraLiteTemplates.Parsing
         private enum ParserState
         {
             InText,
-            InDirective,
+            InTag,
         }
 
         private ParserState m_parserState;
 
-        public Char DirectiveStartCharacter { get; private set; }
+        public Char TagStartCharacter { get; private set; }
 
-        public Char DirectiveEndCharacter { get; private set; }
+        public Char TagEndCharacter { get; private set; }
 
         public Char StringStartCharacter { get; private set; }
 
@@ -55,25 +56,25 @@ namespace XtraLiteTemplates.Parsing
         public Char StringEscapeCharacter { get; private set; }
 
         public Tokenizer(TextReader reader, 
-                         Char directiveStartCharacter, 
-                         Char directiveEndCharacter, 
+                         Char tagStartCharacter, 
+                         Char tagEndCharacter, 
                          Char stringStartCharacter, 
                          Char stringEndCharacter, 
                          Char stringEscapeCharacter)
         {
             Expect.NotNull("reader", reader);
-            Expect.NotEqual("directiveStartCharacter", "directiveEndCharacter", directiveStartCharacter, directiveEndCharacter);
-            Expect.NotEqual("stringStartCharacter", "directiveStartCharacter", stringStartCharacter, directiveStartCharacter);
-            Expect.NotEqual("stringStartCharacter", "directiveEndCharacter", stringStartCharacter, directiveEndCharacter);
-            Expect.NotEqual("stringEndCharacter", "directiveStartCharacter", stringEndCharacter, directiveStartCharacter);
-            Expect.NotEqual("stringEndCharacter", "directiveEndCharacter", stringEndCharacter, directiveEndCharacter);
+            Expect.NotEqual("tagStartCharacter", "tagEndCharacter", tagStartCharacter, tagEndCharacter);
+            Expect.NotEqual("stringStartCharacter", "tagStartCharacter", stringStartCharacter, tagStartCharacter);
+            Expect.NotEqual("stringStartCharacter", "tagEndCharacter", stringStartCharacter, tagEndCharacter);
+            Expect.NotEqual("stringEndCharacter", "tagStartCharacter", stringEndCharacter, tagStartCharacter);
+            Expect.NotEqual("stringEndCharacter", "tagEndCharacter", stringEndCharacter, tagEndCharacter);
             Expect.NotEqual("stringEscapeCharacter", "stringStartCharacter", stringEscapeCharacter, stringStartCharacter);
             Expect.NotEqual("stringEscapeCharacter", "stringEndCharacter", stringEscapeCharacter, stringEndCharacter);
 
             /* Validate allow character set. */
             Char[] all = new char[]
             { 
-                directiveStartCharacter, directiveEndCharacter, stringStartCharacter,
+                tagStartCharacter, tagEndCharacter, stringStartCharacter,
                 stringEndCharacter, stringEscapeCharacter
             };
 
@@ -81,8 +82,8 @@ namespace XtraLiteTemplates.Parsing
             Expect.IsTrue("allowed set of characters", allowedCharacterSet);
 
             this.m_textReader = reader;
-            this.DirectiveStartCharacter = directiveStartCharacter;
-            this.DirectiveEndCharacter = directiveEndCharacter;
+            this.TagStartCharacter = tagStartCharacter;
+            this.TagEndCharacter = tagEndCharacter;
 
             this.StringStartCharacter = stringStartCharacter;
             this.StringEndCharacter = stringEndCharacter;
@@ -140,90 +141,84 @@ namespace XtraLiteTemplates.Parsing
             return !this.m_isEndOfStream;
         }
 
-        public Token ReadNext()
+        private Token ReadNextInternal()
         {
-            if (this.m_isEndOfStream && this.m_parserState != ParserState.InDirective)
+            if (this.m_isEndOfStream && this.m_parserState != ParserState.InTag)
             {
                 return null;
             }
 
-            StringBuilder tokenValue = new StringBuilder();
+            var tokenValue = new StringBuilder();
             Int32 tokenStartIndex = this.m_currentCharacterIndex;
 
-            if (this.m_parserState == ParserState.InDirective && this.m_currentCharacter == this.DirectiveEndCharacter)
+            if (this.m_parserState == ParserState.InTag && this.m_currentCharacter == this.TagEndCharacter)
             {
-                /* Directiove end character. Need to switch to text mode. */
+                /* Tag end character. Need to switch to text mode. */
                 this.m_parserState = ParserState.InText;
 
-                if (!this.NextCharacter(false))
-                {
-                    return null;
-                }
+                var _token = new Token(Token.TokenType.EndTag, 
+                                 this.m_currentCharacter.ToString(), this.m_currentCharacterIndex, 1);
+
+                this.NextCharacter(false);
+                return _token;
             }
-            else if (this.m_parserState == ParserState.InDirective &&
-                     this.m_currentCharacter == this.DirectiveStartCharacter)
+            else if (this.m_parserState == ParserState.InTag &&
+                     this.m_currentCharacter == this.TagStartCharacter)
             {
-                ParseException.UnexpectedCharacter(this.m_currentCharacterIndex, this.DirectiveStartCharacter);
+                ParseException.UnexpectedCharacter(this.m_currentCharacterIndex, this.TagStartCharacter);
             }
 
             if (this.m_parserState == ParserState.InText)
             {
-                while (!this.m_isEndOfStream)
+                tokenValue.Append(this.m_currentCharacter);
+
+                if (this.m_currentCharacter == this.TagStartCharacter)
+                {
+                    /* Found { character. This might actually be an escape sequence. */
+                    this.NextCharacter(true);
+                    if (this.m_currentCharacter == this.TagStartCharacter)
+                    {
+                        this.NextCharacter(false);
+
+                        return new Token(
+                            Token.TokenType.Unparsed, 
+                            tokenValue.ToString(), 
+                            tokenStartIndex, 
+                            this.m_currentCharacterIndex - tokenStartIndex);
+                    }
+                    else
+                    {
+                        this.m_parserState = ParserState.InTag;
+                        return new Token(
+                            Token.TokenType.StartTag, 
+                            tokenValue.ToString(), 
+                            tokenStartIndex,
+                            this.m_currentCharacterIndex - tokenStartIndex);
+                    }
+                }
+                else
                 {
                     /* Parsing free-form text until the start directive character is found. */
-                    while (!this.m_isEndOfStream && this.m_currentCharacter != this.DirectiveStartCharacter)
+                    this.NextCharacter(false);
+                
+                    while (!this.m_isEndOfStream && this.m_currentCharacter != this.TagStartCharacter)
                     {
                         tokenValue.Append(this.m_currentCharacter);
                         this.NextCharacter(false);
                     }
 
-                    if (!this.m_isEndOfStream)
-                    {
-                        /* Found the { character. Read as many as we can and decide which are escapes. */
-                        Int32 escapeSequenceStartIndex = this.m_currentCharacterIndex;
-                        while (this.m_currentCharacter == this.DirectiveStartCharacter)
-                        {
-                            this.NextCharacter(true);
-                        }
-
-                        Int32 escapeLength = this.m_currentCharacterIndex - escapeSequenceStartIndex;
-                        if (escapeLength > 1)
-                        {
-                            /* Append the escape value to the token. */
-                            tokenValue.Append(this.DirectiveStartCharacter, escapeLength / 2);
-                            escapeLength = escapeLength % 2;
-                        }
-
-                        if (escapeLength == 1)
-                        {
-                            /* Directive start. */
-                            this.m_parserState = ParserState.InDirective;
-                            break;
-                        }
-                    }
-                }
-
-                if (tokenValue.Length > 0)
-                {
-                    /* Check for extra in-directive character. */
-                    var delta = this.m_parserState == ParserState.InDirective ? 1 : 0;
-
                     return new Token(
                         Token.TokenType.Unparsed, 
                         tokenValue.ToString(), 
                         tokenStartIndex, 
-                        this.m_currentCharacterIndex - tokenStartIndex - delta);
-                }
-                else
-                {
-                    tokenStartIndex = this.m_currentCharacterIndex;
-                }
+                        this.m_currentCharacterIndex - tokenStartIndex);
 
-                /* No text read only can happen when the first character is a start directive. */
-                Debug.Assert(this.m_isEndOfStream || this.m_parserState == ParserState.InDirective);
+                    /* No text read only can happen when the first character is a start directive. */
+                    Debug.Assert(this.m_isEndOfStream || this.m_parserState == ParserState.InTag);
+                }
             }
 
-            if (this.m_parserState == ParserState.InDirective)
+            if (this.m_parserState == ParserState.InTag)
             {
                 /* Directive parsing is a diffent beast... */
 
@@ -317,7 +312,7 @@ namespace XtraLiteTemplates.Parsing
 
                     Debug.Assert(tokenValue.Length > 0);
                     return new Token(
-                        Token.TokenType.Identifier, 
+                        Token.TokenType.Word, 
                         tokenValue.ToString(), 
                         tokenStartIndex, 
                         this.m_currentCharacterIndex - tokenStartIndex);
@@ -404,7 +399,7 @@ namespace XtraLiteTemplates.Parsing
                         tokenStartIndex, 
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
-                else if (this.m_currentCharacter != DirectiveStartCharacter && this.m_currentCharacter != DirectiveEndCharacter)
+                else if (this.m_currentCharacter != TagStartCharacter && this.m_currentCharacter != TagEndCharacter)
                 {
                     /* Symbol character (unknown) detected. */
                     tokenValue.Append(this.m_currentCharacter);
@@ -421,6 +416,11 @@ namespace XtraLiteTemplates.Parsing
             }
 
             return null;
+        }
+
+        public Token ReadNext()
+        {
+            return ReadNextInternal();
         }
 
         #region IDisposable implementation

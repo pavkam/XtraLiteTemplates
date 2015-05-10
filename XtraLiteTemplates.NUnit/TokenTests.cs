@@ -63,8 +63,8 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentLessThanException("characterIndex", 0, () => new Token(Token.TokenType.Number, "100", -1, 1));
             ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new Token(Token.TokenType.Number, "100", 1, 0));
 
-            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Identifier, null, 0, 1));
-            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Identifier, String.Empty, 0, 1));
+            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Word, null, 0, 1));
+            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Word, String.Empty, 0, 1));
         }
     }
 }
