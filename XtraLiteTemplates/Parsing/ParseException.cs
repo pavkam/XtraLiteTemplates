@@ -59,5 +59,21 @@ namespace XtraLiteTemplates.Parsing
         {
             throw new ParseException(characterIndex, "Invalid escape character '{0}' at position {1}.", character, characterIndex);
         }
+
+        internal static void UnexpectedToken(Token token)
+        {
+            Debug.Assert(token != null);
+
+            throw new ParseException(token.CharacterIndex, 
+                "Unexpected token '{0}' (type: {1}) found at position {2}.", token.Value, token.Type, token.CharacterIndex);
+        }
+
+        internal static void UnexpectedEndOfStreamAfterToken(Token token)
+        {
+            Debug.Assert(token != null);
+
+            throw new ParseException(token.CharacterIndex, 
+                "Unexpected end of stream after token '{0}' (type: {1}) at position {2}.", token.Value, token.Type, token.CharacterIndex);
+        }
     }
 }

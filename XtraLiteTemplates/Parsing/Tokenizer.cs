@@ -212,9 +212,6 @@ namespace XtraLiteTemplates.Parsing
                         tokenValue.ToString(), 
                         tokenStartIndex, 
                         this.m_currentCharacterIndex - tokenStartIndex);
-
-                    /* No text read only can happen when the first character is a start directive. */
-                    Debug.Assert(this.m_isEndOfStream || this.m_parserState == ParserState.InTag);
                 }
             }
 
