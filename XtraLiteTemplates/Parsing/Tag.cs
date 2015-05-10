@@ -25,14 +25,55 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 
-namespace XtraLiteTemplates.Interpretation
+namespace XtraLiteTemplates.Parsing
 {
-    using XtraLiteTemplates.Interpretation.Tom;
-
-    public interface ILexer
+    public sealed class Tag
     {
-        TomNode ReadNext();
+        private readonly IList<String> m_components;
+
+        public Tag()
+        {
+            m_components = new List<String>();
+        }
+
+        public Tag Keyword(String keyword)
+        {
+            Expect.NotEmpty("keyword", keyword);
+
+            m_components.Add(keyword);
+            return this;
+        }
+
+        public Tag Expression()
+        {
+            if (m_components.Count > 0 && m_components[m_components.Count - 1] == null)
+                throw new InvalidOperationException("placeholder_expression_after_expression_not_allowed");
+
+            m_components.Add(null);
+
+            return this;
+        }
+
+
+        internal Boolean MatchesKeyword(Int32 index, IEqualityComparer<String> comparer, String keyword)
+        {
+            Debug.Assert(comparer != null);
+            Debug.Assert(!String.IsNullOrEmpty(keyword));
+
+            if (index >= m_components.Count || m_components[index] == null)
+                return false;
+            
+            return comparer.Equals(m_components[index], keyword);
+        }
+
+        internal Boolean MatchesExpression(Int32 index)
+        {
+            return index < m_components.Count && m_components[index] == null;
+        }
     }
 }
 

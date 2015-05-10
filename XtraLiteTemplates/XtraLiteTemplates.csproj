@@ -74,10 +74,8 @@
     <Compile Include="Parsing\ParseException.cs" />
     <Compile Include="Parsing\Token.cs" />
     <Compile Include="Parsing\Tokenizer.cs" />
-    <Compile Include="Interpretation\Lexer.cs" />
-    <Compile Include="Interpretation\Tom\TomNode.cs" />
-    <Compile Include="Interpretation\ILexer.cs" />
-    <Compile Include="Interpretation\Tag.cs" />
+    <Compile Include="Parsing\Lexer.cs" />
+    <Compile Include="Parsing\Tag.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup />
@@ -92,7 +90,5 @@
   </ProjectExtensions>
   <ItemGroup>
     <Folder Include="Parsing\" />
-    <Folder Include="Interpretation\" />
-    <Folder Include="Interpretation\Tom\" />
   </ItemGroup>
 </Project>

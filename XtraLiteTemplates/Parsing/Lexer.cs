@@ -26,13 +26,55 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 using System;
+using XtraLiteTemplates.Parsing;
+using System.Collections.Generic;
 
-namespace XtraLiteTemplates.Interpretation.Tom
+namespace XtraLiteTemplates.Parsing
 {
-    public class TomNode
+    public class Lexer
     {
-        public TomNode()
+        private IList<Tag[]> m_directives;
+
+        public ITokenizer Tokenizer { get; private set; }
+
+        public IEqualityComparer<String> Comparer { get; private set; }
+
+        public Lexer(ITokenizer tokenizer, IEqualityComparer<String> comparer)
         {
+            Expect.NotNull("tokenizer", tokenizer);
+            Expect.NotNull("comparer", comparer);
+
+            Tokenizer = tokenizer;
+            Comparer = comparer;
+
+            m_directives = new List<Tag[]>();
+        }
+
+        public Lexer RegisterDirective(params Tag[] tags)
+        {
+            Expect.NotEmpty("tags", tags);
+
+            m_directives.Add(tags);
+
+            return this;
+        }
+
+        public String ReadNext()
+        {
+            while (true)
+            {
+                /* Load up the next token and see what it is. */
+                var token = Tokenizer.ReadNext();
+                if (token == null)
+                    break;
+
+                if (token.Type == Token.TokenType.Unparsed)
+                {
+                    /* Unparsed text block. Pass it straign away */
+                }
+            }
+
+            return null;
         }
     }
 }

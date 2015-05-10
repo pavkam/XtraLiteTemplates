@@ -257,7 +257,6 @@ namespace XtraLiteTemplates.NUnit
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedCharacterException(5, 'a', () => tokenizer.ReadNext());
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.EndTag, 6, "}");
         }
 
         [Test]
@@ -289,12 +288,14 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{\"\",\" \", \"\\\\\\\"\\a\\b\\f\\n\\r\\t\\v\\'\\?\"}";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.String, 1, 2, "");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 3, ",");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.String, 4, 3, " ");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 7, ",");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 8, " ");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.String, 9, 24, "\\\"\a\b\f\n\r\t\v'?");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.EndTag, 33, "}");
             Assert.IsNull(tokenizer.ReadNext());
         }
 
@@ -345,6 +346,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{ ";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(2, () => tokenizer.ReadNext());
         }
 
@@ -354,6 +356,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{0";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(2, () => tokenizer.ReadNext());
         }
 
@@ -363,6 +366,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{0.";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(3, () => tokenizer.ReadNext());
         }
 
@@ -372,6 +376,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{0.0";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(4, () => tokenizer.ReadNext());
         }
 
@@ -381,6 +386,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{A";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(2, () => tokenizer.ReadNext());
         }
 
@@ -390,6 +396,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{\"-\"";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(4, () => tokenizer.ReadNext());
         }
 
@@ -399,6 +406,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{\"";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(2, () => tokenizer.ReadNext());
         }
 
@@ -408,6 +416,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{\"\\";
             var tokenizer = new Tokenizer(test);
 
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(3, () => tokenizer.ReadNext());
         }
 
