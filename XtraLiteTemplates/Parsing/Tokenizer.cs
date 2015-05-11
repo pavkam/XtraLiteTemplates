@@ -55,12 +55,8 @@ namespace XtraLiteTemplates.Parsing
 
         public Char StringEscapeCharacter { get; private set; }
 
-        public Tokenizer(TextReader reader, 
-                         Char tagStartCharacter, 
-                         Char tagEndCharacter, 
-                         Char stringStartCharacter, 
-                         Char stringEndCharacter, 
-                         Char stringEscapeCharacter)
+        private void InitializeTokenizer(TextReader reader, Char tagStartCharacter, Char tagEndCharacter, 
+            Char stringStartCharacter, Char stringEndCharacter, Char stringEscapeCharacter)
         {
             Expect.NotNull("reader", reader);
             Expect.NotEqual("tagStartCharacter", "tagEndCharacter", tagStartCharacter, tagEndCharacter);
@@ -95,9 +91,15 @@ namespace XtraLiteTemplates.Parsing
             this.LoadCharacter();
         }
 
-        public Tokenizer(TextReader reader)
-            : this(reader, '{', '}', '"', '"', '\\')
+        public Tokenizer(TextReader reader, Char tagStartCharacter, Char tagEndCharacter, Char stringStartCharacter, 
+            Char stringEndCharacter, Char stringEscapeCharacter)
         {
+            InitializeTokenizer(reader, tagStartCharacter, tagEndCharacter, stringStartCharacter, stringEndCharacter, stringEscapeCharacter);
+        }
+
+        public Tokenizer(TextReader reader)            
+        {
+            InitializeTokenizer(reader, '{', '}', '"', '"', '\\');
         }
 
         public Tokenizer(String text)

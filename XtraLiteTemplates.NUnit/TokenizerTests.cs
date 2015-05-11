@@ -112,6 +112,16 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseConstrunction1()
+        {
+            ExpectArgumentNullException("reader", () => new Tokenizer(null, '<', '>', '{', '}', '-'));
+            ExpectArgumentNullException("reader", () => new Tokenizer((TextReader)null));
+
+            var tokenizer = new Tokenizer((String)null);
+            Assert.IsNull(tokenizer.ReadNext());
+        }
+
+        [Test]
         public void TestCaseStandardConfiguration()
         {
             const String test = "anything";
@@ -142,7 +152,6 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.IsNull(tokenizer.ReadNext());
         }
-
 
         [Test]
         public void TestCaseEmptyOrNullText()
