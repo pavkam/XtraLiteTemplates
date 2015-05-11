@@ -39,6 +39,7 @@
     <Compile Include="LexerTests.cs" />
     <Compile Include="TokenizerTests.cs" />
     <Compile Include="TestBase.cs" />
+    <Compile Include="LexTests.cs" />
     <Compile Include="TokenTests.cs" />
     <Compile Include="ExpressionTests.cs" />
     <Compile Include="ExpressionOperatorTests.cs" />

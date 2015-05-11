@@ -39,7 +39,7 @@ namespace XtraLiteTemplates.Parsing
         {
             Expect.NotEmpty("unparsedText", unparsedText);
 
-            UnparsedText = unparsedText;
+            this.UnparsedText = unparsedText;
         }
     }
 }

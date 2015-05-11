@@ -28,21 +28,8 @@
 
 namespace XtraLiteTemplates.Parsing
 {
-    using System;
-
-    public abstract class Lex
+    public interface ILexer
     {
-        public Int32 FirstCharacterIndex { get; private set; }
-
-        public Int32 OriginalLength { get; private set; }
-
-        protected Lex(Int32 firstCharacterIndex, Int32 originalLength)
-        {
-            Expect.GreaterThanOrEqual("firstCharacterIndex", firstCharacterIndex, 0);
-            Expect.GreaterThan("originalLength", originalLength, 0);
-
-            this.FirstCharacterIndex = firstCharacterIndex;
-            this.OriginalLength = originalLength;
-        }
+        Lex ReadNext();
     }
 }

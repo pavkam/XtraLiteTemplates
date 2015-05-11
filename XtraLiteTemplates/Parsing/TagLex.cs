@@ -39,7 +39,7 @@ namespace XtraLiteTemplates.Parsing
         public TagLex(Tag tag, Object[] components, Int32 firstCharacterIndex, Int32 originalLength)
             : base(firstCharacterIndex, originalLength)
         {
-            Expect.NotNull("components", components);
+            Expect.NotEmpty("components", components);
             Expect.NotNull("tag", tag);
 
             Components = components;

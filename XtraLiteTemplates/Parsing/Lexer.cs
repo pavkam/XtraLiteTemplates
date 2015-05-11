@@ -36,8 +36,9 @@ namespace XtraLiteTemplates.Parsing
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
+    using System.IO;
 
-    public sealed class Lexer
+    public sealed class Lexer : ILexer
     {
         private List<Operator> m_expressionOperators;
         private HashSet<String> m_unaryExpressionOperators;
@@ -59,11 +60,8 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
-        public Lexer(ITokenizer tokenizer, IEqualityComparer<String> comparer)
+        private void InitializeLexer(ITokenizer tokenizer, IEqualityComparer<String> comparer)
         {
-            Expect.NotNull("tokenizer", tokenizer);
-            Expect.NotNull("comparer", comparer);
-
             Tokenizer = tokenizer;
             Comparer = comparer;
 
@@ -71,6 +69,30 @@ namespace XtraLiteTemplates.Parsing
             m_expressionOperators = new List<Operator>();
             m_unaryExpressionOperators = new HashSet<String>(comparer);
             m_binaryExpressionOperators = new HashSet<String>(comparer);
+        }
+
+        public Lexer(ITokenizer tokenizer, IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("tokenizer", tokenizer);
+            Expect.NotNull("comparer", comparer);
+
+            InitializeLexer(tokenizer, comparer);
+        }
+
+        public Lexer(TextReader reader, IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("reader", reader);
+            Expect.NotNull("comparer", comparer);
+
+            InitializeLexer(new Tokenizer(reader), comparer);
+        }
+
+        public Lexer(String text, IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("text", text);
+            Expect.NotNull("comparer", comparer);
+
+            InitializeLexer(new Tokenizer(new StringReader(text)), comparer);
         }
 
         public Lexer RegisterTag(Tag tag)

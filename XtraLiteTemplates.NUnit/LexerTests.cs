@@ -156,17 +156,49 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseConstruction()
+        public void TestCaseConstruction1()
         {
             var tokenizer = new Tokenizer("irrelevant");
 
-            ExpectArgumentNullException("tokenizer", () => new Lexer(null, StringComparer.OrdinalIgnoreCase));
+            ExpectArgumentNullException("tokenizer", () => new Lexer((ITokenizer)null, StringComparer.OrdinalIgnoreCase));
             ExpectArgumentNullException("comparer", () => new Lexer(tokenizer, null));
 
             var lexer = new Lexer(tokenizer, StringComparer.OrdinalIgnoreCase);
 
             Assert.AreSame(tokenizer, lexer.Tokenizer);
             Assert.AreSame(StringComparer.OrdinalIgnoreCase, lexer.Comparer);
+        }
+
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var reader = new StringReader("irrelevant");
+
+            ExpectArgumentNullException("reader", () => new Lexer((StringReader)null, StringComparer.OrdinalIgnoreCase));
+            ExpectArgumentNullException("comparer", () => new Lexer(reader, null));
+
+            var lexer = new Lexer(reader, StringComparer.OrdinalIgnoreCase);
+
+            Assert.AreSame(StringComparer.OrdinalIgnoreCase, lexer.Comparer);
+
+            AssertUnparsedLex(lexer.ReadNext(), 0, "irrelevant");
+            Assert.IsNull(lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var text = "irrelevant";
+
+            ExpectArgumentNullException("text", () => new Lexer((String)null, StringComparer.OrdinalIgnoreCase));
+            ExpectArgumentNullException("comparer", () => new Lexer(text, null));
+
+            var lexer = new Lexer(text, StringComparer.OrdinalIgnoreCase);
+
+            Assert.AreSame(StringComparer.OrdinalIgnoreCase, lexer.Comparer);
+
+            AssertUnparsedLex(lexer.ReadNext(), 0, "irrelevant");
+            Assert.IsNull(lexer.ReadNext());
         }
 
         [Test]
