@@ -39,46 +39,5 @@ namespace XtraLiteTemplates.Expressions
         {
         }
 
-        internal static void CannotEvaluateOperator(Operator @operator, Object constant)
-        {
-            Debug.Assert(@operator != null);
-            throw new ExpressionException("Operator {0} could not be applied to value '{1}'.", @operator, constant);
-        }
-
-        internal static void InvalidExpressionTerm(Object term)
-        {
-            throw new ExpressionException("Invalid expression term: '{0}'.", term);
-        }
-
-        internal static void UnexpectedExpressionTerm(Object term)
-        {
-            throw new ExpressionException("Unexpected expression term: '{0}'.", term);
-        }
-
-        internal static void OperatorAlreadyRegistered(Operator @operator)
-        {
-            Debug.Assert(@operator != null);
-            throw new InvalidOperationException(String.Format("Operator identified by symbol '{0}' has already been registered with expression.", @operator));
-        }
-
-        internal static void CannotRegisterOperatorsForStartedExpression()
-        {
-            throw new InvalidOperationException("Operator registration must be performed before construction.");
-        }
-
-        internal static void CannotModifyAConstructedExpression()
-        {
-            throw new InvalidOperationException("Cannot modify a finalized expression.");
-        }
-
-        internal static void CannotConstructExpressionInvalidState()
-        {
-            throw new ExpressionException("Unbalanced expressions cannot be finalized.");
-        }
-
-        internal static void CannotEvaluateUnconstructedExpression()
-        {
-            throw new InvalidOperationException("Expression has not been finalized.");
-        }
     }
 }

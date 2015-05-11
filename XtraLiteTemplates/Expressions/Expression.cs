@@ -110,7 +110,7 @@ namespace XtraLiteTemplates.Expressions
             Expect.NotNull("operator", @operator);
 
             if (Started)
-                ExpressionException.CannotRegisterOperatorsForStartedExpression();
+                ExceptionHelper.CannotRegisterOperatorsForStartedExpression();
 
             Debug.Assert(!Constructed);
 
@@ -121,7 +121,7 @@ namespace XtraLiteTemplates.Expressions
                     m_startGroupOperators.ContainsKey(unaryOperator.Symbol) ||
                     m_endGroupOperators.ContainsKey(unaryOperator.Symbol))
                 {
-                    ExpressionException.OperatorAlreadyRegistered(unaryOperator);
+                    ExceptionHelper.OperatorAlreadyRegistered(unaryOperator);
                 }
 
                 m_unaryOperators.Add(@operator.Symbol, unaryOperator);
@@ -133,7 +133,7 @@ namespace XtraLiteTemplates.Expressions
                     m_startGroupOperators.ContainsKey(binaryOperator.Symbol) ||
                     m_endGroupOperators.ContainsKey(binaryOperator.Symbol))
                 {
-                    ExpressionException.OperatorAlreadyRegistered(binaryOperator);
+                    ExceptionHelper.OperatorAlreadyRegistered(binaryOperator);
                 }
 
 
@@ -151,7 +151,7 @@ namespace XtraLiteTemplates.Expressions
                     m_endGroupOperators.ContainsKey(groupOperator.Symbol) ||
                     m_endGroupOperators.ContainsKey(groupOperator.Terminator))
                 {
-                    ExpressionException.OperatorAlreadyRegistered(@operator);
+                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
                 }
 
                 m_startGroupOperators.Add(groupOperator.Symbol, groupOperator);
@@ -192,7 +192,7 @@ namespace XtraLiteTemplates.Expressions
             Debug.Assert(isLiteral || term is String);
 
             if (Constructed)
-                ExpressionException.CannotModifyAConstructedExpression();
+                ExceptionHelper.CannotModifyAConstructedExpression();
 
             if (GroupStartOrUnaryOperatorOrLiteralExpected)
             {
@@ -232,7 +232,7 @@ namespace XtraLiteTemplates.Expressions
                         Debug.Assert(operatorNode.RightNode == null);
 
                         if (operatorNode.Operator.ExpectRhsIdentifier && (isLiteral || !(continuationNode is LeafNode)))
-                            ExpressionException.UnexpectedExpressionTerm(term);
+                            ExceptionHelper.UnexpectedExpressionTerm(term);
                         
                         operatorNode.RightNode = continuationNode;
                     }
@@ -287,13 +287,13 @@ namespace XtraLiteTemplates.Expressions
 
                         /* Check that we do not push the RHS identifier off the parent. */
                         if (leftNodeParentOperatorNode != null && leftNodeParentOperatorNode.Operator.ExpectRhsIdentifier)
-                            ExpressionException.UnexpectedExpressionTerm(_symbol);
+                            ExceptionHelper.UnexpectedExpressionTerm(_symbol);
 
                         if (_binaryOperator.ExpectLhsIdentifier)
                         {
                             var leftLeafNode = leftNode as LeafNode;
                             if (leftLeafNode == null || leftLeafNode.Evaluation == LeafNode.EvaluationType.Literal)
-                                ExpressionException.UnexpectedExpressionTerm(_symbol);
+                                ExceptionHelper.UnexpectedExpressionTerm(_symbol);
                             else if (leftLeafNode.Evaluation == LeafNode.EvaluationType.Variable)
                                 leftLeafNode.ConvertToIdentifier();
                         }
@@ -318,13 +318,13 @@ namespace XtraLiteTemplates.Expressions
                 }
             }
 
-            ExpressionException.InvalidExpressionTerm(term);
+            ExceptionHelper.InvalidExpressionTerm(term);
         }
 
         public Expression FeedLiteral(Object literal)
         {
             if (Constructed)
-                ExpressionException.CannotModifyAConstructedExpression();
+                ExceptionHelper.CannotModifyAConstructedExpression();
 
             FeedTerm(literal, true);
             return this;
@@ -335,7 +335,7 @@ namespace XtraLiteTemplates.Expressions
             Expect.NotEmpty("symbol", symbol);
 
             if (Constructed)
-                ExpressionException.CannotModifyAConstructedExpression();
+                ExceptionHelper.CannotModifyAConstructedExpression();
 
             FeedTerm(symbol, false);
             return this;
@@ -346,7 +346,7 @@ namespace XtraLiteTemplates.Expressions
             if (!Constructed)
             {
                 if (GroupStartOrUnaryOperatorOrLiteralExpected || m_openGroups.Count > 0)
-                    ExpressionException.CannotConstructExpressionInvalidState();
+                    ExceptionHelper.CannotConstructExpressionInvalidState();
 
                 /* Reduce the expression if so was desired. */
                 m_root = m_root.Reduce();
@@ -359,7 +359,7 @@ namespace XtraLiteTemplates.Expressions
             Expect.NotNull("context", context);
 
             if (!Constructed)
-                ExpressionException.CannotEvaluateUnconstructedExpression();
+                ExceptionHelper.CannotEvaluateUnconstructedExpression();
 
             return m_function(context);
         }

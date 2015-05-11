@@ -138,7 +138,7 @@ namespace XtraLiteTemplates.Parsing
 
             /* This is where a tag is parsed. */
             if (this.m_currentToken.Type != Token.TokenType.StartTag)
-                ParseException.UnexpectedToken(this.m_currentToken);
+                ExceptionHelper.UnexpectedToken(this.m_currentToken);
 
             Int32 tokenIndex = -1;
 
@@ -153,7 +153,7 @@ namespace XtraLiteTemplates.Parsing
                 tokenIndex++;
                 var _previousToken = this.m_currentToken;
                 if (!this.NextToken())
-                    ParseException.UnexpectedEndOfStreamAfterToken(_previousToken);
+                    ExceptionHelper.UnexpectedEndOfStreamAfterToken(_previousToken);
 
                 _allTokens.Add(this.m_currentToken);
 
@@ -176,7 +176,7 @@ namespace XtraLiteTemplates.Parsing
                                 {
                                     var mergedToken = new Token(Token.TokenType.Symbol,
                                         potentialOperator, _symbolChain[0].CharacterIndex, potentialOperator.Length);
-                                    ParseException.UnexpectedOrInvalidExpressionToken(feedException, mergedToken);
+                                    ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, mergedToken);
                                 }
 
                                 found = true;
@@ -186,14 +186,14 @@ namespace XtraLiteTemplates.Parsing
                         }
 
                         if (!found)
-                            ParseException.UnexpectedToken(_symbolChain[0]);
+                            ExceptionHelper.UnexpectedToken(_symbolChain[0]);
                     }
                 }
 
                 if (this.m_currentToken.Type == Token.TokenType.EndTag)
                 {
                     if (matchingTags.Count != 1)
-                        ParseException.UnexpectedToken(this.m_currentToken);
+                        ExceptionHelper.UnexpectedToken(this.m_currentToken);
                     else
                     {
                         if (currentExpression != null)
@@ -204,7 +204,7 @@ namespace XtraLiteTemplates.Parsing
                             }
                             catch (ExpressionException constructException)
                             {
-                                ParseException.UnexpectedOrInvalidExpressionToken(constructException, m_currentToken);
+                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, m_currentToken);
                             }
                         }
 
@@ -218,7 +218,7 @@ namespace XtraLiteTemplates.Parsing
                     if (_previousToken.Type != Token.TokenType.StartTag &&
                         _previousToken.Type != Token.TokenType.Symbol && 
                         _previousToken.Type != Token.TokenType.Whitespace)
-                        ParseException.UnexpectedToken(m_currentToken);
+                        ExceptionHelper.UnexpectedToken(m_currentToken);
 
                     /* This is either a keyword or part of an expression. Reflect that. */
                     var matchesByKeyword = matchingTags.Where(p => p.MatchesKeyword(_components.Count, Comparer, this.m_currentToken.Value)).ToList();
@@ -235,7 +235,7 @@ namespace XtraLiteTemplates.Parsing
                             }
                             catch (ExpressionException constructException)
                             {
-                                ParseException.UnexpectedOrInvalidExpressionToken(constructException, m_currentToken);
+                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, m_currentToken);
                             }
                         }
 
@@ -253,14 +253,14 @@ namespace XtraLiteTemplates.Parsing
                     if (_previousToken.Type != Token.TokenType.StartTag &&
                         _previousToken.Type != Token.TokenType.Symbol && 
                         _previousToken.Type != Token.TokenType.Whitespace)
-                        ParseException.UnexpectedToken(m_currentToken);
+                        ExceptionHelper.UnexpectedToken(m_currentToken);
 
                     if (currentExpression == null)
                     {
                         /* Starting an expression. */
                         matchingTags.RemoveWhere(p => !p.MatchesExpression(_components.Count));
                         if (matchingTags.Count == 0)
-                            ParseException.UnexpectedToken(this.m_currentToken);
+                            ExceptionHelper.UnexpectedToken(this.m_currentToken);
 
                         currentExpression = CreateExpression();
                         _components.Add(currentExpression);
@@ -279,7 +279,7 @@ namespace XtraLiteTemplates.Parsing
                                 if (Double.TryParse(this.m_currentToken.Value, out _float))
                                     currentExpression.FeedLiteral(_float);
                                 else
-                                    ParseException.UnexpectedToken(this.m_currentToken);
+                                    ExceptionHelper.UnexpectedToken(this.m_currentToken);
                             }
                         }
                         else if (this.m_currentToken.Type == Token.TokenType.String)
@@ -293,7 +293,7 @@ namespace XtraLiteTemplates.Parsing
                     }
                     catch (ExpressionException feedException)
                     {
-                        ParseException.UnexpectedOrInvalidExpressionToken(feedException, this.m_currentToken);
+                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, this.m_currentToken);
                     }
                 }
                 else if (m_currentToken.Type == Token.TokenType.Symbol)
@@ -304,7 +304,7 @@ namespace XtraLiteTemplates.Parsing
                         /* Starting an expression. */
                         matchingTags.RemoveWhere(p => !p.MatchesExpression(_components.Count));
                         if (matchingTags.Count == 0)
-                            ParseException.UnexpectedToken(this.m_currentToken);
+                            ExceptionHelper.UnexpectedToken(this.m_currentToken);
 
                         currentExpression = CreateExpression();
                         _components.Add(currentExpression);

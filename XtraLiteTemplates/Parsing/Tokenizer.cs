@@ -127,7 +127,7 @@ namespace XtraLiteTemplates.Parsing
         {
             if (this.m_isEndOfStream)
             {
-                ParseException.UnexpectedEndOfStream(this.m_currentCharacterIndex);
+                ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
             }
 
             this.LoadCharacter();
@@ -135,7 +135,7 @@ namespace XtraLiteTemplates.Parsing
 
             if (this.m_isEndOfStream && required)
             {
-                ParseException.UnexpectedEndOfStream(this.m_currentCharacterIndex);
+                ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
             }
 
             return !this.m_isEndOfStream;
@@ -165,7 +165,7 @@ namespace XtraLiteTemplates.Parsing
             else if (this.m_parserState == ParserState.InTag &&
                      this.m_currentCharacter == this.TagStartCharacter)
             {
-                ParseException.UnexpectedCharacter(this.m_currentCharacterIndex, this.TagStartCharacter);
+                ExceptionHelper.UnexpectedCharacter(this.m_currentCharacterIndex, this.TagStartCharacter);
             }
 
             if (this.m_parserState == ParserState.InText)
@@ -280,7 +280,7 @@ namespace XtraLiteTemplates.Parsing
                                         tokenValue.Append('?');
                                         break;
                                     default:
-                                        ParseException.InvalidEscapeCharacter(this.m_currentCharacterIndex, this.m_currentCharacter);
+                                        ExceptionHelper.InvalidEscapeCharacter(this.m_currentCharacterIndex, this.m_currentCharacter);
                                         break;
                                 }
                             }
@@ -331,7 +331,7 @@ namespace XtraLiteTemplates.Parsing
 
                         if (!Char.IsDigit(this.m_currentCharacter))
                         {
-                            ParseException.UnexpectedCharacter(this.m_currentCharacterIndex, this.m_currentCharacter);
+                            ExceptionHelper.UnexpectedCharacter(this.m_currentCharacterIndex, this.m_currentCharacter);
                         }
 
                         while (Char.IsDigit(this.m_currentCharacter))

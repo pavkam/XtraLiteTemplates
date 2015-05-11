@@ -34,7 +34,7 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Parsing;
 
     [TestFixture]
-    public class TokenizerTest : TestBase
+    public class TokenizerTests : TestBase
     {
         private static void AssertToken(Token token, Token.TokenType type, Int32 charIndex, Int32 length, String value)
         {

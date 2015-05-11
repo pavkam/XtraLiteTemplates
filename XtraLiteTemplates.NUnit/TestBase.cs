@@ -79,6 +79,38 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
+        protected void ExpectArgumentNotIdentifierException(String argument, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                if (e is ArgumentNullException)
+                {
+                    Assert.IsTrue(e.Message.StartsWith(
+                            String.Format("Argument \"{0}\" cannot be null.", argument),
+                            StringComparison.CurrentCulture));
+                }
+                else 
+                {
+                    Assert.IsInstanceOf(typeof(ArgumentException), e);
+
+                    var isGoodOne = 
+                        e.Message.StartsWith(String.Format("Argument \"{0}\" cannot be empty.", argument), StringComparison.CurrentCulture) ||
+                        e.Message.StartsWith(String.Format("Argument \"{0}\" does not represent a valid identifer.", argument), StringComparison.CurrentCulture);
+
+                    Assert.IsTrue(isGoodOne);
+                }
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+
         protected void ExpectArgumentsEqualException(String argument1, String argument2, Action action)
         {
             try

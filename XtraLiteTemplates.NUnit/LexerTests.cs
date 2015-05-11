@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Parsing;
 
     [TestFixture]
-    public class LexerTest : TestBase
+    public class LexerTests : TestBase
     {
         private static void ExpectUnexpectedTokenException(Int32 index, String token, Token.TokenType type, Action action)
         {

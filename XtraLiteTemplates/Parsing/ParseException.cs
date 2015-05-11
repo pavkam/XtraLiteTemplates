@@ -46,45 +46,5 @@ namespace XtraLiteTemplates.Parsing
             this.CharacterIndex = characterIndex;
         }
 
-        internal static void UnexpectedCharacter(Int32 characterIndex, Char character)
-        {
-            throw new ParseException(characterIndex, "Unexpected character '{0}' found at position {1}.", character, characterIndex);
-        }
-
-        internal static void UnexpectedEndOfStream(Int32 characterIndex)
-        {
-            throw new ParseException(characterIndex, "Unexpected end of stream detected at position {0}.", characterIndex);
-        }
-
-        internal static void InvalidEscapeCharacter(Int32 characterIndex, Char character)
-        {
-            throw new ParseException(characterIndex, "Invalid escape character '{0}' at position {1}.", character, characterIndex);
-        }
-
-        internal static void UnexpectedToken(Token token)
-        {
-            Debug.Assert(token != null);
-
-            throw new ParseException(token.CharacterIndex, 
-                "Unexpected token '{0}' (type: {1}) found at position {2}.", token.Value, token.Type, token.CharacterIndex);
-        }
-
-        internal static void UnexpectedOrInvalidExpressionToken(ExpressionException inner, Token token)
-        {
-            Debug.Assert(token != null);
-            Debug.Assert(inner != null);
-
-            throw new ParseException(token.CharacterIndex,
-                "Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: {3}", 
-                token.Value, token.Type, token.CharacterIndex, inner.Message);
-        }
-
-        internal static void UnexpectedEndOfStreamAfterToken(Token token)
-        {
-            Debug.Assert(token != null);
-
-            throw new ParseException(token.CharacterIndex, 
-                "Unexpected end of stream after token '{0}' (type: {1}) at position {2}.", token.Value, token.Type, token.CharacterIndex);
-        }
     }
 }

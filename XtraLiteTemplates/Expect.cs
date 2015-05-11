@@ -49,9 +49,21 @@ namespace XtraLiteTemplates
             NotNull(name, value);
             if (!value.Any())
             {
-                throw new ArgumentException(
-                    String.Format("Argument \"{0}\" cannot be empty.", name), 
-                    name);
+                throw new ArgumentException(String.Format("Argument \"{0}\" cannot be empty.", name), name);
+            }
+        }
+
+        public static void Identifier(String name, String value)
+        {
+            NotEmpty(name, value);
+
+            var isValid =
+                (Char.IsLetter(value[0]) || value[0] == '_') &&
+                value.All(c => Char.IsLetterOrDigit(c) || c == '_');
+
+            if (!isValid)
+            {
+                throw new ArgumentException(String.Format("Argument \"{0}\" does not represent a valid identifer.", name), name);
             }
         }
 
