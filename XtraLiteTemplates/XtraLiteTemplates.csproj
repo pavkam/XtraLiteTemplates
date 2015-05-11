@@ -52,6 +52,9 @@
     <Compile Include="Expressions\Operators\Standard\StandardUnaryOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\MultiplyOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\SubtractOperator.cs" />
+    <Compile Include="Parsing\TagLex.cs" />
+    <Compile Include="Parsing\UnparsedLex.cs" />
+    <Compile Include="Parsing\Lex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Expect.cs" />
     <Compile Include="Expressions\Nodes\ExpressionNode.cs" />
@@ -88,7 +91,5 @@
       </Properties>
     </MonoDevelop>
   </ProjectExtensions>
-  <ItemGroup>
-    <Folder Include="Parsing\" />
-  </ItemGroup>
+  <ItemGroup />
 </Project>

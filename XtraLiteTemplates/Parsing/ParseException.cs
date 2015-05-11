@@ -30,6 +30,7 @@ namespace XtraLiteTemplates.Parsing
 {
     using System;
     using System.Diagnostics;
+    using XtraLiteTemplates.Expressions;
 
     public class ParseException : FormatException
     {
@@ -66,6 +67,16 @@ namespace XtraLiteTemplates.Parsing
 
             throw new ParseException(token.CharacterIndex, 
                 "Unexpected token '{0}' (type: {1}) found at position {2}.", token.Value, token.Type, token.CharacterIndex);
+        }
+
+        internal static void UnexpectedOrInvalidExpressionToken(ExpressionException inner, Token token)
+        {
+            Debug.Assert(token != null);
+            Debug.Assert(inner != null);
+
+            throw new ParseException(token.CharacterIndex,
+                "Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: {3}", 
+                token.Value, token.Type, token.CharacterIndex, inner.Message);
         }
 
         internal static void UnexpectedEndOfStreamAfterToken(Token token)
