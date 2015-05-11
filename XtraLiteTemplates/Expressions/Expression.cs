@@ -42,11 +42,10 @@ namespace XtraLiteTemplates.Expressions
         private List<Operator> m_supportedOperators;
         private Func<IEvaluationContext, Object> m_function;
         private Stack<SubscriptNode> m_openGroups;
-        private Dictionary<String, UnaryOperator> m_unaryOperators;
-        private Dictionary<String, BinaryOperator> m_binaryOperators;
-        private Dictionary<String, SubscriptOperator> m_startGroupOperators;
-        private Dictionary<String, SubscriptOperator> m_endGroupOperators;
-
+        private Dictionary<String, UnaryOperator> m_unaryOperatorSymbols;
+        private Dictionary<String, BinaryOperator> m_binaryOperatorSymbols;
+        private Dictionary<String, SubscriptOperator> m_subscriptOperatorSymbols;
+        private Dictionary<String, SubscriptOperator> m_subscriptOperatorsTerminators;
 
         public Boolean Constructed
         {
@@ -68,11 +67,11 @@ namespace XtraLiteTemplates.Expressions
         {
             Expect.NotEmpty("symbol", symbol);
 
-            return 
-                m_unaryOperators.ContainsKey(symbol) ||
-            m_binaryOperators.ContainsKey(symbol) ||
-            m_startGroupOperators.ContainsKey(symbol) ||
-            m_endGroupOperators.ContainsKey(symbol);
+            return
+                m_unaryOperatorSymbols.ContainsKey(symbol) ||
+                m_binaryOperatorSymbols.ContainsKey(symbol) ||
+                m_subscriptOperatorSymbols.ContainsKey(symbol) ||
+                m_subscriptOperatorsTerminators.ContainsKey(symbol);
         }
 
         public IReadOnlyList<Operator> SupportedOperators
@@ -90,10 +89,10 @@ namespace XtraLiteTemplates.Expressions
         {
             Expect.NotNull("comparer", comparer);
 
-            m_unaryOperators = new Dictionary<String, UnaryOperator>(comparer);
-            m_binaryOperators = new Dictionary<String, BinaryOperator>(comparer);
-            m_startGroupOperators = new Dictionary<String, SubscriptOperator>();
-            m_endGroupOperators = new Dictionary<String, SubscriptOperator>();
+            m_unaryOperatorSymbols = new Dictionary<String, UnaryOperator>(comparer);
+            m_binaryOperatorSymbols = new Dictionary<String, BinaryOperator>(comparer);
+            m_subscriptOperatorSymbols = new Dictionary<String, SubscriptOperator>();
+            m_subscriptOperatorsTerminators = new Dictionary<String, SubscriptOperator>();
             m_supportedOperators = new List<Operator>();
             m_openGroups = new Stack<SubscriptNode>();
 
@@ -117,45 +116,41 @@ namespace XtraLiteTemplates.Expressions
             if (@operator is UnaryOperator)
             {
                 var unaryOperator = (UnaryOperator)@operator;
-                if (m_unaryOperators.ContainsKey(unaryOperator.Symbol) ||
-                    m_startGroupOperators.ContainsKey(unaryOperator.Symbol) ||
-                    m_endGroupOperators.ContainsKey(unaryOperator.Symbol))
+                if (m_unaryOperatorSymbols.ContainsKey(unaryOperator.Symbol) ||
+                    m_subscriptOperatorSymbols.ContainsKey(unaryOperator.Symbol))
                 {
                     ExceptionHelper.OperatorAlreadyRegistered(unaryOperator);
                 }
 
-                m_unaryOperators.Add(@operator.Symbol, unaryOperator);
+                m_unaryOperatorSymbols.Add(@operator.Symbol, unaryOperator);
             }
             else if (@operator is BinaryOperator)
             {
                 var binaryOperator = (BinaryOperator)@operator;
-                if (m_binaryOperators.ContainsKey(binaryOperator.Symbol) ||
-                    m_startGroupOperators.ContainsKey(binaryOperator.Symbol) ||
-                    m_endGroupOperators.ContainsKey(binaryOperator.Symbol))
+                if (m_binaryOperatorSymbols.ContainsKey(binaryOperator.Symbol) ||
+                    m_subscriptOperatorsTerminators.ContainsKey(binaryOperator.Symbol))
                 {
                     ExceptionHelper.OperatorAlreadyRegistered(binaryOperator);
                 }
 
 
-                m_binaryOperators.Add(@operator.Symbol, binaryOperator);
+                m_binaryOperatorSymbols.Add(@operator.Symbol, binaryOperator);
             }
             else if (@operator is SubscriptOperator)
             {
                 var groupOperator = (SubscriptOperator)@operator;
-                if (m_unaryOperators.ContainsKey(groupOperator.Symbol) ||
-                    m_unaryOperators.ContainsKey(groupOperator.Terminator) ||
-                    m_binaryOperators.ContainsKey(groupOperator.Symbol) ||
-                    m_binaryOperators.ContainsKey(groupOperator.Terminator) ||
-                    m_startGroupOperators.ContainsKey(groupOperator.Symbol) ||
-                    m_startGroupOperators.ContainsKey(groupOperator.Terminator) ||
-                    m_endGroupOperators.ContainsKey(groupOperator.Symbol) ||
-                    m_endGroupOperators.ContainsKey(groupOperator.Terminator))
+                if (m_unaryOperatorSymbols.ContainsKey(groupOperator.Symbol) ||
+                    m_binaryOperatorSymbols.ContainsKey(groupOperator.Terminator) ||
+                    m_subscriptOperatorSymbols.ContainsKey(groupOperator.Symbol) ||
+                    m_subscriptOperatorSymbols.ContainsKey(groupOperator.Terminator) ||
+                    m_subscriptOperatorsTerminators.ContainsKey(groupOperator.Symbol) ||
+                    m_subscriptOperatorsTerminators.ContainsKey(groupOperator.Terminator))
                 {
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
                 }
 
-                m_startGroupOperators.Add(groupOperator.Symbol, groupOperator);
-                m_endGroupOperators.Add(groupOperator.Terminator, groupOperator);
+                m_subscriptOperatorSymbols.Add(groupOperator.Symbol, groupOperator);
+                m_subscriptOperatorsTerminators.Add(groupOperator.Terminator, groupOperator);
             }
             else
                 Debug.Assert(false, "Unsupported operator type.");
@@ -205,18 +200,18 @@ namespace XtraLiteTemplates.Expressions
 
                     /* Good cases. */
                     UnaryOperator _unaryOperator;
-                    if (m_unaryOperators.TryGetValue(_symbol, out _unaryOperator))
+                    if (m_unaryOperatorSymbols.TryGetValue(_symbol, out _unaryOperator))
                         continuationNode = new UnaryOperatorNode(m_current, _unaryOperator);
 
                     SubscriptOperator _groupOperator;
-                    if (m_startGroupOperators.TryGetValue(_symbol, out _groupOperator))
+                    if (m_subscriptOperatorSymbols.TryGetValue(_symbol, out _groupOperator))
                     {
                         continuationNode = new SubscriptNode(m_current, _groupOperator);
                         m_openGroups.Push((SubscriptNode)continuationNode);
                     }
 
                     /* Invalid cases. */
-                    if (continuationNode == null && !m_endGroupOperators.ContainsKey(_symbol) && !m_binaryOperators.ContainsKey(_symbol))
+                    if (continuationNode == null && !m_subscriptOperatorsTerminators.ContainsKey(_symbol) && !m_binaryOperatorSymbols.ContainsKey(_symbol))
                     {
                         var evaluationType = m_current != null && ((OperatorNode)m_current).Operator.ExpectRhsIdentifier ? 
                             LeafNode.EvaluationType.Indentifier : LeafNode.EvaluationType.Variable;
@@ -250,7 +245,7 @@ namespace XtraLiteTemplates.Expressions
                     var _symbol = (String)term;
 
                     SubscriptOperator _groupOperator;
-                    if (m_endGroupOperators.TryGetValue(_symbol, out _groupOperator))
+                    if (m_subscriptOperatorsTerminators.TryGetValue(_symbol, out _groupOperator))
                     {
                         var _currentlyOpenGroupNode = m_openGroups.Count > 0 ? m_openGroups.Pop() : null;
                         if (_currentlyOpenGroupNode != null && _currentlyOpenGroupNode.Operator == _groupOperator)
@@ -270,7 +265,7 @@ namespace XtraLiteTemplates.Expressions
                     }
 */
                     BinaryOperator _binaryOperator;
-                    if (m_binaryOperators.TryGetValue(_symbol, out _binaryOperator))
+                    if (m_binaryOperatorSymbols.TryGetValue(_symbol, out _binaryOperator))
                     {
                         var leftNode = m_current;
 

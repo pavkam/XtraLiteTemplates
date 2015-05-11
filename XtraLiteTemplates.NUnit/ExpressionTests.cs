@@ -49,7 +49,7 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(InvalidOperationException), e);
-                Assert.AreEqual(String.Format("Operator identified by symbol '{0}' has already been registered with expression.", @operator), e.Message);
+                Assert.AreEqual(String.Format("Operator '{0}' (or one of its identifying symbols) already registered.", @operator), e.Message);
             
                 return;
             }
@@ -261,38 +261,25 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            var unaryOp_plus = new NeutralOperator("+");
-            var binaryOp_plus = new SumOperator("+");
-            var groupOp_plus = new SubscriptOperator("+", "-");
+            expression.RegisterOperator(NeutralOperator.Standard);
+            expression.RegisterOperator(SumOperator.Standard);
+            expression.RegisterOperator(SubscriptOperator.Standard);
 
-            expression.RegisterOperator(binaryOp_plus);
-            ExpectOperatorAlreadyRegisteredException(binaryOp_plus, () => expression.RegisterOperator(binaryOp_plus));
-            ExpectOperatorAlreadyRegisteredException(groupOp_plus, () => expression.RegisterOperator(groupOp_plus));
-            expression.RegisterOperator(unaryOp_plus);
-            ExpectOperatorAlreadyRegisteredException(unaryOp_plus, () => expression.RegisterOperator(unaryOp_plus));
-        }
+            ExpectOperatorAlreadyRegisteredException(NeutralOperator.Standard, () => expression.RegisterOperator(NeutralOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(SumOperator.Standard, () => expression.RegisterOperator(SumOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(SubscriptOperator.Standard, () => expression.RegisterOperator(SubscriptOperator.Standard));
 
-        [Test]
-        public void TestCaseOperatorRegistration_3()
-        {
-            var expression = new Expression();
+            var _ss1 = new SubscriptOperator("+", ">");
+            ExpectOperatorAlreadyRegisteredException(_ss1, () => expression.RegisterOperator(_ss1));
 
-            var unaryOp_plus = new NeutralOperator("+");
-            var unaryOp_minus = new NeutralOperator("-");
-            var binaryOp_plus = new SumOperator("+");
-            var binaryOp_minus = new SumOperator("-");
-            var groupOp_plus_minus = new SubscriptOperator("+", "-");
-            var groupOp_minus_plus = new SubscriptOperator("-", "+");
+            var _ss2 = new SubscriptOperator("<", "+");
+            ExpectOperatorAlreadyRegisteredException(_ss2, () => expression.RegisterOperator(_ss2));
 
-            expression.RegisterOperator(groupOp_plus_minus);
-            ExpectOperatorAlreadyRegisteredException(groupOp_plus_minus, () => expression.RegisterOperator(groupOp_plus_minus));
-            ExpectOperatorAlreadyRegisteredException(groupOp_minus_plus, () => expression.RegisterOperator(groupOp_minus_plus));
+            var _ss3 = new SubscriptOperator("(", ">");
+            ExpectOperatorAlreadyRegisteredException(_ss3, () => expression.RegisterOperator(_ss3));
 
-            ExpectOperatorAlreadyRegisteredException(unaryOp_plus, () => expression.RegisterOperator(unaryOp_plus));
-            ExpectOperatorAlreadyRegisteredException(unaryOp_minus, () => expression.RegisterOperator(unaryOp_minus));
-
-            ExpectOperatorAlreadyRegisteredException(binaryOp_plus, () => expression.RegisterOperator(binaryOp_plus));
-            ExpectOperatorAlreadyRegisteredException(binaryOp_minus, () => expression.RegisterOperator(binaryOp_minus));
+            var _ss4 = new SubscriptOperator("<", ")");
+            ExpectOperatorAlreadyRegisteredException(_ss4, () => expression.RegisterOperator(_ss4));
         }
 
         [Test]

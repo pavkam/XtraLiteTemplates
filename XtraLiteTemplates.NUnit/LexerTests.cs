@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.IO;
     using System.Linq;
+    using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.Parsing;
 
@@ -49,6 +50,75 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsInstanceOf(typeof(ParseException), e);
                 Assert.AreEqual(String.Format("Unexpected token '{0}' (type: {1}) found at position {2}.", token, type, index), e.Message);
                 Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        private static void ExpectCannotRegisterTagWithNoComponentsException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual("Cannot register a tag with no defined components.", e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        private static void ExpectOperatorAlreadyRegisteredException(Operator @operator, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual(String.Format("Operator '{0}' (or one of its identifying symbols) already registered.", @operator), e.Message);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        private static void ExpectUnbalancedExpressionCannotBeFinalizedException(Int32 index, String token, Token.TokenType type, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Unbalanced expressions cannot be finalized.",
+                    token, type, index), e.Message);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        private static void ExpectUnexpectedOrInvalidExpressionTokenException(Int32 index, String token, Token.TokenType type, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Invalid expression term: '{0}'.",
+                    token, type, index), e.Message);
 
                 return;
             }
@@ -83,6 +153,68 @@ namespace XtraLiteTemplates.NUnit
 
             var allText = String.Join("|", tagLex.Components.Select(s => s.ToString()));
             Assert.AreEqual(asText, allText);
+        }
+
+        [Test]
+        public void TestCaseConstruction()
+        {
+            var tokenizer = new Tokenizer("irrelevant");
+
+            ExpectArgumentNullException("tokenizer", () => new Lexer(null, StringComparer.OrdinalIgnoreCase));
+            ExpectArgumentNullException("comparer", () => new Lexer(tokenizer, null));
+
+            var lexer = new Lexer(tokenizer, StringComparer.OrdinalIgnoreCase);
+
+            Assert.AreSame(tokenizer, lexer.Tokenizer);
+            Assert.AreSame(StringComparer.OrdinalIgnoreCase, lexer.Comparer);
+        }
+
+        [Test]
+        public void TestCaseTagRegistration()
+        {
+            var tokenizer = new Tokenizer("irrelevant");
+            var lexer = new Lexer(tokenizer, StringComparer.OrdinalIgnoreCase);
+            var emptyTag = new Tag();
+
+            Assert.AreEqual(0, lexer.Tags.Count);
+
+            ExpectArgumentNullException("tag", () => lexer.RegisterTag(null));
+            ExpectCannotRegisterTagWithNoComponentsException(() => lexer.RegisterTag(emptyTag));
+
+            emptyTag.Expression();
+            lexer.RegisterTag(emptyTag);
+            Assert.AreEqual(emptyTag, lexer.Tags.Single());
+
+            lexer.RegisterTag(emptyTag);
+            Assert.AreEqual(emptyTag, lexer.Tags.Single());
+        }
+
+        [Test]
+        public void TestCaseOperatorRegistration()
+        {
+            var tokenizer = new Tokenizer("irrelevant");
+            var lexer = new Lexer(tokenizer, StringComparer.OrdinalIgnoreCase);
+
+            ExpectArgumentNullException("operator", () => lexer.RegisterOperator(null));
+
+            Assert.AreEqual(lexer, lexer.RegisterOperator(NeutralOperator.Standard));
+            Assert.AreEqual(lexer, lexer.RegisterOperator(SumOperator.Standard));
+            Assert.AreEqual(lexer, lexer.RegisterOperator(new SubscriptOperator("<", ">")));
+
+            ExpectOperatorAlreadyRegisteredException(NeutralOperator.Standard, () => lexer.RegisterOperator(NeutralOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(SumOperator.Standard, () => lexer.RegisterOperator(SumOperator.Standard));
+
+            var _ss1 = new SubscriptOperator("+", ")");
+            ExpectOperatorAlreadyRegisteredException(_ss1, () => lexer.RegisterOperator(_ss1));
+
+            var _ss2 = new SubscriptOperator("(", "+");
+            ExpectOperatorAlreadyRegisteredException(_ss2, () => lexer.RegisterOperator(_ss2));
+
+            var _ss3 = new SubscriptOperator("<", ")");
+            ExpectOperatorAlreadyRegisteredException(_ss3, () => lexer.RegisterOperator(_ss3));
+
+            var _ss4 = new SubscriptOperator("(", ">");
+            ExpectOperatorAlreadyRegisteredException(_ss4, () => lexer.RegisterOperator(_ss4));
         }
 
         [Test]
@@ -225,6 +357,162 @@ namespace XtraLiteTemplates.NUnit
 
             lexer = new Lexer(new Tokenizer("{\"ALPHA\"\"BETA\"}"), StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
             ExpectUnexpectedTokenException(8, "BETA", Token.TokenType.String, () => lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseIncompleteTag()
+        {
+            const String test = "{A any B 2 C }";
+
+            var tag = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C").Keyword("D");
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+
+            ExpectUnexpectedTokenException(13, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseIncompleteAndCompleteSelectionTags()
+        {
+            const String test = "{A any B 2 C }";
+
+            var tag1 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C").Keyword("D");
+            var tag2 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
+
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag1).RegisterTag(tag2);
+
+            AssertTagLex(lexer.ReadNext(), 0, 14, tag2, "A|any|B|2|C");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTagSelection1()
+        {
+            const String test = "{A any B 2 C }";
+
+            var tag1 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
+            var tag2 = new Tag().Keyword("A").Expression().Keyword("B").Expression().Keyword("C");
+
+            var lexer12 = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag1).RegisterTag(tag2);
+            var lexer21 = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer12.ReadNext(), 0, 14, tag1, "A|any|B|2|C");
+            AssertTagLex(lexer21.ReadNext(), 0, 14, tag1, "A|any|B|2|C");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTagSelection2()
+        {
+            const String test = "{A any B 2 C }";
+
+            var tag1 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
+            var tag2 = new Tag().Keyword("A").Identifier("any").Keyword("B").Expression().Keyword("C");
+
+            var lexer12 = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag1).RegisterTag(tag2);
+            var lexer21 = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer12.ReadNext(), 0, 14, tag1, "A|any|B|2|C");
+            AssertTagLex(lexer21.ReadNext(), 0, 14, tag2, "A|any|B|2|C");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTagSelection3()
+        {
+            const String test = "{A any B 2 C }";
+
+            var tag1 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
+            var tag2 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
+
+            var lexer12 = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag1).RegisterTag(tag2);
+            var lexer21 = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer12.ReadNext(), 0, 14, tag1, "A|any|B|2|C");
+            AssertTagLex(lexer21.ReadNext(), 0, 14, tag2, "A|any|B|2|C");
+        }
+
+        [Test]
+        public void TestCaseBrokenExpression1()
+        {
+            const String test = "{1 +}";
+
+            var exprTag = new Tag().Expression();
+
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(exprTag).RegisterOperator(SumOperator.Standard);
+
+            ExpectUnbalancedExpressionCannotBeFinalizedException(4, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseBrokenExpression2()
+        {
+            const String test = "{1 + END}";
+
+            var exprTag = new Tag().Expression().Keyword("END");
+
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(exprTag).RegisterOperator(SumOperator.Standard);
+
+            ExpectUnbalancedExpressionCannotBeFinalizedException(5, "END", Token.TokenType.Word, () => lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseCaseSensitivity1()
+        {
+            const String test = "{tag}";
+            var tag = new Tag().Keyword("TAG");
+
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.Ordinal)
+                .RegisterTag(tag);
+
+            ExpectUnexpectedTokenException(1, "tag", Token.TokenType.Word, () => lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseCaseSensitivity2()
+        {
+            const String test = "{keyword identifier}";
+            var tag = new Tag().Keyword("keyword").Identifier("IDENTIFIER", "identifier");
+
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.Ordinal)
+                .RegisterTag(tag);
+
+            AssertTagLex(lexer.ReadNext(), 0, test.Length, tag, "keyword|identifier");
+        }
+
+        [Test]
+        public void TestCaseCaseSensitivity3()
+        {
+            const String test = "{k w}";
+            var tag1 = new Tag().Keyword("k").Identifier("W");
+            var tag2 = new Tag().Keyword("K").Identifier("w");
+            var tag3 = new Tag().Keyword("K").Identifier("W");
+            var tag4 = new Tag().Keyword("k").Identifier("w");
+
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.Ordinal)
+                .RegisterTag(tag1)
+                .RegisterTag(tag2)
+                .RegisterTag(tag3)
+                .RegisterTag(tag4);
+
+            AssertTagLex(lexer.ReadNext(), 0, test.Length, tag4, "k|w");
+        }
+
+        [Test]
+        public void TestCaseCaseSensitivity4()
+        {
+            const String test = "{1 SHL 2}";
+            var exprTag = new Tag().Expression();
+
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.Ordinal)
+                .RegisterTag(exprTag).RegisterOperator(ShiftLeftOperator.Pascal);
+
+            ExpectUnexpectedOrInvalidExpressionTokenException(3, "SHL", Token.TokenType.Word, () => lexer.ReadNext());
         }
     }
 }
