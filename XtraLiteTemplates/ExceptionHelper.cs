@@ -136,5 +136,10 @@ namespace XtraLiteTemplates
         {
             throw new InvalidOperationException("Cannot register a tag with no defined components.");
         }
+
+        internal static void CannotRegisterDirectiveWithNoTags()
+        {
+            throw new InvalidOperationException("Cannot register a directive with no defined tags.");
+        }
     }
 }

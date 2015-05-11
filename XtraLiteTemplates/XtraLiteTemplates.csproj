@@ -53,7 +53,14 @@
     <Compile Include="Expressions\Operators\Standard\StandardUnaryOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\MultiplyOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\SubtractOperator.cs" />
-    <Compile Include="Parsing\ILexer.cs" />
+    <Compile Include="ObjectModel\TagNode.cs" />
+    <Compile Include="ObjectModel\TemplateDocument.cs" />
+    <Compile Include="ObjectModel\CompositeNode.cs" />
+    <Compile Include="ObjectModel\DirectiveNode.cs" />
+    <Compile Include="ObjectModel\UnparsedNode.cs" />
+    <Compile Include="ObjectModel\TemplateNode.cs" />
+    <Compile Include="ObjectModel\Directive.cs" />
+    <Compile Include="ObjectModel\Interpreter.cs" />
     <Compile Include="Parsing\TagLex.cs" />
     <Compile Include="Parsing\UnparsedLex.cs" />
     <Compile Include="Parsing\Lex.cs" />

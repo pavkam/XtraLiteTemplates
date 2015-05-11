@@ -26,10 +26,56 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Parsing
+namespace XtraLiteTemplates.ObjectModel
 {
-    public interface ILexer
+    using System;
+    using System.Diagnostics;
+    using System.Text;
+    using XtraLiteTemplates.Parsing;
+
+    public sealed class TagNode : TemplateNode
     {
-        Lex ReadNext();
+        public new DirectiveNode Parent
+        {
+            get
+            {
+                return (DirectiveNode)base.Parent;
+            }
+        }
+
+        public Int32 FirstCharacterIndex { get; private set; }
+
+        public Int32 OriginalLength { get; private set; }
+
+        public Object[] Components { get; private set; }
+
+        public Tag Tag { get; private set; }
+
+        internal TagNode(DirectiveNode parent, TagLex lex)
+            : base(parent)
+        {
+            Debug.Assert(parent != null);
+            Debug.Assert(lex != null);
+
+            FirstCharacterIndex = lex.FirstCharacterIndex;
+            OriginalLength = lex.OriginalLength;
+            Components = lex.Components;
+            Tag = lex.Tag;
+        }
+
+        public override String ToString(Boolean formatted)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var component in Components)
+            {                
+                if (sb.Length > 0)
+                    sb.Append(" ");
+
+                sb.Append(component.ToString());
+            }
+
+            return String.Format("{{{0}}}", sb.ToString());
+        }
     }
 }
+

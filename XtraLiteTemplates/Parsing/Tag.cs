@@ -25,39 +25,96 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
 
 namespace XtraLiteTemplates.Parsing
 {
+    using System;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Text;
+
     public sealed class Tag
     {
-        private readonly IList<String> m_components;
+        private readonly IList<Object> m_components;
 
         public Tag()
         {
-            m_components = new List<String>();
+            m_components = new List<Object>();
         }
 
         public Tag Keyword(String keyword)
         {
-            Expect.NotEmpty("keyword", keyword);
+            Expect.Identifier("keyword", keyword);
 
             m_components.Add(keyword);
+            return this;
+        }
+
+        public Tag Identifier()
+        {
+            if (m_components.Count > 0 && m_components[m_components.Count - 1] == null)
+                ExceptionHelper.TagAnyIndentifierCannotFollowExpression();
+
+            m_components.Add(String.Empty);
+            return this;
+        }
+
+        public Tag Identifier(params String[] candidates)
+        {
+            Expect.NotEmpty("candidates", candidates);
+
+            foreach (var arg in candidates)
+                Expect.Identifier("candidate", arg);
+
+            m_components.Add(candidates);
             return this;
         }
 
         public Tag Expression()
         {
             if (m_components.Count > 0 && m_components[m_components.Count - 1] == null)
-                throw new InvalidOperationException("placeholder_expression_after_expression_not_allowed");
+                ExceptionHelper.TagExpressionCannotFollowExpression();
 
             m_components.Add(null);
 
             return this;
         }
 
+        public override String ToString()
+        {
+            if (m_components.Count == 0)
+                return String.Empty;
+            else
+            {
+                StringBuilder sb = new StringBuilder();
+                foreach (var component in m_components)
+                {
+                    if (sb.Length > 0)
+                        sb.Append(" ");
+
+                    if (component == null)
+                        sb.Append("(EXPRESSION)");
+                    else if (component == (Object)String.Empty)
+                        sb.Append("(ANY IDENTIFIER)");
+                    else if (component is String)
+                        sb.Append(component);
+                    else
+                        sb.AppendFormat("(ONE OF {0})", String.Join("|", (component as String[])));
+                }
+
+                return sb.ToString();
+            }
+        }
+
+
+        internal Int32 ComponentCount
+        {
+            get
+            {
+                return m_components.Count;
+            }
+        }
 
         internal Boolean MatchesKeyword(Int32 index, IEqualityComparer<String> comparer, String keyword)
         {
@@ -66,8 +123,25 @@ namespace XtraLiteTemplates.Parsing
 
             if (index >= m_components.Count || m_components[index] == null)
                 return false;
-            
-            return comparer.Equals(m_components[index], keyword);
+
+            String stringComponent = m_components[index] as String;
+            return comparer.Equals(stringComponent, keyword);
+        }
+
+        internal Boolean MatchesIdentifier(Int32 index, IEqualityComparer<String> comparer, String identifier)
+        {
+            Debug.Assert(comparer != null);
+            Debug.Assert(!String.IsNullOrEmpty(identifier));
+
+            if (index >= m_components.Count || m_components[index] == null)
+                return false;
+
+            var stringComponent = m_components[index] as String;
+            if (stringComponent != null)
+                return stringComponent == String.Empty;
+
+            String[] _identifiers = m_components[index] as String[];
+            return _identifiers.Any(i => comparer.Equals(i, identifier));
         }
 
         internal Boolean MatchesExpression(Int32 index)

@@ -38,7 +38,7 @@ namespace XtraLiteTemplates.Parsing
     using XtraLiteTemplates.Parsing;
     using System.IO;
 
-    public sealed class Lexer : ILexer
+    public sealed class Lexer
     {
         private List<Operator> m_expressionOperators;
         private HashSet<String> m_unaryExpressionOperators;

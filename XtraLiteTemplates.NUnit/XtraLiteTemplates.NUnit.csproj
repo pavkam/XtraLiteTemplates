@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Inside\TestExpressionEvaluationContext.cs" />
+    <Compile Include="InterpreterTests.cs" />
     <Compile Include="TagTests.cs" />
     <Compile Include="LexerTests.cs" />
     <Compile Include="TokenizerTests.cs" />
