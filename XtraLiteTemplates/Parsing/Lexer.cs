@@ -25,27 +25,39 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using System;
-using XtraLiteTemplates.Parsing;
-using System.Collections.Generic;
-using System.Linq;
-using System.Diagnostics;
-using XtraLiteTemplates.Expressions;
-using XtraLiteTemplates.Expressions.Operators;
-using System.Text;
 
 namespace XtraLiteTemplates.Parsing
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Diagnostics;
+    using System.Text;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Parsing;
+
     public sealed class Lexer
     {
-        private IList<Operator> m_expressionOperators;
-        private IList<Tag> m_tags;
+        private List<Operator> m_expressionOperators;
+        private HashSet<String> m_unaryExpressionOperators;
+        private HashSet<String> m_binaryExpressionOperators;
+        private List<Tag> m_tags;
+
         private Token m_currentToken;
         private Boolean m_isEndOfStream;
 
         public ITokenizer Tokenizer { get; private set; }
 
         public IEqualityComparer<String> Comparer { get; private set; }
+
+        public IReadOnlyCollection<Tag> Tags
+        {
+            get 
+            {
+                return m_tags;
+            }
+        }
 
         public Lexer(ITokenizer tokenizer, IEqualityComparer<String> comparer)
         {
@@ -57,13 +69,18 @@ namespace XtraLiteTemplates.Parsing
 
             m_tags = new List<Tag>();
             m_expressionOperators = new List<Operator>();
+            m_unaryExpressionOperators = new HashSet<String>(comparer);
+            m_binaryExpressionOperators = new HashSet<String>(comparer);
         }
 
         public Lexer RegisterTag(Tag tag)
         {
             Expect.NotNull("tag", tag);
+            if (tag.ComponentCount == 0)
+                ExceptionHelper.CannotRegisterTagWithNoComponents();
 
-            m_tags.Add(tag);
+            if (!m_tags.Contains(tag))
+                m_tags.Add(tag);
 
             return this;
         }
@@ -71,6 +88,38 @@ namespace XtraLiteTemplates.Parsing
         public Lexer RegisterOperator(Operator @operator)
         {
             Expect.NotNull("operator", @operator);
+
+            var unaryOperator = @operator as UnaryOperator;
+            if (unaryOperator != null)
+            {
+                if (m_unaryExpressionOperators.Contains(unaryOperator.Symbol))
+                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
+                else
+                    m_unaryExpressionOperators.Add(unaryOperator.Symbol);
+            }
+
+            var binaryOperator = @operator as BinaryOperator;
+            if (binaryOperator != null)
+            {
+                if (m_binaryExpressionOperators.Contains(binaryOperator.Symbol))
+                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
+                else
+                    m_binaryExpressionOperators.Add(binaryOperator.Symbol);
+            }
+
+            var subscriptOperator = @operator as SubscriptOperator;
+            if (subscriptOperator != null)
+            {
+                if (m_unaryExpressionOperators.Contains(subscriptOperator.Symbol) ||
+                  m_binaryExpressionOperators.Contains(subscriptOperator.Terminator))
+                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
+                else
+                {
+                    m_unaryExpressionOperators.Add(subscriptOperator.Symbol);
+                    m_binaryExpressionOperators.Add(subscriptOperator.Terminator);
+                }
+            }
+
             m_expressionOperators.Add(@operator);
 
             return this;
@@ -192,7 +241,9 @@ namespace XtraLiteTemplates.Parsing
 
                 if (this.m_currentToken.Type == Token.TokenType.EndTag)
                 {
-                    if (matchingTags.Count != 1)
+                    var matchingTag = matchingTags.Where(p => p.ComponentCount == _components.Count).FirstOrDefault();
+
+                    if (matchingTag == null)
                         ExceptionHelper.UnexpectedToken(this.m_currentToken);
                     else
                     {
@@ -209,7 +260,7 @@ namespace XtraLiteTemplates.Parsing
                         }
 
                         NextToken();
-                        return new TagLex(matchingTags.Single(), _components.ToArray(), _allTokens[0].CharacterIndex, _allTokens.Sum(s => s.OriginalLength));
+                        return new TagLex(matchingTag, _components.ToArray(), _allTokens[0].CharacterIndex, _allTokens.Sum(s => s.OriginalLength));
                     }
                 }
 
@@ -222,16 +273,22 @@ namespace XtraLiteTemplates.Parsing
 
                     /* This is either a keyword or part of an expression. Reflect that. */
                     var matchesByKeyword = matchingTags.Where(p => p.MatchesKeyword(_components.Count, Comparer, this.m_currentToken.Value)).ToList();
-                    if (matchesByKeyword.Count > 0)
+                    var matchesByIdentifier = matchingTags.Where(p => p.MatchesIdentifier(_components.Count, Comparer, this.m_currentToken.Value)).ToList();
+
+                    if (matchesByKeyword.Count > 0 || matchesByIdentifier.Count > 0)
                     {
-                        /* Keyword it is then. */
-                        matchingTags = new HashSet<Tag>(matchesByKeyword);
+                        /* Keyword or identifier (prioritize the keyword matches) */
+                        if (matchesByKeyword.Count > 0)
+                            matchingTags = new HashSet<Tag>(matchesByKeyword);
+                        else
+                            matchingTags = new HashSet<Tag>(matchesByIdentifier);
 
                         if (currentExpression != null)
                         {
                             try
                             {
                                 currentExpression.Construct();
+                                currentExpression = null;
                             }
                             catch (ExpressionException constructException)
                             {
@@ -242,8 +299,7 @@ namespace XtraLiteTemplates.Parsing
                         /* Keyword si the next component. */
                         _components.Add(this.m_currentToken.Value);
                         continue;
-                    }
-                  
+                    }                  
                 }
 
                 if (m_currentToken.Type == Token.TokenType.Word ||

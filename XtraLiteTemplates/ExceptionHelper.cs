@@ -98,7 +98,7 @@ namespace XtraLiteTemplates
         internal static void OperatorAlreadyRegistered(Operator @operator)
         {
             Debug.Assert(@operator != null);
-            throw new InvalidOperationException(String.Format("Operator identified by symbol '{0}' has already been registered with expression.", @operator));
+            throw new InvalidOperationException(String.Format("Operator '{0}' (or one of its identifying symbols) already registered.", @operator));
         }
 
         internal static void CannotRegisterOperatorsForStartedExpression()
@@ -130,6 +130,11 @@ namespace XtraLiteTemplates
         internal static void TagExpressionCannotFollowExpression()
         {
             throw new InvalidOperationException("Expression tag component cannot follow another expression.");
+        }
+
+        internal static void CannotRegisterTagWithNoComponents()
+        {
+            throw new InvalidOperationException("Cannot register a tag with no defined components.");
         }
     }
 }
