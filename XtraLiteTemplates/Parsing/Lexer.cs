@@ -37,6 +37,7 @@ namespace XtraLiteTemplates.Parsing
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
     using System.IO;
+    using System.Globalization;
 
     public sealed class Lexer
     {
@@ -359,7 +360,7 @@ namespace XtraLiteTemplates.Parsing
                             else
                             {
                                 Double _float;
-                                if (Double.TryParse(this.m_currentToken.Value, out _float))
+                                if (Double.TryParse(this.m_currentToken.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out _float))
                                     currentExpression.FeedLiteral(_float);
                                 else
                                     ExceptionHelper.UnexpectedToken(this.m_currentToken);

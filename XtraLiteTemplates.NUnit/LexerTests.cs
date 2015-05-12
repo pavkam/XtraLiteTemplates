@@ -247,7 +247,7 @@ namespace XtraLiteTemplates.NUnit
             var tag = new Tag().Expression();
             var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
-            AssertTagLex(lexer.ReadNext(), 0, 6, tag, "1.33");
+            AssertTagLex(lexer.ReadNext(), 0, 6, tag, (1.33).ToString());
             Assert.IsNull(lexer.ReadNext());
         }
 

@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Expressions.Operators.Standard;
@@ -54,7 +55,7 @@ namespace XtraLiteTemplates.NUnit
 
                 if (Int64.TryParse(term, out _integer))
                     result.FeedLiteral(_integer);
-                else if (Double.TryParse(term, out _float))
+                else if (Double.TryParse(term, NumberStyles.Float, CultureInfo.InvariantCulture, out _float))
                     result.FeedLiteral(_float);
                 else if (Boolean.TryParse(term, out _boolean))
                     result.FeedLiteral(_boolean);
