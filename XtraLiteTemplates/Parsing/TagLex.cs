@@ -29,6 +29,7 @@
 namespace XtraLiteTemplates.Parsing
 {
     using System;
+    using System.Text;
 
     public sealed class TagLex : Lex
     {
@@ -44,6 +45,11 @@ namespace XtraLiteTemplates.Parsing
 
             Components = components;
             Tag = tag;
+        }
+
+        public override String ToString()
+        {
+            return String.Join(" ", Components);
         }
     }
 }

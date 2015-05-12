@@ -32,7 +32,7 @@ namespace XtraLiteTemplates.ObjectModel
     using System.IO;
     using XtraLiteTemplates.Expressions;
 
-    public abstract class TemplateNode
+    internal abstract class TemplateNode
     {
         public TemplateNode Parent { get; private set; }
 

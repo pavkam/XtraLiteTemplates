@@ -202,6 +202,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.IsTrue(Tag.TryParse("  $", out tag) && tag.ToString() == "$");
             Assert.IsTrue(Tag.TryParse("TERM  $      TERM", out tag) && tag.ToString() == "TERM $ TERM");
             Assert.IsTrue(Tag.TryParse(" ( T1 T2  T3   )(V1  )$ K1 ? K2", out tag) && tag.ToString() == "(T1 T2 T3) (V1) $ K1 ? K2");
+            Assert.IsTrue(Tag.TryParse("(item1 item2 item1 item3)", out tag) && tag.ToString() == "(item1 item2 item3)");
         }
 
         [Test]
@@ -212,6 +213,102 @@ namespace XtraLiteTemplates.NUnit
 
             var tag = Tag.Parse("HELLO ? WORLD $ (A1 A2 A3)");
             Assert.AreEqual("HELLO ? WORLD $ (A1 A2 A3)", tag.ToString());
+        }
+
+        [Test]
+        public void TestCaseEquality1()
+        {
+            var tag1 = Tag.Parse("(A1 A2)");
+            var tag2 = Tag.Parse("(A2 A1)");
+
+            Assert.AreEqual(tag1, tag2);
+            Assert.AreEqual(tag1.GetHashCode(), tag2.GetHashCode());
+            Assert.AreNotEqual(0, tag1.GetHashCode());
+        }
+
+        [Test]
+        public void TestCaseEquality2()
+        {
+            var tag1 = Tag.Parse("$");
+            var tag2 = Tag.Parse("$");
+
+            Assert.AreEqual(tag1, tag2);
+            Assert.AreEqual(tag1.GetHashCode(), tag2.GetHashCode());
+            Assert.AreNotEqual(0, tag1.GetHashCode());
+        }
+
+        [Test]
+        public void TestCaseEquality3()
+        {
+            var tag1 = Tag.Parse("?");
+            var tag2 = Tag.Parse("?");
+
+            Assert.AreEqual(tag1, tag2);
+            Assert.AreEqual(tag1.GetHashCode(), tag2.GetHashCode());
+            Assert.AreNotEqual(0, tag1.GetHashCode());
+        }
+
+        [Test]
+        public void TestCaseEquality4()
+        {
+            var tag1 = Tag.Parse("? $");
+            var tag2 = Tag.Parse("? $");
+
+            Assert.AreEqual(tag1, tag2);
+            Assert.AreEqual(tag1.GetHashCode(), tag2.GetHashCode());
+            Assert.AreNotEqual(0, tag1.GetHashCode());
+        }
+
+        [Test]
+        public void TestCaseEquality5()
+        {
+            var tag1 = Tag.Parse("HELLO WORLD");
+            var tag2 = Tag.Parse("hello world");
+
+            Assert.AreNotEqual(tag1, tag2);
+            Assert.AreNotEqual(tag1.GetHashCode(), tag2.GetHashCode());
+
+            Assert.IsTrue(tag1.Equals(tag2, StringComparer.OrdinalIgnoreCase));
+            Assert.AreEqual(tag1.GetHashCode(StringComparer.OrdinalIgnoreCase), tag2.GetHashCode(StringComparer.OrdinalIgnoreCase));
+        }
+
+        [Test]
+        public void TestCaseEquality6()
+        {
+            var tag1 = Tag.Parse("TEST $ ANY (OTHER OPERATOR) ? IN THE ? $ WORLD");
+            var tag2 = Tag.Parse("TEST $ ANY (OTHER operator) ? IN THE ? $ WORLD");
+
+            Assert.AreNotEqual(tag1, tag2);
+            Assert.AreNotEqual(tag1.GetHashCode(), tag2.GetHashCode());
+
+            Assert.IsTrue(tag1.Equals(tag2, StringComparer.OrdinalIgnoreCase));
+            Assert.AreEqual(tag1.GetHashCode(StringComparer.OrdinalIgnoreCase), tag2.GetHashCode(StringComparer.OrdinalIgnoreCase));
+        }
+
+        [Test]
+        public void TestCaseEquality7()
+        {
+            var tag1 = Tag.Parse("(K1)");
+            var tag2 = Tag.Parse("(K1 K2)");
+
+            Assert.AreNotEqual(tag1, tag2);
+            Assert.AreNotEqual(tag1.GetHashCode(), tag2.GetHashCode());
+        }
+
+        [Test]
+        public void TestCaseEquality8()
+        {
+            var tag1 = Tag.Parse("(K1)");
+            Assert.AreNotEqual(tag1, null);
+        }
+
+        [Test]
+        public void TestCaseEqualityExceptions()
+        {
+            var tag1 = Tag.Parse("(K1)");
+
+            ExpectArgumentNullException("comparer", () => tag1.GetHashCode(null));
+            ExpectArgumentNullException("comparer", () => tag1.Equals(tag1, null));
         }
     }
 }

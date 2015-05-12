@@ -101,9 +101,14 @@ namespace XtraLiteTemplates.Parsing
             if (tag.ComponentCount == 0)
                 ExceptionHelper.CannotRegisterTagWithNoComponents();
 
-            if (!m_tags.Contains(tag))
-                m_tags.Add(tag);
+            /* Check for an equivalent tag in the list */
+            foreach (var ot in m_tags)
+            {
+                if (ot.Equals(tag, Comparer))
+                    return this;
+            }
 
+            m_tags.Add(tag);
             return this;
         }
 

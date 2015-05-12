@@ -150,7 +150,7 @@ namespace XtraLiteTemplates.Parsing
             Tag beingBuilt = new Tag();
             Boolean identifierGroupBeingParsed = false;
             StringBuilder currentParsedWord = new StringBuilder();
-            List<String> currentIdentifierGroup = new List<String>();
+            HashSet<String> currentIdentifierGroup = new HashSet<String>();
             for (var i = 0; i < markup.Length; i++)
             {
                 if (Char.IsWhiteSpace(markup[i]) || markup[i] == MarkupIdentifierGroupStartCharacter || markup[i] == MarkupIdentifierGroupEndCharacter)
@@ -271,6 +271,104 @@ namespace XtraLiteTemplates.Parsing
             return result;
         }
 
+
+        public Boolean Equals(Object obj, IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("comparer", comparer);
+
+            var tag = obj as Tag;
+            if (tag == null || tag.m_components.Count != m_components.Count)
+                return false;
+            else
+            {
+                for (var i = 0; i < m_components.Count; i++)
+                {
+                    /* Compare as expressions. */
+                    if (m_components[i] == null && tag.m_components[i] != null)
+                        return false;
+                    else if (m_components[i] == null && tag.m_components[i] != null)
+                        return false;
+
+                    /* Compare as keywords or "any identifiers" */
+                    var otherKeyword = tag.m_components[i] as String;
+                    var mineKeyword = m_components[i] as String;
+
+                    if (otherKeyword != null && mineKeyword == null)
+                        return false;
+                    else if (otherKeyword == null && mineKeyword != null)
+                        return false;
+                    else if (otherKeyword != null && mineKeyword != null)
+                    {
+                        if (!comparer.Equals(otherKeyword, mineKeyword))
+                            return false;
+                    }
+
+                    /* Compare as identifier options. */
+                    var otherIdents = tag.m_components[i] as String[];
+                    var mineIdents = m_components[i] as String[];
+
+                    if (otherIdents != null && mineIdents == null)
+                        return false;
+                    else if (otherIdents == null && mineIdents != null)
+                        return false;
+                    else if (otherIdents != null && mineIdents != null)
+                    {
+                        Debug.Assert(otherIdents.Length > 0);
+                        Debug.Assert(mineIdents.Length > 0);
+
+                        var areEqualSets = new HashSet<String>(otherIdents, comparer).SetEquals(mineIdents);
+                        if (!areEqualSets)
+                            return false;
+                    }
+                }
+            }
+
+            return true;
+        }
+
+        public override Boolean Equals(Object obj)
+        {
+            return Equals(obj, StringComparer.CurrentCulture);
+        }
+
+        public Int32 GetHashCode(IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("comparer", comparer);
+
+            var hash = 17; /* Just a magic constant */
+            unchecked
+            {
+                foreach (var component in m_components)
+                {
+                    hash = hash * 23;
+
+                    if (component != null)
+                    {
+                        var stringComponent = component as String;
+                        if (stringComponent != null)
+                            hash += comparer.GetHashCode(stringComponent);
+                        else
+                        {
+                            var identArray = component as String[];
+                            Debug.Assert(identArray != null);
+
+                            var identsHash = 0;
+                            foreach (var ident in identArray)
+                                identsHash = identsHash ^ comparer.GetHashCode(ident);
+
+                            hash += identsHash;
+                        }
+                    }
+                }
+            }
+
+            return hash;
+        }
+
+        public override Int32 GetHashCode()
+        {
+            return GetHashCode(StringComparer.CurrentCulture);
+        }
 
         internal Int32 ComponentCount
         {

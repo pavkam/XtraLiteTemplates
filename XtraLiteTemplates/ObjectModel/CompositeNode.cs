@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.ObjectModel
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.ObjectModel.Directives;
 
-    public abstract class CompositeNode : TemplateNode, IEvaluable
+    internal abstract class CompositeNode : TemplateNode, IEvaluable
     {
         private readonly List<TemplateNode> m_children;
 
@@ -54,7 +54,7 @@ namespace XtraLiteTemplates.ObjectModel
             m_children = new List<TemplateNode>();
         }
 
-        internal void AddChild(TemplateNode child)
+        public void AddChild(TemplateNode child)
         {
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);

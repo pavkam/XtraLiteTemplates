@@ -71,6 +71,14 @@ namespace XtraLiteTemplates
                 token.Value, token.Type, token.CharacterIndex, inner.Message);
         }
 
+        internal static void UnexpectedTag(TagLex tagLex)
+        {
+            Debug.Assert(tagLex != null);
+
+            throw new ParseException(tagLex.FirstCharacterIndex,
+                "Unexpected tag '{0}' found at position {1}.", tagLex.FirstCharacterIndex, tagLex.ToString());
+        }
+
         internal static void UnexpectedEndOfStreamAfterToken(Token token)
         {
             Debug.Assert(token != null);
@@ -94,6 +102,8 @@ namespace XtraLiteTemplates
         {
             throw new ExpressionException("Unexpected expression term: '{0}'.", term);
         }
+
+
 
         internal static void OperatorAlreadyRegistered(Operator @operator)
         {
@@ -136,12 +146,7 @@ namespace XtraLiteTemplates
         {
             throw new InvalidOperationException("Cannot register a tag with no defined components.");
         }
-
-        internal static void CannotRegisterDirectiveWithNoTags()
-        {
-            throw new InvalidOperationException("Cannot register a directive with no defined tags.");
-        }
-
+        
         internal static void InvalidTagMarkup(String markup)
         {
             throw new FormatException(String.Format("Invalid tag markup: '{0}'", markup));

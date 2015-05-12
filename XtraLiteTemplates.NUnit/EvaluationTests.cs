@@ -48,7 +48,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterDirective(directive)
                 .RegisterOperator(MultiplyOperator.Standard);
 
-            var document = interpreter.ConstructDocument();
+            var document = interpreter.Construct();
             var context = new TestEvaluationContext("count", 5);
 
             using (var writer = new StringWriter())

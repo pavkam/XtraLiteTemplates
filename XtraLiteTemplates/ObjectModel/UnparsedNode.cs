@@ -35,7 +35,7 @@ namespace XtraLiteTemplates.ObjectModel
     using XtraLiteTemplates.ObjectModel.Directives;
     using XtraLiteTemplates.Parsing;
 
-    public sealed class UnparsedNode : TemplateNode, IEvaluable
+    internal sealed class UnparsedNode : TemplateNode, IEvaluable
     {
         public Int32 FirstCharacterIndex { get; private set; }
 
@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.ObjectModel
 
         public String UnparsedText { get; private set; }
 
-        internal UnparsedNode(TemplateNode parent, UnparsedLex lex)
+        public UnparsedNode(TemplateNode parent, UnparsedLex lex)
             : base(parent)
         {
             Debug.Assert(parent != null);

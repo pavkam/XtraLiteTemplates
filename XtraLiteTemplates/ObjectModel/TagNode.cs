@@ -34,7 +34,7 @@ namespace XtraLiteTemplates.ObjectModel
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Parsing;
 
-    public sealed class TagNode : TemplateNode
+    internal sealed class TagNode : TemplateNode
     {
         public new DirectiveNode Parent
         {
@@ -52,7 +52,7 @@ namespace XtraLiteTemplates.ObjectModel
 
         public Tag Tag { get; private set; }
 
-        internal TagNode(DirectiveNode parent, TagLex lex)
+        public TagNode(DirectiveNode parent, TagLex lex)
             : base(parent)
         {
             Debug.Assert(parent != null);
@@ -64,7 +64,7 @@ namespace XtraLiteTemplates.ObjectModel
             Tag = lex.Tag;
         }
 
-        internal Object[] Evaluate(IExpressionEvaluationContext context)
+        public Object[] Evaluate(IExpressionEvaluationContext context)
         {
             Debug.Assert(context != null);
             Object[] result = new Object[Components.Length];

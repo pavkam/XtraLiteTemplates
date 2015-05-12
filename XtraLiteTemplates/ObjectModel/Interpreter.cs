@@ -86,8 +86,7 @@ namespace XtraLiteTemplates.ObjectModel
         public Interpreter RegisterDirective(Directive directive)
         {
             Expect.NotNull("directive", directive);
-            if (directive.Tags.Count == 0)
-                ExceptionHelper.CannotRegisterDirectiveWithNoTags();
+            Debug.Assert(directive.Tags.Any());
 
             if (!m_directives.Contains(directive))
             {
@@ -132,35 +131,47 @@ namespace XtraLiteTemplates.ObjectModel
                     Debug.Assert(tagLex != null);
 
                     var directiveCompositeNode = compositeNode as DirectiveNode;
-                    if (directiveCompositeNode != null && 
-                        directiveCompositeNode.Directive.Tags.Count > matchIndex &&
-                        directiveCompositeNode.Directive.Tags[matchIndex] == tagLex.Tag)
+                    if (directiveCompositeNode != null &&
+                        directiveCompositeNode.SelectDirective(matchIndex, tagLex.Tag, Comparer))
                     {
                         /* OK, this is the N'th part of the current directive. */
                         matchIndex++;
-                        compositeNode.AddChild(new TagNode(compositeNode as DirectiveNode, tagLex));
+                        compositeNode.AddChild(new TagNode(directiveCompositeNode, tagLex));
 
-                        if (matchIndex == directiveCompositeNode.Directive.Tags.Count)
-                            return;
+                        if (directiveCompositeNode.CandidateDirectiveLockedIn)
+                            break;
                     }
-                    else
+
+                    /* Match any directive that starts with this tag. */
+                    var candidateDirectives = m_directives.Where(p => p.Tags[0].Equals(tagLex.Tag, Comparer)).ToArray();
+                    if (candidateDirectives.Length == 0)
                     {
-                        /* Nothing matched */
-                        var firstMatched = m_directives.FirstOrDefault(p => p.Tags[0] == tagLex.Tag);
-                        Debug.Assert(firstMatched != null);
+                        /* No directive found that starts with the supplied tag! Nothing we can do but bail at this point. */
+                        ExceptionHelper.UnexpectedTag(tagLex);
+                    }
 
-                        var directiveNode = new DirectiveNode(compositeNode, firstMatched);
-                        compositeNode.AddChild(directiveNode);
-                        directiveNode.AddChild(new TagNode(directiveNode, tagLex));
+                    var directiveNode = new DirectiveNode(compositeNode, candidateDirectives);
+                    compositeNode.AddChild(directiveNode);
+                    directiveNode.AddChild(new TagNode(directiveNode, tagLex));
 
-                        if (firstMatched.Tags.Count > 0)
-                            Interpret(directiveNode);
+                    /* Select the current directive. */
+                    directiveNode.SelectDirective(0, tagLex.Tag, Comparer);
+
+                    if (!directiveNode.CandidateDirectiveLockedIn)
+                    {
+                        Interpret(directiveNode);
+                        
+                        if (!directiveNode.CandidateDirectiveLockedIn)
+                        {
+                            /* Expecting all child directives to have locked in. Otherwise they weren't closed! */
+                            ExceptionHelper.UnexpectedEndOfStream(lex.FirstCharacterIndex + lex.OriginalLength - 1);
+                        }
                     }
                 }
             }
         }
 
-        public TemplateDocument ConstructDocument()
+        public IEvaluable Construct()
         {
             var document = new TemplateDocument();
             Interpret(document);

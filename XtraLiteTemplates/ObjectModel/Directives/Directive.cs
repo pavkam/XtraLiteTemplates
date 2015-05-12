@@ -47,7 +47,7 @@ namespace XtraLiteTemplates.ObjectModel.Directives
 
         private readonly List<Tag> m_tags;
 
-        public IReadOnlyList<Tag> Tags
+        internal IReadOnlyList<Tag> Tags
         {
             get 
             {
@@ -55,9 +55,18 @@ namespace XtraLiteTemplates.ObjectModel.Directives
             }
         }
 
-
         public Directive(params Tag[] tags)
         {
+            Expect.NotEmpty("tags", tags);
+
+            foreach (var tag in tags)
+            {
+                Expect.NotNull("tag", tag);
+
+                if (tag.ComponentCount == 0)
+                    ExceptionHelper.CannotRegisterTagWithNoComponents();
+            }
+
             m_tags = new List<Tag>(tags);
         }
 
@@ -67,13 +76,58 @@ namespace XtraLiteTemplates.ObjectModel.Directives
             foreach (var tag in m_tags)
             {
                 if (sb.Length > 0)
-                    sb.Append(" ... ");
+                    sb.Append("...");
 
                 sb.AppendFormat("{{{0}}}", tag.ToString());
             }
 
             return sb.ToString();
         }
+
+
+        public Boolean Equals(Object obj, IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("comparer", comparer);
+
+            var directiveObj = obj as Directive;
+            if (directiveObj == null || directiveObj.m_tags.Count != directiveObj.m_tags.Count)
+                return false;
+            else if (directiveObj == this)
+                return true;
+
+            for (var i = 0; i < m_tags.Count; i++)
+            {
+                if (!m_tags[i].Equals(directiveObj.m_tags[i]))
+                    return false;
+            }
+
+            return true;
+        }
+
+        public override Boolean Equals(Object obj)
+        {
+            return Equals(obj, StringComparer.CurrentCulture);
+        }
+
+        public Int32 GetHashCode(IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("comparer", comparer);
+
+            var hash = 73; /* Magic constant */
+            unchecked
+            {
+                foreach (var tag in Tags)
+                    hash = hash * 51 + tag.GetHashCode(comparer);
+            }
+
+            return hash;
+        }
+
+        public override Int32 GetHashCode()
+        {
+            return GetHashCode(StringComparer.CurrentCulture);
+        }
+
 
         protected internal abstract FlowDecision Execute(Tag tag, Object[] components, ref Object state, IDirectiveEvaluationContext context, out String text);
     }

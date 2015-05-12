@@ -29,6 +29,8 @@
 namespace XtraLiteTemplates.ObjectModel.Directives.Standard
 {
     using System;
+    using System.Collections.Generic;
+    using System.Linq;
     using System.Diagnostics;
     using XtraLiteTemplates.Parsing;
 
@@ -48,8 +50,7 @@ namespace XtraLiteTemplates.ObjectModel.Directives.Standard
             Debug.Assert(components.Length == tag.ComponentCount);
 
             text = null;
-
-            if (tag == Tags[0])
+            if (Tags[0] == tag)
             {
                 Int64 remainingIterations = 0;
 
@@ -66,7 +67,7 @@ namespace XtraLiteTemplates.ObjectModel.Directives.Standard
                 if (remainingIterations > 0)
                     return FlowDecision.Evaluate;
             }
-            else if (tag == Tags[1])
+            else if (Tags[1] == tag)
                 return FlowDecision.Restart;
 
             return FlowDecision.Terminate;

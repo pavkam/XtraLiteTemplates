@@ -26,19 +26,36 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.ObjectModel.Directives
 {
     using System;
-    using System.IO;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Text;
-    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
-    internal sealed class TemplateDocument : CompositeNode, IEvaluable
+    public abstract class SimpleDirective : Directive
     {
-        internal TemplateDocument()
-            : base(null)
+        public SimpleDirective(Tag tag)
+            : base(tag)
         {
         }
+
+        protected internal sealed override FlowDecision Execute(Tag tag, Object[] components, 
+            ref Object state, IDirectiveEvaluationContext context, out String text)
+        {
+            /* It is a simple directive. Expecting just one tag here. */
+            Debug.Assert(tag != null);
+            Debug.Assert(components != null);
+            Debug.Assert(components.Length == tag.ComponentCount);
+            Debug.Assert(context != null);
+
+            text = Execute(components, context);
+            return FlowDecision.Terminate;
+        }
+
+        protected abstract String Execute(Object[] components, IDirectiveEvaluationContext context);
     }
 }
 
