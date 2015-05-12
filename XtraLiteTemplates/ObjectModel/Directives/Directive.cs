@@ -26,7 +26,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.ObjectModel.Directives
 {
     using System;
     using System.Linq;
@@ -35,8 +35,16 @@ namespace XtraLiteTemplates.ObjectModel
     using System.Text;
     using XtraLiteTemplates.Parsing;
 
-    public sealed class Directive
+    public abstract class Directive
     {
+        public enum FlowDecision
+        {
+            Terminate,
+            Restart,
+            Evaluate,
+            Skip,
+        }
+
         private readonly List<Tag> m_tags;
 
         public IReadOnlyList<Tag> Tags
@@ -66,6 +74,8 @@ namespace XtraLiteTemplates.ObjectModel
 
             return sb.ToString();
         }
+
+        protected internal abstract FlowDecision Execute(Tag tag, Object[] components, ref Object state, IDirectiveEvaluationContext context, out String text);
     }
 }
 

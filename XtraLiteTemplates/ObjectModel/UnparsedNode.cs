@@ -30,9 +30,12 @@ namespace XtraLiteTemplates.ObjectModel
 {
     using System;
     using System.Diagnostics;
+    using System.IO;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.ObjectModel.Directives;
     using XtraLiteTemplates.Parsing;
 
-    public sealed class UnparsedNode : TemplateNode
+    public sealed class UnparsedNode : TemplateNode, IEvaluable
     {
         public Int32 FirstCharacterIndex { get; private set; }
 
@@ -51,7 +54,17 @@ namespace XtraLiteTemplates.ObjectModel
             UnparsedText = lex.UnparsedText;
         }
 
-        public override String ToString(Boolean formatted)
+        public void Evaluate(TextWriter writer, IDirectiveEvaluationContext nodeContext, 
+            IExpressionEvaluationContext expressionContext)
+        {
+            Expect.NotNull("writer", writer);
+            Expect.NotNull("nodeContext", nodeContext);
+            Expect.NotNull("expressionContext", expressionContext);
+
+            writer.Write(nodeContext.HandleUnparsedText(UnparsedText));
+        }
+
+        public override String ToString()
         {
             return UnparsedText;
         }

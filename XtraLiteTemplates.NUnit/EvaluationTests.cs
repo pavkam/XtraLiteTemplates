@@ -25,65 +25,37 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+using NUnit.Framework;
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.IO;
-    using System.Text;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
+    using XtraLiteTemplates.NUnit.Inside;
+    using XtraLiteTemplates.ObjectModel;
+    using XtraLiteTemplates.ObjectModel.Directives.Standard;
+    using XtraLiteTemplates.Parsing;
 
-    public abstract class CompositeNode : TemplateNode, IEvaluable
+    [TestFixture]
+    public class EvaluationTests : TestBase
     {
-        private readonly List<TemplateNode> m_children;
-
-        public IReadOnlyList<TemplateNode> Children
+        [Test]
+        public void TestCaseRepeat1()
         {
-            get
+            var directive = new RepeatDirective();
+            var interpreter = new Interpreter("{repeat count*2}R{end}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive)
+                .RegisterOperator(MultiplyOperator.Standard);
+
+            var document = interpreter.ConstructDocument();
+            var context = new TestEvaluationContext("count", 5);
+
+            using (var writer = new StringWriter())
             {
-                return m_children;
+                document.Evaluate(writer, context, context);
+                Assert.AreEqual("RRRRRRRRRR", writer.ToString());
             }
-        }
-
-        protected CompositeNode(TemplateNode parent)
-            : base(parent)
-        {
-            m_children = new List<TemplateNode>();
-        }
-
-        internal void AddChild(TemplateNode child)
-        {
-            Debug.Assert(child != null);
-            Debug.Assert(child.Parent == this);
-
-            if (!m_children.Contains(child))
-                m_children.Add(child);
-        }
-
-        public virtual void Evaluate(TextWriter writer, IDirectiveEvaluationContext nodeContext, IExpressionEvaluationContext expressionContext)
-        {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("nodeContext", nodeContext);
-            Expect.NotNull("expressionContext", expressionContext);
-
-            foreach (var child in Children)
-            {
-                var evaluable = child as IEvaluable;
-                if (evaluable != null)
-                    evaluable.Evaluate(writer, nodeContext, expressionContext);
-            }
-        }
-
-        public override String ToString()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var child in Children)
-                sb.Append(child.ToString());
-
-            return String.Format("({0})", sb.ToString());
         }
     }
 }

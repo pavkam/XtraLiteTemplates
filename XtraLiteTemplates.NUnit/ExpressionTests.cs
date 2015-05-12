@@ -182,7 +182,7 @@ namespace XtraLiteTemplates.NUnit
             return result;
         }
 
-        private IEvaluationContext CreateStandardTestEvaluationContext(Expression e, Boolean gatherErrors = false)
+        private IExpressionEvaluationContext CreateStandardTestEvaluationContext(Expression e, Boolean gatherErrors = false)
         {
             var variables = new Dictionary<String, Object>()
             {

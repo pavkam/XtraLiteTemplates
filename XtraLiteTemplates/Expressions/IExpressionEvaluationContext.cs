@@ -25,30 +25,17 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
-namespace XtraLiteTemplates.NUnit
+namespace XtraLiteTemplates.Expressions
 {
     using System;
-    using XtraLiteTemplates.ObjectModel;
-    using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Expressions.Operators;
 
-    [TestFixture]
-    public class InterpreterTests : TestBase
+    public interface IExpressionEvaluationContext
     {
-        [Test]
-        public void TestCaseUnparsedLexContruction1()
-        {
-            /*
-            var directive = new Directive(new Tag().Keyword("hello"), new Tag().Keyword("world"));
-            var interpreter = new Interpreter("{hello}something{world}", StringComparer.OrdinalIgnoreCase);
-            interpreter.RegisterDirective(directive);
+        Object HandleEvaluationError(Operator @operator, Object operand);
+        Object HandleEvaluationError(Operator @operator, Object leftOperand, Object rightOperand);
 
-            var document = interpreter.ConstructDocument();
-            var text = document.ToString();
-            Assert.AreEqual("(({hello}something{world}))", text);
-             */
-        }
+        Object GetVariable(String identifier);
     }
 }
-

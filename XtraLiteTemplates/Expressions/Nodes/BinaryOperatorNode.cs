@@ -72,7 +72,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return this;
         }
 
-        public override Func<IEvaluationContext, Object> Build()
+        public override Func<IExpressionEvaluationContext, Object> Build()
         {
             var leftFunc = LeftNode.Build();
             var rightFunc = RightNode.Build();

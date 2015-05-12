@@ -29,6 +29,8 @@
 namespace XtraLiteTemplates.ObjectModel
 {
     using System;
+    using System.IO;
+    using XtraLiteTemplates.Expressions;
 
     public abstract class TemplateNode
     {
@@ -37,13 +39,6 @@ namespace XtraLiteTemplates.ObjectModel
         protected TemplateNode(TemplateNode parent)
         {
             Parent = parent;
-        }
-
-        public abstract String ToString(Boolean formatted);
-
-        public override String ToString()
-        {
-            return ToString(false);
         }
     }
 }

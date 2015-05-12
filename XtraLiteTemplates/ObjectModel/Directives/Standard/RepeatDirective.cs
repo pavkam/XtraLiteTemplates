@@ -26,64 +26,50 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.ObjectModel.Directives.Standard
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
-    using System.Text;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Parsing;
 
-    public abstract class CompositeNode : TemplateNode, IEvaluable
+    public sealed class RepeatDirective : Directive
     {
-        private readonly List<TemplateNode> m_children;
-
-        public IReadOnlyList<TemplateNode> Children
+        public RepeatDirective() : 
+            base(Tag.Parse("REPEAT $"), Tag.Parse("END"))
         {
-            get
+        }
+
+        protected internal override FlowDecision Execute(Tag tag, Object[] components, ref Object state,
+            IDirectiveEvaluationContext context, out String text)
+        {
+            Debug.Assert(tag != null);
+            Debug.Assert(components != null);
+            Debug.Assert(context != null);
+            Debug.Assert(components.Length == tag.ComponentCount);
+
+            text = null;
+
+            if (tag == Tags[0])
             {
-                return m_children;
+                Int64 remainingIterations = 0;
+
+                if (state != null)
+                {
+                    Debug.Assert(state is Int64);
+                    remainingIterations = (Int64)state;
+                }
+                else if (components[1] is Int64)
+                    remainingIterations = (Int64)components[1];
+
+                state = remainingIterations - 1;
+
+                if (remainingIterations > 0)
+                    return FlowDecision.Evaluate;
             }
-        }
+            else if (tag == Tags[1])
+                return FlowDecision.Restart;
 
-        protected CompositeNode(TemplateNode parent)
-            : base(parent)
-        {
-            m_children = new List<TemplateNode>();
-        }
-
-        internal void AddChild(TemplateNode child)
-        {
-            Debug.Assert(child != null);
-            Debug.Assert(child.Parent == this);
-
-            if (!m_children.Contains(child))
-                m_children.Add(child);
-        }
-
-        public virtual void Evaluate(TextWriter writer, IDirectiveEvaluationContext nodeContext, IExpressionEvaluationContext expressionContext)
-        {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("nodeContext", nodeContext);
-            Expect.NotNull("expressionContext", expressionContext);
-
-            foreach (var child in Children)
-            {
-                var evaluable = child as IEvaluable;
-                if (evaluable != null)
-                    evaluable.Evaluate(writer, nodeContext, expressionContext);
-            }
-        }
-
-        public override String ToString()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var child in Children)
-                sb.Append(child.ToString());
-
-            return String.Format("({0})", sb.ToString());
+            return FlowDecision.Terminate;
         }
     }
 }

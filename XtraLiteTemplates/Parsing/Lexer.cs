@@ -234,7 +234,7 @@ namespace XtraLiteTemplates.Parsing
                     while (_symbolChain.Count > 0)
                     {
                         Boolean found = false;
-                        for (var i = _symbolChain.Count; i > 0; i++)
+                        for (var i = _symbolChain.Count; i > 0; i--)
                         {
                             var potentialOperator = String.Join(String.Empty, _symbolChain.Take(i).Select(s => s.Value));
                             if (KnownSymbol(potentialOperator))

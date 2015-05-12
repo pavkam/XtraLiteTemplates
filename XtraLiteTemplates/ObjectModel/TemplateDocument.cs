@@ -29,12 +29,14 @@
 namespace XtraLiteTemplates.ObjectModel
 {
     using System;
+    using System.IO;
     using System.Text;
+    using XtraLiteTemplates.Expressions;
 
-    public sealed class TemplateDocument : CompositeNode
+    public sealed class TemplateDocument : CompositeNode, IEvaluable
     {
         internal TemplateDocument()
-            : base(null, "document")
+            : base(null)
         {
         }
     }

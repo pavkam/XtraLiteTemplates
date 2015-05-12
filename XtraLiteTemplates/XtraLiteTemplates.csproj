@@ -32,7 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExceptionHelper.cs" />
-    <Compile Include="Expressions\IEvaluationContext.cs" />
+    <Compile Include="Expressions\IExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\Nodes\OperatorNode.cs" />
     <Compile Include="Expressions\Operators\Standard\MemberAccessOperator.cs" />
@@ -53,13 +53,16 @@
     <Compile Include="Expressions\Operators\Standard\StandardUnaryOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\MultiplyOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\SubtractOperator.cs" />
+    <Compile Include="ObjectModel\Directives\Standard\RepeatDirective.cs" />
+    <Compile Include="ObjectModel\IEvaluable.cs" />
+    <Compile Include="ObjectModel\Directives\IDirectiveEvaluationContext.cs" />
     <Compile Include="ObjectModel\TagNode.cs" />
     <Compile Include="ObjectModel\TemplateDocument.cs" />
     <Compile Include="ObjectModel\CompositeNode.cs" />
     <Compile Include="ObjectModel\DirectiveNode.cs" />
     <Compile Include="ObjectModel\UnparsedNode.cs" />
     <Compile Include="ObjectModel\TemplateNode.cs" />
-    <Compile Include="ObjectModel\Directive.cs" />
+    <Compile Include="ObjectModel\Directives\Directive.cs" />
     <Compile Include="ObjectModel\Interpreter.cs" />
     <Compile Include="Parsing\TagLex.cs" />
     <Compile Include="Parsing\UnparsedLex.cs" />

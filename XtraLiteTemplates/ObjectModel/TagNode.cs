@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.ObjectModel
     using System;
     using System.Diagnostics;
     using System.Text;
+    using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Parsing;
 
     public sealed class TagNode : TemplateNode
@@ -63,7 +64,26 @@ namespace XtraLiteTemplates.ObjectModel
             Tag = lex.Tag;
         }
 
-        public override String ToString(Boolean formatted)
+        internal Object[] Evaluate(IExpressionEvaluationContext context)
+        {
+            Debug.Assert(context != null);
+            Object[] result = new Object[Components.Length];
+            for (var i = 0; i < Components.Length; i++)
+            {
+                var expression = Components[i] as Expression;
+                if (expression != null)
+                {
+                    /* Evaluate the expression. */
+                    result[i] = expression.Evaluate(context);
+                }
+                else
+                    result[i] = Components[i];
+            }
+
+            return result;
+        }
+
+        public override String ToString()
         {
             StringBuilder sb = new StringBuilder();
             foreach (var component in Components)

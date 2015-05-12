@@ -34,7 +34,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Inside\TestEvaluationContext.cs" />
     <Compile Include="Inside\TestExpressionEvaluationContext.cs" />
+    <Compile Include="EvaluationTests.cs" />
     <Compile Include="InterpreterTests.cs" />
     <Compile Include="TagTests.cs" />
     <Compile Include="LexerTests.cs" />

@@ -37,6 +37,7 @@ namespace XtraLiteTemplates.ObjectModel
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
     using System.IO;
+    using XtraLiteTemplates.ObjectModel.Directives;
 
     public sealed class Interpreter
     {

@@ -26,16 +26,16 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.ObjectModel
 {
     using System;
-    using XtraLiteTemplates.Expressions.Operators;
+    using System.IO;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.ObjectModel.Directives;
 
-    public interface IEvaluationContext
+    public interface IEvaluable
     {
-        Object HandleEvaluationError(Operator @operator, Object operand);
-        Object HandleEvaluationError(Operator @operator, Object leftOperand, Object rightOperand);
-
-        Object GetVariable(String identifier);
+        void Evaluate(TextWriter writer,
+            IDirectiveEvaluationContext directiveContext, IExpressionEvaluationContext expressionContext);
     }
 }

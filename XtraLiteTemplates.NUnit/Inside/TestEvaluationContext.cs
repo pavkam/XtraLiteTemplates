@@ -25,66 +25,81 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+using NUnit.Framework;
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.NUnit.Inside
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
-    using System.Text;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.ObjectModel.Directives;
 
-    public abstract class CompositeNode : TemplateNode, IEvaluable
+    public class TestEvaluationContext : IExpressionEvaluationContext, IDirectiveEvaluationContext
     {
-        private readonly List<TemplateNode> m_children;
+        private Dictionary<String, Object> m_variables;
 
-        public IReadOnlyList<TemplateNode> Children
+        public TestEvaluationContext(IEnumerable<KeyValuePair<String, Object>> variables, IEqualityComparer<String> comparer)
         {
-            get
-            {
-                return m_children;
-            }
+            Debug.Assert(variables != null);
+            Debug.Assert(comparer != null);
+
+            m_variables = new Dictionary<String, Object>(comparer);
+            foreach (var kvp in variables)
+                m_variables[kvp.Key] = kvp.Value;
         }
 
-        protected CompositeNode(TemplateNode parent)
-            : base(parent)
+        public TestEvaluationContext(IEnumerable<KeyValuePair<String, Object>> variables)
+            : this(variables, StringComparer.OrdinalIgnoreCase)
         {
-            m_children = new List<TemplateNode>();
         }
 
-        internal void AddChild(TemplateNode child)
+        public TestEvaluationContext(String variable, Object value)
+            : this(new KeyValuePair<String, Object>[] { new KeyValuePair<String, Object>(variable, value) })
         {
-            Debug.Assert(child != null);
-            Debug.Assert(child.Parent == this);
-
-            if (!m_children.Contains(child))
-                m_children.Add(child);
         }
 
-        public virtual void Evaluate(TextWriter writer, IDirectiveEvaluationContext nodeContext, IExpressionEvaluationContext expressionContext)
+        public Object HandleEvaluationError(Operator @operator, Object operand)
         {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("nodeContext", nodeContext);
-            Expect.NotNull("expressionContext", expressionContext);
+            Assert.NotNull(@operator);
 
-            foreach (var child in Children)
-            {
-                var evaluable = child as IEvaluable;
-                if (evaluable != null)
-                    evaluable.Evaluate(writer, nodeContext, expressionContext);
-            }
+            return null;
         }
 
-        public override String ToString()
+        public Object HandleEvaluationError(Operator @operator, Object leftOperand, Object rightOperand)
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (var child in Children)
-                sb.Append(child.ToString());
+            Assert.NotNull(@operator);
 
-            return String.Format("({0})", sb.ToString());
+            return null;
+        }
+
+        public Object GetVariable(String identifier)
+        {
+            Assert.IsNotEmpty(identifier);
+
+            return m_variables[identifier];
+        }
+
+        public Boolean HandleEvaluationError(Directive directive, out String handled)
+        {
+            Assert.NotNull(directive);
+
+            handled = null;
+            return false;
+        }
+
+        public String HandleDirectiveText(Directive directive, String value)
+        {
+            Assert.NotNull(directive);
+
+            return value;
+        }
+
+        public String HandleUnparsedText(String value)
+        {
+            return value;
         }
     }
 }
-
