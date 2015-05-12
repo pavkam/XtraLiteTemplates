@@ -36,7 +36,37 @@ namespace XtraLiteTemplates.Parsing
 
     public sealed class Tag
     {
+        private const String MarkupExpressionWord = "$";
+
+        private const String MarkupAnyIdentifierWord = "?";
+
+        private const Char MarkupIdentifierGroupStartCharacter = '(';
+
+        private const Char MarkupIdentifierGroupEndCharacter = ')';
+
+        public static String AsIdentifier(String candidate)
+        {
+            if (candidate != null)
+                candidate = candidate.Trim();
+
+            var isValid =
+                !String.IsNullOrEmpty(candidate) &&
+                (Char.IsLetter(candidate[0]) || candidate[0] == '_') &&
+                candidate.All(c => Char.IsLetterOrDigit(c) || c == '_');
+
+            return isValid ? candidate : null;
+        }
+
+
         private readonly IList<Object> m_components;
+
+        private Boolean LastComponentIsExpression
+        {
+            get
+            {
+                return m_components.Count > 0 && m_components[m_components.Count - 1] == null;
+            }
+        }
 
         public Tag()
         {
@@ -94,17 +124,151 @@ namespace XtraLiteTemplates.Parsing
                         sb.Append(" ");
 
                     if (component == null)
-                        sb.Append("(EXPRESSION)");
+                        sb.Append(MarkupExpressionWord);
                     else if (component == (Object)String.Empty)
-                        sb.Append("(ANY IDENTIFIER)");
+                        sb.Append(MarkupAnyIdentifierWord);
                     else if (component is String)
                         sb.Append(component);
                     else
-                        sb.AppendFormat("(ONE OF {0})", String.Join("|", (component as String[])));
+                    {
+                        sb.AppendFormat("{0}{1}{2}", MarkupIdentifierGroupStartCharacter,
+                            String.Join(" ", (component as String[])), MarkupIdentifierGroupEndCharacter);
+                    }
                 }
 
                 return sb.ToString();
             }
+        }
+
+        public static Boolean TryParse(String markup, out Tag result)
+        {
+            result = null;
+            if (String.IsNullOrEmpty(markup))
+                return false;
+
+            /* Parse the markup */
+            Tag beingBuilt = new Tag();
+            Boolean identifierGroupBeingParsed = false;
+            StringBuilder currentParsedWord = new StringBuilder();
+            List<String> currentIdentifierGroup = new List<String>();
+            for (var i = 0; i < markup.Length; i++)
+            {
+                if (Char.IsWhiteSpace(markup[i]) || markup[i] == MarkupIdentifierGroupStartCharacter || markup[i] == MarkupIdentifierGroupEndCharacter)
+                {
+                    /* A term has ended (maybe) */
+                    if (currentParsedWord.Length > 0)
+                    {
+                        var word = currentParsedWord.ToString();
+                        currentParsedWord.Clear();
+
+                        if (word == MarkupExpressionWord)
+                        {
+                            /* This signifies an expression. */
+                            if (beingBuilt.LastComponentIsExpression || identifierGroupBeingParsed)
+                                return false;
+                            else
+                                beingBuilt.Expression();
+                        }
+                        else if (word == MarkupAnyIdentifierWord)
+                        {
+                            /* This signifies an expression. */
+                            if (beingBuilt.LastComponentIsExpression || identifierGroupBeingParsed)
+                                return false;
+                            else
+                                beingBuilt.Identifier();
+                        }
+                        else
+                        {
+                            var identifier = AsIdentifier(word);
+
+                            if (identifier == null)
+                                return false;
+
+                            if (identifierGroupBeingParsed)
+                                currentIdentifierGroup.Add(identifier);
+                            else
+                            {
+                                /* Standalone keyword */
+                                beingBuilt.Keyword(identifier);
+                            }
+                        }
+                    }
+                }
+
+                if (markup[i] == MarkupIdentifierGroupStartCharacter)
+                {
+                    /* This signifies an identifier group being specified. */
+                    if (identifierGroupBeingParsed)
+                        return false;
+                    else
+                        identifierGroupBeingParsed = true;
+                }
+                else if (markup[i] == MarkupIdentifierGroupEndCharacter)
+                {
+                    /* This signifies an identifier group being ended. */
+                    if (!identifierGroupBeingParsed || currentIdentifierGroup.Count == 0)
+                        return false;
+                    else
+                    {
+                        beingBuilt.Identifier(currentIdentifierGroup.ToArray());
+                        currentIdentifierGroup.Clear();
+
+                        identifierGroupBeingParsed = false;
+                    }
+                }
+                else if (!Char.IsWhiteSpace(markup[i]))
+                {
+                    /* Just put the character in the box-ah */
+                    currentParsedWord.Append(markup[i]);
+                }
+            }
+
+            /* Finalize and flush. */
+            if (identifierGroupBeingParsed)
+                return false;
+
+            if (currentParsedWord.Length > 0)
+            {
+                var word = currentParsedWord.ToString();
+                if (word == MarkupExpressionWord)
+                {
+                    /* This signifies an expression. */
+                    if (beingBuilt.LastComponentIsExpression)
+                        return false;
+                    else
+                        beingBuilt.Expression();
+                }
+                else if (word == MarkupAnyIdentifierWord)
+                {
+                    /* This signifies an expression. */
+                    if (beingBuilt.LastComponentIsExpression)
+                        return false;
+                    else
+                        beingBuilt.Identifier();
+                }
+                else
+                {
+                    var identifier = AsIdentifier(word);
+                    if (identifier == null)
+                        return false;
+
+                    beingBuilt.Keyword(identifier);
+                }
+            }
+
+            if (beingBuilt.m_components.Count > 0)
+                result = beingBuilt;
+
+            return result != null;
+        }
+
+        public static Tag Parse(String markup)
+        {
+            Tag result;
+            if (!TryParse(markup, out result))
+                ExceptionHelper.InvalidTagMarkup(markup);
+                
+            return result;
         }
 
 

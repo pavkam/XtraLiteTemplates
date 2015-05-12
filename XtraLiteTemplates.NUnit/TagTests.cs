@@ -70,6 +70,22 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
+        private static void ExpectInvalidTagMarkupException(String markup, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(FormatException), e);
+                Assert.AreEqual(String.Format("Invalid tag markup: '{0}'", markup), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
 
         [Test]
         public void TestCaseEmptyTag()
@@ -106,7 +122,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreSame(tag, tag.Expression());
             ExpectTagAnyIndentifierCannotFollowExpressionException(() => tag.Identifier());
 
-            Assert.AreEqual("(ANY IDENTIFIER) (EXPRESSION)", tag.ToString());
+            Assert.AreEqual("? $", tag.ToString());
         }
 
         [Test]
@@ -117,7 +133,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreSame(tag, tag.Expression());
             ExpectTagExpressionCannotFollowExpressionException(() => tag.Expression());
 
-            Assert.AreEqual("(EXPRESSION)", tag.ToString());
+            Assert.AreEqual("$", tag.ToString());
         }
 
         [Test]
@@ -134,7 +150,7 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentNotIdentifierException("candidate", () => tag.Identifier("__good0ne", "symbol|inside"));
 
             Assert.AreSame(tag, tag.Identifier("candidate1", "candidate2", "candidate3"));
-            Assert.AreEqual("(ONE OF candidate1|candidate2|candidate3)", tag.ToString());
+            Assert.AreEqual("(candidate1 candidate2 candidate3)", tag.ToString());
         }
 
         [Test]
@@ -149,7 +165,53 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreSame(tag, tag.Keyword("kewl"));
             Assert.AreSame(tag, tag.Identifier());
 
-            Assert.AreEqual("if (EXPRESSION) (ONE OF then|otherwise|something|else) (EXPRESSION) kewl (ANY IDENTIFIER)", tag.ToString());
+            Assert.AreEqual("if $ (then otherwise something else) $ kewl ?", tag.ToString());
+        }
+
+        [Test]
+        public void TestCaseTryParseFailures()
+        {
+            Tag tag;
+
+            Assert.IsFalse(Tag.TryParse(null, out tag));
+            Assert.IsFalse(Tag.TryParse(String.Empty, out tag));
+            Assert.IsFalse(Tag.TryParse(" ", out tag));
+            Assert.IsFalse(Tag.TryParse("{", out tag));
+            Assert.IsFalse(Tag.TryParse("9", out tag));
+            Assert.IsFalse(Tag.TryParse("KEYWORD+FAILURE", out tag));
+            Assert.IsFalse(Tag.TryParse("(LIST OF ITEMS", out tag));
+            Assert.IsFalse(Tag.TryParse("LIST OF ITEMS)", out tag));
+            Assert.IsFalse(Tag.TryParse("??", out tag));
+            Assert.IsFalse(Tag.TryParse("(?)", out tag));
+            Assert.IsFalse(Tag.TryParse("($)", out tag));
+            Assert.IsFalse(Tag.TryParse("EMPTY () GROUP", out tag));
+            Assert.IsFalse(Tag.TryParse("(ITEM () ITEM)", out tag));
+            Assert.IsFalse(Tag.TryParse("$$", out tag));
+            Assert.IsFalse(Tag.TryParse("?$", out tag));
+            Assert.IsFalse(Tag.TryParse("IF $ THEN $ ?", out tag));
+            Assert.IsFalse(Tag.TryParse("$ $", out tag));
+        }
+
+        [Test]
+        public void TestCaseTryParse()
+        {
+            Tag tag;
+
+            Assert.IsTrue(Tag.TryParse("$", out tag) && tag.ToString() == "$");
+            Assert.IsTrue(Tag.TryParse("$  ", out tag) && tag.ToString() == "$");
+            Assert.IsTrue(Tag.TryParse("  $", out tag) && tag.ToString() == "$");
+            Assert.IsTrue(Tag.TryParse("TERM  $      TERM", out tag) && tag.ToString() == "TERM $ TERM");
+            Assert.IsTrue(Tag.TryParse(" ( T1 T2  T3   )(V1  )$ K1 ? K2", out tag) && tag.ToString() == "(T1 T2 T3) (V1) $ K1 ? K2");
+        }
+
+        [Test]
+        public void TestCaseParse()
+        {
+            ExpectInvalidTagMarkupException("IF $ $", () => Tag.Parse("IF $ $"));
+            ExpectInvalidTagMarkupException("", () => Tag.Parse(""));
+
+            var tag = Tag.Parse("HELLO ? WORLD $ (A1 A2 A3)");
+            Assert.AreEqual("HELLO ? WORLD $ (A1 A2 A3)", tag.ToString());
         }
     }
 }

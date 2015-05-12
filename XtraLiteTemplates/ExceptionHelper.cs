@@ -141,5 +141,10 @@ namespace XtraLiteTemplates
         {
             throw new InvalidOperationException("Cannot register a directive with no defined tags.");
         }
+
+        internal static void InvalidTagMarkup(String markup)
+        {
+            throw new FormatException(String.Format("Invalid tag markup: '{0}'", markup));
+        }
     }
 }
