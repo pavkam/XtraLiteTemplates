@@ -318,7 +318,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected static void ExpectOperatorAlreadyRegisteredException(Operator @operator, Action action)
+        protected static void ExpectOperatorAlreadyRegisteredException(String @operator, Action action)
         {
             try
             {

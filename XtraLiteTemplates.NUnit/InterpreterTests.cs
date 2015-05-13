@@ -30,6 +30,10 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.IO;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
+    using XtraLiteTemplates.NUnit.Inside;
     using XtraLiteTemplates.ObjectModel;
     using XtraLiteTemplates.Parsing;
 
@@ -37,17 +41,62 @@ namespace XtraLiteTemplates.NUnit
     public class InterpreterTests : TestBase
     {
         [Test]
-        public void TestCaseUnparsedLexContruction1()
+        public void TestCaseInterpreterConstructionExceptions()
         {
-            /*
-            var directive = new Directive(new Tag().Keyword("hello"), new Tag().Keyword("world"));
-            var interpreter = new Interpreter("{hello}something{world}", StringComparer.OrdinalIgnoreCase);
-            interpreter.RegisterDirective(directive);
+            ExpectArgumentNullException("tokenizer", () => new Interpreter((ITokenizer)null, StringComparer.Ordinal));
+            ExpectArgumentNullException("comparer", () => new Interpreter(new Tokenizer("irrelevant"), null));
 
-            var document = interpreter.ConstructDocument();
-            var text = document.ToString();
-            Assert.AreEqual("(({hello}something{world}))", text);
-             */
+            ExpectArgumentNullException("reader", () => new Interpreter((TextReader)null, StringComparer.Ordinal));
+            ExpectArgumentNullException("comparer", () => new Interpreter(new StringReader("irrelevant"), null));
+
+            ExpectArgumentNullException("text", () => new Interpreter((String)null, StringComparer.Ordinal));
+            ExpectArgumentNullException("comparer", () => new Interpreter("irrelevant", null));
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstruction()
+        {
+            var interpreter = new Interpreter(new Tokenizer("irrelevant"), StringComparer.CurrentCulture);
+            Assert.AreEqual(StringComparer.CurrentCulture, interpreter.Comparer);
+
+            interpreter = new Interpreter(new StringReader("irrelevant"), StringComparer.CurrentCulture);
+            Assert.AreEqual(StringComparer.CurrentCulture, interpreter.Comparer);
+
+            interpreter = new Interpreter("irrelevant", StringComparer.CurrentCulture);
+            Assert.AreEqual(StringComparer.CurrentCulture, interpreter.Comparer);
+        }
+
+        [Test]
+        public void TestCaseInterpreterRegistrationAndExceptions()
+        {
+            var interpreter = new Interpreter("irrelevant", StringComparer.CurrentCulture);
+
+            ExpectArgumentNullException("directive", () => interpreter.RegisterDirective(null));
+            ExpectArgumentNullException("operator", () => interpreter.RegisterOperator(null));
+
+            interpreter.RegisterOperator(new NeutralOperator("A"));
+            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new NeutralOperator("A")));
+            interpreter.RegisterOperator(new SumOperator("A"));
+            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new SumOperator("A")));
+            interpreter.RegisterOperator(new SubscriptOperator("O", "C"));
+            ExpectOperatorAlreadyRegisteredException("OC", () => interpreter.RegisterOperator(new SubscriptOperator("O", "C")));
+            ExpectOperatorAlreadyRegisteredException("AM", () => interpreter.RegisterOperator(new SubscriptOperator("A", "M")));
+
+            interpreter.RegisterOperator(new SumOperator("L"));
+            ExpectOperatorAlreadyRegisteredException("KL", () => interpreter.RegisterOperator(new SubscriptOperator("K", "L")));
+            interpreter.RegisterOperator(new NeutralOperator("L"));
+
+            interpreter.RegisterOperator(new SubscriptOperator("W", "V"));
+            ExpectOperatorAlreadyRegisteredException("W", () => interpreter.RegisterOperator(new NeutralOperator("W")));
+            ExpectOperatorAlreadyRegisteredException("V", () => interpreter.RegisterOperator(new SumOperator("V")));
+            interpreter.RegisterOperator(new NeutralOperator("V"));
+            interpreter.RegisterOperator(new SumOperator("W"));
+
+            var d1 = new RippedOpenDirective(Tag.Parse("HELLO"));
+            var d2 = new RippedOpenDirective(Tag.Parse("WORLD"));
+            interpreter.RegisterDirective(d1);
+            interpreter.RegisterDirective(d2);
+            interpreter.RegisterDirective(d1);
         }
     }
 }

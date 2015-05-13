@@ -147,20 +147,20 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(lexer, lexer.RegisterOperator(SumOperator.Standard));
             Assert.AreEqual(lexer, lexer.RegisterOperator(new SubscriptOperator("<", ">")));
 
-            ExpectOperatorAlreadyRegisteredException(NeutralOperator.Standard, () => lexer.RegisterOperator(NeutralOperator.Standard));
-            ExpectOperatorAlreadyRegisteredException(SumOperator.Standard, () => lexer.RegisterOperator(SumOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(NeutralOperator.Standard.ToString(), () => lexer.RegisterOperator(NeutralOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(SumOperator.Standard.ToString(), () => lexer.RegisterOperator(SumOperator.Standard));
 
             var _ss1 = new SubscriptOperator("+", ")");
-            ExpectOperatorAlreadyRegisteredException(_ss1, () => lexer.RegisterOperator(_ss1));
+            ExpectOperatorAlreadyRegisteredException(_ss1.ToString(), () => lexer.RegisterOperator(_ss1));
 
             var _ss2 = new SubscriptOperator("(", "+");
-            ExpectOperatorAlreadyRegisteredException(_ss2, () => lexer.RegisterOperator(_ss2));
+            ExpectOperatorAlreadyRegisteredException(_ss2.ToString(), () => lexer.RegisterOperator(_ss2));
 
             var _ss3 = new SubscriptOperator("<", ")");
-            ExpectOperatorAlreadyRegisteredException(_ss3, () => lexer.RegisterOperator(_ss3));
+            ExpectOperatorAlreadyRegisteredException(_ss3.ToString(), () => lexer.RegisterOperator(_ss3));
 
             var _ss4 = new SubscriptOperator("(", ">");
-            ExpectOperatorAlreadyRegisteredException(_ss4, () => lexer.RegisterOperator(_ss4));
+            ExpectOperatorAlreadyRegisteredException(_ss4.ToString(), () => lexer.RegisterOperator(_ss4));
         }
 
         [Test]

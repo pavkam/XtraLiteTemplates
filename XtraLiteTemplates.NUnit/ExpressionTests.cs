@@ -40,9 +40,6 @@ namespace XtraLiteTemplates.NUnit
     [TestFixture]
     public class ExpressionTests : TestBase
     {
-
-
-
         private static Expression CreateTestExpression(String exprString)
         {
             Debug.Assert(!String.IsNullOrEmpty(exprString));
@@ -139,10 +136,10 @@ namespace XtraLiteTemplates.NUnit
             var groupOp_plus = new SubscriptOperator("+", "-");
 
             expression.RegisterOperator(unaryOp_plus);
-            ExpectOperatorAlreadyRegisteredException(unaryOp_plus, () => expression.RegisterOperator(unaryOp_plus));
-            ExpectOperatorAlreadyRegisteredException(groupOp_plus, () => expression.RegisterOperator(groupOp_plus));
+            ExpectOperatorAlreadyRegisteredException(unaryOp_plus.ToString(), () => expression.RegisterOperator(unaryOp_plus));
+            ExpectOperatorAlreadyRegisteredException(groupOp_plus.ToString(), () => expression.RegisterOperator(groupOp_plus));
             expression.RegisterOperator(binaryOp_plus);
-            ExpectOperatorAlreadyRegisteredException(binaryOp_plus, () => expression.RegisterOperator(binaryOp_plus));
+            ExpectOperatorAlreadyRegisteredException(binaryOp_plus.ToString(), () => expression.RegisterOperator(binaryOp_plus));
         }
 
         [Test]
@@ -154,21 +151,21 @@ namespace XtraLiteTemplates.NUnit
             expression.RegisterOperator(SumOperator.Standard);
             expression.RegisterOperator(SubscriptOperator.Standard);
 
-            ExpectOperatorAlreadyRegisteredException(NeutralOperator.Standard, () => expression.RegisterOperator(NeutralOperator.Standard));
-            ExpectOperatorAlreadyRegisteredException(SumOperator.Standard, () => expression.RegisterOperator(SumOperator.Standard));
-            ExpectOperatorAlreadyRegisteredException(SubscriptOperator.Standard, () => expression.RegisterOperator(SubscriptOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(NeutralOperator.Standard.ToString(), () => expression.RegisterOperator(NeutralOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(SumOperator.Standard.ToString(), () => expression.RegisterOperator(SumOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(SubscriptOperator.Standard.ToString(), () => expression.RegisterOperator(SubscriptOperator.Standard));
 
             var _ss1 = new SubscriptOperator("+", ">");
-            ExpectOperatorAlreadyRegisteredException(_ss1, () => expression.RegisterOperator(_ss1));
+            ExpectOperatorAlreadyRegisteredException(_ss1.ToString(), () => expression.RegisterOperator(_ss1));
 
             var _ss2 = new SubscriptOperator("<", "+");
-            ExpectOperatorAlreadyRegisteredException(_ss2, () => expression.RegisterOperator(_ss2));
+            ExpectOperatorAlreadyRegisteredException(_ss2.ToString(), () => expression.RegisterOperator(_ss2));
 
             var _ss3 = new SubscriptOperator("(", ">");
-            ExpectOperatorAlreadyRegisteredException(_ss3, () => expression.RegisterOperator(_ss3));
+            ExpectOperatorAlreadyRegisteredException(_ss3.ToString(), () => expression.RegisterOperator(_ss3));
 
             var _ss4 = new SubscriptOperator("<", ")");
-            ExpectOperatorAlreadyRegisteredException(_ss4, () => expression.RegisterOperator(_ss4));
+            ExpectOperatorAlreadyRegisteredException(_ss4.ToString(), () => expression.RegisterOperator(_ss4));
         }
 
         [Test]

@@ -58,6 +58,7 @@ namespace XtraLiteTemplates.ObjectModel
             m_directives = new List<Directive>();
         }
 
+
         public Interpreter(ITokenizer tokenizer, IEqualityComparer<String> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
