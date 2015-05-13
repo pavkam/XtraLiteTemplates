@@ -30,8 +30,11 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.Linq;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.ObjectModel;
+    using XtraLiteTemplates.ObjectModel.Directives;
     using XtraLiteTemplates.Parsing;
 
     public class TestBase
@@ -511,6 +514,40 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
                 Assert.AreEqual("Unbalanced expressions cannot be finalized.", e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+
+        protected static void ExpectUnmatchedDirectiveTagException(Directive[] directives, Int32 index, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InterpreterException), e);
+                Assert.AreEqual(String.Format("Directive(s) {0} encountered at position {1}, could not be finalized by matching all component tags.", 
+                    String.Join(" or ", directives.AsEnumerable()), index), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectUnexpectedTagException(String actualTag, Int32 index, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InterpreterException), e);
+                Assert.AreEqual(String.Format("Unexpected tag {{{0}}} encountered at position {1}.", actualTag, index), e.Message);    
                 return;
             }
 

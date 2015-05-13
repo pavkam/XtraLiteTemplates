@@ -34,6 +34,8 @@ namespace XtraLiteTemplates
     using System.Linq;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.ObjectModel;
+    using XtraLiteTemplates.ObjectModel.Directives;
     using XtraLiteTemplates.Parsing;
 
     internal static class ExceptionHelper
@@ -75,8 +77,8 @@ namespace XtraLiteTemplates
         {
             Debug.Assert(tagLex != null);
 
-            throw new ParseException(tagLex.FirstCharacterIndex,
-                "Unexpected tag '{0}' found at position {1}.", tagLex.FirstCharacterIndex, tagLex.ToString());
+            throw new InterpreterException(new Directive[0], tagLex.FirstCharacterIndex,
+                "Unexpected tag {{{0}}} encountered at position {1}.", tagLex.ToString(), tagLex.FirstCharacterIndex);
         }
 
         internal static void UnexpectedEndOfStreamAfterToken(Token token)
@@ -150,6 +152,16 @@ namespace XtraLiteTemplates
         internal static void InvalidTagMarkup(String markup)
         {
             throw new FormatException(String.Format("Invalid tag markup: '{0}'", markup));
+        }
+
+
+        internal static void UnmatchedDirectiveTag(Directive[] candidateDirectives, Int32 firstCharaterIndex)
+        {
+            Debug.Assert(candidateDirectives != null);
+
+            throw new InterpreterException(candidateDirectives, firstCharaterIndex,
+                "Directive(s) {0} encountered at position {1}, could not be finalized by matching all component tags.",
+                String.Join(" or ", candidateDirectives.AsEnumerable()), firstCharaterIndex);
         }
     }
 }

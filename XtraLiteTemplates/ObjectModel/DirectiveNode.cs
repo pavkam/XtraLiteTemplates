@@ -42,6 +42,14 @@ namespace XtraLiteTemplates.ObjectModel
     {
         private Directive[] m_directives;
 
+        public Directive[] CandidateDirectives
+        {
+            get
+            {
+                return m_directives;
+            }
+        }
+
         public DirectiveNode(TemplateNode parent, Directive[] candidateDirectives)
             : base(parent)
         {

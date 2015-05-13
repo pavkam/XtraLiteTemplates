@@ -57,6 +57,7 @@
     <Compile Include="ObjectModel\Directives\Standard\RepeatDirective.cs" />
     <Compile Include="ObjectModel\IEvaluable.cs" />
     <Compile Include="ObjectModel\Directives\IDirectiveEvaluationContext.cs" />
+    <Compile Include="ObjectModel\ParseException.cs" />
     <Compile Include="ObjectModel\TagNode.cs" />
     <Compile Include="ObjectModel\TemplateDocument.cs" />
     <Compile Include="ObjectModel\CompositeNode.cs" />

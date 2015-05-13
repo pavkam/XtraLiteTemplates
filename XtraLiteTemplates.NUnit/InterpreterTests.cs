@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
     using XtraLiteTemplates.ObjectModel;
+    using XtraLiteTemplates.ObjectModel.Directives;
     using XtraLiteTemplates.Parsing;
 
     [TestFixture]
@@ -97,6 +98,218 @@ namespace XtraLiteTemplates.NUnit
             interpreter.RegisterDirective(d1);
             interpreter.RegisterDirective(d2);
             interpreter.RegisterDirective(d1);
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructNoMatchingTag1()
+        {
+            var directive = new RippedOpenDirective(
+                Tag.Parse("OPEN"),
+                Tag.Parse("CLOSE"));
+
+            var interpreter = new Interpreter("{OPEN}text goes here", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive);
+
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive }, 0, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructNoMatchingTag2()
+        {
+            var directive = new RippedOpenDirective(
+                Tag.Parse("OPEN"),
+                Tag.Parse("INSIDE"),
+                Tag.Parse("CLOSE"));
+
+            var interpreter = new Interpreter("{OPEN}text goes{INSIDE}here", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive);
+
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive }, 0, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructNoMatchingTag3()
+        {
+            var directive1 = new RippedOpenDirective(
+                Tag.Parse("T1"),
+                Tag.Parse("T2"));
+            var directive2 = new RippedOpenDirective(
+                Tag.Parse("T1"),
+                Tag.Parse("T3"));
+
+            var interpreter = new Interpreter("{T1}multiple choice", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1).RegisterDirective(directive2);
+
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructNoMatchingTag4()
+        {
+            var directive1 = new RippedOpenDirective(
+                Tag.Parse("T1"),
+                Tag.Parse("T2"));
+            var directive2 = new RippedOpenDirective(
+                Tag.Parse("T1"),
+                Tag.Parse("T3"));
+
+            var interpreter = new Interpreter("{T1}{T1}{T3}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1).RegisterDirective(directive2);
+
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructNoMatchingTag5()
+        {
+            var directive1 = new RippedOpenDirective(
+                Tag.Parse("T1"),
+                Tag.Parse("T"));
+            var directive2 = new RippedOpenDirective(
+                Tag.Parse("T2"),
+                Tag.Parse("T"));
+
+            var interpreter = new Interpreter("{T1}{T2}{T}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1).RegisterDirective(directive2);
+
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1 }, 0, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructNoMatchingTag6()
+        {
+            var directive1 = new RippedOpenDirective(
+                Tag.Parse("T"),
+                Tag.Parse("T1"));
+            var directive2 = new RippedOpenDirective(
+                Tag.Parse("T"),
+                Tag.Parse("T2"));
+
+            var interpreter = new Interpreter("{T}{T}{T2}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1).RegisterDirective(directive2);
+
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructUnexpectedTag1()
+        {
+            var directive = new RippedOpenDirective(
+                Tag.Parse("A"),
+                Tag.Parse("B"));
+
+            var interpreter = new Interpreter("{B}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive);
+
+            ExpectUnexpectedTagException("B", 0, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructUnexpectedTag2()
+        {
+            var directive = new RippedOpenDirective(
+                Tag.Parse("A"),
+                Tag.Parse("B"),
+                Tag.Parse("C"));
+
+            var interpreter = new Interpreter("{A}{C}{B}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive);
+
+            ExpectUnexpectedTagException("C", 3, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructUnexpectedTag3()
+        {
+            var directive1 = new RippedOpenDirective(
+                Tag.Parse("A"),
+                Tag.Parse("B"));
+            var directive2 = new RippedOpenDirective(
+                Tag.Parse("C"),
+                Tag.Parse("D"));
+
+            var interpreter = new Interpreter("{A}..{D}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1).RegisterDirective(directive2);
+
+            ExpectUnexpectedTagException("D", 5, () => interpreter.Construct());
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructSelection1()
+        {
+            var directive1 = new RippedOpenDirective(
+                Tag.Parse("A"),
+                Tag.Parse("B"));
+            var directive2 = new RippedOpenDirective(
+                Tag.Parse("C"),
+                Tag.Parse("D"));
+
+            var interpreter = new Interpreter("{A}1{C}2{A}3{B}4{D}5{B}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1).RegisterDirective(directive2);
+
+            var evaluable = interpreter.Construct();
+            var repr = evaluable.ToString();
+
+            Assert.AreEqual("(({A}1({C}2({A}3{B})4{D})5{B}))", repr);
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructSelection2()
+        {
+            var directive1 = new RippedOpenDirective(Tag.Parse("MATCH ME ?"));
+            var directive2 = new RippedOpenDirective(Tag.Parse("MATCH ME $"));
+
+            var interpreter1 = new Interpreter("{MATCH ME identifier}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1).RegisterDirective(directive2);
+            var interpreter2 = new Interpreter("{MATCH ME identifier}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive2).RegisterDirective(directive1);
+
+            var repr1 = interpreter1.Construct().ToString();
+            var repr2 = interpreter2.Construct().ToString();
+
+            Assert.AreEqual("(({MATCH ME identifier}))", repr1);
+            Assert.AreEqual("(({MATCH ME identifier}))", repr2);
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructSelection3()
+        {
+            var directive1 = new RippedOpenDirective(
+                Tag.Parse("START"),
+                Tag.Parse("MID"),
+                Tag.Parse("END"));
+            var directive2 = new RippedOpenDirective(
+                Tag.Parse("START"),
+                Tag.Parse("MID"),
+                Tag.Parse("OTHER END"));
+
+            var repr = new Interpreter("{START}{MID}{OTHER END}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1)
+                .RegisterDirective(directive2)
+                .Construct()
+                .ToString();
+
+            Assert.AreEqual("(({START}{MID}{OTHER END}))", repr);
+        }
+
+        [Test]
+        public void TestCaseInterpreterConstructSelection4()
+        {
+            var directive1 = new RippedOpenDirective(
+                Tag.Parse("IF ?"),
+                Tag.Parse("END"));
+            var directive2 = new RippedOpenDirective(
+                Tag.Parse("IF ?"),
+                Tag.Parse("ELSE"),
+                Tag.Parse("END"));
+
+            var repr = new Interpreter("{IF A}1{IF B}2{ELSE}3{END}4{IF A}5{END}6{END}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive1)
+                .RegisterDirective(directive2)
+                .Construct()
+                .ToString();
+
+            Assert.AreEqual("(({IF A}1({IF B}2{ELSE}3{END})4({IF A}5{END})6{END}))", repr);
         }
     }
 }

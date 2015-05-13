@@ -141,6 +141,8 @@ namespace XtraLiteTemplates.ObjectModel
 
                         if (directiveCompositeNode.CandidateDirectiveLockedIn)
                             break;
+                        else
+                            continue;
                     }
 
                     /* Match any directive that starts with this tag. */
@@ -165,7 +167,7 @@ namespace XtraLiteTemplates.ObjectModel
                         if (!directiveNode.CandidateDirectiveLockedIn)
                         {
                             /* Expecting all child directives to have locked in. Otherwise they weren't closed! */
-                            ExceptionHelper.UnexpectedEndOfStream(lex.FirstCharacterIndex + lex.OriginalLength - 1);
+                            ExceptionHelper.UnmatchedDirectiveTag(directiveNode.CandidateDirectives, lex.FirstCharacterIndex);
                         }
                     }
                 }
