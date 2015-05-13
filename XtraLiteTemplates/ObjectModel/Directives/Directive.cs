@@ -37,7 +37,7 @@ namespace XtraLiteTemplates.ObjectModel.Directives
 
     public abstract class Directive
     {
-        public enum FlowDecision
+        protected internal enum FlowDecision
         {
             Terminate,
             Restart,

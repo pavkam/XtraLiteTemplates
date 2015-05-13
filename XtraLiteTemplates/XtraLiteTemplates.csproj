@@ -55,6 +55,7 @@
     <Compile Include="Expressions\Operators\Standard\SubtractOperator.cs" />
     <Compile Include="ObjectModel\Directives\SimpleDirective.cs" />
     <Compile Include="ObjectModel\Directives\Standard\RepeatDirective.cs" />
+    <Compile Include="ObjectModel\Directives\Standard\InterpolationDirective.cs" />
     <Compile Include="ObjectModel\IEvaluable.cs" />
     <Compile Include="ObjectModel\Directives\IDirectiveEvaluationContext.cs" />
     <Compile Include="ObjectModel\ParseException.cs" />

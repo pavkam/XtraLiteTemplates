@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
@@ -87,24 +88,18 @@ namespace XtraLiteTemplates.NUnit.Inside
             return m_variables[identifier];
         }
 
-        public Boolean HandleEvaluationError(Directive directive, out String handled)
+
+        public String ProcessUnparsedText(String value)
         {
-            Assert.NotNull(directive);
-
-            handled = null;
-            return false;
-        }
-
-        public String HandleDirectiveText(Directive directive, String value)
-        {
-            Assert.NotNull(directive);
-
             return value;
         }
 
-        public String HandleUnparsedText(String value)
+        public CultureInfo CultureInfo
         {
-            return value;
+            get 
+            {
+                return System.Globalization.CultureInfo.InvariantCulture;
+            }
         }
     }
 }

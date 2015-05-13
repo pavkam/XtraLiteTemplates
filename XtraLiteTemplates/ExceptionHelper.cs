@@ -163,5 +163,16 @@ namespace XtraLiteTemplates
                 "Directive(s) {0} encountered at position {1}, could not be finalized by matching all component tags.",
                 String.Join(" or ", candidateDirectives.AsEnumerable()), firstCharaterIndex);
         }
+
+
+        internal static void UnexpectedNumberOfExpressionComponentsInTag(Tag tag, Int32 expectedCount)
+        {
+            throw new InvalidOperationException(String.Format("The provided tag {{{0}}} is expected to contain {1} 'expression' components.", tag, expectedCount));
+        }
+
+        internal static void UnexpectedNumberOfAnyIdentifierComponentsInTag(Tag tag, Int32 expectedCount)
+        {
+            throw new InvalidOperationException(String.Format("The provided tag {{{0}}} is expected to contain {1} 'any matching identifier' components.", tag, expectedCount));
+        }
     }
 }

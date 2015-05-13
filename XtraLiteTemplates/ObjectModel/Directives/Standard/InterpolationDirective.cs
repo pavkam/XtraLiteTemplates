@@ -26,15 +26,45 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives
+namespace XtraLiteTemplates.ObjectModel.Directives.Standard
 {
     using System;
-    using System.Globalization;
-    using System.IO;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Text;
+    using XtraLiteTemplates.Parsing;
 
-    public interface IDirectiveEvaluationContext
+    public sealed class InterpolationDirective : SimpleDirective
     {
-        CultureInfo CultureInfo { get;  }
-        String ProcessUnparsedText(String value);
+        public static InterpolationDirective Standard { get; private set; }
+
+        static InterpolationDirective()
+        {
+            Standard = new InterpolationDirective();
+        }
+
+        private InterpolationDirective()
+            : base(Tag.Parse("$"))
+        {
+        }
+
+        protected override String Execute(Object[] components, IDirectiveEvaluationContext context)
+        {
+            Debug.Assert(components != null);
+            Debug.Assert(components.Length == 1);
+
+            if (components[0] == null)
+                return null;
+            else
+            {
+                var formattable = components[0] as IFormattable;
+                if (formattable != null)
+                    return formattable.ToString(null, context.CultureInfo);
+                else
+                    return components[0].ToString();
+            }
+        }
     }
 }
+

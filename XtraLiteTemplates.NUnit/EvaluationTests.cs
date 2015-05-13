@@ -119,6 +119,25 @@ namespace XtraLiteTemplates.NUnit
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
             Assert.AreEqual("-> {T1} -> Evaluate -> (first) -> {T2} -> Evaluate -> (second) -> {T3} -> Restart -> () -> {T1} -> Skip -> () -> {T2} -> Skip -> () -> {T3} -> Terminate ->", exo);
         }
+
+        [Test]
+        public void TestCaseEvaluationStandardInterpolationDirective()
+        {
+            var evaluable = new Interpreter("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(InterpolationDirective.Standard)
+                .RegisterOperator(MemberAccessOperator.Pascal)
+                .Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, 
+                kw("var_string", "some string"), 
+                kw("var_integer", 123), 
+                kw("var_float", 1.33), 
+                kw("var_boolean", false),
+                kw("var_object", new Tuple<String>("inner item"))
+            );
+
+            Assert.AreEqual("1, some string, 123, 1.33, False, inner item", exo);
+        }
     }
 }
 

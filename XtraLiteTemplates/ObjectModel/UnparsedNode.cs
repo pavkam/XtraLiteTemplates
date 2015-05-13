@@ -61,7 +61,7 @@ namespace XtraLiteTemplates.ObjectModel
             Expect.NotNull("nodeContext", nodeContext);
             Expect.NotNull("expressionContext", expressionContext);
 
-            writer.Write(nodeContext.HandleUnparsedText(UnparsedText));
+            writer.Write(nodeContext.ProcessUnparsedText(UnparsedText));
         }
 
         public override String ToString()

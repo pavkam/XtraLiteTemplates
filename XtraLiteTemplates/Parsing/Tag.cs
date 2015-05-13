@@ -378,6 +378,24 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
+
+        public Int32 ExpressionComponentCount
+        {
+            get
+            {
+                return m_components.Count(c => c == null);
+            }
+        }
+
+        public Int32 AnyIdentifierComponentCount
+        {
+            get
+            {
+                return m_components.Count(c => c == String.Empty);
+            }
+        }
+
+
         internal Boolean MatchesKeyword(Int32 index, IEqualityComparer<String> comparer, String keyword)
         {
             Debug.Assert(comparer != null);
