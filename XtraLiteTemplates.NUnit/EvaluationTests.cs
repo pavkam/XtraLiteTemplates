@@ -63,6 +63,10 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseRepeat1()
         {
+            Double a = 99999999999999999999999999999.0 ;
+            Int64 v = (Int64)a;
+            if (v == 0)
+                return;
        /*     var directive = new RepeatDirective();
             var interpreter = new Interpreter("{repeat count*2}R{end}", StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive)

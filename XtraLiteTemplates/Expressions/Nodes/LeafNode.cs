@@ -33,6 +33,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.CodeDom.Compiler;
     using System.IO;
     using System.Diagnostics;
+    using XtraLiteTemplates.Expressions.Operators;
 
     internal class LeafNode : ExpressionNode
     {
@@ -43,14 +44,14 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Indentifier,
         }
 
-        public Object Operand { get; private set; }
+        public Primitive Operand { get; private set; }
 
         public EvaluationType Evaluation { get; private set; }
 
-        public LeafNode(ExpressionNode parent, Object operand, EvaluationType type)
+        public LeafNode(ExpressionNode parent, Primitive operand, EvaluationType type)
             : base(parent)
         {
-            Debug.Assert(type == EvaluationType.Literal || operand is String);
+            Debug.Assert(type == EvaluationType.Literal || operand.Value is String);
 
             Operand = operand;
             Evaluation = type;
@@ -59,18 +60,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
         public override String ToString(ExpressionFormatStyle style)
         {
             if (Evaluation == EvaluationType.Indentifier)
-                return (String)Operand;
+                return (String)Operand.Value;
             else if (Evaluation == EvaluationType.Variable)
                 return String.Format("@{0}", Operand);
-            else if (Operand == null)
-                return "undefined";
-            else if (Operand is String)
+            else if (Operand.Value is String)
             {
                 using (var writer = new StringWriter())
                 {
                     using (var provider = CodeDomProvider.CreateProvider("CSharp"))
                     {
-                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand), writer, null);
+                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand.Value), writer, null);
                         return writer.ToString();
                     }
                 }
@@ -85,10 +84,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Evaluation = EvaluationType.Indentifier;
         }
 
-        public override Func<IExpressionEvaluationContext, Object> Build()
+        public override Func<IExpressionEvaluationContext, Primitive> Build()
         {
             if (Evaluation == EvaluationType.Variable)
-                return (IExpressionEvaluationContext context) => context.GetVariable((String)Operand);
+                return (IExpressionEvaluationContext context) => new Primitive(context.GetVariable((String)Operand.Value));
             else
                 return (IExpressionEvaluationContext context) => Operand;
         }

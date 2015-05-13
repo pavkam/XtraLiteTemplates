@@ -36,9 +36,8 @@ namespace XtraLiteTemplates.Expressions.Operators
 
         public Associativity Associativity { get; private set; }
 
-        protected BinaryOperator(String symbol, Int32 precedence, 
-                                 Associativity associativity,
-                                 Boolean expectLhsIdentifier, Boolean expectRhsIdentifier)
+        protected BinaryOperator(String symbol, Int32 precedence, Associativity associativity,
+            Boolean expectLhsIdentifier, Boolean expectRhsIdentifier)
             : base(symbol, precedence, expectRhsIdentifier)
         {
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
@@ -47,12 +46,11 @@ namespace XtraLiteTemplates.Expressions.Operators
             Associativity = associativity;
         }
 
-        public abstract Boolean Evaluate(Object left, Object right, out Object result);
+        public abstract Primitive Evaluate(Primitive left, Primitive right);
 
-        public override Boolean Evaluate(Object arg, out Object result)
+        public override Primitive Evaluate(Primitive arg)
         {
-            result = arg;
-            return false;
+            return arg;
         }
     }
 }

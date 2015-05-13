@@ -50,7 +50,7 @@ namespace XtraLiteTemplates.Expressions.Operators
             Terminator = terminator;
         }
 
-        public override Boolean Evaluate(Object arg, out Object result)
+        public override Primitive Evaluate(Primitive arg)
         {
             result = arg;
             return true;

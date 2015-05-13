@@ -44,16 +44,9 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        protected override Boolean Evaluate(Int64 arg, out Object result)
+        protected override Primitive Evaluate(Primitive arg)
         {
-            result = -arg;
-            return true;
-        }
-
-        protected override Boolean Evaluate(Double arg, out Object result)
-        {
-            result = -arg;
-            return true;
+            return -arg;
         }
     }
 }

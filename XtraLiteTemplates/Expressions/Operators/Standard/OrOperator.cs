@@ -47,22 +47,17 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        protected override Boolean Evaluate(Int64 left, Int64 right, out Object result)
+        protected override Primitive Evaluate(Primitive left, Primitive right)
         {
-            result = left | right;
-            return true;
+            return left | right;
         }
 
-        protected override Boolean Evaluate(Boolean left, Boolean right, out Object result)
+        protected override Primitive Evaluate(Primitive arg)
         {
-            result = left | right;
-            return true;
-        }
-
-        protected override Boolean EvaluateLeft(Boolean left, out Object result)
-        {
-            result = left;
-            return left == true;
+            if (arg.AsBoolean() == true)
+                return true;
+            else
+                return null;
         }
     }
 }

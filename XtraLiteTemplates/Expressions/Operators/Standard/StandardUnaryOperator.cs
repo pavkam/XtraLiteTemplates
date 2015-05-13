@@ -36,53 +36,6 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
             : base(symbol, false)
         {
         }
-
-        public override Boolean Evaluate(Object arg, out Object result)
-        {
-            result = null;
-
-            if (arg != null)
-            {
-                Int64 _integer;
-                if (TryAsInteger(arg, out _integer))
-                    return Evaluate(_integer, out result);
-                Boolean _boolean;
-                if (TryAsBoolean(arg, out _boolean))
-                    return Evaluate(_boolean, out result);
-                Double _float;
-                if (TryAsFloat(arg, out _float))
-                    return Evaluate(_float, out result);
-                String _string;
-                if (TryAsString(arg, out _string))
-                    return Evaluate(_string, out result);
-            }
-
-            return false;
-        }
-
-        protected virtual Boolean Evaluate(String arg, out Object result)
-        {
-            result = null;
-            return false;
-        }
-
-        protected virtual Boolean Evaluate(Int64 arg, out Object result)
-        {
-            result = null;
-            return false;
-        }
-
-        protected virtual Boolean Evaluate(Double arg, out Object result)
-        {
-            result = null;
-            return false;
-        }
-
-        protected virtual Boolean Evaluate(Boolean arg, out Object result)
-        {
-            result = null;
-            return false;
-        }
     }
 }
 

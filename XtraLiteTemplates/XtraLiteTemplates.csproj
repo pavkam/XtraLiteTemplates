@@ -32,6 +32,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="Expressions\Operators\Primitive.cs" />
     <Compile Include="Expressions\IExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\Nodes\OperatorNode.cs" />

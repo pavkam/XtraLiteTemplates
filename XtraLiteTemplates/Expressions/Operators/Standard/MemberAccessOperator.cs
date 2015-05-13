@@ -54,25 +54,23 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
             Comparer = comparer;
         }
 
-        public override Boolean Evaluate(Object left, Object right, out Object result)
+        public override Primitive Evaluate(Primitive left, Primitive right)
         {
-            var memberName = right as String;
+            var memberName = right.AsString();
             Debug.Assert(memberName != null);
 
-            if (left != null)
+            if (left.Value != null)
             {
-                foreach (var property in left.GetType().GetProperties())
+                foreach (var property in left.Value.GetType().GetProperties())
                 {
                     if (!property.CanRead || property.GetIndexParameters().Length > 0 || !Comparer.Equals(property.Name, memberName))
                         continue;
                     
-                    result = property.GetValue(left);
-                    return true;
+                    return new Primitive(property.GetValue(left.Value));
                 }
             }
 
-            result = null;
-            return false;
+            return null;
         }
     }
 }
