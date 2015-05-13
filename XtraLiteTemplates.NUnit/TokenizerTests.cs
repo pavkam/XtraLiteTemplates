@@ -51,65 +51,7 @@ namespace XtraLiteTemplates.NUnit
             AssertToken(token, type, charIndex, value.Length, value);
         }
 
-        private static void ExpectUnexpectedCharacterException(Int32 index, Char character, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ParseException), e);
-                Assert.AreEqual(String.Format("Unexpected character '{0}' found at position {1}.", character, index), e.Message);
-                if (e is ParseException)
-                {
-                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
-                }
-                return;
-            }
 
-            Assert.Fail();
-        }
-
-        private static void ExpectInvalidEscapeCharacterException(Int32 index, Char character, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ParseException), e);
-                Assert.AreEqual(String.Format("Invalid escape character '{0}' at position {1}.", character, index), e.Message);
-                if (e is ParseException)
-                {
-                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
-                }
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        private static void ExpectUnexpectedEndOfStreamException(Int32 index, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ParseException), e);
-                Assert.AreEqual(String.Format("Unexpected end of stream detected at position {0}.", index), e.Message);
-                if (e is ParseException)
-                {
-                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
-                }
-                return;
-            }
-
-            Assert.Fail();
-        }
 
         [Test]
         public void TestCaseConstrunction1()

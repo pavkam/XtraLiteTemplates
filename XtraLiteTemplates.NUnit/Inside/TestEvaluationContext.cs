@@ -61,6 +61,11 @@ namespace XtraLiteTemplates.NUnit.Inside
         {
         }
 
+        public TestEvaluationContext(IEqualityComparer<String> comparer)
+            : this(new KeyValuePair<String, Object>[] { }, comparer)
+        {
+        }
+
         public Object HandleEvaluationError(Operator @operator, Object operand)
         {
             Assert.NotNull(@operator);

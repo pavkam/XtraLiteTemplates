@@ -370,7 +370,7 @@ namespace XtraLiteTemplates.Parsing
             return GetHashCode(StringComparer.CurrentCulture);
         }
 
-        internal Int32 ComponentCount
+        public Int32 ComponentCount
         {
             get
             {

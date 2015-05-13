@@ -30,6 +30,9 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Parsing;
 
     public class TestBase
     {
@@ -213,6 +216,301 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsTrue(e.Message.StartsWith(
                         String.Format("Argument condition \"{0}\" failed to be validated as true.", condition), 
                         StringComparison.CurrentCulture));
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+
+        protected static void ExpectUnexpectedCharacterException(Int32 index, Char character, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.AreEqual(String.Format("Unexpected character '{0}' found at position {1}.", character, index), e.Message);
+                if (e is ParseException)
+                {
+                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+                }
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectInvalidEscapeCharacterException(Int32 index, Char character, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.AreEqual(String.Format("Invalid escape character '{0}' at position {1}.", character, index), e.Message);
+                if (e is ParseException)
+                {
+                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+                }
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectUnexpectedEndOfStreamException(Int32 index, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.AreEqual(String.Format("Unexpected end of stream detected at position {0}.", index), e.Message);
+                if (e is ParseException)
+                {
+                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+                }
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+
+        protected static void ExpectUnexpectedTokenException(Int32 index, String token, Token.TokenType type, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.AreEqual(String.Format("Unexpected token '{0}' (type: {1}) found at position {2}.", token, type, index), e.Message);
+                Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectCannotRegisterTagWithNoComponentsException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual("Cannot register a tag with no defined components.", e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectOperatorAlreadyRegisteredException(Operator @operator, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual(String.Format("Operator '{0}' (or one of its identifying symbols) already registered.", @operator), e.Message);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectUnbalancedExpressionCannotBeFinalizedException(Int32 index, String token, Token.TokenType type, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Unbalanced expressions cannot be finalized.",
+                    token, type, index), e.Message);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectUnexpectedOrInvalidExpressionTokenException(Int32 index, String token, Token.TokenType type, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Invalid expression term: '{0}'.",
+                    token, type, index), e.Message);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+
+        protected static void ExpectTagAnyIndentifierCannotFollowExpressionException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual("Indentifier tag component cannot follow an expression.", e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectTagExpressionCannotFollowExpressionException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual("Expression tag component cannot follow another expression.", e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectInvalidTagMarkupException(String markup, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(FormatException), e);
+                Assert.AreEqual(String.Format("Invalid tag markup: '{0}'", markup), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+
+        protected static void ExpectCannotModifyAConstructedExpressionException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual("Cannot modify a finalized expression.", e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectCannotRegisterOperatorsForStartedExpressionException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual("Operator registration must be performed before construction.", e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectCannotEvaluateUnconstructedExpressionException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual("Expression has not been finalized.", e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectInvalidExpressionTermException(Object term, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ExpressionException), e);
+                Assert.AreEqual(String.Format("Invalid expression term: '{0}'.", term), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectUnexpectedExpressionTermException(Object term, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ExpressionException), e);
+                Assert.AreEqual(String.Format("Unexpected expression term: '{0}'.", term), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectCannotConstructExpressionInvalidStateException(Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ExpressionException), e);
+                Assert.AreEqual("Unbalanced expressions cannot be finalized.", e.Message);
                 return;
             }
 

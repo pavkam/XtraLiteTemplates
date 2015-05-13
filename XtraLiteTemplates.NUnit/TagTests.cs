@@ -38,60 +38,12 @@ namespace XtraLiteTemplates.NUnit
     [TestFixture]
     public class TagTests : TestBase
     {
-        private static void ExpectTagAnyIndentifierCannotFollowExpressionException(Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
-                Assert.AreEqual("Indentifier tag component cannot follow an expression.", e.Message);
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        private static void ExpectTagExpressionCannotFollowExpressionException(Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
-                Assert.AreEqual("Expression tag component cannot follow another expression.", e.Message);
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        private static void ExpectInvalidTagMarkupException(String markup, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(FormatException), e);
-                Assert.AreEqual(String.Format("Invalid tag markup: '{0}'", markup), e.Message);
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-
         [Test]
         public void TestCaseEmptyTag()
         {
             var tag = new Tag();
 
+            Assert.AreEqual(0, tag.ComponentCount);
             Assert.AreEqual(String.Empty, tag.ToString());
         }
 
@@ -109,6 +61,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreSame(tag, tag.Keyword("alpha"));
             Assert.AreSame(tag, tag.Keyword("_underscore"));
             Assert.AreSame(tag, tag.Keyword("with007_numbers"));
+            Assert.AreEqual(3, tag.ComponentCount);
 
             Assert.AreEqual("alpha _underscore with007_numbers", tag.ToString());
         }
@@ -164,6 +117,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreSame(tag, tag.Expression());
             Assert.AreSame(tag, tag.Keyword("kewl"));
             Assert.AreSame(tag, tag.Identifier());
+            Assert.AreEqual(6, tag.ComponentCount);
 
             Assert.AreEqual("if $ (then otherwise something else) $ kewl ?", tag.ToString());
         }

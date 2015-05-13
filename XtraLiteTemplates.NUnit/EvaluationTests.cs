@@ -57,6 +57,25 @@ namespace XtraLiteTemplates.NUnit
                 Assert.AreEqual("RRRRRRRRRR", writer.ToString());
             }
         }
+
+        [Test]
+        public void TestCaseSingleTagDirectiveInterpretation()
+        {
+            var tag = Tag.Parse("HELLO WORLD");
+            var directive = new RippedOpenDirective(tag);
+            var interpreter = new Interpreter("{HELLO WORLD}", StringComparer.OrdinalIgnoreCase).RegisterDirective(directive);
+            var evaluable = interpreter.Construct();
+            var context = new TestEvaluationContext(interpreter.Comparer);
+
+            String result = null;
+            using (var sw = new StringWriter())
+            {
+                evaluable.Evaluate(sw, context, context);
+                result = sw.ToString();
+            }
+
+            Assert.AreEqual("<START><{HELLO WORLD} -> Restart -> {HELLO WORLD}><END>", result);
+        }
     }
 }
 

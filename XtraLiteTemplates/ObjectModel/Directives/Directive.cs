@@ -97,7 +97,7 @@ namespace XtraLiteTemplates.ObjectModel.Directives
 
             for (var i = 0; i < m_tags.Count; i++)
             {
-                if (!m_tags[i].Equals(directiveObj.m_tags[i]))
+                if (!m_tags[i].Equals(directiveObj.m_tags[i], comparer))
                     return false;
             }
 
