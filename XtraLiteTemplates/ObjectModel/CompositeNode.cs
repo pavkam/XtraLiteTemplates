@@ -63,17 +63,16 @@ namespace XtraLiteTemplates.ObjectModel
                 m_children.Add(child);
         }
 
-        public virtual void Evaluate(TextWriter writer, IDirectiveEvaluationContext nodeContext, IExpressionEvaluationContext expressionContext)
+        public virtual void Evaluate(TextWriter writer, IDirectiveEvaluationContext context)
         {
             Expect.NotNull("writer", writer);
-            Expect.NotNull("nodeContext", nodeContext);
-            Expect.NotNull("expressionContext", expressionContext);
+            Expect.NotNull("context", context);
 
             foreach (var child in Children)
             {
                 var evaluable = child as IEvaluable;
                 if (evaluable != null)
-                    evaluable.Evaluate(writer, nodeContext, expressionContext);
+                    evaluable.Evaluate(writer, context);
             }
         }
 

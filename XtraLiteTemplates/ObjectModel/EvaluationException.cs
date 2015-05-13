@@ -33,19 +33,16 @@ namespace XtraLiteTemplates.ObjectModel
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.ObjectModel.Directives;
 
-    public class InterpreterException : FormatException
+    public class EvaluationException : InvalidOperationException
     {
-        public Directive[] CandidateDirectives { get; private set; }
-        public Int32 FirstCharacterIndex { get; private set; }
+        public Directive Directive { get; private set; }
 
-        internal InterpreterException(Directive[] candidateDirectives, Int32 firstCharacterIndex, String format, params Object[] args)
-            : base(String.Format(format, args))
+        internal EvaluationException(Exception innerException, Directive directive, String format, params Object[] args)
+            : base(String.Format(format, args), innerException)
         {
-            Debug.Assert(firstCharacterIndex >= 0);
+            Debug.Assert(directive != null);
 
-            this.FirstCharacterIndex = firstCharacterIndex;
-            this.CandidateDirectives = candidateDirectives;
+            Directive = directive;
         }
-
     }
 }

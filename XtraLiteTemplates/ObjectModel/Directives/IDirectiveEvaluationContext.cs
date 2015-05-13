@@ -31,10 +31,13 @@ namespace XtraLiteTemplates.ObjectModel.Directives
     using System;
     using System.Globalization;
     using System.IO;
+    using XtraLiteTemplates.Expressions;
 
-    public interface IDirectiveEvaluationContext
+    public interface IDirectiveEvaluationContext : IExpressionEvaluationContext
     {
-        CultureInfo CultureInfo { get;  }
+        CultureInfo CultureInfo { get; }
+        Boolean IgnoreEvaluationExceptions { get; }
+
         String ProcessUnparsedText(String value);
     }
 }

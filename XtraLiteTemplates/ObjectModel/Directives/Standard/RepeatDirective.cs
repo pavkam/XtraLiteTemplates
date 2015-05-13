@@ -36,41 +36,34 @@ namespace XtraLiteTemplates.ObjectModel.Directives.Standard
 
     public sealed class RepeatDirective : Directive
     {
-        public RepeatDirective() : 
+        public static RepeatDirective Standard { get; private set; }
+
+        static RepeatDirective()
+        {
+            Standard = new RepeatDirective();
+        }
+
+        private RepeatDirective() : 
             base(Tag.Parse("REPEAT $"), Tag.Parse("END"))
         {
         }
 
-        protected internal override FlowDecision Execute(Tag tag, Object[] components, ref Object state,
+        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
             IDirectiveEvaluationContext context, out String text)
         {
-            Debug.Assert(tag != null);
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);
             Debug.Assert(context != null);
-            Debug.Assert(components.Length == tag.ComponentCount);
 
-            text = null;
-            if (Tags[0] == tag)
+            if (tagIndex == 0)
             {
-                Int64 remainingIterations = 0;
-
-                if (state != null)
-                {
-                    Debug.Assert(state is Int64);
-                    remainingIterations = (Int64)state;
-                }
-                else if (components[1] is Int64)
-                    remainingIterations = (Int64)components[1];
-
-                state = remainingIterations - 1;
-
-                if (remainingIterations > 0)
-                    return FlowDecision.Evaluate;
-            }
-            else if (Tags[1] == tag)
-                return FlowDecision.Restart;
+                /* REPEAT */
+                Debug.Assert(components.Length == 2);
+                //var remainingIterations = state ?? components[1]
+            } text = null;
 
             return FlowDecision.Terminate;
+            
         }
     }
 }

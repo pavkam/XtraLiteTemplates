@@ -42,13 +42,13 @@ namespace XtraLiteTemplates.ObjectModel.Directives
         {
         }
 
-        protected internal sealed override FlowDecision Execute(Tag tag, Object[] components, 
+        protected internal sealed override FlowDecision Execute(Int32 tagIndex, Object[] components, 
             ref Object state, IDirectiveEvaluationContext context, out String text)
         {
             /* It is a simple directive. Expecting just one tag here. */
-            Debug.Assert(tag != null);
+            Debug.Assert(tagIndex == 0);
             Debug.Assert(components != null);
-            Debug.Assert(components.Length == tag.ComponentCount);
+            Debug.Assert(components.Length == Tags[0].ComponentCount);
             Debug.Assert(context != null);
 
             text = Execute(components, context);

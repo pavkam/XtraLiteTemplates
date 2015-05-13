@@ -129,7 +129,7 @@ namespace XtraLiteTemplates.ObjectModel.Directives
         }
 
 
-        protected internal abstract FlowDecision Execute(Tag tag, Object[] components, ref Object state, IDirectiveEvaluationContext context, out String text);
+        protected internal abstract FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state, IDirectiveEvaluationContext context, out String text);
     }
 }
 

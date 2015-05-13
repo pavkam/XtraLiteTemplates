@@ -165,14 +165,12 @@ namespace XtraLiteTemplates
         }
 
 
-        internal static void UnexpectedNumberOfExpressionComponentsInTag(Tag tag, Int32 expectedCount)
+        internal static void DirectiveEvaluationError(Directive directive, Exception exception)
         {
-            throw new InvalidOperationException(String.Format("The provided tag {{{0}}} is expected to contain {1} 'expression' components.", tag, expectedCount));
-        }
+            Debug.Assert(directive != null);
+            Debug.Assert(exception != null);
 
-        internal static void UnexpectedNumberOfAnyIdentifierComponentsInTag(Tag tag, Int32 expectedCount)
-        {
-            throw new InvalidOperationException(String.Format("The provided tag {{{0}}} is expected to contain {1} 'any matching identifier' components.", tag, expectedCount));
+            throw new EvaluationException(exception, directive, "Evaluation of directive {0} resulted in an error: {1}", directive, exception.Message);
         }
     }
 }

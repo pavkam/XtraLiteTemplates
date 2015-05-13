@@ -55,13 +55,17 @@ namespace XtraLiteTemplates.NUnit.Inside
             m_myTags = tags;
         }
 
-        protected override FlowDecision Execute(Tag tag, Object[] components, 
+        protected override FlowDecision Execute(Int32 tagIndex, Object[] components, 
             ref Object state, IDirectiveEvaluationContext context, out String text)
         {
-            Assert.IsNotNull(tag);
+            Assert.GreaterOrEqual(tagIndex, 0);
+            Assert.Less(tagIndex, m_myTags.Length);
             Assert.IsNotNull(components);
-            Assert.AreEqual(tag.ComponentCount, components.Length);
             Assert.IsNotNull(context);
+
+            var tag = m_myTags[tagIndex];
+            Assert.AreEqual(tag.ComponentCount, components.Length);
+
 
             if (state == null)
             {
@@ -107,15 +111,7 @@ namespace XtraLiteTemplates.NUnit.Inside
 
                 if (stateAsFlow.PreviousDecision == FlowDecision.Evaluate || stateAsFlow.PreviousDecision == FlowDecision.Skip)
                 {
-                    Int32 indexOfNow;
-                    for (indexOfNow = 0; indexOfNow < m_myTags.Length; indexOfNow++)
-                    {
-                        if (m_myTags[indexOfNow] == tag)
-                            break;
-                    }
-                    Assert.Less(indexOfNow, m_myTags.Length);
-                    Assert.Greater(indexOfNow, 0);
-                    Assert.AreEqual(m_myTags[indexOfNow - 1], stateAsFlow.PreviousTag);
+                    Assert.AreEqual(m_myTags[tagIndex - 1], stateAsFlow.PreviousTag);
                 }
                 else if (stateAsFlow.PreviousDecision == FlowDecision.Restart)
                 {
@@ -153,15 +149,8 @@ namespace XtraLiteTemplates.NUnit.Inside
                 }
                 else
                 {
-                    Int32 indexOfNow;
-                    for (indexOfNow = 0; indexOfNow < m_myTags.Length; indexOfNow++)
-                    {
-                        if (m_myTags[indexOfNow] == tag)
-                            break;
-                    }
-
                     stateAsFlow.PreviousTag = tag;
-                    stateAsFlow.ExpectedTag = m_myTags[indexOfNow + 1];
+                    stateAsFlow.ExpectedTag = m_myTags[tagIndex + 1];
                 }
 
                 text += String.Format(" -> {0} ->", stateAsFlow.PreviousDecision);

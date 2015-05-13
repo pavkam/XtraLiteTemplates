@@ -101,5 +101,13 @@ namespace XtraLiteTemplates.NUnit.Inside
                 return System.Globalization.CultureInfo.InvariantCulture;
             }
         }
+
+        public Boolean IgnoreEvaluationExceptions
+        {
+            get 
+            {
+                return false;
+            }
+        }
     }
 }

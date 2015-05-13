@@ -54,14 +54,12 @@ namespace XtraLiteTemplates.ObjectModel
             UnparsedText = lex.UnparsedText;
         }
 
-        public void Evaluate(TextWriter writer, IDirectiveEvaluationContext nodeContext, 
-            IExpressionEvaluationContext expressionContext)
+        public void Evaluate(TextWriter writer, IDirectiveEvaluationContext context)
         {
             Expect.NotNull("writer", writer);
-            Expect.NotNull("nodeContext", nodeContext);
-            Expect.NotNull("expressionContext", expressionContext);
+            Expect.NotNull("context", context);
 
-            writer.Write(nodeContext.ProcessUnparsedText(UnparsedText));
+            writer.Write(context.ProcessUnparsedText(UnparsedText));
         }
 
         public override String ToString()
