@@ -30,6 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.Collections.Generic;
     using System.IO;
     using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
@@ -40,6 +41,25 @@ namespace XtraLiteTemplates.NUnit
     [TestFixture]
     public class EvaluationTests : TestBase
     {
+        private KeyValuePair<String, Object> kw(String key, Object value)
+        {
+            return new KeyValuePair<String, Object>(key, value);
+        }
+
+        private String Evaluate(IEvaluable evaluable, StringComparer comparer, params KeyValuePair<String, Object>[] values)
+        {
+            var context = new TestEvaluationContext(values, comparer);
+
+            String result = null;
+            using (var sw = new StringWriter())
+            {
+                evaluable.Evaluate(sw, context, context);
+                result = sw.ToString();
+            }
+
+            return result;
+        }
+
         [Test]
         public void TestCaseRepeat1()
         {
@@ -59,22 +79,45 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseSingleTagDirectiveInterpretation()
+        public void TestCaseEvaluationSingleTagDirective()
         {
-            var tag = Tag.Parse("HELLO WORLD");
-            var directive = new RippedOpenDirective(tag);
-            var interpreter = new Interpreter("{HELLO WORLD}", StringComparer.OrdinalIgnoreCase).RegisterDirective(directive);
-            var evaluable = interpreter.Construct();
-            var context = new TestEvaluationContext(interpreter.Comparer);
+            var directive = new RippedOpenDirective(
+                Tag.Parse("T"));
 
-            String result = null;
-            using (var sw = new StringWriter())
-            {
-                evaluable.Evaluate(sw, context, context);
-                result = sw.ToString();
-            }
+            var evaluable = new Interpreter("{T}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive).Construct();
 
-            Assert.AreEqual("<START><{HELLO WORLD} -> Restart -> {HELLO WORLD}><END>", result);
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
+            Assert.AreEqual("-> {T} -> Restart -> () -> {T} -> Terminate ->", exo);
+        }
+
+        [Test]
+        public void TestCaseEvaluationTwoTagDirective()
+        {
+            var directive = new RippedOpenDirective(
+                Tag.Parse("T1"),
+                Tag.Parse("T2"));
+
+            var evaluable = new Interpreter("{T1}text{T2}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive).Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
+            Assert.AreEqual("-> {T1} -> Evaluate -> (text) -> {T2} -> Restart -> () -> {T1} -> Skip -> () -> {T2} -> Terminate ->", exo);
+        }
+
+        [Test]
+        public void TestCaseEvaluationThreeTagDirective()
+        {
+            var directive = new RippedOpenDirective(
+                Tag.Parse("T1"),
+                Tag.Parse("T2"),
+                Tag.Parse("T3"));
+
+            var evaluable = new Interpreter("{T1}first{T2}second{T3}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive).Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
+            Assert.AreEqual("-> {T1} -> Evaluate -> (first) -> {T2} -> Evaluate -> (second) -> {T3} -> Restart -> () -> {T1} -> Skip -> () -> {T2} -> Skip -> () -> {T3} -> Terminate ->", exo);
         }
     }
 }

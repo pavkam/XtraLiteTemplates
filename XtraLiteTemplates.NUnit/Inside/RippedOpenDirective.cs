@@ -45,11 +45,6 @@ namespace XtraLiteTemplates.NUnit.Inside
             public Int32 Mode;
             public Tag PreviousTag;
             public Tag ExpectedTag;
-
-            public override String ToString()
-            {
-                return String.Format("<{{{0}}} -> {1} -> {{{2}}}>", PreviousTag, PreviousDecision, ExpectedTag);
-            }
         }
 
         private Tag[] m_myTags;
@@ -70,6 +65,9 @@ namespace XtraLiteTemplates.NUnit.Inside
 
             if (state == null)
             {
+                text = "-> ";
+                text += String.Format("{{{0}}}", tag);
+
                 /* Assuming first execution. */
                 Assert.AreEqual(m_myTags[0], tag);
 
@@ -87,18 +85,20 @@ namespace XtraLiteTemplates.NUnit.Inside
                 {
                     state = new FlowState
                     {
-                        Mode = 0,
+                        Mode = 1,
                         ExpectedTag = m_myTags[0],
                         PreviousDecision = FlowDecision.Restart,
                         PreviousTag = tag,
                     };
                 }
 
-                text = "<START>";
+                text += String.Format(" -> {0} -> (", (state as FlowState).PreviousDecision);
                 return (state as FlowState).PreviousDecision;
             } 
             else
             {
+                text = String.Format(") -> {{{0}}}", tag);
+
                 var stateAsFlow = state as FlowState;
 
                 Assert.NotNull(stateAsFlow);
@@ -113,8 +113,8 @@ namespace XtraLiteTemplates.NUnit.Inside
                         if (m_myTags[indexOfNow] == tag)
                             break;
                     }
-                    Assert.Less(m_myTags.Length, indexOfNow);
-                    Assert.Greater(0, indexOfNow);
+                    Assert.Less(indexOfNow, m_myTags.Length);
+                    Assert.Greater(indexOfNow, 0);
                     Assert.AreEqual(m_myTags[indexOfNow - 1], stateAsFlow.PreviousTag);
                 }
                 else if (stateAsFlow.PreviousDecision == FlowDecision.Restart)
@@ -131,17 +131,11 @@ namespace XtraLiteTemplates.NUnit.Inside
                         stateAsFlow.PreviousDecision = FlowDecision.Restart;
                         stateAsFlow.PreviousTag = tag;
                         stateAsFlow.ExpectedTag = m_myTags[0];
-
-                        text = stateAsFlow.ToString();
                     } 
                     else
                     {
                         stateAsFlow.PreviousDecision = FlowDecision.Terminate;
-
-                        text = "<END>";
                     }
-                    
-                    return stateAsFlow.PreviousDecision;
                 }
                 else if (m_myTags.First() == tag)
                 {
@@ -156,15 +150,26 @@ namespace XtraLiteTemplates.NUnit.Inside
                     {
                         stateAsFlow.PreviousDecision = FlowDecision.Terminate;
                     }
-
-                    text = stateAsFlow.ToString();
-                    return stateAsFlow.PreviousDecision;
                 }
-            }
+                else
+                {
+                    Int32 indexOfNow;
+                    for (indexOfNow = 0; indexOfNow < m_myTags.Length; indexOfNow++)
+                    {
+                        if (m_myTags[indexOfNow] == tag)
+                            break;
+                    }
 
-            Assert.Fail();
-            text = null;
-            return FlowDecision.Terminate;
+                    stateAsFlow.PreviousTag = tag;
+                    stateAsFlow.ExpectedTag = m_myTags[indexOfNow + 1];
+                }
+
+                text += String.Format(" -> {0} ->", stateAsFlow.PreviousDecision);
+                if (stateAsFlow.PreviousDecision != FlowDecision.Terminate)
+                    text += " (";
+
+                return stateAsFlow.PreviousDecision;
+            }
         }
     }
 }

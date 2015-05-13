@@ -99,7 +99,10 @@ namespace XtraLiteTemplates.ObjectModel
                     {
                         tagNode = Children[i] as TagNode;
                         if (tagNode != null)
+                        {
+                            tagNodeIndex = i;
                             break;
+                        }
 
                         var evaluable = Children[i] as IEvaluable;
                         Debug.Assert(evaluable != null);
@@ -115,7 +118,10 @@ namespace XtraLiteTemplates.ObjectModel
                     {
                         tagNode = Children[i] as TagNode;
                         if (tagNode != null)
+                        {
+                            tagNodeIndex = i;
                             break;
+                        }
                     }
                 }
             }
