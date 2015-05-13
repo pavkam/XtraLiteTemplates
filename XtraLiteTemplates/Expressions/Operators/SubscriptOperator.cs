@@ -52,8 +52,7 @@ namespace XtraLiteTemplates.Expressions.Operators
 
         public override Primitive Evaluate(Primitive arg)
         {
-            result = arg;
-            return true;
+            return arg;
         }
 
         public override String ToString()

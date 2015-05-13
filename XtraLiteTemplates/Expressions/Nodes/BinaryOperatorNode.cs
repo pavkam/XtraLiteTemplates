@@ -56,40 +56,40 @@ namespace XtraLiteTemplates.Expressions.Nodes
             RightNode = RightNode as LeafNode ?? RightNode.Reduce();
 
             var leafLeft = LeftNode as LeafNode;
-            Object reducedOperand;
             if (leafLeft != null && leafLeft.Evaluation == LeafNode.EvaluationType.Literal)
             {
-                if (Operator.Evaluate(leafLeft.Operand, out reducedOperand))
-                    return new LeafNode(Parent, reducedOperand, LeafNode.EvaluationType.Literal);
+                if (Operator.SupportsLhsShortCircuit)
+                {
+                    var reducedByLeft = Operator.Evaluate(leafLeft.Operand);
+                    if (reducedByLeft.Value != null)
+                        return new LeafNode(Parent, reducedByLeft, LeafNode.EvaluationType.Literal);
+                }
 
                 /* Right side. */
                 var leafRight = RightNode as LeafNode;
-                if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal &&
-                    Operator.Evaluate(leafLeft.Operand, leafRight.Operand, out reducedOperand))
-                    return new LeafNode(Parent, reducedOperand, LeafNode.EvaluationType.Literal);
+                if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal)
+                    return new LeafNode(Parent, Operator.Evaluate(leafLeft.Operand, leafRight.Operand), LeafNode.EvaluationType.Literal);
             }
 
             return this;
         }
 
-        public override Func<IExpressionEvaluationContext, Object> Build()
+        public override Func<IExpressionEvaluationContext, Primitive> Build()
         {
             var leftFunc = LeftNode.Build();
             var rightFunc = RightNode.Build();
             return (context) =>
             {
-                Object result;
-                Object leftOperand = leftFunc(context);
-                if (!Operator.Evaluate(leftOperand, out result))
+                var left = leftFunc(context);
+                if (Operator.SupportsLhsShortCircuit)
                 {
-                    Object rightOperand = rightFunc(context);
-
-                    if (!Operator.Evaluate(leftOperand, rightOperand, out result))
-                        result = context.HandleEvaluationError(Operator, leftOperand, rightOperand);
+                    var evaluatedByLeft = Operator.Evaluate(left);
+                    if (evaluatedByLeft.Value != null)
+                        return evaluatedByLeft;
                 }
-                return result;
-            };
 
+                return Operator.Evaluate(left, rightFunc(context));
+            };
         }
 
         public override String ToString(ExpressionFormatStyle style)

@@ -30,6 +30,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
     using System.Collections.Generic;
+    using XtraLiteTemplates.Expressions.Operators;
 
     internal abstract class ExpressionNode
     {
@@ -45,7 +46,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return this;
         }
 
-        public abstract Func<IExpressionEvaluationContext, Object> Build();
+        public abstract Func<IExpressionEvaluationContext, Primitive> Build();
 
         public abstract String ToString(ExpressionFormatStyle style);
 

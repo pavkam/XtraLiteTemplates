@@ -40,7 +40,7 @@ namespace XtraLiteTemplates.Expressions
         private ExpressionNode m_current;
         private ExpressionNode m_root;
         private List<Operator> m_supportedOperators;
-        private Func<IExpressionEvaluationContext, Object> m_function;
+        private Func<IExpressionEvaluationContext, Primitive> m_function;
         private Stack<SubscriptNode> m_openGroups;
         private Dictionary<String, UnaryOperator> m_unaryOperatorSymbols;
         private Dictionary<String, BinaryOperator> m_binaryOperatorSymbols;
@@ -193,7 +193,7 @@ namespace XtraLiteTemplates.Expressions
             {
                 ExpressionNode continuationNode = null;
                 if (isLiteral)
-                    continuationNode = new LeafNode(m_current, term, LeafNode.EvaluationType.Literal);
+                    continuationNode = new LeafNode(m_current, new Primitive(term), LeafNode.EvaluationType.Literal);
                 else
                 {
                     var _symbol = (String)term;

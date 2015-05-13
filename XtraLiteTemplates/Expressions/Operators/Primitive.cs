@@ -35,7 +35,7 @@ namespace XtraLiteTemplates.Expressions.Operators
 
     public struct Primitive
     {
-        public Object Value { get; private set; }
+        private Object Value { get; set; }
 
         public Primitive(Object value) : this()
         {
@@ -123,19 +123,7 @@ namespace XtraLiteTemplates.Expressions.Operators
 
         public String AsString()
         {
-            String result;
-            if (Value is String)
-                result = (String)Value;
-            else if (Value is Double)
-                result = ((Double)Value).ToString(CultureInfo.InvariantCulture);
-            else if (Value is Boolean)
-                result = ((Boolean)Value).ToString(CultureInfo.InvariantCulture);
-            else if (Value == null)
-                result = "undefined";
-            else
-                result = Value.ToString();
-
-            return result;
+            return ToString();
         }
 
         public Boolean AsBoolean()
@@ -302,6 +290,23 @@ namespace XtraLiteTemplates.Expressions.Operators
                 return 0;
             else 
                 return Value.GetHashCode();
+        }
+
+        public override String ToString()
+        {
+            String result;
+            if (Value is String)
+                result = (String)Value;
+            else if (Value is Double)
+                result = ((Double)Value).ToString(CultureInfo.InvariantCulture);
+            else if (Value is Boolean)
+                result = ((Boolean)Value).ToString(CultureInfo.InvariantCulture);
+            else if (Value == null)
+                result = "undefined";
+            else
+                result = Value.ToString();
+
+            return result;
         }
     }
 }

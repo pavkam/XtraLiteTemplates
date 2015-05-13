@@ -44,7 +44,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        protected override Primitive Evaluate(Primitive arg)
+        public override Primitive Evaluate(Primitive arg)
         {
             return -arg;
         }

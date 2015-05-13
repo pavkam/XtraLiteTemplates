@@ -47,12 +47,20 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        protected override Primitive Evaluate(Primitive left, Primitive right)
+        public override Primitive Evaluate(Primitive left, Primitive right)
         {
             return left | right;
         }
 
-        protected override Primitive Evaluate(Primitive arg)
+        public override Boolean SupportsLhsShortCircuit
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public override Primitive Evaluate(Primitive arg)
         {
             if (arg.AsBoolean() == true)
                 return true;

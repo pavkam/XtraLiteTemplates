@@ -47,7 +47,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        protected override Primitive Evaluate(Primitive left, Primitive right)
+        public override Primitive Evaluate(Primitive left, Primitive right)
         {
             return left == right;
         }

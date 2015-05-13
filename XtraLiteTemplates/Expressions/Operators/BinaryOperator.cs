@@ -52,6 +52,14 @@ namespace XtraLiteTemplates.Expressions.Operators
         {
             return arg;
         }
+
+        public virtual Boolean SupportsLhsShortCircuit
+        {
+            get
+            {
+                return false;
+            }
+        }
     }
 }
 

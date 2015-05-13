@@ -46,17 +46,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Operator = @operator;
         }
 
-        public override Func<IExpressionEvaluationContext, Object> Build()
+        public override Func<IExpressionEvaluationContext, Primitive> Build()
         {
             var childFunc = RightNode.Build();
-            return (context) =>
-            {
-                Object operand = childFunc(context);
-                Object result;
-                if (!Operator.Evaluate(operand, out result))
-                    result = context.HandleEvaluationError(Operator, operand);
-                return result;
-            };
+            return (context) => Operator.Evaluate(childFunc(context));
         }
 
         public override ExpressionNode Reduce()
@@ -64,11 +57,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
             /* Right side. */
             RightNode = RightNode as LeafNode ?? RightNode.Reduce();
             var leafRight = RightNode as LeafNode;
-            Object reducedOperand;
 
-            if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal &&
-                Operator.Evaluate(leafRight.Operand, out reducedOperand))
-                return new LeafNode(Parent, reducedOperand, LeafNode.EvaluationType.Literal);
+            if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal)
+                return new LeafNode(Parent, Operator.Evaluate(leafRight.Operand), LeafNode.EvaluationType.Literal);
             else
                 return this;
         }

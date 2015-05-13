@@ -47,17 +47,11 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
         {
         }
 
-        protected override Boolean Evaluate(Boolean arg, out Object result)
+        public override Primitive Evaluate(Primitive arg)
         {
-            result = !arg;
-            return true;
+            return !arg;
         }
 
-        protected override Boolean Evaluate(Int64 arg, out Object result)
-        {
-            result = ~arg;
-            return true;
-        }
     }
 }
 
