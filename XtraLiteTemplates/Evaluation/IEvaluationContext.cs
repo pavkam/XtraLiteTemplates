@@ -26,22 +26,19 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Globalization;
     using System.IO;
-    using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public interface IDirectiveEvaluationContext : IExpressionEvaluationContext
+    public interface IEvaluationContext : IVariableContext
     {
-        IPrimitiveTypeConverter TypeConverter { get; }
         Boolean IgnoreEvaluationExceptions { get; }
         String ProcessUnparsedText(String value);
 
         void PushFrame();
         void PopFrame();
-        void SetVariable(String identifier, Object value);
     }
 }

@@ -26,54 +26,63 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives.Standard
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Diagnostics;
-    using XtraLiteTemplates.Parsing;
+    using System.IO;
+    using System.Text;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Evaluation.Directives;
 
-    public sealed class RepeatDirective : Directive
+    internal abstract class CompositeNode : TemplateNode, IEvaluable
     {
-        public RepeatDirective() : 
-            base(Tag.Parse("REPEAT $ TIMES"), Tag.Parse("END REPEAT"))
+        private readonly List<TemplateNode> m_children;
+
+        public IReadOnlyList<TemplateNode> Children
         {
+            get
+            {
+                return m_children;
+            }
         }
 
-        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
-            IDirectiveEvaluationContext context, out String text)
+        protected CompositeNode(TemplateNode parent)
+            : base(parent)
         {
-            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
-            Debug.Assert(components != null);
-            Debug.Assert(context != null);
+            m_children = new List<TemplateNode>();
+        }
 
-            text = null;
-            Int32 remainingIterations;
-            if (state == null)
-            {
-                /* Starting up. */
-                Debug.Assert(tagIndex == 0);
-                Debug.Assert(components.Length == 3);
+        public void AddChild(TemplateNode child)
+        {
+            Debug.Assert(child != null);
+            Debug.Assert(child.Parent == this);
 
-                remainingIterations = context.TypeConverter.ConvertToInteger(components[1]);
-            }
-            else if (tagIndex == 0)
-            {
-                Debug.Assert(state is Int32);
-                remainingIterations = (Int32)state;
-            }
-            else
-                return FlowDecision.Restart;
+            if (!m_children.Contains(child))
+                m_children.Add(child);
+        }
 
-            remainingIterations--;
-            if (remainingIterations >= 0)
+        public virtual void Evaluate(TextWriter writer, IEvaluationContext context)
+        {
+            Expect.NotNull("writer", writer);
+            Expect.NotNull("context", context);
+
+            foreach (var child in Children)
             {
-                state = remainingIterations;
-                return FlowDecision.Evaluate;
+                var evaluable = child as IEvaluable;
+                if (evaluable != null)
+                    evaluable.Evaluate(writer, context);
             }
-            else
-                return FlowDecision.Terminate;
+        }
+
+        public override String ToString()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (var child in Children)
+                sb.Append(child.ToString());
+
+            return String.Format("({0})", sb.ToString());
         }
     }
 }

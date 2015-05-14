@@ -26,30 +26,16 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives.Standard
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Text;
-    using XtraLiteTemplates.Parsing;
-using XtraLiteTemplates.Expressions.Operators.Standard;
+    using System.Globalization;
+    using System.IO;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public sealed class InterpolationDirective : SimpleDirective
+    public interface IVariableContext : IVariableProvider
     {
-        public InterpolationDirective()
-            : base(Tag.Parse("$"))
-        {
-        }
-
-        protected override String Execute(Object[] components, IDirectiveEvaluationContext context)
-        {
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == 1);
-
-            return context.TypeConverter.ConvertToString(components[0]);
-        }
+        void SetVariable(String identifier, Object value);
     }
 }
-

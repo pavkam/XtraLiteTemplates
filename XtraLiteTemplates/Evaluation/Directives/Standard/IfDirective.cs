@@ -26,23 +26,40 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation.Directives.Standard
 {
     using System;
+    using System.Linq;
+    using System.Collections.Generic;
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using System.Text;
+    using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public class EvaluationException : InvalidOperationException
+    public sealed class IfDirective : StandardDirective
     {
-        public Directive Directive { get; private set; }
-
-        internal EvaluationException(Exception innerException, Directive directive, String format, params Object[] args)
-            : base(String.Format(format, args), innerException)
+        public IfDirective(IPrimitiveTypeConverter typeConverter)
+            : base(typeConverter, Tag.Parse("IF $ THEN"), Tag.Parse("END IF"))
         {
-            Debug.Assert(directive != null);
+        }
 
-            Directive = directive;
+        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
+            IVariableContext context, out String text)
+        {
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
+            Debug.Assert(components != null);
+            Debug.Assert(context != null);
+
+            text = null;
+            if (tagIndex == 0)
+            {
+                Debug.Assert(components.Length == 3);
+                if (TypeConverter.ConvertToBoolean(components[1]) == true)
+                    return FlowDecision.Evaluate;
+            }
+            
+            return FlowDecision.Terminate;
         }
     }
 }
+

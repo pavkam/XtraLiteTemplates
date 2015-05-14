@@ -37,9 +37,10 @@ namespace XtraLiteTemplates.NUnit.Inside
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Expressions.Operators.Standard;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Evaluation.Directives;
+    using XtraLiteTemplates.Evaluation;
 
-    public class TestEvaluationContext : IExpressionEvaluationContext, IDirectiveEvaluationContext
+    public class TestEvaluationContext : IVariableProvider, IEvaluationContext
     {
         private Stack<Dictionary<String, Object>> m_variableFrames;
 
@@ -122,14 +123,6 @@ namespace XtraLiteTemplates.NUnit.Inside
             get 
             {
                 return false;
-            }
-        }
-
-        public IPrimitiveTypeConverter TypeConverter
-        {
-            get 
-            {
-                return new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
             }
         }
     }

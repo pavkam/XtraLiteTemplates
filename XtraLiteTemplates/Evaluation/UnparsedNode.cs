@@ -26,13 +26,13 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
     using System.IO;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
 
     internal sealed class UnparsedNode : TemplateNode, IEvaluable
@@ -54,7 +54,7 @@ namespace XtraLiteTemplates.ObjectModel
             UnparsedText = lex.UnparsedText;
         }
 
-        public void Evaluate(TextWriter writer, IDirectiveEvaluationContext context)
+        public void Evaluate(TextWriter writer, IEvaluationContext context)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("context", context);

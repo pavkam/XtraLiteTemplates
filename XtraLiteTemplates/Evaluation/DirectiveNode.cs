@@ -26,7 +26,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Collections.Generic;
@@ -35,7 +35,7 @@ namespace XtraLiteTemplates.ObjectModel
     using System.Linq;
     using System.Text;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
 
     internal sealed class DirectiveNode : CompositeNode, IEvaluable
@@ -60,7 +60,7 @@ namespace XtraLiteTemplates.ObjectModel
             m_directives = candidateDirectives;
         }
 
-        public override void Evaluate(TextWriter writer, IDirectiveEvaluationContext context)
+        public override void Evaluate(TextWriter writer, IEvaluationContext context)
         {
             Debug.Assert(writer != null);
             Debug.Assert(context != null);

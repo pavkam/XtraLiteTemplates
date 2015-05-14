@@ -26,33 +26,12 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives.Standard
+namespace XtraLiteTemplates.Expressions
 {
     using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Text;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public sealed class ConditionalInterpolationDirective : SimpleDirective
+    public interface IVariableProvider
     {
-        public ConditionalInterpolationDirective()
-            : base(Tag.Parse("$ IF $"))
-        {
-        }
-
-        protected override String Execute(Object[] components, IDirectiveEvaluationContext context)
-        {
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == 3);
-
-            if (context.TypeConverter.ConvertToBoolean(components[2]))
-                return context.TypeConverter.ConvertToString(components[0]);
-            else
-                return null;
-        }
+        Object GetVariable(String identifier);
     }
 }
-

@@ -26,52 +26,15 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives.Standard
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Text;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
+    using System.IO;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Evaluation.Directives;
 
-    public sealed class IfElseDirective : Directive
+    public interface IEvaluable
     {
-        public IfElseDirective()
-            : base(Tag.Parse("IF $ THEN"), Tag.Parse("ELSE"), Tag.Parse("END IF"))
-        {
-        }
-
-        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
-            IDirectiveEvaluationContext context, out String text)
-        {
-            Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
-            Debug.Assert(components != null);
-            Debug.Assert(context != null);
-
-            text = null;
-            if (tagIndex == 0)
-            {
-                Debug.Assert(components.Length == 3);
-
-                var conditionIsTrue = context.TypeConverter.ConvertToBoolean(components[1]) == true;
-                state = conditionIsTrue;
-
-                return conditionIsTrue ? FlowDecision.Evaluate : FlowDecision.Skip;
-            }
-            else if (tagIndex == 1)
-            {
-                Debug.Assert(components.Length == 1);
-                Debug.Assert(state is Boolean);
-                var conditionWasTrue = (Boolean)state;
-
-                if (!conditionWasTrue)
-                    return FlowDecision.Evaluate;
-            }
-            
-            return FlowDecision.Terminate;
-        }
+        void Evaluate(TextWriter writer, IEvaluationContext context);
     }
 }
-

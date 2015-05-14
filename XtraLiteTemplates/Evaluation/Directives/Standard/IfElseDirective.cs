@@ -26,16 +26,52 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.Evaluation.Directives.Standard
 {
     using System;
-    using XtraLiteTemplates.Expressions.Operators;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Text;
+    using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public interface IExpressionEvaluationContext
+    public sealed class IfElseDirective : StandardDirective
     {
-        Object HandleEvaluationError(Operator @operator, Object operand);
-        Object HandleEvaluationError(Operator @operator, Object leftOperand, Object rightOperand);
+        public IfElseDirective(IPrimitiveTypeConverter typeConverter)
+            : base(typeConverter, Tag.Parse("IF $ THEN"), Tag.Parse("ELSE"), Tag.Parse("END IF"))
+        {
+        }
 
-        Object GetVariable(String identifier);
+        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
+            IVariableContext context, out String text)
+        {
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
+            Debug.Assert(components != null);
+            Debug.Assert(context != null);
+
+            text = null;
+            if (tagIndex == 0)
+            {
+                Debug.Assert(components.Length == 3);
+
+                var conditionIsTrue = TypeConverter.ConvertToBoolean(components[1]) == true;
+                state = conditionIsTrue;
+
+                return conditionIsTrue ? FlowDecision.Evaluate : FlowDecision.Skip;
+            }
+            else if (tagIndex == 1)
+            {
+                Debug.Assert(components.Length == 1);
+                Debug.Assert(state is Boolean);
+                var conditionWasTrue = (Boolean)state;
+
+                if (!conditionWasTrue)
+                    return FlowDecision.Evaluate;
+            }
+            
+            return FlowDecision.Terminate;
+        }
     }
 }
+

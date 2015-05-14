@@ -26,19 +26,18 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.IO;
+    using System.Text;
     using XtraLiteTemplates.Expressions;
 
-    internal abstract class TemplateNode
+    internal sealed class TemplateDocument : CompositeNode, IEvaluable
     {
-        public TemplateNode Parent { get; private set; }
-
-        protected TemplateNode(TemplateNode parent)
+        internal TemplateDocument()
+            : base(null)
         {
-            Parent = parent;
         }
     }
 }

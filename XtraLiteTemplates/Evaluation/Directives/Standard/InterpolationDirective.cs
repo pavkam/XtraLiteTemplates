@@ -26,63 +26,34 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation.Directives.Standard
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using System.Text;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    internal abstract class CompositeNode : TemplateNode, IEvaluable
+    public sealed class InterpolationDirective : StandardDirective
     {
-        private readonly List<TemplateNode> m_children;
-
-        public IReadOnlyList<TemplateNode> Children
+        public InterpolationDirective(IPrimitiveTypeConverter typeConverter)
+            : base(typeConverter, Tag.Parse("$"))
         {
-            get
-            {
-                return m_children;
-            }
         }
 
-        protected CompositeNode(TemplateNode parent)
-            : base(parent)
+        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components,
+            ref Object state, IVariableContext context, out String text)
         {
-            m_children = new List<TemplateNode>();
-        }
+            /* It is a simple directive. Expecting just one tag here. */
+            Debug.Assert(tagIndex == 0);
+            Debug.Assert(components != null);
+            Debug.Assert(components.Length == Tags[0].ComponentCount);
+            Debug.Assert(context != null);
 
-        public void AddChild(TemplateNode child)
-        {
-            Debug.Assert(child != null);
-            Debug.Assert(child.Parent == this);
-
-            if (!m_children.Contains(child))
-                m_children.Add(child);
-        }
-
-        public virtual void Evaluate(TextWriter writer, IDirectiveEvaluationContext context)
-        {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("context", context);
-
-            foreach (var child in Children)
-            {
-                var evaluable = child as IEvaluable;
-                if (evaluable != null)
-                    evaluable.Evaluate(writer, context);
-            }
-        }
-
-        public override String ToString()
-        {
-            StringBuilder sb = new StringBuilder();
-            foreach (var child in Children)
-                sb.Append(child.ToString());
-
-            return String.Format("({0})", sb.ToString());
+            text = TypeConverter.ConvertToString(components[0]);
+            return FlowDecision.Terminate;
         }
     }
 }

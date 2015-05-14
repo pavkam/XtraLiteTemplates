@@ -35,8 +35,8 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Expressions.Operators.Standard;
-    using XtraLiteTemplates.ObjectModel;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
 
     public class TestBase

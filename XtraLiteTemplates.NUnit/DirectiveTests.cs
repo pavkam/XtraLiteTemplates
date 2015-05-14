@@ -34,7 +34,7 @@ namespace XtraLiteTemplates.NUnit
     using System.Linq;
     using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.ObjectModel;
+    using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Parsing;
 
     [TestFixture]

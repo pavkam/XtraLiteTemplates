@@ -26,39 +26,67 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives.Standard
+namespace XtraLiteTemplates.Evaluation.Directives.Standard
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Diagnostics;
-    using System.Text;
     using XtraLiteTemplates.Parsing;
+    using System.Collections;
     using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public sealed class IfDirective : Directive
+    public sealed class ForEachDirective : StandardDirective
     {
-        public IfDirective()
-            : base(Tag.Parse("IF $ THEN"), Tag.Parse("END IF"))
+        public ForEachDirective(IPrimitiveTypeConverter typeConverter) :
+            base(typeConverter, Tag.Parse("FOR EACH ? IN $"), Tag.Parse("END FOR EACH"))
         {
         }
 
         protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
-            IDirectiveEvaluationContext context, out String text)
+            IVariableContext context, out String text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);
             Debug.Assert(context != null);
 
             text = null;
-            if (tagIndex == 0)
+           
+            IEnumerator enumerator;
+            if (state == null)
             {
-                Debug.Assert(components.Length == 3);
-                if (context.TypeConverter.ConvertToBoolean(components[1]) == true)
-                    return FlowDecision.Evaluate;
+                /* Starting up. */
+                Debug.Assert(tagIndex == 0);
+                Debug.Assert(components.Length == 5);
+
+                if (components[4] == null)
+                    return FlowDecision.Terminate;
+
+                var enumerable = components[4] as IEnumerable;
+                if (enumerable == null)
+                    enumerable = new Object[] { enumerable };
+
+                enumerator = enumerable.GetEnumerator();
+                state = enumerator;
             }
-            
-            return FlowDecision.Terminate;
+            else if (tagIndex == 0)
+            {
+                Debug.Assert(components.Length == 5);
+                enumerator = state as IEnumerator;
+                Debug.Assert(enumerator != null);
+            }
+            else
+                return FlowDecision.Restart;
+
+            if (!enumerator.MoveNext())
+                return FlowDecision.Terminate;
+            else
+            {
+                var variableName = components[2] as String;
+                Debug.Assert(variableName != null);
+                context.SetVariable(variableName, enumerator.Current);
+                return FlowDecision.Evaluate;
+            }
         }
     }
 }

@@ -26,59 +26,23 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions.Nodes
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Evaluation.Directives;
 
-    internal sealed class UnaryOperatorNode : OperatorNode
+    public class EvaluationException : InvalidOperationException
     {
-        public new UnaryOperator Operator
+        public Directive Directive { get; private set; }
+
+        internal EvaluationException(Exception innerException, Directive directive, String format, params Object[] args)
+            : base(String.Format(format, args), innerException)
         {
-            get
-            {
-                return base.Operator as UnaryOperator;
-            }
-        }
+            Debug.Assert(directive != null);
 
-        public UnaryOperatorNode(ExpressionNode parent, UnaryOperator @operator)
-            : base(parent, @operator)
-        {
-        }
-
-        public override Func<IVariableProvider, Object> Build()
-        {
-            var childFunc = RightNode.Build();
-            return (context) => Operator.Evaluate(childFunc(context));
-        }
-
-        public override ExpressionNode Reduce()
-        {
-            /* Right side. */
-            RightNode = RightNode as LeafNode ?? RightNode.Reduce();
-            var leafRight = RightNode as LeafNode;
-
-            if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal)
-                return new LeafNode(Parent, Operator.Evaluate(leafRight.Operand), LeafNode.EvaluationType.Literal);
-            else
-                return this;
-        }
-
-        public override String ToString(ExpressionFormatStyle style)
-        {
-            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
-
-            String result = null;
-
-            if (style == ExpressionFormatStyle.Canonical)
-                result = String.Format("{0}{{{1}}}", Operator, childAsString);
-            else
-                result = String.Format("{0}{1}", Operator, childAsString);
-
-            Debug.Assert(result != null);
-            return result;
+            Directive = directive;
         }
     }
 }
-

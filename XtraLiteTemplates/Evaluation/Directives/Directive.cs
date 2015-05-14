@@ -26,7 +26,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives
+namespace XtraLiteTemplates.Evaluation.Directives
 {
     using System;
     using System.Linq;
@@ -129,7 +129,7 @@ namespace XtraLiteTemplates.ObjectModel.Directives
         }
 
 
-        protected internal abstract FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state, IDirectiveEvaluationContext context, out String text);
+        protected internal abstract FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state, IVariableContext context, out String text);
     }
 }
 

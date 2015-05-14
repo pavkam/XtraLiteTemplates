@@ -46,7 +46,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return this;
         }
 
-        public abstract Func<IExpressionEvaluationContext, Object> Build();
+        public abstract Func<IVariableProvider, Object> Build();
 
         public abstract String ToString(ExpressionFormatStyle style);
 

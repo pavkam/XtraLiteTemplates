@@ -40,7 +40,7 @@ namespace XtraLiteTemplates.Expressions
         private ExpressionNode m_current;
         private ExpressionNode m_root;
         private List<Operator> m_supportedOperators;
-        private Func<IExpressionEvaluationContext, Object> m_function;
+        private Func<IVariableProvider, Object> m_function;
         private Stack<SubscriptNode> m_openGroups;
         private Dictionary<String, UnaryOperator> m_unaryOperatorSymbols;
         private Dictionary<String, BinaryOperator> m_binaryOperatorSymbols;
@@ -349,7 +349,7 @@ namespace XtraLiteTemplates.Expressions
             }
         }
 
-        public Object Evaluate(IExpressionEvaluationContext context)
+        public Object Evaluate(IVariableProvider context)
         {
             Expect.NotNull("context", context);
 

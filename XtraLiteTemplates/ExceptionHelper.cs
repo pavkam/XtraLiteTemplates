@@ -34,8 +34,8 @@ namespace XtraLiteTemplates
     using System.Linq;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.ObjectModel;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
 
     internal static class ExceptionHelper

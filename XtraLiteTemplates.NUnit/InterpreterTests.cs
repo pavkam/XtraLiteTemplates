@@ -34,8 +34,8 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.ObjectModel;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
 
     [TestFixture]

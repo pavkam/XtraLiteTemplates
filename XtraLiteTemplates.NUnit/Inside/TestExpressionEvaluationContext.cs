@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
 
-    public sealed class TestExpressionEvaluationContext : IExpressionEvaluationContext
+    public sealed class TestExpressionEvaluationContext : IVariableProvider
     {
         private Boolean m_gatherErrors;
         private Dictionary<String, Object> m_variables;

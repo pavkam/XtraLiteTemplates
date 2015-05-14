@@ -26,15 +26,56 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation.Directives.Standard
 {
     using System;
-    using System.IO;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using System.Collections.Generic;
+    using System.Linq;
+    using System.Diagnostics;
+    using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public interface IEvaluable
+    public sealed class RepeatDirective : StandardDirective
     {
-        void Evaluate(TextWriter writer, IDirectiveEvaluationContext context);
+        public RepeatDirective(IPrimitiveTypeConverter typeConverter) :
+            base(typeConverter, Tag.Parse("REPEAT $ TIMES"), Tag.Parse("END REPEAT"))
+        {
+        }
+
+        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
+            IVariableContext context, out String text)
+        {
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
+            Debug.Assert(components != null);
+            Debug.Assert(context != null);
+
+            text = null;
+            Int32 remainingIterations;
+            if (state == null)
+            {
+                /* Starting up. */
+                Debug.Assert(tagIndex == 0);
+                Debug.Assert(components.Length == 3);
+
+                remainingIterations = TypeConverter.ConvertToInteger(components[1]);
+            }
+            else if (tagIndex == 0)
+            {
+                Debug.Assert(state is Int32);
+                remainingIterations = (Int32)state;
+            }
+            else
+                return FlowDecision.Restart;
+
+            remainingIterations--;
+            if (remainingIterations >= 0)
+            {
+                state = remainingIterations;
+                return FlowDecision.Evaluate;
+            }
+            else
+                return FlowDecision.Terminate;
+        }
     }
 }
+

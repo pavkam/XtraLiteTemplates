@@ -35,8 +35,8 @@ namespace XtraLiteTemplates.NUnit
     using System.Linq;
     using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.ObjectModel;
-    using XtraLiteTemplates.ObjectModel.Directives.Standard;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Evaluation.Directives.Standard;
     using XtraLiteTemplates.Parsing;
 
     [TestFixture]
@@ -109,7 +109,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardInterpolationDirective()
         {
             var evaluable = new Interpreter("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new InterpolationDirective())
+                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
                 .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
                 .Construct();
 
@@ -128,8 +128,8 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardConditionalInterpolationDirective()
         {
             var evaluable = new Interpreter("{\"DEAR\" + \" \" IF Dude.IsDear}{Dude.FirstName} {Dude.LastName}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new InterpolationDirective())
-                .RegisterDirective(new ConditionalInterpolationDirective())
+                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
+                .RegisterDirective(new ConditionalInterpolationDirective(CreateTypeConverter()))
                 .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
                 .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
                 .Construct();
@@ -161,7 +161,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardRepeatDirective()
         {
             var evaluable = new Interpreter("{REPEAT 5 TIMES}text-{END REPEAT}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new RepeatDirective())
+                .RegisterDirective(new RepeatDirective(CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
                 .Construct();
 
@@ -174,8 +174,8 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardForEachDirective1()
         {
             var evaluable = new Interpreter("{FOR EACH name IN names}{name},{END FOR EACH}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new InterpolationDirective())
-                .RegisterDirective(new ForEachDirective())
+                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
+                .RegisterDirective(new ForEachDirective(CreateTypeConverter()))
                 .Construct();
 
             String[] name = new String[] { "Mary", "Joe", "Peter" };
@@ -188,8 +188,8 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardForEachDirective2()
         {
             var evaluable = new Interpreter("{FOR EACH x IN 1:2}{FOR EACH y IN 3:4}{x + \"-\" + y},{END FOR EACH}{END FOR EACH}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new InterpolationDirective())
-                .RegisterDirective(new ForEachDirective())
+                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
+                .RegisterDirective(new ForEachDirective(CreateTypeConverter()))
                 .RegisterOperator(new IntegerRangeOperator(CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
                 .Construct();
@@ -203,7 +203,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardIfDirective()
         {
             var evaluable = new Interpreter("{IF true THEN}this{IF true THEN}_will_{END IF}evaluate{END IF}{IF false THEN}but this won't!{END IF}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new IfDirective())
+                .RegisterDirective(new IfDirective(CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
                 .Construct();
 
@@ -216,7 +216,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardIfElseDirective()
         {
             var evaluable = new Interpreter("{IF true THEN}1{ELSE}2{END IF}{IF false THEN}3{ELSE}4{END IF}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new IfElseDirective())
+                .RegisterDirective(new IfElseDirective(CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
                 .Construct();
 

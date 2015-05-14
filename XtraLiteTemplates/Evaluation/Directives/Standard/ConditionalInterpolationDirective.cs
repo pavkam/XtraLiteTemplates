@@ -26,7 +26,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives
+namespace XtraLiteTemplates.Evaluation.Directives.Standard
 {
     using System;
     using System.Linq;
@@ -34,16 +34,17 @@ namespace XtraLiteTemplates.ObjectModel.Directives
     using System.Diagnostics;
     using System.Text;
     using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public abstract class SimpleDirective : Directive
+    public sealed class ConditionalInterpolationDirective : StandardDirective
     {
-        public SimpleDirective(Tag tag)
-            : base(tag)
+        public ConditionalInterpolationDirective(IPrimitiveTypeConverter typeConverter)
+            : base(typeConverter, Tag.Parse("$ IF $"))
         {
         }
 
-        protected internal sealed override FlowDecision Execute(Int32 tagIndex, Object[] components, 
-            ref Object state, IDirectiveEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components,
+            ref Object state, IVariableContext context, out String text)
         {
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);
@@ -51,11 +52,13 @@ namespace XtraLiteTemplates.ObjectModel.Directives
             Debug.Assert(components.Length == Tags[0].ComponentCount);
             Debug.Assert(context != null);
 
-            text = Execute(components, context);
+            if (TypeConverter.ConvertToBoolean(components[2]))
+                text = TypeConverter.ConvertToString(components[0]);
+            else
+                text = null;
+
             return FlowDecision.Terminate;
         }
-
-        protected abstract String Execute(Object[] components, IDirectiveEvaluationContext context);
     }
 }
 

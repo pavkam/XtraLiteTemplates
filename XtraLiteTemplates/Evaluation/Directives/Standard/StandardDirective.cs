@@ -26,30 +26,26 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation.Directives.Standard
 {
     using System;
+    using System.Linq;
+    using System.Collections.Generic;
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using System.Text;
+    using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public class InterpreterException : FormatException
+    public abstract class StandardDirective : Directive
     {
-        public Directive[] CandidateDirectives { get; private set; }
-        public Int32 FirstCharacterIndex { get; private set; }
+        public IPrimitiveTypeConverter TypeConverter { get; private set; }
 
-        internal InterpreterException(Exception innerException, Directive[] candidateDirectives, Int32 firstCharacterIndex, String format, params Object[] args)
-            : base(String.Format(format, args), innerException)
+        public StandardDirective(IPrimitiveTypeConverter typeConverter, params Tag[] tags)
+            : base(tags)
         {
-            Debug.Assert(firstCharacterIndex >= 0);
-
-            this.FirstCharacterIndex = firstCharacterIndex;
-            this.CandidateDirectives = candidateDirectives;
-        }
-
-        internal InterpreterException(Directive[] candidateDirectives, Int32 firstCharacterIndex, String format, params Object[] args)
-            : this(null, candidateDirectives, firstCharacterIndex, format, args)
-        {
+            Expect.NotNull("typeConverter", typeConverter);
+            TypeConverter = typeConverter;
         }
     }
 }
+

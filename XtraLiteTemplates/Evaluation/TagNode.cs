@@ -26,7 +26,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
@@ -64,7 +64,7 @@ namespace XtraLiteTemplates.ObjectModel
             Tag = lex.Tag;
         }
 
-        public Object[] Evaluate(IExpressionEvaluationContext context)
+        public Object[] Evaluate(IVariableProvider context)
         {
             Debug.Assert(context != null);
             Object[] result = new Object[Components.Length];

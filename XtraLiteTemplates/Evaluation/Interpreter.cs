@@ -26,7 +26,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel
+namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Collections.Generic;
@@ -37,7 +37,7 @@ namespace XtraLiteTemplates.ObjectModel
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
     using System.IO;
-    using XtraLiteTemplates.ObjectModel.Directives;
+    using XtraLiteTemplates.Evaluation.Directives;
 
     public sealed class Interpreter
     {

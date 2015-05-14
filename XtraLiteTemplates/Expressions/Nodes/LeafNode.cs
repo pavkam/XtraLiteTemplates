@@ -84,12 +84,12 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Evaluation = EvaluationType.Indentifier;
         }
 
-        public override Func<IExpressionEvaluationContext, Object> Build()
+        public override Func<IVariableProvider, Object> Build()
         {
             if (Evaluation == EvaluationType.Variable)
-                return (IExpressionEvaluationContext context) => context.GetVariable((String)Operand);
+                return (IVariableProvider context) => context.GetVariable((String)Operand);
             else
-                return (IExpressionEvaluationContext context) => Operand;
+                return (IVariableProvider context) => Operand;
         }
     }
 }
