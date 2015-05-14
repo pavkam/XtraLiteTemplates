@@ -31,30 +31,27 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
     using System;
     using System.Collections.Generic;
 
-    public abstract class StandardLogicalComparisonOperator : StandardBinaryOperator
+    public sealed class RelationalGreaterThanOperator : StandardRelationalOperator
     {
-        public IComparer<String> StringComparer { get; private set; }
-
-        public StandardLogicalComparisonOperator(String symbol, Int32 precedence, 
-            IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, precedence, typeConverter)
+        public RelationalGreaterThanOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 6, stringComparer, typeConverter)
         {
-            Expect.NotNull("stringComparer", stringComparer);
-            StringComparer = stringComparer;
         }
 
-        public sealed override Object Evaluate(Object left, Object right)
+        public RelationalGreaterThanOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : this(">", stringComparer, typeConverter)
         {
-            Int32 relation;
-            if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)
-                relation = StringComparer.Compare(TypeConverter.ConvertToString(left), TypeConverter.ConvertToString(right));
-            else
-                relation = TypeConverter.ConvertToNumber(left).CompareTo(TypeConverter.ConvertToNumber(right));
-
-            return Evaluate(relation, left, right);
         }
 
-        public abstract Boolean Evaluate(Int32 relation, Object left, Object right);
+        public RelationalGreaterThanOperator(IPrimitiveTypeConverter typeConverter)
+            : this(System.StringComparer.CurrentCulture, typeConverter)
+        {
+        }
+
+        public override Boolean Evaluate(Int32 relation, Object left, Object right)
+        {
+            return relation > 0;
+        }
     }
 }
 

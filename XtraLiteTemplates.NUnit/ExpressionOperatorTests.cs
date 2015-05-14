@@ -63,14 +63,6 @@ namespace XtraLiteTemplates.NUnit
 
 
 
-        private IPrimitiveTypeConverter TypeConverter
-        {
-            get
-            {
-                return new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
-            }
-        }
-
 
         [Test]
         public void TestCaseStandardOperatorSubscript()
@@ -121,17 +113,17 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorLogicalAnd()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalAndOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalAndOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new LogicalAndOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new LogicalAndOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalAndOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalAndOperator(null));
 
-            var standard = new LogicalAndOperator(TypeConverter);
-            Assert.AreEqual("&", standard.Symbol);
+            var standard = new LogicalAndOperator(CreateTypeConverter());
+            Assert.AreEqual("&&", standard.Symbol);
 
-            var op = new LogicalAndOperator("operator", TypeConverter);
+            var op = new LogicalAndOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(8, op.Precedence);
+            Assert.AreEqual(11, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
@@ -149,17 +141,17 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorLogicalOr()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalOrOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalOrOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new LogicalOrOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new LogicalOrOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalOrOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalOrOperator(null));
 
-            var standard = new LogicalOrOperator(TypeConverter);
-            Assert.AreEqual("|", standard.Symbol);
+            var standard = new LogicalOrOperator(CreateTypeConverter());
+            Assert.AreEqual("||", standard.Symbol);
 
-            var op = new LogicalOrOperator("operator", TypeConverter);
+            var op = new LogicalOrOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(10, op.Precedence);
+            Assert.AreEqual(12, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
@@ -177,15 +169,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorLogicalNot()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalNotOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalNotOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new LogicalNotOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new LogicalNotOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalNotOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalNotOperator(null));
 
-            var standard = new LogicalNotOperator(TypeConverter);
+            var standard = new LogicalNotOperator(CreateTypeConverter());
             Assert.AreEqual("!", standard.Symbol);
 
-            var op = new LogicalNotOperator("operator", TypeConverter);
+            var op = new LogicalNotOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(1, op.Precedence);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
@@ -198,15 +190,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorBitwiseNot()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseNotOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseNotOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new BitwiseNotOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseNotOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseNotOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseNotOperator(null));
 
-            var standard = new BitwiseNotOperator(TypeConverter);
+            var standard = new BitwiseNotOperator(CreateTypeConverter());
             Assert.AreEqual("~", standard.Symbol);
 
-            var op = new BitwiseNotOperator("operator", TypeConverter);
+            var op = new BitwiseNotOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(1, op.Precedence);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
@@ -219,15 +211,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorBitwiseXor()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseXorOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseXorOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new BitwiseXorOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseXorOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseXorOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseXorOperator(null));
 
-            var standard = new BitwiseXorOperator(TypeConverter);
+            var standard = new BitwiseXorOperator(CreateTypeConverter());
             Assert.AreEqual("^", standard.Symbol);
 
-            var op = new BitwiseXorOperator("operator", TypeConverter);
+            var op = new BitwiseXorOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(9, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
@@ -243,17 +235,17 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorBitwiseAnd()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseAndOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseAndOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new BitwiseAndOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseAndOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseAndOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseAndOperator(null));
 
-            var standard = new BitwiseAndOperator(TypeConverter);
+            var standard = new BitwiseAndOperator(CreateTypeConverter());
             Assert.AreEqual("&", standard.Symbol);
 
-            var op = new LogicalAndOperator("operator", TypeConverter);
+            var op = new BitwiseAndOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(8, op.Precedence);
+            Assert.AreEqual(9, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
@@ -267,15 +259,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorBitwiseOr()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseOrOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseOrOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new BitwiseOrOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseOrOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseOrOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseOrOperator(null));
 
-            var standard = new BitwiseOrOperator(TypeConverter);
+            var standard = new BitwiseOrOperator(CreateTypeConverter());
             Assert.AreEqual("|", standard.Symbol);
 
-            var op = new LogicalOrOperator("operator", TypeConverter);
+            var op = new BitwiseOrOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(10, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
@@ -291,22 +283,22 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorBitwiseShiftLeft()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseShiftLeftOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseShiftLeftOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new BitwiseShiftLeftOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseShiftLeftOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseShiftLeftOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseShiftLeftOperator(null));
 
-            var standard = new BitwiseShiftLeftOperator(TypeConverter);
+            var standard = new BitwiseShiftLeftOperator(CreateTypeConverter());
             Assert.AreEqual("<<", standard.Symbol);
 
-            var op = new BitwiseShiftLeftOperator("operator", TypeConverter);
+            var op = new BitwiseShiftLeftOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(5, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
-            AssertEvaluation<Int32>(op, 0xFF, 4L, 0x0FF0);
+            AssertEvaluation<Int32>(op, 0xFF, 4, 0x0FF0);
             AssertEvaluation<Int32>(op, 0x10, 64, 0x10);
             AssertEvaluation<Int32>(op, 1, 2, 4);
         }
@@ -314,22 +306,22 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorBitwiseShiftRight()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseShiftRightOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseShiftRightOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new BitwiseShiftRightOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseShiftRightOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseShiftRightOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseShiftRightOperator(null));
 
-            var standard = new BitwiseShiftRightOperator(TypeConverter);
+            var standard = new BitwiseShiftRightOperator(CreateTypeConverter());
             Assert.AreEqual(">>", standard.Symbol);
 
-            var op = new BitwiseShiftRightOperator("operator", TypeConverter);
+            var op = new BitwiseShiftRightOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(5, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
-            AssertEvaluation<Int32>(op, 0xFFAA, 4L, 0x0FFA);
+            AssertEvaluation<Int32>(op, 0xFFAA, 4, 0x0FFA);
             AssertEvaluation<Int32>(op, 0x10, 64, 0x10);
             AssertEvaluation<Int32>(op, 4, 1, 2);
         }
@@ -339,15 +331,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorArithmeticSubtract()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticSubtractOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticSubtractOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new ArithmeticSubtractOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticSubtractOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSubtractOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSubtractOperator(null));
 
-            var standard = new ArithmeticSubtractOperator(TypeConverter);
+            var standard = new ArithmeticSubtractOperator(CreateTypeConverter());
             Assert.AreEqual("-", standard.Symbol);
 
-            var op = new ArithmeticSubtractOperator("operator", TypeConverter);
+            var op = new ArithmeticSubtractOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(4, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
@@ -362,15 +354,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorArithmeticSum()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticSumOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticSumOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new ArithmeticSumOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticSumOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSumOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSumOperator(null));
 
-            var standard = new ArithmeticSumOperator(TypeConverter);
+            var standard = new ArithmeticSumOperator(CreateTypeConverter());
             Assert.AreEqual("+", standard.Symbol);
 
-            var op = new ArithmeticSumOperator("operator", TypeConverter);
+            var op = new ArithmeticSumOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(4, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
@@ -387,15 +379,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorArithmeticDivide()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticDivideOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticDivideOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new ArithmeticDivideOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticDivideOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticDivideOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticDivideOperator(null));
 
-            var standard = new ArithmeticDivideOperator(TypeConverter);
+            var standard = new ArithmeticDivideOperator(CreateTypeConverter());
             Assert.AreEqual("/", standard.Symbol);
 
-            var op = new ArithmeticDivideOperator("operator", TypeConverter);
+            var op = new ArithmeticDivideOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
@@ -411,38 +403,38 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorArithmeticModulo()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticModuloOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticModuloOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new ArithmeticModuloOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticModuloOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticModuloOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticModuloOperator(null));
 
-            var standard = new ArithmeticModuloOperator(TypeConverter);
+            var standard = new ArithmeticModuloOperator(CreateTypeConverter());
             Assert.AreEqual("%", standard.Symbol);
 
-            var op = new ArithmeticModuloOperator("operator", TypeConverter);
+            var op = new ArithmeticModuloOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
 
-            AssertEvaluation<Double>(op, 1.8, 2, 1);
-            AssertEvaluation<Double>(op, -5.5, 3, -2);
-            AssertEvaluation<Double>(op, Int32.MaxValue, Int32.MaxValue, 0);
+            AssertEvaluation<Double, Int32>(op, 1.8, 2, 1);
+            AssertEvaluation<Double, Int32>(op, -5.5, 3, -2);
+            AssertEvaluation<Double, Int32>(op, Int32.MaxValue, Int32.MaxValue, 0);
         }
 
         [Test]
         public void TestCaseStandardOperatorArithmeticMultiply()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticMultiplyOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticMultiplyOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new ArithmeticMultiplyOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticMultiplyOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticMultiplyOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticMultiplyOperator(null));
 
-            var standard = new ArithmeticMultiplyOperator(TypeConverter);
+            var standard = new ArithmeticMultiplyOperator(CreateTypeConverter());
             Assert.AreEqual("*", standard.Symbol);
 
-            var op = new ArithmeticMultiplyOperator("operator", TypeConverter);
+            var op = new ArithmeticMultiplyOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(3, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
@@ -459,15 +451,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorArithmeticNegate()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticNegateOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticNegateOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new ArithmeticNegateOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticNegateOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNegateOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNegateOperator(null));
 
-            var standard = new ArithmeticNegateOperator(TypeConverter);
+            var standard = new ArithmeticNegateOperator(CreateTypeConverter());
             Assert.AreEqual("-", standard.Symbol);
 
-            var op = new ArithmeticNegateOperator("operator", TypeConverter);
+            var op = new ArithmeticNegateOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(1, op.Precedence);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
@@ -479,15 +471,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStandardOperatorArithmeticNeutral()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticNeutralOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticNeutralOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new ArithmeticNeutralOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticNeutralOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNeutralOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNeutralOperator(null));
 
-            var standard = new ArithmeticNeutralOperator(TypeConverter);
+            var standard = new ArithmeticNeutralOperator(CreateTypeConverter());
             Assert.AreEqual("+", standard.Symbol);
 
-            var op = new ArithmeticNeutralOperator("operator", TypeConverter);
+            var op = new ArithmeticNeutralOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(1, op.Precedence);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
@@ -500,26 +492,26 @@ namespace XtraLiteTemplates.NUnit
 
 
         [Test]
-        public void TestCaseStandardOperatorLogicalEquals()
+        public void TestCaseStandardOperatorRelationalEquals()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalEqualsOperator(null, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalEqualsOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentNullException("stringComparer", () => new LogicalEqualsOperator("operator", null, TypeConverter));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalEqualsOperator("operator", StringComparer.Ordinal, null));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalEqualsOperator(null));
-            ExpectArgumentEmptyException("stringComparer", () => new LogicalEqualsOperator(null, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new RelationalEqualsOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new RelationalEqualsOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentNullException("stringComparer", () => new RelationalEqualsOperator("operator", null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalEqualsOperator("operator", StringComparer.Ordinal, null));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalEqualsOperator(null));
+            ExpectArgumentEmptyException("stringComparer", () => new RelationalEqualsOperator(null, CreateTypeConverter()));
 
-            var standard = new LogicalEqualsOperator(TypeConverter);
+            var standard = new RelationalEqualsOperator(CreateTypeConverter());
             Assert.AreEqual("==", standard.Symbol);
             Assert.AreEqual(StringComparer.CurrentCulture, standard.StringComparer);
 
-            var op = new LogicalEqualsOperator("operator", StringComparer.Ordinal, TypeConverter);
+            var op = new RelationalEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(7, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
-            Assert.AreEqual(StringComparer.Ordinal, standard.StringComparer);
+            Assert.AreEqual(StringComparer.Ordinal, op.StringComparer);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, true);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, 0, false);
@@ -535,26 +527,26 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseStandardOperatorLogicalNotEquals()
+        public void TestCaseStandardOperatorRelationalNotEquals()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalNotEqualsOperator(null, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalNotEqualsOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentNullException("stringComparer", () => new LogicalNotEqualsOperator("operator", null, TypeConverter));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalNotEqualsOperator("operator", StringComparer.Ordinal, null));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalNotEqualsOperator(null));
-            ExpectArgumentEmptyException("stringComparer", () => new LogicalNotEqualsOperator(null, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new RelationalNotEqualsOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new RelationalNotEqualsOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentNullException("stringComparer", () => new RelationalNotEqualsOperator("operator", null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalNotEqualsOperator("operator", StringComparer.Ordinal, null));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalNotEqualsOperator(null));
+            ExpectArgumentEmptyException("stringComparer", () => new RelationalNotEqualsOperator(null, CreateTypeConverter()));
 
-            var standard = new LogicalNotEqualsOperator(TypeConverter);
+            var standard = new RelationalNotEqualsOperator(CreateTypeConverter());
             Assert.AreEqual("!=", standard.Symbol);
             Assert.AreEqual(StringComparer.CurrentCulture, standard.StringComparer);
 
-            var op = new LogicalNotEqualsOperator("operator", StringComparer.Ordinal, TypeConverter);
+            var op = new RelationalNotEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(7, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
-            Assert.AreEqual(StringComparer.Ordinal, standard.StringComparer);
+            Assert.AreEqual(StringComparer.Ordinal, op.StringComparer);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, false);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, 0, true);
@@ -570,26 +562,26 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseStandardOperatorLogicalGreaterThan()
+        public void TestCaseStandardOperatorRelationalGreaterThan()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalGreaterThanOperator(null, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalGreaterThanOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentNullException("stringComparer", () => new LogicalGreaterThanOperator("operator", null, TypeConverter));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalGreaterThanOperator("operator", StringComparer.Ordinal, null));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalGreaterThanOperator(null));
-            ExpectArgumentEmptyException("stringComparer", () => new LogicalGreaterThanOperator(null, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new RelationalGreaterThanOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new RelationalGreaterThanOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentNullException("stringComparer", () => new RelationalGreaterThanOperator("operator", null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalGreaterThanOperator("operator", StringComparer.Ordinal, null));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalGreaterThanOperator(null));
+            ExpectArgumentEmptyException("stringComparer", () => new RelationalGreaterThanOperator(null, CreateTypeConverter()));
 
-            var standard = new LogicalGreaterThanOperator(TypeConverter);
+            var standard = new RelationalGreaterThanOperator(CreateTypeConverter());
             Assert.AreEqual(">", standard.Symbol);
             Assert.AreEqual(StringComparer.CurrentCulture, standard.StringComparer);
 
-            var op = new LogicalGreaterThanOperator("operator", StringComparer.Ordinal, TypeConverter);
+            var op = new RelationalGreaterThanOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
-            Assert.AreEqual(StringComparer.Ordinal, standard.StringComparer);
+            Assert.AreEqual(StringComparer.Ordinal, op.StringComparer);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, false);
             AssertEvaluation<Int64, Boolean>(op, 0, Int64.MinValue, true);
@@ -599,26 +591,26 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseStandardOperatorLogicalGreaterThanOrEquals()
+        public void TestCaseStandardOperatorRelationalGreaterThanOrEquals()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalGreaterThanOrEqualsOperator(null, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalGreaterThanOrEqualsOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentNullException("stringComparer", () => new LogicalGreaterThanOrEqualsOperator("operator", null, TypeConverter));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalGreaterThanOrEqualsOperator("operator", StringComparer.Ordinal, null));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalGreaterThanOrEqualsOperator(null));
-            ExpectArgumentEmptyException("stringComparer", () => new LogicalGreaterThanOrEqualsOperator(null, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new RelationalGreaterThanOrEqualsOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new RelationalGreaterThanOrEqualsOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentNullException("stringComparer", () => new RelationalGreaterThanOrEqualsOperator("operator", null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalGreaterThanOrEqualsOperator("operator", StringComparer.Ordinal, null));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalGreaterThanOrEqualsOperator(null));
+            ExpectArgumentEmptyException("stringComparer", () => new RelationalGreaterThanOrEqualsOperator(null, CreateTypeConverter()));
 
-            var standard = new LogicalGreaterThanOrEqualsOperator(TypeConverter);
+            var standard = new RelationalGreaterThanOrEqualsOperator(CreateTypeConverter());
             Assert.AreEqual(">=", standard.Symbol);
             Assert.AreEqual(StringComparer.CurrentCulture, standard.StringComparer);
 
-            var op = new LogicalGreaterThanOrEqualsOperator("operator", StringComparer.Ordinal, TypeConverter);
+            var op = new RelationalGreaterThanOrEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
-            Assert.AreEqual(StringComparer.Ordinal, standard.StringComparer);
+            Assert.AreEqual(StringComparer.Ordinal, op.StringComparer);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, true);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, Int64.MaxValue, false);
@@ -631,26 +623,26 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseStandardOperatorLogicalLowerThan()
+        public void TestCaseStandardOperatorRelationalLowerThan()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalLowerThanOperator(null, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalLowerThanOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentNullException("stringComparer", () => new LogicalLowerThanOperator("operator", null, TypeConverter));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalLowerThanOperator("operator", StringComparer.Ordinal, null));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalLowerThanOperator(null));
-            ExpectArgumentEmptyException("stringComparer", () => new LogicalLowerThanOperator(null, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new RelationalLowerThanOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new RelationalLowerThanOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentNullException("stringComparer", () => new RelationalLowerThanOperator("operator", null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalLowerThanOperator("operator", StringComparer.Ordinal, null));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalLowerThanOperator(null));
+            ExpectArgumentEmptyException("stringComparer", () => new RelationalLowerThanOperator(null, CreateTypeConverter()));
 
-            var standard = new LogicalLowerThanOperator(TypeConverter);
+            var standard = new RelationalLowerThanOperator(CreateTypeConverter());
             Assert.AreEqual("<", standard.Symbol);
             Assert.AreEqual(StringComparer.CurrentCulture, standard.StringComparer);
 
-            var op = new LogicalLowerThanOperator("operator", StringComparer.Ordinal, TypeConverter);
+            var op = new RelationalLowerThanOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
-            Assert.AreEqual(StringComparer.Ordinal, standard.StringComparer);
+            Assert.AreEqual(StringComparer.Ordinal, op.StringComparer);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, false);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, 0, true);
@@ -660,26 +652,26 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseStandardOperatorLogicalLowerThanOrEquals()
+        public void TestCaseStandardOperatorRelationalLowerThanOrEquals()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalLowerThanOrEqualsOperator(null, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalLowerThanOrEqualsOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentNullException("stringComparer", () => new LogicalLowerThanOrEqualsOperator("operator", null, TypeConverter));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalLowerThanOrEqualsOperator("operator", StringComparer.Ordinal, null));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalLowerThanOrEqualsOperator(null));
-            ExpectArgumentEmptyException("stringComparer", () => new LogicalLowerThanOrEqualsOperator(null, TypeConverter));
+            ExpectArgumentNullException("symbol", () => new RelationalLowerThanOrEqualsOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new RelationalLowerThanOrEqualsOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
+            ExpectArgumentNullException("stringComparer", () => new RelationalLowerThanOrEqualsOperator("operator", null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalLowerThanOrEqualsOperator("operator", StringComparer.Ordinal, null));
+            ExpectArgumentEmptyException("typeConverter", () => new RelationalLowerThanOrEqualsOperator(null));
+            ExpectArgumentEmptyException("stringComparer", () => new RelationalLowerThanOrEqualsOperator(null, CreateTypeConverter()));
 
-            var standard = new LogicalLowerThanOrEqualsOperator(TypeConverter);
+            var standard = new RelationalLowerThanOrEqualsOperator(CreateTypeConverter());
             Assert.AreEqual("<=", standard.Symbol);
             Assert.AreEqual(StringComparer.CurrentCulture, standard.StringComparer);
 
-            var op = new LogicalLowerThanOrEqualsOperator("operator", StringComparer.Ordinal, TypeConverter);
+            var op = new RelationalLowerThanOrEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
             Assert.AreEqual(6, op.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
             Assert.AreEqual(false, op.ExpectLhsIdentifier);
             Assert.AreEqual(false, op.ExpectRhsIdentifier);
-            Assert.AreEqual(StringComparer.Ordinal, standard.StringComparer);
+            Assert.AreEqual(StringComparer.Ordinal, op.StringComparer);
 
             AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, true);
             AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, Int64.MaxValue, true);

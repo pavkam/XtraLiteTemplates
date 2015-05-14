@@ -30,15 +30,22 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.Globalization;
     using System.Linq;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.ObjectModel;
     using XtraLiteTemplates.ObjectModel.Directives;
     using XtraLiteTemplates.Parsing;
 
     public class TestBase
     {
+        protected static IPrimitiveTypeConverter CreateTypeConverter()
+        {
+            return new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+        }
+
         protected void ExpectArgumentNullException(String argument, Action action)
         {
             try

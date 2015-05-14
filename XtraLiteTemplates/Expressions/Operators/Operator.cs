@@ -29,6 +29,9 @@
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
+    using System.Linq;
+    using System.Collections.Generic;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
 
     public abstract class Operator
     {
@@ -65,6 +68,81 @@ namespace XtraLiteTemplates.Expressions.Operators
             return Symbol.GetHashCode();
         }
 
+
+        public static IReadOnlyCollection<Operator> CreateStandardRelationalOperators(
+            IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+        {
+            var result = new List<Operator>()
+            {
+                new RelationalEqualsOperator(stringComparer, typeConverter),
+                new RelationalNotEqualsOperator(stringComparer, typeConverter),
+                new RelationalGreaterThanOperator(stringComparer, typeConverter),
+                new RelationalGreaterThanOrEqualsOperator(stringComparer, typeConverter),
+                new RelationalLowerThanOperator(stringComparer, typeConverter),
+                new RelationalLowerThanOrEqualsOperator(stringComparer, typeConverter),
+            };
+
+            return result;
+        }
+
+        public static IReadOnlyCollection<Operator> CreateStandardLogicalOperators(IPrimitiveTypeConverter typeConverter)
+        {
+            var result = new List<Operator>()
+            {
+                new LogicalAndOperator(typeConverter),
+                new LogicalOrOperator(typeConverter),
+                new LogicalNotOperator(typeConverter),
+            };
+
+            return result;
+        }
+
+        public static IReadOnlyCollection<Operator> CreateStandardBitwiseOperators(IPrimitiveTypeConverter typeConverter)
+        {
+            var result = new List<Operator>()
+            {
+                new BitwiseAndOperator(typeConverter),
+                new BitwiseNotOperator(typeConverter),
+                new BitwiseOrOperator(typeConverter),
+                new BitwiseXorOperator(typeConverter),
+                new BitwiseShiftLeftOperator(typeConverter),
+                new BitwiseShiftRightOperator(typeConverter),
+            };
+
+            return result;
+        }
+
+        public static IReadOnlyCollection<Operator> CreateStandardArithmeticOperators(IPrimitiveTypeConverter typeConverter)
+        {
+            var result = new List<Operator>()
+            {
+                new ArithmeticDivideOperator(typeConverter),
+                new ArithmeticModuloOperator(typeConverter),
+                new ArithmeticMultiplyOperator(typeConverter),
+                new ArithmeticNegateOperator(typeConverter),
+                new ArithmeticNeutralOperator(typeConverter),
+                new ArithmeticSubtractOperator(typeConverter),
+                new ArithmeticSumOperator(typeConverter),
+            };
+
+            return result;
+        }
+
+
+        public static IReadOnlyCollection<Operator> CreateStandardOperators(
+            IComparer<String> stringComparer, IEqualityComparer<String> identifierComparer, IPrimitiveTypeConverter typeConverter)
+        {
+            var allOperators =
+                CreateStandardRelationalOperators(stringComparer, typeConverter)
+                .Concat(CreateStandardLogicalOperators(typeConverter))
+                .Concat(CreateStandardBitwiseOperators(typeConverter))
+                .Concat(CreateStandardArithmeticOperators(typeConverter)).ToList();
+
+            allOperators.Add(new SubscriptOperator());
+            allOperators.Add(new MemberAccessOperator(identifierComparer));
+
+            return allOperators;
+        }
     }
 }
 

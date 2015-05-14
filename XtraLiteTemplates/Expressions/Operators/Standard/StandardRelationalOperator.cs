@@ -31,27 +31,30 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
     using System;
     using System.Collections.Generic;
 
-    public sealed class LogicalGreaterThanOperator : StandardLogicalComparisonOperator
+    public abstract class StandardRelationalOperator : StandardBinaryOperator
     {
-        public LogicalGreaterThanOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, 6, stringComparer, typeConverter)
+        public IComparer<String> StringComparer { get; private set; }
+
+        public StandardRelationalOperator(String symbol, Int32 precedence, 
+            IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, precedence, typeConverter)
         {
+            Expect.NotNull("stringComparer", stringComparer);
+            StringComparer = stringComparer;
         }
 
-        public LogicalGreaterThanOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
-            : this("!=", stringComparer, typeConverter)
+        public sealed override Object Evaluate(Object left, Object right)
         {
+            Int32 relation;
+            if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)
+                relation = StringComparer.Compare(TypeConverter.ConvertToString(left), TypeConverter.ConvertToString(right));
+            else
+                relation = TypeConverter.ConvertToNumber(left).CompareTo(TypeConverter.ConvertToNumber(right));
+
+            return Evaluate(relation, left, right);
         }
 
-        public LogicalGreaterThanOperator(IPrimitiveTypeConverter typeConverter)
-            : this(System.StringComparer.CurrentCulture, typeConverter)
-        {
-        }
-
-        public override Boolean Evaluate(Int32 relation, Object left, Object right)
-        {
-            return relation > 0;
-        }
+        public abstract Boolean Evaluate(Int32 relation, Object left, Object right);
     }
 }
 

@@ -31,26 +31,26 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
     using System;
     using System.Collections.Generic;
 
-    public sealed class LogicalLowerThanOperator : StandardLogicalComparisonOperator
+    public sealed class RelationalNotEqualsOperator : StandardRelationalOperator
     {
-        public LogicalLowerThanOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, 6, stringComparer, typeConverter)
+        public RelationalNotEqualsOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 7, stringComparer, typeConverter)
         {
         }
 
-        public LogicalLowerThanOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public RelationalNotEqualsOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
             : this("!=", stringComparer, typeConverter)
         {
         }
 
-        public LogicalLowerThanOperator(IPrimitiveTypeConverter typeConverter)
+        public RelationalNotEqualsOperator(IPrimitiveTypeConverter typeConverter)
             : this(System.StringComparer.CurrentCulture, typeConverter)
         {
         }
 
         public override Boolean Evaluate(Int32 relation, Object left, Object right)
         {
-            return relation < 0;
+            return relation != 0;
         }
     }
 }

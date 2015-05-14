@@ -141,14 +141,17 @@ namespace XtraLiteTemplates.NUnit
             var tokenizer = new Tokenizer("irrelevant");
             var lexer = new Lexer(tokenizer, StringComparer.OrdinalIgnoreCase);
 
+            var neutral = new ArithmeticNeutralOperator(CreateTypeConverter());
+            var sum = new ArithmeticSumOperator(CreateTypeConverter());
+
             ExpectArgumentNullException("operator", () => lexer.RegisterOperator(null));
 
-            Assert.AreEqual(lexer, lexer.RegisterOperator(ArithmeticNeutralOperator.Standard));
-            Assert.AreEqual(lexer, lexer.RegisterOperator(ArithmeticSumOperator.Standard));
+            Assert.AreEqual(lexer, lexer.RegisterOperator(neutral));
+            Assert.AreEqual(lexer, lexer.RegisterOperator(sum));
             Assert.AreEqual(lexer, lexer.RegisterOperator(new SubscriptOperator("<", ">")));
 
-            ExpectOperatorAlreadyRegisteredException(ArithmeticNeutralOperator.Standard.ToString(), () => lexer.RegisterOperator(ArithmeticNeutralOperator.Standard));
-            ExpectOperatorAlreadyRegisteredException(ArithmeticSumOperator.Standard.ToString(), () => lexer.RegisterOperator(ArithmeticSumOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(neutral.ToString(), () => lexer.RegisterOperator(neutral));
+            ExpectOperatorAlreadyRegisteredException(sum.ToString(), () => lexer.RegisterOperator(sum));
 
             var _ss1 = new SubscriptOperator("+", ")");
             ExpectOperatorAlreadyRegisteredException(_ss1.ToString(), () => lexer.RegisterOperator(_ss1));
@@ -254,14 +257,14 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseKeywordAndExpressionTag()
         {
-            const String test = "{IF 10 = 10}";
+            const String test = "{IF 10 == 10}";
 
             var ifTag = new Tag().Keyword("IF").Expression();
             var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(ifTag)
-                .RegisterOperator(new LogicalEqualsOperator("=", StringComparer.CurrentCulture, new FlexiblePrimitiveTypeConverter());
+                .RegisterOperator(new RelationalEqualsOperator(StringComparer.CurrentCulture, CreateTypeConverter()));
 
-            AssertTagLex(lexer.ReadNext(), 0, 12, ifTag, "IF|True");
+            AssertTagLex(lexer.ReadNext(), 0, 13, ifTag, "IF|True");
             Assert.IsNull(lexer.ReadNext());
         }
 
@@ -389,7 +392,7 @@ namespace XtraLiteTemplates.NUnit
             var exprTag = new Tag().Expression();
 
             var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
-                .RegisterTag(exprTag).RegisterOperator(ArithmeticSumOperator.Standard);
+                .RegisterTag(exprTag).RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()));
 
             ExpectUnbalancedExpressionCannotBeFinalizedException(4, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
         }
@@ -402,7 +405,7 @@ namespace XtraLiteTemplates.NUnit
             var exprTag = new Tag().Expression().Keyword("END");
 
             var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
-                .RegisterTag(exprTag).RegisterOperator(ArithmeticSumOperator.Standard);
+                .RegisterTag(exprTag).RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()));
 
             ExpectUnbalancedExpressionCannotBeFinalizedException(5, "END", Token.TokenType.Word, () => lexer.ReadNext());
         }
@@ -456,7 +459,7 @@ namespace XtraLiteTemplates.NUnit
             var exprTag = new Tag().Expression();
 
             var lexer = new Lexer(new Tokenizer(test), StringComparer.Ordinal)
-                .RegisterTag(exprTag).RegisterOperator(BitwiseShiftLeftOperator.Pascal);
+                .RegisterTag(exprTag).RegisterOperator(new BitwiseShiftLeftOperator("shl", CreateTypeConverter()));
 
             ExpectUnexpectedOrInvalidExpressionTokenException(3, "SHL", Token.TokenType.Word, () => lexer.ReadNext());
         }

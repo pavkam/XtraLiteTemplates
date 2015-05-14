@@ -130,7 +130,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluable = new Interpreter("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}", StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(InterpolationDirective.Standard)
-                .RegisterOperator(MemberAccessOperator.Pascal)
+                .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
                 .Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, 
