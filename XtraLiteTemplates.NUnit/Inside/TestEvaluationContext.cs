@@ -36,20 +36,25 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System.IO;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.ObjectModel.Directives;
 
     public class TestEvaluationContext : IExpressionEvaluationContext, IDirectiveEvaluationContext
     {
-        private Dictionary<String, Object> m_variables;
+        private Stack<Dictionary<String, Object>> m_variableFrames;
 
         public TestEvaluationContext(IEnumerable<KeyValuePair<String, Object>> variables, IEqualityComparer<String> comparer)
         {
             Debug.Assert(variables != null);
             Debug.Assert(comparer != null);
 
-            m_variables = new Dictionary<String, Object>(comparer);
+            m_variableFrames = new Stack<Dictionary<String, Object>>();
+
+            var zeroFramevariables = new Dictionary<String, Object>(comparer);
             foreach (var kvp in variables)
-                m_variables[kvp.Key] = kvp.Value;
+                zeroFramevariables[kvp.Key] = kvp.Value;
+
+            m_variableFrames.Push(zeroFramevariables);
         }
 
         public TestEvaluationContext(IEnumerable<KeyValuePair<String, Object>> variables)
@@ -81,11 +86,29 @@ namespace XtraLiteTemplates.NUnit.Inside
             return null;
         }
 
+
+        public void PushFrame()
+        {
+            var newFrame = new Dictionary<String, Object>(m_variableFrames.Peek(), m_variableFrames.Peek().Comparer);
+            m_variableFrames.Push(newFrame);
+        }
+
+        public void PopFrame()
+        {
+            Assert.Greater(m_variableFrames.Count, 1);
+            m_variableFrames.Pop();
+        }
+
+        public void SetVariable(String identifier, Object value)
+        {
+            m_variableFrames.Peek()[identifier] = value;
+        }
+
         public Object GetVariable(String identifier)
         {
             Assert.IsNotEmpty(identifier);
 
-            return m_variables[identifier];
+            return m_variableFrames.Peek()[identifier];
         }
 
 
@@ -94,19 +117,19 @@ namespace XtraLiteTemplates.NUnit.Inside
             return value;
         }
 
-        public CultureInfo CultureInfo
-        {
-            get 
-            {
-                return System.Globalization.CultureInfo.InvariantCulture;
-            }
-        }
-
         public Boolean IgnoreEvaluationExceptions
         {
             get 
             {
                 return false;
+            }
+        }
+
+        public IPrimitiveTypeConverter TypeConverter
+        {
+            get 
+            {
+                return new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
             }
         }
     }

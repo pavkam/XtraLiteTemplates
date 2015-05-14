@@ -67,6 +67,8 @@ namespace XtraLiteTemplates.ObjectModel
             Debug.Assert(Children.Count > 0);
             Debug.Assert(m_directives.Length == 1);
 
+            context.PushFrame();
+
             var directiveComponentIndex = 0;
             var tagIndex = 0;
             var tagNode = Children[directiveComponentIndex] as TagNode;
@@ -140,6 +142,8 @@ namespace XtraLiteTemplates.ObjectModel
                     }
                 }
             }
+
+            context.PopFrame();
         }
 
         public Boolean SelectDirective(Int32 presenceIndex, Tag tag, IEqualityComparer<String> comparer)

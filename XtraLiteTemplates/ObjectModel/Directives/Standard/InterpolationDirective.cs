@@ -34,17 +34,11 @@ namespace XtraLiteTemplates.ObjectModel.Directives.Standard
     using System.Diagnostics;
     using System.Text;
     using XtraLiteTemplates.Parsing;
+using XtraLiteTemplates.Expressions.Operators.Standard;
 
     public sealed class InterpolationDirective : SimpleDirective
     {
-        public static InterpolationDirective Standard { get; private set; }
-
-        static InterpolationDirective()
-        {
-            Standard = new InterpolationDirective();
-        }
-
-        private InterpolationDirective()
+        public InterpolationDirective()
             : base(Tag.Parse("$"))
         {
         }
@@ -54,16 +48,7 @@ namespace XtraLiteTemplates.ObjectModel.Directives.Standard
             Debug.Assert(components != null);
             Debug.Assert(components.Length == 1);
 
-            if (components[0] == null)
-                return null;
-            else
-            {
-                var formattable = components[0] as IFormattable;
-                if (formattable != null)
-                    return formattable.ToString(null, context.CultureInfo);
-                else
-                    return components[0].ToString();
-            }
+            return context.TypeConverter.ConvertToString(components[0]);
         }
     }
 }

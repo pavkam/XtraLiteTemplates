@@ -26,22 +26,40 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives
+namespace XtraLiteTemplates.ObjectModel.Directives.Standard
 {
     using System;
-    using System.Globalization;
-    using System.IO;
-    using XtraLiteTemplates.Expressions;
+    using System.Linq;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Text;
+    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public interface IDirectiveEvaluationContext : IExpressionEvaluationContext
+    public sealed class IfDirective : Directive
     {
-        IPrimitiveTypeConverter TypeConverter { get; }
-        Boolean IgnoreEvaluationExceptions { get; }
-        String ProcessUnparsedText(String value);
+        public IfDirective()
+            : base(Tag.Parse("IF $ THEN"), Tag.Parse("END IF"))
+        {
+        }
 
-        void PushFrame();
-        void PopFrame();
-        void SetVariable(String identifier, Object value);
+        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
+            IDirectiveEvaluationContext context, out String text)
+        {
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
+            Debug.Assert(components != null);
+            Debug.Assert(context != null);
+
+            text = null;
+            if (tagIndex == 0)
+            {
+                Debug.Assert(components.Length == 3);
+                if (context.TypeConverter.ConvertToBoolean(components[1]) == true)
+                    return FlowDecision.Evaluate;
+            }
+            
+            return FlowDecision.Terminate;
+        }
     }
 }
+

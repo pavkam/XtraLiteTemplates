@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.Collections.Generic;
     using System.IO;
+    using System.Linq;
     using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
     using XtraLiteTemplates.ObjectModel;
@@ -60,28 +61,7 @@ namespace XtraLiteTemplates.NUnit
             return result;
         }
 
-        [Test]
-        public void TestCaseRepeat1()
-        {
-            Double a = 99999999999999999999999999999.0 ;
-            Int64 v = (Int64)a;
-            if (v == 0)
-                return;
-       /*     var directive = new RepeatDirective();
-            var interpreter = new Interpreter("{repeat count*2}R{end}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(directive)
-                .RegisterOperator(MultiplyOperator.Standard);
 
-            var document = interpreter.Construct();
-            var context = new TestEvaluationContext("count", 5);
-
-            using (var writer = new StringWriter())
-            {
-                document.Evaluate(writer, context, context);
-                Assert.AreEqual("RRRRRRRRRR", writer.ToString());
-            }
-        * */
-        }
 
         [Test]
         public void TestCaseEvaluationSingleTagDirective()
@@ -129,7 +109,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardInterpolationDirective()
         {
             var evaluable = new Interpreter("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}", StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(InterpolationDirective.Standard)
+                .RegisterDirective(new InterpolationDirective())
                 .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
                 .Construct();
 
@@ -142,6 +122,107 @@ namespace XtraLiteTemplates.NUnit
             );
 
             Assert.AreEqual("1, some string, 123, 1.33, False, inner item", exo);
+        }
+
+        [Test]
+        public void TestCaseEvaluationStandardConditionalInterpolationDirective()
+        {
+            var evaluable = new Interpreter("{\"DEAR\" + \" \" IF Dude.IsDear}{Dude.FirstName} {Dude.LastName}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new InterpolationDirective())
+                .RegisterDirective(new ConditionalInterpolationDirective())
+                .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
+                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .Construct();
+
+            var dude = new
+            {
+                IsDear = false,
+                FirstName = "Jenny",
+                LastName = "O'Peters",
+            };
+
+            var dear_dude = new
+            {
+                IsDear = true,
+                FirstName = "John",
+                LastName = "McDude",
+            };
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase,
+                kw("Dude", dude));
+            var dear_exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase,
+                kw("Dude", dear_dude));
+
+            Assert.AreEqual("Jenny O'Peters", exo);
+            Assert.AreEqual("DEAR John McDude", dear_exo);
+        }
+
+        [Test]
+        public void TestCaseEvaluationStandardRepeatDirective()
+        {
+            var evaluable = new Interpreter("{REPEAT 5 TIMES}text-{END REPEAT}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new RepeatDirective())
+                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
+
+            Assert.AreEqual("text-text-text-text-text-", exo);
+        }
+
+        [Test]
+        public void TestCaseEvaluationStandardForEachDirective1()
+        {
+            var evaluable = new Interpreter("{FOR EACH name IN names}{name},{END FOR EACH}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new InterpolationDirective())
+                .RegisterDirective(new ForEachDirective())
+                .Construct();
+
+            String[] name = new String[] { "Mary", "Joe", "Peter" };
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("names", name));
+
+            Assert.AreEqual("Mary,Joe,Peter,", exo);
+        }
+
+        [Test]
+        public void TestCaseEvaluationStandardForEachDirective2()
+        {
+            var evaluable = new Interpreter("{FOR EACH x IN 1:2}{FOR EACH y IN 3:4}{x + \"-\" + y},{END FOR EACH}{END FOR EACH}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new InterpolationDirective())
+                .RegisterDirective(new ForEachDirective())
+                .RegisterOperator(new IntegerRangeOperator(CreateTypeConverter()))
+                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
+
+            Assert.AreEqual("1-3,1-4,2-3,2-4,", exo);
+        }
+
+        [Test]
+        public void TestCaseEvaluationStandardIfDirective()
+        {
+            var evaluable = new Interpreter("{IF true THEN}this{IF true THEN}_will_{END IF}evaluate{END IF}{IF false THEN}but this won't!{END IF}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new IfDirective())
+                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("true", true), kw("false", false));
+
+            Assert.AreEqual("this_will_evaluate", exo);
+        }
+
+        [Test]
+        public void TestCaseEvaluationStandardIfElseDirective()
+        {
+            var evaluable = new Interpreter("{IF true THEN}1{ELSE}2{END IF}{IF false THEN}3{ELSE}4{END IF}", StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new IfElseDirective())
+                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("true", true), kw("false", false));
+
+            Assert.AreEqual("14", exo);
         }
     }
 }

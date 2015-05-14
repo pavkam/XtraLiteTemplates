@@ -33,11 +33,12 @@ namespace XtraLiteTemplates.ObjectModel.Directives.Standard
     using System.Linq;
     using System.Diagnostics;
     using XtraLiteTemplates.Parsing;
+    using System.Collections;
 
-    public sealed class RepeatDirective : Directive
+    public sealed class ForEachDirective : Directive
     {
-        public RepeatDirective() : 
-            base(Tag.Parse("REPEAT $ TIMES"), Tag.Parse("END REPEAT"))
+        public ForEachDirective() : 
+            base(Tag.Parse("FOR EACH ? IN $"), Tag.Parse("END FOR EACH"))
         {
         }
 
@@ -49,31 +50,42 @@ namespace XtraLiteTemplates.ObjectModel.Directives.Standard
             Debug.Assert(context != null);
 
             text = null;
-            Int32 remainingIterations;
+           
+            IEnumerator enumerator;
             if (state == null)
             {
                 /* Starting up. */
                 Debug.Assert(tagIndex == 0);
-                Debug.Assert(components.Length == 3);
+                Debug.Assert(components.Length == 5);
 
-                remainingIterations = context.TypeConverter.ConvertToInteger(components[1]);
+                if (components[4] == null)
+                    return FlowDecision.Terminate;
+
+                var enumerable = components[4] as IEnumerable;
+                if (enumerable == null)
+                    enumerable = new Object[] { enumerable };
+
+                enumerator = enumerable.GetEnumerator();
+                state = enumerator;
             }
             else if (tagIndex == 0)
             {
-                Debug.Assert(state is Int32);
-                remainingIterations = (Int32)state;
+                Debug.Assert(components.Length == 5);
+                enumerator = state as IEnumerator;
+                Debug.Assert(enumerator != null);
             }
             else
                 return FlowDecision.Restart;
 
-            remainingIterations--;
-            if (remainingIterations >= 0)
+            if (!enumerator.MoveNext())
+                return FlowDecision.Terminate;
+            else
             {
-                state = remainingIterations;
+                var variableName = components[2] as String;
+                Debug.Assert(variableName != null);
+                context.SetVariable(variableName, enumerator.Current);
                 return FlowDecision.Evaluate;
             }
-            else
-                return FlowDecision.Terminate;
         }
     }
 }

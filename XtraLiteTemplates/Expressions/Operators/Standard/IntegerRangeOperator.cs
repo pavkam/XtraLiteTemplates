@@ -26,22 +26,33 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.ObjectModel.Directives
+namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
-    using System.Globalization;
-    using System.IO;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
+    using System.Linq;
 
-    public interface IDirectiveEvaluationContext : IExpressionEvaluationContext
+    public sealed class IntegerRangeOperator : StandardBinaryOperator
     {
-        IPrimitiveTypeConverter TypeConverter { get; }
-        Boolean IgnoreEvaluationExceptions { get; }
-        String ProcessUnparsedText(String value);
+        public IntegerRangeOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 2, typeConverter)
+        {
+        }
 
-        void PushFrame();
-        void PopFrame();
-        void SetVariable(String identifier, Object value);
+        public IntegerRangeOperator(IPrimitiveTypeConverter typeConverter)
+            : this(":", typeConverter)
+        {
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            var min = TypeConverter.ConvertToInteger(left);
+            var max = TypeConverter.ConvertToInteger(right);
+
+            if (min <= max)
+                return Enumerable.Range(min, max - min + 1);
+            else
+                return null;
+        }
     }
 }
+
