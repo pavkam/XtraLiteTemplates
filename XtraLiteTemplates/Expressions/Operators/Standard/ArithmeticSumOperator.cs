@@ -30,23 +30,31 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class LowerThanOperator : StandardBinaryOperator
+    public sealed class ArithmeticSumOperator : StandardBinaryOperator
     {
-        public static BinaryOperator Standard { get; private set; }
-
-        static LowerThanOperator()
-        {
-            Standard = new LowerThanOperator("<");
-        }
-
-        public LowerThanOperator(String symbol)
-            : base(symbol, 6)
+        public ArithmeticSumOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 4, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public ArithmeticSumOperator(IPrimitiveTypeConverter typeConverter)
+            : this("+", typeConverter)
         {
-            return left < right;
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            var leftType = TypeConverter.TypeOf(left);
+            var rightType = TypeConverter.TypeOf(right);
+
+            if (leftType == PrimitiveType.String || rightType == PrimitiveType.String)
+                return TypeConverter.ConvertToString(left) + TypeConverter.ConvertToString(right);
+            else if (leftType == PrimitiveType.Number || rightType == PrimitiveType.Number)
+                return TypeConverter.ConvertToNumber(left) + TypeConverter.ConvertToNumber(right);
+            else if (leftType == PrimitiveType.Boolean || rightType == PrimitiveType.Boolean)
+                return TypeConverter.ConvertToNumber(left) + TypeConverter.ConvertToNumber(right);
+            else
+                return null;
         }
     }
 }

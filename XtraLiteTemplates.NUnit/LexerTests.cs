@@ -143,12 +143,12 @@ namespace XtraLiteTemplates.NUnit
 
             ExpectArgumentNullException("operator", () => lexer.RegisterOperator(null));
 
-            Assert.AreEqual(lexer, lexer.RegisterOperator(NeutralOperator.Standard));
-            Assert.AreEqual(lexer, lexer.RegisterOperator(SumOperator.Standard));
+            Assert.AreEqual(lexer, lexer.RegisterOperator(ArithmeticNeutralOperator.Standard));
+            Assert.AreEqual(lexer, lexer.RegisterOperator(ArithmeticSumOperator.Standard));
             Assert.AreEqual(lexer, lexer.RegisterOperator(new SubscriptOperator("<", ">")));
 
-            ExpectOperatorAlreadyRegisteredException(NeutralOperator.Standard.ToString(), () => lexer.RegisterOperator(NeutralOperator.Standard));
-            ExpectOperatorAlreadyRegisteredException(SumOperator.Standard.ToString(), () => lexer.RegisterOperator(SumOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(ArithmeticNeutralOperator.Standard.ToString(), () => lexer.RegisterOperator(ArithmeticNeutralOperator.Standard));
+            ExpectOperatorAlreadyRegisteredException(ArithmeticSumOperator.Standard.ToString(), () => lexer.RegisterOperator(ArithmeticSumOperator.Standard));
 
             var _ss1 = new SubscriptOperator("+", ")");
             ExpectOperatorAlreadyRegisteredException(_ss1.ToString(), () => lexer.RegisterOperator(_ss1));
@@ -259,7 +259,7 @@ namespace XtraLiteTemplates.NUnit
             var ifTag = new Tag().Keyword("IF").Expression();
             var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(ifTag)
-                .RegisterOperator(EqualsOperator.Pascal);
+                .RegisterOperator(new LogicalEqualsOperator("=", StringComparer.CurrentCulture, new FlexiblePrimitiveTypeConverter());
 
             AssertTagLex(lexer.ReadNext(), 0, 12, ifTag, "IF|True");
             Assert.IsNull(lexer.ReadNext());
@@ -389,7 +389,7 @@ namespace XtraLiteTemplates.NUnit
             var exprTag = new Tag().Expression();
 
             var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
-                .RegisterTag(exprTag).RegisterOperator(SumOperator.Standard);
+                .RegisterTag(exprTag).RegisterOperator(ArithmeticSumOperator.Standard);
 
             ExpectUnbalancedExpressionCannotBeFinalizedException(4, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
         }
@@ -402,7 +402,7 @@ namespace XtraLiteTemplates.NUnit
             var exprTag = new Tag().Expression().Keyword("END");
 
             var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
-                .RegisterTag(exprTag).RegisterOperator(SumOperator.Standard);
+                .RegisterTag(exprTag).RegisterOperator(ArithmeticSumOperator.Standard);
 
             ExpectUnbalancedExpressionCannotBeFinalizedException(5, "END", Token.TokenType.Word, () => lexer.ReadNext());
         }
@@ -456,7 +456,7 @@ namespace XtraLiteTemplates.NUnit
             var exprTag = new Tag().Expression();
 
             var lexer = new Lexer(new Tokenizer(test), StringComparer.Ordinal)
-                .RegisterTag(exprTag).RegisterOperator(ShiftLeftOperator.Pascal);
+                .RegisterTag(exprTag).RegisterOperator(BitwiseShiftLeftOperator.Pascal);
 
             ExpectUnexpectedOrInvalidExpressionTokenException(3, "SHL", Token.TokenType.Word, () => lexer.ReadNext());
         }

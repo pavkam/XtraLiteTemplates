@@ -30,23 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class MultiplyOperator : StandardBinaryOperator
+    public sealed class LogicalNotOperator : StandardUnaryOperator
     {
-        public static BinaryOperator Standard { get; private set; }
-
-        static MultiplyOperator()
-        {
-            Standard = new MultiplyOperator("*");
-        }
-
-        public MultiplyOperator(String symbol)
-            : base(symbol, 3)
+        public LogicalNotOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public LogicalNotOperator(IPrimitiveTypeConverter typeConverter)
+            : base("!", typeConverter)
         {
-            return left * right;
+        }
+
+        public override Object Evaluate(Object arg)
+        {
+            return !TypeConverter.ConvertToBoolean(arg);
         }
     }
 }

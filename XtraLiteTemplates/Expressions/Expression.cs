@@ -40,7 +40,7 @@ namespace XtraLiteTemplates.Expressions
         private ExpressionNode m_current;
         private ExpressionNode m_root;
         private List<Operator> m_supportedOperators;
-        private Func<IExpressionEvaluationContext, Primitive> m_function;
+        private Func<IExpressionEvaluationContext, Object> m_function;
         private Stack<SubscriptNode> m_openGroups;
         private Dictionary<String, UnaryOperator> m_unaryOperatorSymbols;
         private Dictionary<String, BinaryOperator> m_binaryOperatorSymbols;
@@ -193,7 +193,7 @@ namespace XtraLiteTemplates.Expressions
             {
                 ExpressionNode continuationNode = null;
                 if (isLiteral)
-                    continuationNode = new LeafNode(m_current, new Primitive(term), LeafNode.EvaluationType.Literal);
+                    continuationNode = new LeafNode(m_current, term, LeafNode.EvaluationType.Literal);
                 else
                 {
                     var _symbol = (String)term;
@@ -371,70 +371,6 @@ namespace XtraLiteTemplates.Expressions
                 return "??";
             else
                 return m_root.ToString(style);
-        }
-
-        public static Expression CreateStandardC()
-        {
-            var expression = new Expression(StringComparer.Ordinal);
-
-            expression.RegisterOperator(SubscriptOperator.Standard);
-            expression.RegisterOperator(MemberAccessOperator.C);
-
-            expression.RegisterOperator(OrOperator.C);
-            expression.RegisterOperator(AndOperator.C);
-            expression.RegisterOperator(NotOperator.C);
-            expression.RegisterOperator(ShiftLeftOperator.C);
-            expression.RegisterOperator(ShiftRightOperator.C);
-            expression.RegisterOperator(XorOperator.C);
-
-            expression.RegisterOperator(EqualsOperator.C);
-            expression.RegisterOperator(NotEqualsOperator.C);
-            expression.RegisterOperator(GreaterThanOperator.Standard);
-            expression.RegisterOperator(GreaterThanOrEqualsOperator.Standard);
-            expression.RegisterOperator(LowerThanOperator.Standard);
-            expression.RegisterOperator(LowerThanOrEqualsOperator.Standard);
-
-            expression.RegisterOperator(NeutralOperator.Standard);
-            expression.RegisterOperator(NegateOperator.Standard);
-            expression.RegisterOperator(ModuloOperator.C);
-            expression.RegisterOperator(DivideOperator.Standard);
-            expression.RegisterOperator(MultiplyOperator.Standard);
-            expression.RegisterOperator(SubtractOperator.Standard);
-            expression.RegisterOperator(SumOperator.Standard);
-
-            return expression;
-        }
-
-        public static Expression CreateStandardPascal()
-        {
-            var expression = new Expression(StringComparer.OrdinalIgnoreCase);
-
-            expression.RegisterOperator(SubscriptOperator.Standard);
-            expression.RegisterOperator(MemberAccessOperator.Pascal);
-
-            expression.RegisterOperator(OrOperator.Pascal);
-            expression.RegisterOperator(AndOperator.Pascal);
-            expression.RegisterOperator(NotOperator.Pascal);
-            expression.RegisterOperator(ShiftLeftOperator.Pascal);
-            expression.RegisterOperator(ShiftRightOperator.Pascal);
-            expression.RegisterOperator(XorOperator.Pascal);
-
-            expression.RegisterOperator(EqualsOperator.Pascal);
-            expression.RegisterOperator(NotEqualsOperator.Pascal);
-            expression.RegisterOperator(GreaterThanOperator.Standard);
-            expression.RegisterOperator(GreaterThanOrEqualsOperator.Standard);
-            expression.RegisterOperator(LowerThanOperator.Standard);
-            expression.RegisterOperator(LowerThanOrEqualsOperator.Standard);
-
-            expression.RegisterOperator(NeutralOperator.Standard);
-            expression.RegisterOperator(NegateOperator.Standard);
-            expression.RegisterOperator(ModuloOperator.Pascal);
-            expression.RegisterOperator(DivideOperator.Standard);
-            expression.RegisterOperator(MultiplyOperator.Standard);
-            expression.RegisterOperator(SubtractOperator.Standard);
-            expression.RegisterOperator(SumOperator.Standard);
-
-            return expression;
         }
     }
 }

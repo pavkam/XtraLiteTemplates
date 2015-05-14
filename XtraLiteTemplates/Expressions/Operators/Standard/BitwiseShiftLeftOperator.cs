@@ -30,16 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public abstract class StandardUnaryOperator : UnaryOperator
+    public sealed class BitwiseShiftLeftOperator : StandardBinaryOperator
     {
-        protected IPrimitiveTypeConverter TypeConverter { get; private set; }
-
-        protected StandardUnaryOperator(String symbol, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, false)
+        public BitwiseShiftLeftOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 5, typeConverter)
         {
-            Expect.NotNull("typeConverter", typeConverter);
+        }
 
-            TypeConverter = typeConverter;
+        public BitwiseShiftLeftOperator(IPrimitiveTypeConverter typeConverter)
+            : this("<<", typeConverter)
+        {
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            return TypeConverter.ConvertToInteger(left) << TypeConverter.ConvertToInteger(right);
         }
     }
 }

@@ -30,24 +30,27 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class NeutralOperator : StandardUnaryOperator
+    public sealed class LogicalOrOperator : StandardBinaryOperator
     {
-        public static UnaryOperator Standard { get; private set; }
-
-
-        static NeutralOperator()
-        {
-            Standard = new NeutralOperator("+");
-        }
-
-        public NeutralOperator(String symbol)
-            : base(symbol)
+        public LogicalOrOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 12, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive arg)
+        public LogicalOrOperator(IPrimitiveTypeConverter typeConverter)
+            : this("||", typeConverter)
         {
-            return +arg;
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            return TypeConverter.ConvertToBoolean(left) || TypeConverter.ConvertToBoolean(right);
+        }
+
+        public override Boolean EvaluateLhs(Object left, out Object result)
+        {
+            result = true;
+            return (TypeConverter.TypeOf(left) == PrimitiveType.Boolean && TypeConverter.ConvertToBoolean(left) == true);
         }
     }
 }

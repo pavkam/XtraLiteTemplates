@@ -30,42 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class AndOperator : StandardBinaryOperator
+    public sealed class ArithmeticModuloOperator : StandardBinaryOperator
     {
-        public static BinaryOperator C { get; private set; }
-
-        public static BinaryOperator Pascal { get; private set; }
-
-        static AndOperator()
-        {
-            C = new AndOperator("&");
-            Pascal = new AndOperator("and");
-        }
-
-        public AndOperator(String symbol)
-            : base(symbol, 8)
+        public ArithmeticModuloOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 3, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public ArithmeticModuloOperator(IPrimitiveTypeConverter typeConverter)
+            : this("%", typeConverter)
         {
-            return left & right;
         }
 
-        public override Boolean SupportsLhsShortCircuit
+        public override Object Evaluate(Object left, Object right)
         {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override Primitive Evaluate(Primitive arg)
-        {
-            if (arg.AsBoolean() == false)
-                return false;
-            else
-                return null;
+            return TypeConverter.ConvertToInteger(left) % TypeConverter.ConvertToInteger(right);
         }
     }
 }

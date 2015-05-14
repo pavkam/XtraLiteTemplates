@@ -30,23 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class DivideOperator : StandardBinaryOperator
+    public sealed class ArithmeticNeutralOperator : StandardUnaryOperator
     {
-        public static BinaryOperator Standard { get; private set; }
-
-        static DivideOperator()
-        {
-            Standard = new DivideOperator("/");
-        }
-
-        public DivideOperator(String symbol)
-            : base(symbol, 3)
+        public ArithmeticNeutralOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public ArithmeticNeutralOperator(IPrimitiveTypeConverter typeConverter)
+            : base("+", typeConverter)
         {
-            return left / right;
+        }
+
+        public override Object Evaluate(Object arg)
+        {
+            return TypeConverter.ConvertToNumber(arg);
         }
     }
 }

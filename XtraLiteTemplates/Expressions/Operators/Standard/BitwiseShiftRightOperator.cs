@@ -30,26 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class ModuloOperator : StandardBinaryOperator
+    public sealed class BitwiseShiftRightOperator : StandardBinaryOperator
     {
-        public static BinaryOperator C { get; private set; }
-
-        public static BinaryOperator Pascal { get; private set; }
-
-        static ModuloOperator()
-        {
-            C = new ModuloOperator("%");
-            Pascal = new ModuloOperator("mod");
-        }
-
-        public ModuloOperator(String symbol)
-            : base(symbol, 3)
+        public BitwiseShiftRightOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 5, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public BitwiseShiftRightOperator(IPrimitiveTypeConverter typeConverter)
+            : this(">>", typeConverter)
         {
-            return left % right;
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            return TypeConverter.ConvertToInteger(left) >> TypeConverter.ConvertToInteger(right);
         }
     }
 }

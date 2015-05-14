@@ -36,6 +36,8 @@ namespace XtraLiteTemplates.Expressions.Operators
             : base(symbol, 1, expectRhsIdentifier) 
         {
         }
+
+        public abstract Object Evaluate(Object arg);
     }
 }
 

@@ -75,23 +75,23 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentNullException("directive", () => interpreter.RegisterDirective(null));
             ExpectArgumentNullException("operator", () => interpreter.RegisterOperator(null));
 
-            interpreter.RegisterOperator(new NeutralOperator("A"));
-            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new NeutralOperator("A")));
-            interpreter.RegisterOperator(new SumOperator("A"));
-            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new SumOperator("A")));
+            interpreter.RegisterOperator(new ArithmeticNeutralOperator("A"));
+            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("A")));
+            interpreter.RegisterOperator(new ArithmeticSumOperator("A"));
+            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new ArithmeticSumOperator("A")));
             interpreter.RegisterOperator(new SubscriptOperator("O", "C"));
             ExpectOperatorAlreadyRegisteredException("OC", () => interpreter.RegisterOperator(new SubscriptOperator("O", "C")));
             ExpectOperatorAlreadyRegisteredException("AM", () => interpreter.RegisterOperator(new SubscriptOperator("A", "M")));
 
-            interpreter.RegisterOperator(new SumOperator("L"));
+            interpreter.RegisterOperator(new ArithmeticSumOperator("L"));
             ExpectOperatorAlreadyRegisteredException("KL", () => interpreter.RegisterOperator(new SubscriptOperator("K", "L")));
-            interpreter.RegisterOperator(new NeutralOperator("L"));
+            interpreter.RegisterOperator(new ArithmeticNeutralOperator("L"));
 
             interpreter.RegisterOperator(new SubscriptOperator("W", "V"));
-            ExpectOperatorAlreadyRegisteredException("W", () => interpreter.RegisterOperator(new NeutralOperator("W")));
-            ExpectOperatorAlreadyRegisteredException("V", () => interpreter.RegisterOperator(new SumOperator("V")));
-            interpreter.RegisterOperator(new NeutralOperator("V"));
-            interpreter.RegisterOperator(new SumOperator("W"));
+            ExpectOperatorAlreadyRegisteredException("W", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("W")));
+            ExpectOperatorAlreadyRegisteredException("V", () => interpreter.RegisterOperator(new ArithmeticSumOperator("V")));
+            interpreter.RegisterOperator(new ArithmeticNeutralOperator("V"));
+            interpreter.RegisterOperator(new ArithmeticSumOperator("W"));
 
             var d1 = new RippedOpenDirective(Tag.Parse("HELLO"));
             var d2 = new RippedOpenDirective(Tag.Parse("WORLD"));

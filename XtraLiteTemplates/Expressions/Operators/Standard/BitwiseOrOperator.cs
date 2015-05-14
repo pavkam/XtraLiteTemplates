@@ -30,23 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class NegateOperator : StandardUnaryOperator
+    public sealed class BitwiseOrOperator : StandardBinaryOperator
     {
-        public static UnaryOperator Standard { get; private set; }
-
-        static NegateOperator()
-        {
-            Standard = new NegateOperator("-");
-        }
-
-        public NegateOperator(String symbol)
-            : base(symbol)
+        public BitwiseOrOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 10, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive arg)
+        public BitwiseOrOperator(IPrimitiveTypeConverter typeConverter)
+            : this("|", typeConverter)
         {
-            return -arg;
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            return TypeConverter.ConvertToInteger(left) | TypeConverter.ConvertToInteger(right);
         }
     }
 }

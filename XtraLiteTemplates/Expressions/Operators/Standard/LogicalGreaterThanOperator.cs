@@ -29,27 +29,28 @@
 namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
+    using System.Collections.Generic;
 
-    public sealed class NotEqualsOperator : StandardBinaryOperator
+    public sealed class LogicalGreaterThanOperator : StandardLogicalComparisonOperator
     {
-        public static BinaryOperator C { get; private set; }
-
-        public static BinaryOperator Pascal { get; private set; }
-
-        static NotEqualsOperator()
-        {
-            C = new NotEqualsOperator("!=");
-            Pascal = new NotEqualsOperator("<>");
-        }
-
-        public NotEqualsOperator(String symbol)
-            : base(symbol, 7)
+        public LogicalGreaterThanOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 6, stringComparer, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public LogicalGreaterThanOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : this("!=", stringComparer, typeConverter)
         {
-            return left != right;
+        }
+
+        public LogicalGreaterThanOperator(IPrimitiveTypeConverter typeConverter)
+            : this(System.StringComparer.CurrentCulture, typeConverter)
+        {
+        }
+
+        public override Boolean Evaluate(Int32 relation, Object left, Object right)
+        {
+            return relation > 0;
         }
     }
 }

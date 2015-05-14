@@ -32,13 +32,6 @@ namespace XtraLiteTemplates.Expressions.Operators
 
     public class SubscriptOperator : Operator
     {
-        public static SubscriptOperator Standard { get; private set; }
-
-        static SubscriptOperator()
-        {
-            Standard = new SubscriptOperator("(", ")");
-        }
-
         public String Terminator { get; private set; }
 
         public SubscriptOperator(String symbol, String terminator)
@@ -50,9 +43,9 @@ namespace XtraLiteTemplates.Expressions.Operators
             Terminator = terminator;
         }
 
-        public override Primitive Evaluate(Primitive arg)
+        public SubscriptOperator()
+            : this("(", ")")
         {
-            return arg;
         }
 
         public override String ToString()

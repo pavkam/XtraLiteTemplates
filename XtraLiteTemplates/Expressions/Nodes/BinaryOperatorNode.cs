@@ -58,12 +58,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
             var leafLeft = LeftNode as LeafNode;
             if (leafLeft != null && leafLeft.Evaluation == LeafNode.EvaluationType.Literal)
             {
-                if (Operator.SupportsLhsShortCircuit)
-                {
-                    var reducedByLeft = Operator.Evaluate(leafLeft.Operand);
-                    if (reducedByLeft.Value != null)
-                        return new LeafNode(Parent, reducedByLeft, LeafNode.EvaluationType.Literal);
-                }
+                Object reducedByLeft;
+                if (Operator.EvaluateLhs(leafLeft.Operand, out reducedByLeft))
+                    return new LeafNode(Parent, reducedByLeft, LeafNode.EvaluationType.Literal);
 
                 /* Right side. */
                 var leafRight = RightNode as LeafNode;
@@ -74,21 +71,20 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return this;
         }
 
-        public override Func<IExpressionEvaluationContext, Primitive> Build()
+        public override Func<IExpressionEvaluationContext, Object> Build()
         {
             var leftFunc = LeftNode.Build();
             var rightFunc = RightNode.Build();
+
             return (context) =>
             {
                 var left = leftFunc(context);
-                if (Operator.SupportsLhsShortCircuit)
-                {
-                    var evaluatedByLeft = Operator.Evaluate(left);
-                    if (evaluatedByLeft.Value != null)
-                        return evaluatedByLeft;
-                }
+                Object evaluatedByLeft;
 
-                return Operator.Evaluate(left, rightFunc(context));
+                if (Operator.EvaluateLhs(left, out evaluatedByLeft))
+                    return evaluatedByLeft;
+                else
+                    return Operator.Evaluate(left, rightFunc(context));
             };
         }
 

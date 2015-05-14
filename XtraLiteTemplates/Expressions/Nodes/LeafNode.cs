@@ -44,14 +44,14 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Indentifier,
         }
 
-        public Primitive Operand { get; private set; }
+        public Object Operand { get; private set; }
 
         public EvaluationType Evaluation { get; private set; }
 
-        public LeafNode(ExpressionNode parent, Primitive operand, EvaluationType type)
+        public LeafNode(ExpressionNode parent, Object operand, EvaluationType type)
             : base(parent)
         {
-            Debug.Assert(type == EvaluationType.Literal || operand.Value is String);
+            Debug.Assert(type == EvaluationType.Literal || operand is String);
 
             Operand = operand;
             Evaluation = type;
@@ -60,16 +60,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
         public override String ToString(ExpressionFormatStyle style)
         {
             if (Evaluation == EvaluationType.Indentifier)
-                return (String)Operand.Value;
+                return (String)Operand;
             else if (Evaluation == EvaluationType.Variable)
                 return String.Format("@{0}", Operand);
-            else if (Operand.Value is String)
+            else if (Operand is String)
             {
                 using (var writer = new StringWriter())
                 {
                     using (var provider = CodeDomProvider.CreateProvider("CSharp"))
                     {
-                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand.Value), writer, null);
+                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand), writer, null);
                         return writer.ToString();
                     }
                 }
@@ -84,10 +84,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Evaluation = EvaluationType.Indentifier;
         }
 
-        public override Func<IExpressionEvaluationContext, Primitive> Build()
+        public override Func<IExpressionEvaluationContext, Object> Build()
         {
             if (Evaluation == EvaluationType.Variable)
-                return (IExpressionEvaluationContext context) => new Primitive(context.GetVariable((String)Operand.Value));
+                return (IExpressionEvaluationContext context) => context.GetVariable((String)Operand);
             else
                 return (IExpressionEvaluationContext context) => Operand;
         }

@@ -29,44 +29,32 @@
 namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
+    using System.Collections.Generic;
 
-    public sealed class OrOperator : StandardBinaryOperator
+    public abstract class StandardLogicalComparisonOperator : StandardBinaryOperator
     {
-        public static BinaryOperator C { get; private set; }
+        public IComparer<String> StringComparer { get; private set; }
 
-        public static BinaryOperator Pascal { get; private set; }
-
-        static OrOperator()
+        public StandardLogicalComparisonOperator(String symbol, Int32 precedence, 
+            IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, precedence, typeConverter)
         {
-            C = new OrOperator("|");
-            Pascal = new OrOperator("or");
+            Expect.NotNull("stringComparer", stringComparer);
+            StringComparer = stringComparer;
         }
 
-        public OrOperator(String symbol)
-            : base(symbol, 10)
+        public sealed override Object Evaluate(Object left, Object right)
         {
-        }
-
-        public override Primitive Evaluate(Primitive left, Primitive right)
-        {
-            return left | right;
-        }
-
-        public override Boolean SupportsLhsShortCircuit
-        {
-            get
-            {
-                return true;
-            }
-        }
-
-        public override Primitive Evaluate(Primitive arg)
-        {
-            if (arg.AsBoolean() == true)
-                return true;
+            Int32 relation;
+            if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)
+                relation = StringComparer.Compare(TypeConverter.ConvertToString(left), TypeConverter.ConvertToString(right));
             else
-                return null;
+                relation = TypeConverter.ConvertToNumber(left).CompareTo(TypeConverter.ConvertToNumber(right));
+
+            return Evaluate(relation, left, right);
         }
+
+        public abstract Boolean Evaluate(Int32 relation, Object left, Object right);
     }
 }
 

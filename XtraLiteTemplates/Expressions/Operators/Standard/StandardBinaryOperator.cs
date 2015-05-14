@@ -32,9 +32,14 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public abstract class StandardBinaryOperator : BinaryOperator
     {
-        protected StandardBinaryOperator(String symbol, Int32 precedence)
+        protected IPrimitiveTypeConverter TypeConverter { get; private set; }
+
+        protected StandardBinaryOperator(String symbol, Int32 precedence, IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, Associativity.LeftToRight, false, false)
         {
+            Expect.NotNull("typeConverter", typeConverter);
+
+            TypeConverter = typeConverter;
         }
     }
 }

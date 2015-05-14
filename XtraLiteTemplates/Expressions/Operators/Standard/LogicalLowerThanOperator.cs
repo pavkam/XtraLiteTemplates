@@ -29,17 +29,28 @@
 namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
+    using System.Collections.Generic;
 
-    public abstract class StandardUnaryOperator : UnaryOperator
+    public sealed class LogicalLowerThanOperator : StandardLogicalComparisonOperator
     {
-        protected IPrimitiveTypeConverter TypeConverter { get; private set; }
-
-        protected StandardUnaryOperator(String symbol, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, false)
+        public LogicalLowerThanOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 6, stringComparer, typeConverter)
         {
-            Expect.NotNull("typeConverter", typeConverter);
+        }
 
-            TypeConverter = typeConverter;
+        public LogicalLowerThanOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : this("!=", stringComparer, typeConverter)
+        {
+        }
+
+        public LogicalLowerThanOperator(IPrimitiveTypeConverter typeConverter)
+            : this(System.StringComparer.CurrentCulture, typeConverter)
+        {
+        }
+
+        public override Boolean Evaluate(Int32 relation, Object left, Object right)
+        {
+            return relation < 0;
         }
     }
 }

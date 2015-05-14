@@ -30,26 +30,27 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class EqualsOperator : StandardBinaryOperator
+    public sealed class LogicalAndOperator : StandardBinaryOperator
     {
-        public static BinaryOperator C { get; private set; }
-
-        public static BinaryOperator Pascal { get; private set; }
-
-        static EqualsOperator()
-        {
-            C = new EqualsOperator("==");
-            Pascal = new EqualsOperator("=");
-        }
-
-        public EqualsOperator(String symbol)
-            : base(symbol, 7)
+        public LogicalAndOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 11, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public LogicalAndOperator(IPrimitiveTypeConverter typeConverter)
+            : this("&&", typeConverter)
         {
-            return left == right;
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            return TypeConverter.ConvertToBoolean(left) && TypeConverter.ConvertToBoolean(right);
+        }
+
+        public override Boolean EvaluateLhs(Object left, out Object result)
+        {
+            result = false;
+            return (TypeConverter.TypeOf(left) == PrimitiveType.Boolean && TypeConverter.ConvertToBoolean(left) == false);
         }
     }
 }

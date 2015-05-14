@@ -38,7 +38,6 @@ namespace XtraLiteTemplates.Expressions.Operators
 
         public Boolean ExpectRhsIdentifier { get; private set; }
 
-
         protected Operator(String symbol, Int32 precedence, Boolean expectRhsIdentifier)
         {
             Expect.NotEmpty("symbol", symbol);
@@ -48,8 +47,6 @@ namespace XtraLiteTemplates.Expressions.Operators
             Symbol = symbol;
             Precedence = precedence;
         }
-
-        public abstract Primitive Evaluate(Primitive arg);
 
         public override String ToString()
         {
@@ -67,6 +64,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         {
             return Symbol.GetHashCode();
         }
+
     }
 }
 

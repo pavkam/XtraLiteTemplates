@@ -46,19 +46,12 @@ namespace XtraLiteTemplates.Expressions.Operators
             Associativity = associativity;
         }
 
-        public abstract Primitive Evaluate(Primitive left, Primitive right);
+        public abstract Object Evaluate(Object left, Object right);
 
-        public override Primitive Evaluate(Primitive arg)
+        public virtual Boolean EvaluateLhs(Object left, out Object result)
         {
-            return arg;
-        }
-
-        public virtual Boolean SupportsLhsShortCircuit
-        {
-            get
-            {
-                return false;
-            }
+            result = null;
+            return false;
         }
     }
 }

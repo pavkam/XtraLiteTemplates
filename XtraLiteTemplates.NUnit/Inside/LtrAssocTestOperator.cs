@@ -39,10 +39,9 @@ namespace XtraLiteTemplates.NUnit.Inside
         {
         }
 
-        public override Boolean Evaluate(Object left, Object right, out Object result)
+        public override Object Evaluate(Object left, Object right)
         {
-            result = String.Format("{0},{1}", left, right);
-            return true;
+            return String.Format("{0},{1}", left, right);
         }
     }
 }

@@ -30,23 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class SubtractOperator : StandardBinaryOperator
+    public sealed class BitwiseAndOperator : StandardBinaryOperator
     {
-        public static BinaryOperator Standard { get; private set; }
-
-        static SubtractOperator()
-        {
-            Standard = new SubtractOperator("-");
-        }
-
-        public SubtractOperator(String symbol)
-            : base(symbol, 4)
+        public BitwiseAndOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 9, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public BitwiseAndOperator(IPrimitiveTypeConverter typeConverter)
+            : this("&", typeConverter)
         {
-            return left - right;
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            return TypeConverter.ConvertToInteger(left) & TypeConverter.ConvertToInteger(right);
         }
     }
 }

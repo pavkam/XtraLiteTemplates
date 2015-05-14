@@ -42,9 +42,26 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
-        internal SubscriptNode(ExpressionNode parent, SubscriptOperator @operator)
+        public SubscriptNode(ExpressionNode parent, SubscriptOperator @operator)
             : base(parent, @operator)
         {
+        }
+
+        public override Func<IExpressionEvaluationContext, Object> Build()
+        {
+            return RightNode.Build();
+        }
+
+        public override ExpressionNode Reduce()
+        {
+            /* Right side. */
+            RightNode = RightNode as LeafNode ?? RightNode.Reduce();
+            var leafRight = RightNode as LeafNode;
+
+            if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal)
+                return leafRight;
+            else
+                return this;
         }
 
         public override String ToString(ExpressionFormatStyle style)

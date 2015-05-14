@@ -30,16 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public abstract class StandardUnaryOperator : UnaryOperator
+    public sealed class ArithmeticNegateOperator : StandardUnaryOperator
     {
-        protected IPrimitiveTypeConverter TypeConverter { get; private set; }
-
-        protected StandardUnaryOperator(String symbol, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, false)
+        public ArithmeticNegateOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, typeConverter)
         {
-            Expect.NotNull("typeConverter", typeConverter);
+        }
 
-            TypeConverter = typeConverter;
+        public ArithmeticNegateOperator(IPrimitiveTypeConverter typeConverter)
+            : base("-", typeConverter)
+        {
+        }
+
+        public override Object Evaluate(Object arg)
+        {
+            return - TypeConverter.ConvertToNumber(arg);
         }
     }
 }

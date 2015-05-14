@@ -45,24 +45,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
             Operator = @operator;
         }
-
-        public override Func<IExpressionEvaluationContext, Primitive> Build()
-        {
-            var childFunc = RightNode.Build();
-            return (context) => Operator.Evaluate(childFunc(context));
-        }
-
-        public override ExpressionNode Reduce()
-        {
-            /* Right side. */
-            RightNode = RightNode as LeafNode ?? RightNode.Reduce();
-            var leafRight = RightNode as LeafNode;
-
-            if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal)
-                return new LeafNode(Parent, Operator.Evaluate(leafRight.Operand), LeafNode.EvaluationType.Literal);
-            else
-                return this;
-        }
     }
 }
 

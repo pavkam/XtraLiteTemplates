@@ -30,26 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class XorOperator : StandardBinaryOperator
+    public sealed class ArithmeticSubtractOperator : StandardBinaryOperator
     {
-        public static BinaryOperator C { get; private set; }
-
-        public static BinaryOperator Pascal { get; private set; }
-
-        static XorOperator()
-        {
-            C = new XorOperator("^");
-            Pascal = new XorOperator("xor");
-        }
-
-        public XorOperator(String symbol)
-            : base(symbol, 9)
+        public ArithmeticSubtractOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 4, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public ArithmeticSubtractOperator(IPrimitiveTypeConverter typeConverter)
+            : this("-", typeConverter)
         {
-            return left ^ right;
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            return TypeConverter.ConvertToNumber(left) - TypeConverter.ConvertToNumber(right);
         }
     }
 }

@@ -30,23 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class GreaterThanOperator : StandardBinaryOperator
+    public sealed class ArithmeticMultiplyOperator : StandardBinaryOperator
     {
-        public static BinaryOperator Standard { get; private set; }
-
-        static GreaterThanOperator()
-        {
-            Standard = new GreaterThanOperator(">");
-        }
-
-        public GreaterThanOperator(String symbol)
-            : base(symbol, 6)
+        public ArithmeticMultiplyOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 3, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public ArithmeticMultiplyOperator(IPrimitiveTypeConverter typeConverter)
+            : this("*", typeConverter)
         {
-            return left > right;
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            return TypeConverter.ConvertToNumber(left) * TypeConverter.ConvertToNumber(right);
         }
     }
 }

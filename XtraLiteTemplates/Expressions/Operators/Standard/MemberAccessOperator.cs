@@ -35,17 +35,7 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 
     public sealed class MemberAccessOperator : BinaryOperator
     {
-        public static MemberAccessOperator C { get; private set; }
-
-        public static MemberAccessOperator Pascal { get; private set; }
-
         public IEqualityComparer<String> Comparer { get; private set; }
-
-        static MemberAccessOperator()
-        {
-            C = new MemberAccessOperator(".", StringComparer.Ordinal);
-            Pascal = new MemberAccessOperator(".", StringComparer.OrdinalIgnoreCase);
-        }
 
         public MemberAccessOperator(String symbol, IEqualityComparer<String> comparer)
             : base(symbol, 0, Associativity.LeftToRight, false, true)
@@ -54,19 +44,24 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
             Comparer = comparer;
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public MemberAccessOperator(IEqualityComparer<String> comparer)
+            : this(".", comparer)
         {
-            var memberName = right.AsString();
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            var memberName = right as String;
             Debug.Assert(memberName != null);
 
-            if (left.Value != null)
+            if (left != null)
             {
-                foreach (var property in left.Value.GetType().GetProperties())
+                foreach (var property in left.GetType().GetProperties())
                 {
                     if (!property.CanRead || property.GetIndexParameters().Length > 0 || !Comparer.Equals(property.Name, memberName))
                         continue;
                     
-                    return new Primitive(property.GetValue(left.Value));
+                    return property.GetValue(left);
                 }
             }
 

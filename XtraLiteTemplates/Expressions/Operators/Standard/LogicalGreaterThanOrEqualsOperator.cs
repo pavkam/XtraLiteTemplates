@@ -29,24 +29,28 @@
 namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
+    using System.Collections.Generic;
 
-    public sealed class GreaterThanOrEqualsOperator : StandardBinaryOperator
+    public sealed class LogicalGreaterThanOrEqualsOperator : StandardLogicalComparisonOperator
     {
-        public static BinaryOperator Standard { get; private set; }
-
-        static GreaterThanOrEqualsOperator()
-        {
-            Standard = new GreaterThanOrEqualsOperator(">=");
-        }
-
-        public GreaterThanOrEqualsOperator(String symbol)
-            : base(symbol, 6)
+        public LogicalGreaterThanOrEqualsOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 6, stringComparer, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public LogicalGreaterThanOrEqualsOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+            : this("!=", stringComparer, typeConverter)
         {
-            return left >= right;
+        }
+
+        public LogicalGreaterThanOrEqualsOperator(IPrimitiveTypeConverter typeConverter)
+            : this(System.StringComparer.CurrentCulture, typeConverter)
+        {
+        }
+
+        public override Boolean Evaluate(Int32 relation, Object left, Object right)
+        {
+            return relation >= 0;
         }
     }
 }

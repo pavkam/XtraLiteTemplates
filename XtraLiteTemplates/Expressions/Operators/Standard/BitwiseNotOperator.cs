@@ -30,26 +30,21 @@ namespace XtraLiteTemplates.Expressions.Operators.Standard
 {
     using System;
 
-    public sealed class ShiftLeftOperator : StandardBinaryOperator
+    public sealed class BitwiseNotOperator : StandardUnaryOperator
     {
-        public static BinaryOperator C { get; private set; }
-
-        public static BinaryOperator Pascal { get; private set; }
-
-        static ShiftLeftOperator()
-        {
-            C = new ShiftLeftOperator("<<");
-            Pascal = new ShiftLeftOperator("shl");
-        }
-
-        public ShiftLeftOperator(String symbol)
-            : base(symbol, 5)
+        public BitwiseNotOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, typeConverter)
         {
         }
 
-        public override Primitive Evaluate(Primitive left, Primitive right)
+        public BitwiseNotOperator(IPrimitiveTypeConverter typeConverter)
+            : base("~", typeConverter)
         {
-            return left << (Int32)right.AsNumber();
+        }
+
+        public override Object Evaluate(Object arg)
+        {
+            return ~TypeConverter.ConvertToInteger(arg);
         }
     }
 }
