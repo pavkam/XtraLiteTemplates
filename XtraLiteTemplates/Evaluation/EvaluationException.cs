@@ -35,14 +35,9 @@ namespace XtraLiteTemplates.Evaluation
 
     public class EvaluationException : InvalidOperationException
     {
-        public Directive Directive { get; private set; }
-
-        internal EvaluationException(Exception innerException, Directive directive, String format, params Object[] args)
+        internal EvaluationException(Exception innerException, String format, params Object[] args)
             : base(String.Format(format, args), innerException)
         {
-            Debug.Assert(directive != null);
-
-            Directive = directive;
         }
     }
 }

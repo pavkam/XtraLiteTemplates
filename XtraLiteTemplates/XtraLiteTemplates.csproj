@@ -32,13 +32,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Evaluation\Directives\Standard\StandardDirective.cs" />
+    <Compile Include="Evaluation\StandardEvaluationContext.cs" />
     <Compile Include="Evaluation\IVariableContext.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Expressions\IVariableProvider.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\Nodes\OperatorNode.cs" />
     <Compile Include="Expressions\Operators\Standard\IntegerRangeOperator.cs" />
-    <Compile Include="Expressions\Operators\Standard\FlexiblePrimitiveTypeConverter.cs" />
     <Compile Include="Expressions\Operators\Standard\BitwiseAndOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\BitwiseOrOperator.cs" />
     <Compile Include="Expressions\Operators\Standard\BitwiseNotOperator.cs" />
@@ -81,6 +81,7 @@
     <Compile Include="Evaluation\TemplateNode.cs" />
     <Compile Include="Evaluation\Directives\Directive.cs" />
     <Compile Include="Evaluation\Interpreter.cs" />
+    <Compile Include="Language.cs" />
     <Compile Include="Parsing\TagLex.cs" />
     <Compile Include="Parsing\UnparsedLex.cs" />
     <Compile Include="Parsing\Lex.cs" />

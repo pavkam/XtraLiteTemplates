@@ -67,7 +67,7 @@ namespace XtraLiteTemplates.Evaluation
             Debug.Assert(Children.Count > 0);
             Debug.Assert(m_directives.Length == 1);
 
-            context.PushFrame();
+            context.OpenEvaluationFrame();
 
             var directiveComponentIndex = 0;
             var tagIndex = 0;
@@ -143,7 +143,7 @@ namespace XtraLiteTemplates.Evaluation
                 }
             }
 
-            context.PopFrame();
+            context.CloseEvaluationFrame();
         }
 
         public Boolean SelectDirective(Int32 presenceIndex, Tag tag, IEqualityComparer<String> comparer)

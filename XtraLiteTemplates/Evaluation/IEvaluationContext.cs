@@ -38,7 +38,7 @@ namespace XtraLiteTemplates.Evaluation
         Boolean IgnoreEvaluationExceptions { get; }
         String ProcessUnparsedText(String value);
 
-        void PushFrame();
-        void PopFrame();
+        void OpenEvaluationFrame();
+        void CloseEvaluationFrame();
     }
 }

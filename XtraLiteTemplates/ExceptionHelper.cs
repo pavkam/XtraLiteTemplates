@@ -170,7 +170,19 @@ namespace XtraLiteTemplates
             Debug.Assert(directive != null);
             Debug.Assert(exception != null);
 
-            throw new EvaluationException(exception, directive, "Evaluation of directive {0} resulted in an error: {1}", directive, exception.Message);
+            throw new EvaluationException(exception, "Evaluation of directive {0} resulted in an error: {1}", directive, exception.Message);
+        }
+
+        internal static void DepletedVariableFrames()
+        {
+            throw new EvaluationException(null, "The current evaluation context has no open variable frames.");
+        }
+
+        internal static void UndefinedVariable(String identifier)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(identifier));
+
+            throw new EvaluationException(null, "Attempted to read a non-existent variable: '{0}'.");
         }
     }
 }

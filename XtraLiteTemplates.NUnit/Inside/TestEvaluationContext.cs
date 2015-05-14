@@ -88,13 +88,13 @@ namespace XtraLiteTemplates.NUnit.Inside
         }
 
 
-        public void PushFrame()
+        public void OpenEvaluationFrame()
         {
             var newFrame = new Dictionary<String, Object>(m_variableFrames.Peek(), m_variableFrames.Peek().Comparer);
             m_variableFrames.Push(newFrame);
         }
 
-        public void PopFrame()
+        public void CloseEvaluationFrame()
         {
             Assert.Greater(m_variableFrames.Count, 1);
             m_variableFrames.Pop();
