@@ -44,7 +44,7 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
         }
 
         public IfDirective(IPrimitiveTypeConverter typeConverter)
-            : this("IF $ THEN", "END IF", typeConverter)
+            : this("IF $ THEN", "END", typeConverter)
         {
         }
 

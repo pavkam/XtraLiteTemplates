@@ -44,40 +44,36 @@ namespace XtraLiteTemplates.NUnit
     public class XLTemplateTests : TestBase
     {
         [Test]
-        public void TestCaseEvaluationSingleTagDirective()
+        public void TestCaseCaseSensitiveInvariantCulture()
         {
-            var dialect = new StandardDialect(CultureInfo.CurrentCulture, 
-                StringComparer.InvariantCulture);
+            const String text = @"
+{REPEAT 20.1 TIMES}={END}{'  '}
+    {FOR EACH index IN 0 : 100}
+        {IF index % 10.2 == 0 then}
+            {index / 10 + ': '}
+            {' ' + var1 + ' ' IF INDEX%20 == 0}
+            {' ' + VAR2 + ' ' IF index%30 == 0}
+            {if (inDex/10) % 2 == 0 THEN}
+                {' EVEN'}
+            {else}
+                {' ODD'}
+            {END} -- 
 
-            var template = new XLTemplate(dialect, "{IF 10 > 2 THEN}YES{END IF}");
-            var result = template.Evaluate(new Dictionary<String, Object>());
+            
+        {end}
+    {END}
+{'  '}{REPEAT 20.19 times}={END}
+";
+            var variables = new Dictionary<String, Object>()
+            {
+                { "var1", "<+>" },
+                { "var2", ">-<" },
+            };
 
-            Assert.AreEqual("YES", result);
-        }
+            var template = new XLTemplate(StandardDialect.OrdinalIgnoreCase, text.Replace("'", "\""));
+            var result = template.Evaluate(variables);
 
-        [Test]
-        public void TestCaseEvaluationSingleTagDirective11()
-        {
-            var result = XLTemplate.Evaluate("{IF 10 > 2 THEN}YES{END IF}");
-            Assert.AreEqual("YES", result);
-        }
-
-        [Test]
-        public void TestCaseEvaluationSingleTagDirective12()
-        {
-            var result = XLTemplate.Evaluate("{name}'s age is {AGE}!", 
-                Tuple.Create<String, Object>("name", "John"),
-                Tuple.Create<String, Object>("age", 30));
-
-            Assert.AreEqual("John's age is 30!", result);
-        }
-
-        [Test]
-        public void TestCaseEvaluationSingleTagDirective132()
-        {
-            var result = XLTemplate.Evaluate("{if true then}write me{end if}");
-
-            Assert.AreEqual("write me", result);
+            Assert.AreEqual("====================  0:  <+>  >-<  EVEN--1:  ODD--2:  <+>  EVEN--3:  >-<  ODD--4:  <+>  EVEN--5:  ODD--6:  <+>  >-<  EVEN--7:  ODD--8:  <+>  EVEN--9:  >-<  ODD--10:  <+>  EVEN--  ====================", result);
         }
     }
 }

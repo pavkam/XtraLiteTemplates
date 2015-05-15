@@ -44,7 +44,7 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
         }
 
         public ForEachDirective(IPrimitiveTypeConverter typeConverter) :
-            this("FOR EACH ? IN $", "END FOR EACH", typeConverter)
+            this("FOR EACH ? IN $", "END", typeConverter)
         {
         }
 

@@ -44,7 +44,7 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
         }
 
         public IfElseDirective(IPrimitiveTypeConverter typeConverter)
-            : this("IF $ THEN", "ELSE", "END IF", typeConverter)
+            : this("IF $ THEN", "ELSE", "END", typeConverter)
         {
         }
 

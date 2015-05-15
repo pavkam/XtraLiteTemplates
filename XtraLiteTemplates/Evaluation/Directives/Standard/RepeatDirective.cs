@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
         }
 
         public RepeatDirective(IPrimitiveTypeConverter typeConverter) :
-            this("REPEAT $ TIMES", "END REPEAT", typeConverter)
+            this("REPEAT $ TIMES", "END", typeConverter)
         {
         }
 

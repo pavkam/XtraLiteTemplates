@@ -116,6 +116,7 @@ namespace XtraLiteTemplates
                 CreateOperator<ArithmeticSumOperator>(),
                 CreateOperator<MemberAccessOperator>(),
                 CreateOperator<IntegerRangeOperator>(),
+                CreateOperator<SubscriptOperator>(),
             };
 
             Operators = operators.Where(p => p != null).ToList();
@@ -138,6 +139,7 @@ namespace XtraLiteTemplates
             {
                 { "true", true },
                 { "false", false },
+                { "undefined", null },
                 { "NaN", Double.NaN },
                 { "Infinity", Double.PositiveInfinity },
                 { "PositiveInfinity", Double.PositiveInfinity },
@@ -223,7 +225,10 @@ namespace XtraLiteTemplates
 
         public virtual String DecorateUnparsedText(String unparsedText)
         {
-            return unparsedText;
+            if (String.IsNullOrEmpty(unparsedText))
+                return String.Empty;
+            else
+                return unparsedText.Trim();
         }
 
 
