@@ -52,37 +52,23 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        private void InitializeInterpreter(ITokenizer tokenizer, IEqualityComparer<String> comparer)
+        public IFormatProvider FormatProvider
         {
-            m_lexer = new Lexer(tokenizer, comparer);
-            m_directives = new List<Directive>();
+            get
+            {
+                return m_lexer.FormatProvider;
+            }
         }
 
-
-        public Interpreter(ITokenizer tokenizer, IEqualityComparer<String> comparer)
+        public Interpreter(ITokenizer tokenizer, IFormatProvider formatProvider, IEqualityComparer<String> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
+            Expect.NotNull("formatProvider", formatProvider);
             Expect.NotNull("comparer", comparer);
 
-            InitializeInterpreter(tokenizer, comparer);
+            m_lexer = new Lexer(tokenizer, formatProvider, comparer);
+            m_directives = new List<Directive>();
         }
-
-        public Interpreter(TextReader reader, IEqualityComparer<String> comparer)
-        {
-            Expect.NotNull("reader", reader);
-            Expect.NotNull("comparer", comparer);
-
-            InitializeInterpreter(new Tokenizer(reader), comparer);
-        }
-
-        public Interpreter(String text, IEqualityComparer<String> comparer)
-        {
-            Expect.NotNull("text", text);
-            Expect.NotNull("comparer", comparer);
-
-            InitializeInterpreter(new Tokenizer(new StringReader(text)), comparer);
-        }
-
 
         public Interpreter RegisterDirective(Directive directive)
         {

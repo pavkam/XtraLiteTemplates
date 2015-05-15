@@ -38,6 +38,7 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Evaluation.Directives.Standard;
     using XtraLiteTemplates.Parsing;
+    using System.Globalization;
 
     [TestFixture]
     public class EvaluationTests : TestBase
@@ -69,7 +70,8 @@ namespace XtraLiteTemplates.NUnit
             var directive = new RippedOpenDirective(
                 Tag.Parse("T"));
 
-            var evaluable = new Interpreter("{T}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{T}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive).Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
@@ -83,7 +85,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T1"),
                 Tag.Parse("T2"));
 
-            var evaluable = new Interpreter("{T1}text{T2}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{T1}text{T2}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive).Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
@@ -98,7 +101,7 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T2"),
                 Tag.Parse("T3"));
 
-            var evaluable = new Interpreter("{T1}first{T2}second{T3}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{T1}first{T2}second{T3}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive).Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
@@ -108,7 +111,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationStandardInterpolationDirective()
         {
-            var evaluable = new Interpreter("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
                 .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
                 .Construct();
@@ -127,7 +131,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationStandardConditionalInterpolationDirective()
         {
-            var evaluable = new Interpreter("{\"DEAR\" + \" \" IF Dude.IsDear}{Dude.FirstName} {Dude.LastName}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{\"DEAR\" + \" \" IF Dude.IsDear}{Dude.FirstName} {Dude.LastName}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
                 .RegisterDirective(new ConditionalInterpolationDirective(CreateTypeConverter()))
                 .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
@@ -160,7 +165,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationStandardRepeatDirective()
         {
-            var evaluable = new Interpreter("{REPEAT 5 TIMES}text-{END REPEAT}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{REPEAT 5 TIMES}text-{END REPEAT}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new RepeatDirective(CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
                 .Construct();
@@ -173,7 +179,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationStandardForEachDirective1()
         {
-            var evaluable = new Interpreter("{FOR EACH name IN names}{name},{END FOR EACH}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{FOR EACH name IN names}{name},{END FOR EACH}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
                 .RegisterDirective(new ForEachDirective(CreateTypeConverter()))
                 .Construct();
@@ -187,7 +194,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationStandardForEachDirective2()
         {
-            var evaluable = new Interpreter("{FOR EACH x IN 1:2}{FOR EACH y IN 3:4}{x + \"-\" + y},{END FOR EACH}{END FOR EACH}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{FOR EACH x IN 1:2}{FOR EACH y IN 3:4}{x + \"-\" + y},{END FOR EACH}{END FOR EACH}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
                 .RegisterDirective(new ForEachDirective(CreateTypeConverter()))
                 .RegisterOperator(new IntegerRangeOperator(CreateTypeConverter()))
@@ -202,7 +210,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationStandardIfDirective()
         {
-            var evaluable = new Interpreter("{IF true THEN}this{IF true THEN}_will_{END IF}evaluate{END IF}{IF false THEN}but this won't!{END IF}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{IF true THEN}this{IF true THEN}_will_{END IF}evaluate{END IF}{IF false THEN}but this won't!{END IF}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new IfDirective(CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
                 .Construct();
@@ -215,7 +224,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationStandardIfElseDirective()
         {
-            var evaluable = new Interpreter("{IF true THEN}1{ELSE}2{END IF}{IF false THEN}3{ELSE}4{END IF}", StringComparer.OrdinalIgnoreCase)
+            var evaluable = new Interpreter(new Tokenizer("{IF true THEN}1{ELSE}2{END IF}{IF false THEN}3{ELSE}4{END IF}"), 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new IfElseDirective(CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
                 .Construct();

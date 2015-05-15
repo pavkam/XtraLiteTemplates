@@ -52,6 +52,8 @@ namespace XtraLiteTemplates.Parsing
 
         public ITokenizer Tokenizer { get; private set; }
 
+        public IFormatProvider FormatProvider { get; private set; }
+
         public IEqualityComparer<String> Comparer { get; private set; }
 
         public IReadOnlyCollection<Tag> Tags
@@ -62,8 +64,13 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
-        private void InitializeLexer(ITokenizer tokenizer, IEqualityComparer<String> comparer)
+        public Lexer(ITokenizer tokenizer, IFormatProvider formatProvider, IEqualityComparer<String> comparer)
         {
+            Expect.NotNull("tokenizer", tokenizer);
+            Expect.NotNull("comparer", comparer);
+            Expect.NotNull("formatProvider", formatProvider);
+
+            FormatProvider = formatProvider;
             Tokenizer = tokenizer;
             Comparer = comparer;
 
@@ -72,30 +79,6 @@ namespace XtraLiteTemplates.Parsing
             m_unaryExpressionOperators = new HashSet<String>(comparer);
             m_binaryExpressionOperators = new HashSet<String>(comparer);
             m_specials = new Dictionary<String, Object>();
-        }
-
-        public Lexer(ITokenizer tokenizer, IEqualityComparer<String> comparer)
-        {
-            Expect.NotNull("tokenizer", tokenizer);
-            Expect.NotNull("comparer", comparer);
-
-            InitializeLexer(tokenizer, comparer);
-        }
-
-        public Lexer(TextReader reader, IEqualityComparer<String> comparer)
-        {
-            Expect.NotNull("reader", reader);
-            Expect.NotNull("comparer", comparer);
-
-            InitializeLexer(new Tokenizer(reader), comparer);
-        }
-
-        public Lexer(String text, IEqualityComparer<String> comparer)
-        {
-            Expect.NotNull("text", text);
-            Expect.NotNull("comparer", comparer);
-
-            InitializeLexer(new Tokenizer(new StringReader(text)), comparer);
         }
 
 
@@ -378,7 +361,7 @@ namespace XtraLiteTemplates.Parsing
                         if (this.m_currentToken.Type == Token.TokenType.Number)
                         {
                             Double _float;
-                            if (Double.TryParse(this.m_currentToken.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out _float))
+                            if (Double.TryParse(this.m_currentToken.Value, NumberStyles.Number, FormatProvider, out _float))
                                 currentExpression.FeedLiteral(_float);
                             else
                                 ExceptionHelper.UnexpectedToken(this.m_currentToken);

@@ -116,7 +116,7 @@ namespace XtraLiteTemplates
                     Dialect.StartStringLiteralCharacter, Dialect.EndStringLiteralCharacter, Dialect.StringLiteralEscapeCharacter, 
                     Dialect.NumberDecimalSeparatorCharacter);
 
-                var interpreter = new Interpreter(tokenizer, Dialect.IdentifierComparer);
+                var interpreter = new Interpreter(tokenizer, Dialect.Culture, Dialect.IdentifierComparer);
 
                 /* Register all directives and operators into the interpreter. */
                 foreach (var directive in Dialect.Directives)
