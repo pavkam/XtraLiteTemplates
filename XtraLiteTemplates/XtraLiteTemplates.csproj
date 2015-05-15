@@ -32,7 +32,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Evaluation\Directives\Standard\StandardDirective.cs" />
-    <Compile Include="Evaluation\StandardEvaluationContext.cs" />
     <Compile Include="Evaluation\IVariableContext.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Expressions\IVariableProvider.cs" />
@@ -81,8 +80,9 @@
     <Compile Include="Evaluation\TemplateNode.cs" />
     <Compile Include="Evaluation\Directives\Directive.cs" />
     <Compile Include="Evaluation\Interpreter.cs" />
+    <Compile Include="Expressions\FlexiblePrimitiveTypeConverter.cs" />
+    <Compile Include="StandardDialect.cs" />
     <Compile Include="IDialect.cs" />
-    <Compile Include="Language.cs" />
     <Compile Include="Parsing\TagLex.cs" />
     <Compile Include="Parsing\UnparsedLex.cs" />
     <Compile Include="Parsing\Lex.cs" />

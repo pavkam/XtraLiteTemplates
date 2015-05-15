@@ -26,7 +26,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Evaluation
+namespace XtraLiteTemplates.Expressions
 {
     using System;
     using System.Collections.Generic;
@@ -34,71 +34,15 @@ namespace XtraLiteTemplates.Evaluation
     using System.IO;
     using XtraLiteTemplates.Expressions.Operators.Standard;
 
-    public class StandardEvaluationContext : IEvaluationContext, IPrimitiveTypeConverter
+    public class FlexiblePrimitiveTypeConverter : IPrimitiveTypeConverter
     {
-        private Stack<Dictionary<String, Object>> m_frames;
-
         public IFormatProvider PrimitiveFormatProvider { get; private set; }
-        public IEqualityComparer<String> IdentifierComparer { get; private set; }
-        public Boolean IgnoreEvaluationExceptions { get; private set;  }
 
-        public StandardEvaluationContext(Boolean ignoreEvaluationExceptions, 
-            IEqualityComparer<String> identifierComparer, IFormatProvider primitiveFormatPrivider)
+        public FlexiblePrimitiveTypeConverter(IFormatProvider primitiveFormatPrivider)
         {
-            Expect.NotNull("identifierComparer", identifierComparer);
             Expect.NotNull("primitiveFormatPrivider", primitiveFormatPrivider);
 
-            IdentifierComparer = identifierComparer;
-            IgnoreEvaluationExceptions = ignoreEvaluationExceptions;
             PrimitiveFormatProvider = primitiveFormatPrivider;
-
-            m_frames = new Stack<Dictionary<String, Object>>();
-        }
-        
-        public virtual String ProcessUnparsedText(String value)
-        {
-            return value;
-        }
-
-
-        public void OpenEvaluationFrame()
-        {
-            m_frames.Push(new Dictionary<String, Object>(IdentifierComparer));
-        }
-
-        public void CloseEvaluationFrame()
-        {
-            if (m_frames.Count == 0)
-                ExceptionHelper.DepletedVariableFrames();
-
-            m_frames.Pop();
-        }
-
-        public void SetVariable(String identifier, Object value)
-        {
-            if (m_frames.Count == 0)
-                ExceptionHelper.DepletedVariableFrames();
-
-            var topFrame = m_frames.Peek();
-            topFrame[identifier] = value;
-        }
-
-        public Object GetVariable(String identifier)
-        {
-            if (m_frames.Count == 0)
-                ExceptionHelper.DepletedVariableFrames();
-
-            var topFrame = m_frames.Peek();
-
-            Object result;
-            if (!topFrame.TryGetValue(identifier, out result))
-            {
-                result = null;
-                if (!IgnoreEvaluationExceptions)
-                    ExceptionHelper.UndefinedVariable(identifier);
-            }
-
-            return result;
         }
         
 

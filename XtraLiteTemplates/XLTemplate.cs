@@ -28,6 +28,7 @@ namespace XtraLiteTemplates
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Text;
@@ -37,17 +38,80 @@ namespace XtraLiteTemplates
 
     public sealed class XLTemplate
     {
+        private sealed class EvaluationContext : IEvaluationContext
+        {
+            private Stack<Dictionary<String, Object>> m_frames;
+            private IEqualityComparer<String> m_identifierComparer;
+            private Boolean m_ignoreEvaluationExceptions;
+            private Func<String, String> m_unparsedTextHandler;
+
+            public EvaluationContext(Boolean ignoreEvaluationExceptions, 
+                IEqualityComparer<String> identifierComparer, Func<String, String> unparsedTextHandler)
+            {
+                Debug.Assert(identifierComparer != null);
+                Debug.Assert(unparsedTextHandler != null);
+
+                m_identifierComparer = identifierComparer;
+                m_ignoreEvaluationExceptions = ignoreEvaluationExceptions;
+                m_unparsedTextHandler = unparsedTextHandler;
+
+                m_frames = new Stack<Dictionary<String, Object>>();
+            }
+        
+            public String ProcessUnparsedText(String value)
+            {
+                return m_unparsedTextHandler(value);
+            }
+
+            public void OpenEvaluationFrame()
+            {
+                m_frames.Push(new Dictionary<String, Object>(m_identifierComparer));
+            }
+
+            public void CloseEvaluationFrame()
+            {
+                Debug.Assert(m_frames.Count > 0);
+                m_frames.Pop();
+            }
+
+            public void SetVariable(String identifier, Object value)
+            {
+                Debug.Assert(m_frames.Count > 0);
+
+                var topFrame = m_frames.Peek();
+                topFrame[identifier] = value;
+            }
+
+            public Object GetVariable(String identifier)
+            {
+                foreach (var frame in m_frames)
+                {
+                    Object result;
+                    if (frame.TryGetValue(identifier, out result))
+                        return result;
+                }
+
+                return null;
+            }
+
+            public bool IgnoreEvaluationExceptions
+            {
+                get
+                {
+                    return m_ignoreEvaluationExceptions;
+                }
+            }
+        }
+
         public IDialect Dialect { get; private set; }
         public String Template { get; private set; }
 
-        private IEvaluable m_evaluable { get; private set; }
+        private IEvaluable m_evaluable;
 
-        private IEvaluable Compile(String template)
+        private IEvaluable Compile()
         {
-            Debug.Assert(template != null);
-
             var tokenizer = new Tokenizer(Template);
-            var interpreter = new Interpreter(tokenizer, Dialect.Comparer);
+            var interpreter = new Interpreter(tokenizer, Dialect.IdentifierComparer);
 
             /* Register all directives and operators into the interpreter. */
             foreach (var directive in Dialect.Directives)
@@ -65,27 +129,70 @@ namespace XtraLiteTemplates
             Expect.NotNull("dialect", dialect);
             Expect.NotNull("template", template);
 
+            Dialect = dialect;
+            Template = template;
+
             /* Compile template */
-            m_evaluable = Compile(template);
+            m_evaluable = Compile();
         }
 
-        public void Evaluate(TextWriter writer)
+        public void Evaluate(TextWriter writer, IReadOnlyDictionary<String, Object> variables)
         {
             Expect.NotNull("writer", writer);
+            Expect.NotNull("variables", variables);
 
             /* Create a standard evaluation context that will be used for evaluation of said template. */
-            var context = new StandardEvaluationContext(true, Dialect.Comparer, Dialect.Culture);
+            var context = new EvaluationContext(true, Dialect.IdentifierComparer, Dialect.DecorateUnparsedText);
+
+            /* Load in the variables. */
+            context.OpenEvaluationFrame();
+            foreach (var variable in variables)
+                context.SetVariable(variable.Key, variable.Value);
+
+            /* Evaluate. */
             m_evaluable.Evaluate(writer, context);
+            context.CloseEvaluationFrame();
         }
 
-        public String Evaluate()
+        public String Evaluate(IReadOnlyDictionary<String, Object> variables)
         {
             /* Call the original version with a created writer. */
             using (var writer = new StringWriter())
             {
-                Evaluate(writer);
+                Evaluate(writer, variables);
                 return writer.ToString();
             }
+        }
+
+        public override String ToString()
+        {
+            if (m_evaluable != null)
+                return m_evaluable.ToString();
+            else
+                return null;
+        }
+
+
+        public static String Evaluate(String template, Boolean ignoreCase, IReadOnlyDictionary<String, Object> variables)
+        {
+            Expect.NotNull("template", template);
+            Expect.NotNull("variables", variables);
+
+            var dialect = ignoreCase ? StandardDialect.CurrentCultureIgnoreCase : StandardDialect.CurrentCulture;
+            var instance = new XLTemplate(dialect, template);
+
+            return instance.Evaluate(variables);
+        }
+
+        public static String Evaluate(String template, IReadOnlyDictionary<String, Object> variables)
+        {
+            return Evaluate(template, true, variables);
+        }
+
+        public static String Evaluate(String template, params Tuple<String, Object>[] variables)
+        {
+            Expect.NotNull("variables", variables);
+            return Evaluate(template, variables.ToDictionary(k => k.Item1, v => v.Item2));
         }
     }
 }

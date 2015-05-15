@@ -34,6 +34,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="XLTemplateTests.cs" />
     <Compile Include="Inside\RippedOpenDirective.cs" />
     <Compile Include="Inside\TestEvaluationContext.cs" />
     <Compile Include="Inside\TestExpressionEvaluationContext.cs" />

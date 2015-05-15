@@ -25,27 +25,52 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+using NUnit.Framework;
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.Collections.Generic;
-    using System.Globalization;
+    using System.IO;
     using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using XtraLiteTemplates.Evaluation.Directives;
-    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Expressions.Operators.Standard;
+    using XtraLiteTemplates.NUnit.Inside;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Evaluation.Directives.Standard;
+    using XtraLiteTemplates.Parsing;
+    using System.Globalization;
 
-    public interface IDialect
+    [TestFixture]
+    public class XLTemplateTests : TestBase
     {
-        CultureInfo Culture { get; }
+        [Test]
+        public void TestCaseEvaluationSingleTagDirective()
+        {
+            var dialect = new StandardDialect(CultureInfo.CurrentCulture, 
+                StringComparer.InvariantCulture);
 
-        IEqualityComparer<String> IdentifierComparer { get; }
+            var template = new XLTemplate(dialect, "{IF 10 > 2 THEN}YES{END IF}");
+            var result = template.Evaluate(new Dictionary<String, Object>());
 
-        IReadOnlyCollection<Operator> Operators { get; }
-        IReadOnlyCollection<Directive> Directives { get; }
+            Assert.AreEqual("YES", result);
+        }
 
-        String DecorateUnparsedText(String unparsedText);
+        [Test]
+        public void TestCaseEvaluationSingleTagDirective11()
+        {
+            var result = XLTemplate.Evaluate("{IF 10 > 2 THEN}YES{END IF}");
+            Assert.AreEqual("YES", result);
+        }
+
+        [Test]
+        public void TestCaseEvaluationSingleTagDirective12()
+        {
+            var result = XLTemplate.Evaluate("{name}'s age is {AGE}!", 
+                Tuple.Create<String, Object>("name", "John"),
+                Tuple.Create<String, Object>("age", 30));
+
+            Assert.AreEqual("John's age is 30!", result);
+        }
     }
 }
+
