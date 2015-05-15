@@ -123,7 +123,8 @@ namespace XtraLiteTemplates.Parsing
             var unaryOperator = @operator as UnaryOperator;
             if (unaryOperator != null)
             {
-                if (m_unaryExpressionOperators.Contains(unaryOperator.Symbol))
+                if (m_unaryExpressionOperators.Contains(unaryOperator.Symbol) || 
+                    m_specials.ContainsKey(unaryOperator.Symbol))
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
                 else
                     m_unaryExpressionOperators.Add(unaryOperator.Symbol);
@@ -132,7 +133,8 @@ namespace XtraLiteTemplates.Parsing
             var binaryOperator = @operator as BinaryOperator;
             if (binaryOperator != null)
             {
-                if (m_binaryExpressionOperators.Contains(binaryOperator.Symbol))
+                if (m_binaryExpressionOperators.Contains(binaryOperator.Symbol) ||
+                    m_specials.ContainsKey(binaryOperator.Symbol))
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
                 else
                     m_binaryExpressionOperators.Add(binaryOperator.Symbol);
@@ -142,7 +144,9 @@ namespace XtraLiteTemplates.Parsing
             if (subscriptOperator != null)
             {
                 if (m_unaryExpressionOperators.Contains(subscriptOperator.Symbol) ||
-                  m_binaryExpressionOperators.Contains(subscriptOperator.Terminator))
+                    m_binaryExpressionOperators.Contains(subscriptOperator.Terminator) ||
+                    m_specials.ContainsKey(subscriptOperator.Symbol) ||
+                    m_specials.ContainsKey(subscriptOperator.Terminator))
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
                 else
                 {

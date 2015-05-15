@@ -345,6 +345,24 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
+
+        protected static void ExpectSpecialCannotBeRegisteredException(String keyword, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(InvalidOperationException), e);
+                Assert.AreEqual(String.Format("Special keyword '{0}' cannot be registered as it is currently in use by an operator.", keyword), e.Message);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
         protected static void ExpectUnbalancedExpressionCannotBeFinalizedException(Int32 index, String token, Token.TokenType type, Action action)
         {
             try

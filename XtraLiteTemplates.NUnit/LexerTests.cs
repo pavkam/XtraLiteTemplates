@@ -39,8 +39,6 @@ namespace XtraLiteTemplates.NUnit
     [TestFixture]
     public class LexerTests : TestBase
     {
-
-
         private static void AssertUnparsedLex(Lex lex, Int32 firstCharacterIndex, Int32 originalLength, String unparsedText)
         {
             Assert.IsInstanceOf<UnparsedLex>(lex);
@@ -164,6 +162,50 @@ namespace XtraLiteTemplates.NUnit
 
             var _ss4 = new SubscriptOperator("(", ">");
             ExpectOperatorAlreadyRegisteredException(_ss4.ToString(), () => lexer.RegisterOperator(_ss4));
+
+
+            /* Clashing with specials */
+            lexer.RegisterSpecial("FALSE", false);
+
+            var clashingOp1 = new ArithmeticNeutralOperator("FALSE", CreateTypeConverter());
+            var clashingOp2 = new ArithmeticSumOperator("FALSE", CreateTypeConverter());
+            var clashingOp3 = new SubscriptOperator("FALSE", "ABRA");
+            var clashingOp4 = new SubscriptOperator("CADABRA", "FALSE");
+
+            ExpectOperatorAlreadyRegisteredException(clashingOp1.ToString(), () => lexer.RegisterOperator(clashingOp1));
+            ExpectOperatorAlreadyRegisteredException(clashingOp2.ToString(), () => lexer.RegisterOperator(clashingOp2));
+            ExpectOperatorAlreadyRegisteredException(clashingOp3.ToString(), () => lexer.RegisterOperator(clashingOp3));
+            ExpectOperatorAlreadyRegisteredException(clashingOp4.ToString(), () => lexer.RegisterOperator(clashingOp4));
+        }
+
+        [Test]
+        public void TestCaseSpecialRegistration()
+        {
+            var tokenizer = new Tokenizer("irrelevant");
+            var lexer = new Lexer(tokenizer, StringComparer.OrdinalIgnoreCase);
+
+            /* Exceptions */
+            ExpectArgumentNotIdentifierException("keyword", () => lexer.RegisterSpecial(null, null));
+            ExpectArgumentNotIdentifierException("keyword", () => lexer.RegisterSpecial(String.Empty, null));
+            ExpectArgumentNotIdentifierException("keyword", () => lexer.RegisterSpecial("12ABC", null));
+
+            var clashingOp1 = new ArithmeticNeutralOperator("T1", CreateTypeConverter());
+            var clashingOp2 = new ArithmeticSumOperator("T2", CreateTypeConverter());
+            var clashingOp3 = new SubscriptOperator("T3", "ABRA");
+            var clashingOp4 = new SubscriptOperator("CADABRA", "T4");
+
+            lexer.RegisterOperator(clashingOp1);
+            lexer.RegisterOperator(clashingOp2);
+            lexer.RegisterOperator(clashingOp3);
+            lexer.RegisterOperator(clashingOp4);
+
+            ExpectSpecialCannotBeRegisteredException("T1", () => lexer.RegisterSpecial("T1", true));
+            ExpectSpecialCannotBeRegisteredException("T2", () => lexer.RegisterSpecial("T2", true));
+            ExpectSpecialCannotBeRegisteredException("T3", () => lexer.RegisterSpecial("T3", true));
+            ExpectSpecialCannotBeRegisteredException("T4", () => lexer.RegisterSpecial("T4", true));
+
+            Assert.AreEqual(lexer, lexer.RegisterSpecial("FALSE", false));
+            Assert.AreEqual(lexer, lexer.RegisterSpecial("FALSE", false));
         }
 
         [Test]
@@ -266,6 +308,33 @@ namespace XtraLiteTemplates.NUnit
 
             AssertTagLex(lexer.ReadNext(), 0, 13, ifTag, "IF|True");
             Assert.IsNull(lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseSpecialKeyword()
+        {
+            const String test = "{IF TRUE}";
+
+            var ifTag = new Tag().Keyword("IF").Expression();
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(ifTag)
+                .RegisterSpecial("TRUE", 100.5);
+
+            AssertTagLex(lexer.ReadNext(), 0, 9, ifTag, "IF|100.5");
+            Assert.IsNull(lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseSpecialKeywordMismatch()
+        {
+            const String test = "{IF TRUE}";
+
+            var ifTag = new Tag().Keyword("IF").Keyword("TRUE").Expression();
+            var lexer = new Lexer(new Tokenizer(test), StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(ifTag)
+                .RegisterSpecial("TRUE", 100.5);
+
+            ExpectUnexpectedTokenException(4, "TRUE", Token.TokenType.Word, () => lexer.ReadNext());
         }
 
         [Test]
