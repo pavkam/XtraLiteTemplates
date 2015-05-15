@@ -427,6 +427,9 @@ namespace XtraLiteTemplates.NUnit
             AssertEvaluation<Double>(op, Int64.MaxValue, 1, Int64.MaxValue);
             AssertEvaluation<Double>(op, 1, 2, (1.00 / 2.00));
             AssertEvaluation<Double>(op, 5, -3, (5.00 / -3.00));
+            AssertEvaluation<Double>(op, 0, 1, Double.PositiveInfinity);
+            AssertEvaluation<Double>(op, 0, -1, Double.NegativeInfinity);
+            AssertEvaluation<Double>(op, 1, 0, Double.NaN);
         }
 
         [Test]

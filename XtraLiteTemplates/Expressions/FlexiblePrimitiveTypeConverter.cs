@@ -36,13 +36,13 @@ namespace XtraLiteTemplates.Expressions
 
     public class FlexiblePrimitiveTypeConverter : IPrimitiveTypeConverter
     {
-        public IFormatProvider PrimitiveFormatProvider { get; private set; }
+        public IFormatProvider FormatProvider { get; private set; }
 
-        public FlexiblePrimitiveTypeConverter(IFormatProvider primitiveFormatPrivider)
+        public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider)
         {
-            Expect.NotNull("primitiveFormatPrivider", primitiveFormatPrivider);
+            Expect.NotNull("formatProvider", formatProvider);
 
-            PrimitiveFormatProvider = primitiveFormatPrivider;
+            FormatProvider = formatProvider;
         }
         
 
@@ -68,7 +68,7 @@ namespace XtraLiteTemplates.Expressions
             else if (obj is Int64)
                 reduced = (Double)(Int64)obj;
             else if (obj is UInt64)
-                reduced = (Double)(Int64)obj;
+                reduced = (Double)(UInt64)obj;
             else if (obj is Single)
                 reduced = (Double)(Single)obj;
             else if (obj is Decimal)
@@ -81,7 +81,11 @@ namespace XtraLiteTemplates.Expressions
 
         public virtual Int32 ConvertToInteger(Object obj)
         {
-            return (Int32)ConvertToNumber(obj);
+            var number = ConvertToNumber(obj);
+            if (Double.IsNaN(number) || Double.IsInfinity(number))
+                return 0;
+            else
+                return (Int32)number;
         }
 
         public virtual Double ConvertToNumber(Object obj)
@@ -91,13 +95,24 @@ namespace XtraLiteTemplates.Expressions
             Double result;
 
             if (obj == null)
-                result = 0;
+                result = Double.NaN;
             else if (obj is Double)
                 result = (Double)obj;
             else if (obj is Boolean)
                 result = (Boolean)obj ? 1 : 0;
-            else if (!(obj is String) || !Double.TryParse((String)obj, System.Globalization.NumberStyles.Float, PrimitiveFormatProvider, out result))
-                result = Double.NaN;
+            else
+            {
+                var str = obj as String;
+                if (str != null)
+                {
+                    if (str.Length == 0)
+                        result = 0;
+                    else if (!Double.TryParse(str, System.Globalization.NumberStyles.Number, FormatProvider, out result))
+                        result = Double.NaN;
+                }
+                else
+                    result = Double.NaN;
+            }
 
             return result;
         }
@@ -111,9 +126,9 @@ namespace XtraLiteTemplates.Expressions
             if (obj is String)
                 result = (String)obj;
             else if (obj is Double)
-                result = ((Double)obj).ToString(PrimitiveFormatProvider);
+                result = ((Double)obj).ToString(FormatProvider);
             else if (obj is Boolean)
-                result = ((Boolean)obj).ToString(PrimitiveFormatProvider);
+                result = ((Boolean)obj).ToString(FormatProvider);
             else if (obj == null)
                 result = "undefined";
             else
