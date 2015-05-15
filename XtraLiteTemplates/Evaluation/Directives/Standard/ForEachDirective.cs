@@ -38,8 +38,13 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
 
     public sealed class ForEachDirective : StandardDirective
     {
+        public ForEachDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+            base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
+        {
+        }
+
         public ForEachDirective(IPrimitiveTypeConverter typeConverter) :
-            base(typeConverter, Tag.Parse("FOR EACH ? IN $"), Tag.Parse("END FOR EACH"))
+            this("FOR EACH ? IN $", "END FOR EACH", typeConverter)
         {
         }
 

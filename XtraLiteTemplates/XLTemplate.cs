@@ -110,21 +110,27 @@ namespace XtraLiteTemplates
 
         private IEvaluable Compile()
         {
-            var tokenizer = new Tokenizer(Template);
-            var interpreter = new Interpreter(tokenizer, Dialect.IdentifierComparer);
+            using (var reader = new StringReader(Template))
+            {
+                var tokenizer = new Tokenizer(reader, Dialect.StartTagCharacter, Dialect.EndTagCharacter, 
+                    Dialect.StartStringLiteralCharacter, Dialect.EndStringLiteralCharacter, Dialect.StringLiteralEscapeCharacter, 
+                    Dialect.NumberDecimalSeparatorCharacter);
 
-            /* Register all directives and operators into the interpreter. */
-            foreach (var directive in Dialect.Directives)
-                interpreter.RegisterDirective(directive);
+                var interpreter = new Interpreter(tokenizer, Dialect.IdentifierComparer);
 
-            foreach (var @operator in Dialect.Operators)
-                interpreter.RegisterOperator(@operator);
+                /* Register all directives and operators into the interpreter. */
+                foreach (var directive in Dialect.Directives)
+                    interpreter.RegisterDirective(directive);
 
-            foreach (var keyword in Dialect.SpecialKeywords)
-                interpreter.RegisterSpecial(keyword.Key, keyword.Value);
+                foreach (var @operator in Dialect.Operators)
+                    interpreter.RegisterOperator(@operator);
 
-            /* Construct the template and obtain the evaluable object. */
-            return interpreter.Construct();
+                foreach (var keyword in Dialect.SpecialKeywords)
+                    interpreter.RegisterSpecial(keyword.Key, keyword.Value);
+
+                /* Construct the template and obtain the evaluable object. */
+                return interpreter.Construct();
+            }
         }
 
         public XLTemplate(IDialect dialect, String template)

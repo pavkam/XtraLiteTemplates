@@ -38,8 +38,13 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
 
     public sealed class ConditionalInterpolationDirective : StandardDirective
     {
+        public ConditionalInterpolationDirective(String markup, IPrimitiveTypeConverter typeConverter)
+            : base(typeConverter, Tag.Parse(markup))
+        {
+        }
+
         public ConditionalInterpolationDirective(IPrimitiveTypeConverter typeConverter)
-            : base(typeConverter, Tag.Parse("$ IF $"))
+            : this("$ IF $", typeConverter)
         {
         }
 

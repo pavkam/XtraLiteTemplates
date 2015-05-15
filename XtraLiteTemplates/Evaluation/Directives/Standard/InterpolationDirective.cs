@@ -38,8 +38,13 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
 
     public sealed class InterpolationDirective : StandardDirective
     {
+        public InterpolationDirective(String tagMarkup, IPrimitiveTypeConverter typeConverter)
+            : base(typeConverter, Tag.Parse(tagMarkup))
+        {
+        }
+
         public InterpolationDirective(IPrimitiveTypeConverter typeConverter)
-            : base(typeConverter, Tag.Parse("$"))
+            : this("$", typeConverter)
         {
         }
 

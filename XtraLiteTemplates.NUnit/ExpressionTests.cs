@@ -40,11 +40,42 @@ namespace XtraLiteTemplates.NUnit
 
     [TestFixture]
     public class ExpressionTests : TestBase
-    {
+    { 
         private static Expression CreateBloatedExpression()
         {
+            var typeConverter = CreateTypeConverter();
+            var comparer = StringComparer.Ordinal;
+
+            var operators = new List<Operator>()
+            {
+                new RelationalEqualsOperator(comparer, typeConverter),
+                new RelationalNotEqualsOperator(comparer, typeConverter),
+                new RelationalGreaterThanOperator(comparer, typeConverter),
+                new RelationalGreaterThanOrEqualsOperator(comparer, typeConverter),
+                new RelationalLowerThanOperator(comparer, typeConverter),
+                new RelationalLowerThanOrEqualsOperator(comparer, typeConverter),
+                new LogicalAndOperator(typeConverter),
+                new LogicalOrOperator(typeConverter),
+                new LogicalNotOperator(typeConverter),
+                new BitwiseAndOperator(typeConverter),
+                new BitwiseNotOperator(typeConverter),
+                new BitwiseOrOperator(typeConverter),
+                new BitwiseXorOperator(typeConverter),
+                new BitwiseShiftLeftOperator(typeConverter),
+                new BitwiseShiftRightOperator(typeConverter),
+                new ArithmeticDivideOperator(typeConverter),
+                new ArithmeticModuloOperator(typeConverter),
+                new ArithmeticMultiplyOperator(typeConverter),
+                new ArithmeticNegateOperator(typeConverter),
+                new ArithmeticNeutralOperator(typeConverter),
+                new ArithmeticSubtractOperator(typeConverter),
+                new ArithmeticSumOperator(typeConverter),
+                new SubscriptOperator(),
+                new MemberAccessOperator(comparer),
+            };
+
             var expression = new Expression(StringComparer.Ordinal);
-            foreach (var op in Operator.CreateStandardOperators(StringComparer.Ordinal, StringComparer.Ordinal, CreateTypeConverter()))
+            foreach (var op in operators)
             {
                 expression.RegisterOperator(op);
             }

@@ -225,5 +225,57 @@ namespace XtraLiteTemplates
         {
             return unparsedText;
         }
+
+
+        public virtual Char StartTagCharacter
+        {
+            get
+            {
+                return '{';
+            }
+        }
+
+        public virtual Char EndTagCharacter
+        {
+            get 
+            {
+                return '}';
+            }
+        }
+
+        public virtual Char StartStringLiteralCharacter
+        {
+            get
+            {
+                return '"';
+            }
+        }
+
+        public virtual Char EndStringLiteralCharacter
+        {
+            get
+            {
+                return '"';
+            }
+        }
+
+        public virtual Char StringLiteralEscapeCharacter
+        {
+            get
+            {
+                return '\\';
+            }
+        }
+
+        public virtual Char NumberDecimalSeparatorCharacter
+        {
+            get
+            {
+                if (Culture.NumberFormat.NumberDecimalSeparator.Length != 1)
+                    return '.';
+                else
+                    return Culture.NumberFormat.NumberDecimalSeparator[0];
+            }
+        }
     }
 }

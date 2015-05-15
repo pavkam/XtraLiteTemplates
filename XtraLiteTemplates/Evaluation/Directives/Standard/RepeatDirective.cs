@@ -37,8 +37,13 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
 
     public sealed class RepeatDirective : StandardDirective
     {
+        public RepeatDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+            base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
+        {
+        }
+
         public RepeatDirective(IPrimitiveTypeConverter typeConverter) :
-            base(typeConverter, Tag.Parse("REPEAT $ TIMES"), Tag.Parse("END REPEAT"))
+            this("REPEAT $ TIMES", "END REPEAT", typeConverter)
         {
         }
 

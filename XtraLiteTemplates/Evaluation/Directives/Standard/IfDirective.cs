@@ -38,8 +38,13 @@ namespace XtraLiteTemplates.Evaluation.Directives.Standard
 
     public sealed class IfDirective : StandardDirective
     {
+        public IfDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter)
+            : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
+        {
+        }
+
         public IfDirective(IPrimitiveTypeConverter typeConverter)
-            : base(typeConverter, Tag.Parse("IF $ THEN"), Tag.Parse("END IF"))
+            : this("IF $ THEN", "END IF", typeConverter)
         {
         }
 

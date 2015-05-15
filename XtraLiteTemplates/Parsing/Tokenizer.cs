@@ -49,14 +49,16 @@ namespace XtraLiteTemplates.Parsing
 
         public Char TagEndCharacter { get; private set; }
 
-        public Char StringStartCharacter { get; private set; }
+        public Char StringLiteralStartCharacter { get; private set; }
 
-        public Char StringEndCharacter { get; private set; }
+        public Char StringLiteralEndCharacter { get; private set; }
 
-        public Char StringEscapeCharacter { get; private set; }
+        public Char StringLiteralEscapeCharacter { get; private set; }
 
-        private void InitializeTokenizer(TextReader reader, Char tagStartCharacter, Char tagEndCharacter, 
-            Char stringStartCharacter, Char stringEndCharacter, Char stringEscapeCharacter)
+        public Char NumberLiteralDecimalSeparatorCharacter { get; private set; }
+
+        private void InitializeTokenizer(TextReader reader, Char tagStartCharacter, Char tagEndCharacter,
+            Char stringStartCharacter, Char stringEndCharacter, Char stringEscapeCharacter, Char numberDecimalSeparatorCharacter)
         {
             Expect.NotNull("reader", reader);
             Expect.NotEqual("tagStartCharacter", "tagEndCharacter", tagStartCharacter, tagEndCharacter);
@@ -66,38 +68,45 @@ namespace XtraLiteTemplates.Parsing
             Expect.NotEqual("stringEndCharacter", "tagEndCharacter", stringEndCharacter, tagEndCharacter);
             Expect.NotEqual("stringEscapeCharacter", "stringStartCharacter", stringEscapeCharacter, stringStartCharacter);
             Expect.NotEqual("stringEscapeCharacter", "stringEndCharacter", stringEscapeCharacter, stringEndCharacter);
+            Expect.NotEqual("tagStartCharacter", "numberDecimalSeparatorCharacter", tagStartCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual("tagEndCharacter", "numberDecimalSeparatorCharacter", tagEndCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual("stringStartCharacter", "numberDecimalSeparatorCharacter", stringStartCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual("stringEndCharacter", "numberDecimalSeparatorCharacter", stringEndCharacter, numberDecimalSeparatorCharacter);
 
             /* Validate allow character set. */
             Char[] all = new char[]
             { 
                 tagStartCharacter, tagEndCharacter, stringStartCharacter,
-                stringEndCharacter, stringEscapeCharacter
+                stringEndCharacter, stringEscapeCharacter, numberDecimalSeparatorCharacter
             };
 
-            var allowedCharacterSet = !all.Any(c => Char.IsWhiteSpace(c) || Char.IsLetterOrDigit(c) || c == '_' || c == '.');
+            var allowedCharacterSet = !all.Any(c => Char.IsWhiteSpace(c) || Char.IsLetterOrDigit(c) || c == '_');
             Expect.IsTrue("allowed set of characters", allowedCharacterSet);
 
             this.m_textReader = reader;
             this.TagStartCharacter = tagStartCharacter;
             this.TagEndCharacter = tagEndCharacter;
 
-            this.StringStartCharacter = stringStartCharacter;
-            this.StringEndCharacter = stringEndCharacter;
-            this.StringEscapeCharacter = stringEscapeCharacter;
+            this.StringLiteralStartCharacter = stringStartCharacter;
+            this.StringLiteralEndCharacter = stringEndCharacter;
+            this.StringLiteralEscapeCharacter = stringEscapeCharacter;
+
+            this.NumberLiteralDecimalSeparatorCharacter = numberDecimalSeparatorCharacter;
 
             this.m_parserState = ParserState.InText;
             this.m_currentCharacterIndex = -1;
         }
 
         public Tokenizer(TextReader reader, Char tagStartCharacter, Char tagEndCharacter, Char stringStartCharacter, 
-            Char stringEndCharacter, Char stringEscapeCharacter)
+            Char stringEndCharacter, Char stringEscapeCharacter, Char numberDecimalSeparatorCharacter)
         {
-            InitializeTokenizer(reader, tagStartCharacter, tagEndCharacter, stringStartCharacter, stringEndCharacter, stringEscapeCharacter);
+            InitializeTokenizer(reader, tagStartCharacter, tagEndCharacter,
+                stringStartCharacter, stringEndCharacter, stringEscapeCharacter, numberDecimalSeparatorCharacter);
         }
 
         public Tokenizer(TextReader reader)            
         {
-            InitializeTokenizer(reader, '{', '}', '"', '"', '\\');
+            InitializeTokenizer(reader, '{', '}', '"', '"', '\\', '.');
         }
 
         public Tokenizer(String text)
@@ -227,32 +236,32 @@ namespace XtraLiteTemplates.Parsing
 
                 Debug.Assert(!this.m_isEndOfStream);
 
-                if (this.m_currentCharacter == this.StringStartCharacter)
+                if (this.m_currentCharacter == this.StringLiteralStartCharacter)
                 {
                     /* String constant start character. Read all the way until the matching one is found (or escape!) */
                     while (true)
                     {
                         this.NextCharacter(true);
 
-                        if (this.m_currentCharacter == this.StringEndCharacter)
+                        if (this.m_currentCharacter == this.StringLiteralEndCharacter)
                         {
                             /* End of string. */
                             this.NextCharacter(true);
                             break;
                         }
 
-                        if (this.m_currentCharacter == this.StringEscapeCharacter)
+                        if (this.m_currentCharacter == this.StringLiteralEscapeCharacter)
                         {
                             /* Escape character. */
                             this.NextCharacter(true);
 
-                            if (m_currentCharacter == this.StringEscapeCharacter)
+                            if (m_currentCharacter == this.StringLiteralEscapeCharacter)
                             {
-                                tokenValue.Append(this.StringEscapeCharacter);
+                                tokenValue.Append(this.StringLiteralEscapeCharacter);
                             }
-                            else if (m_currentCharacter == this.StringEndCharacter)
+                            else if (m_currentCharacter == this.StringLiteralEndCharacter)
                             {
-                                tokenValue.Append(this.StringEndCharacter);
+                                tokenValue.Append(this.StringLiteralEndCharacter);
                             }
                             else
                             {
@@ -329,7 +338,7 @@ namespace XtraLiteTemplates.Parsing
                         this.NextCharacter(true);
                     }
 
-                    if (this.m_currentCharacter == '.' && Char.IsDigit(PeekCharacter()))
+                    if (this.m_currentCharacter == this.NumberLiteralDecimalSeparatorCharacter && Char.IsDigit(PeekCharacter()))
                     {
                         /* This is a Decimal point. Read the remaining bits. */
                         tokenValue.Append(this.m_currentCharacter);
@@ -349,7 +358,7 @@ namespace XtraLiteTemplates.Parsing
                         tokenStartIndex, 
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
-                else if (this.m_currentCharacter == '.')
+                else if (this.m_currentCharacter == this.NumberLiteralDecimalSeparatorCharacter)
                 {
                     /* dot-prefixed number may have started. */
                     tokenValue.Append(this.m_currentCharacter);

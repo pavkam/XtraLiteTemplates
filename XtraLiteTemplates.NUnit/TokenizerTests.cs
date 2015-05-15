@@ -56,7 +56,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConstrunction1()
         {
-            ExpectArgumentNullException("reader", () => new Tokenizer(null, '<', '>', '{', '}', '-'));
+            ExpectArgumentNullException("reader", () => new Tokenizer(null, '<', '>', '{', '}', '-', ','));
             ExpectArgumentNullException("reader", () => new Tokenizer((TextReader)null));
 
             var tokenizer = new Tokenizer((String)null);
@@ -71,22 +71,23 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreEqual('{', tokenizer.TagStartCharacter);
             Assert.AreEqual('}', tokenizer.TagEndCharacter);
-            Assert.AreEqual('"', tokenizer.StringStartCharacter);
-            Assert.AreEqual('"', tokenizer.StringEndCharacter);
-            Assert.AreEqual('\\', tokenizer.StringEscapeCharacter);
+            Assert.AreEqual('"', tokenizer.StringLiteralStartCharacter);
+            Assert.AreEqual('"', tokenizer.StringLiteralEndCharacter);
+            Assert.AreEqual('\\', tokenizer.StringLiteralEscapeCharacter);
         }
 
         [Test]
         public void TestCaseCustomConfiguration()
         {
             const String test = "<{hello-r-n-}}>";
-            var tokenizer = new Tokenizer(new StringReader(test), '<', '>', '{', '}', '-');
+            var tokenizer = new Tokenizer(new StringReader(test), '<', '>', '{', '}', '-', ',');
 
             Assert.AreEqual('<', tokenizer.TagStartCharacter);
             Assert.AreEqual('>', tokenizer.TagEndCharacter);
-            Assert.AreEqual('{', tokenizer.StringStartCharacter);
-            Assert.AreEqual('}', tokenizer.StringEndCharacter);
-            Assert.AreEqual('-', tokenizer.StringEscapeCharacter);
+            Assert.AreEqual('{', tokenizer.StringLiteralStartCharacter);
+            Assert.AreEqual('}', tokenizer.StringLiteralEndCharacter);
+            Assert.AreEqual('-', tokenizer.StringLiteralEscapeCharacter);
+            Assert.AreEqual(',', tokenizer.NumberLiteralDecimalSeparatorCharacter);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "<");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.String, 1, 13, "hello\r\n}");
@@ -394,17 +395,26 @@ namespace XtraLiteTemplates.NUnit
         {
             var dummyReader = new StringReader("valid");
             ExpectArgumentsEqualException("tagStartCharacter", "tagEndCharacter", 
-                () => new Tokenizer(dummyReader, '{', '{', '"', '"', '\\'));
-            ExpectArgumentsEqualException("stringStartCharacter", "tagStartCharacter", 
-                () => new Tokenizer(dummyReader, '{', '}', '{', '"', '\\'));
-            ExpectArgumentsEqualException("stringStartCharacter", "tagEndCharacter", 
-                () => new Tokenizer(dummyReader, '{', '}', '}', '"', '\\'));
-            ExpectArgumentsEqualException("stringEndCharacter", "tagStartCharacter", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '{', '\\'));
-            ExpectArgumentsEqualException("stringEndCharacter", "tagEndCharacter", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '}', '\\'));
-            ExpectArgumentsEqualException("stringEscapeCharacter", "stringEndCharacter", 
-                () => new Tokenizer(dummyReader, '{', '}', '<', '>', '>'));
+                () => new Tokenizer(dummyReader, '{', '{', '"', '"', '\\', ','));
+            ExpectArgumentsEqualException("stringStartCharacter", "tagStartCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '{', '"', '\\', ','));
+            ExpectArgumentsEqualException("stringStartCharacter", "tagEndCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '}', '"', '\\', ','));
+            ExpectArgumentsEqualException("stringEndCharacter", "tagStartCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '{', '\\', ','));
+            ExpectArgumentsEqualException("stringEndCharacter", "tagEndCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '}', '\\', ','));
+            ExpectArgumentsEqualException("stringEscapeCharacter", "stringEndCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '<', '>', '>', ','));
+
+            ExpectArgumentsEqualException("tagStartCharacter", "numberDecimalSeparatorCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '\\', '{'));
+            ExpectArgumentsEqualException("tagEndCharacter", "numberDecimalSeparatorCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '\\', '}'));
+            ExpectArgumentsEqualException("stringStartCharacter", "numberDecimalSeparatorCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '(', ')', '\\', '('));
+            ExpectArgumentsEqualException("stringEndCharacter", "numberDecimalSeparatorCharacter",
+                () => new Tokenizer(dummyReader, '{', '}', '(', ')', '\\', ')'));
         }
 
         [Test]
@@ -413,59 +423,58 @@ namespace XtraLiteTemplates.NUnit
             var dummyReader = new StringReader("valid");
 
             ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, 'a', '}', '"', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, ' ', '}', '"', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '0', '}', '"', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '_', '}', '"', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '.', '}', '"', '"', '\\'));
+                () => new Tokenizer(dummyReader, 'a', '}', '"', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, ' ', '}', '"', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '0', '}', '"', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '_', '}', '"', '"', '\\', ','));
 
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', 'a', '"', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', ' ', '"', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '0', '"', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '_', '"', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '.', '"', '"', '\\'));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', 'a', '"', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', ' ', '"', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '0', '"', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '_', '"', '"', '\\', ','));
 
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', 'a', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', ' ', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '0', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '_', '"', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '.', '"', '\\'));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', 'a', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', ' ', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '0', '"', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '_', '"', '\\', ','));
 
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', 'a', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', ' ', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '0', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '_', '\\'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '.', '\\'));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', 'a', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', ' ', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '0', '\\', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '_', '\\', ','));
 
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '"', 'a'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '"', ' '));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '0'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '_'));
-            ExpectArgumentConditionNotTrueException("allowed set of characters", 
-                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '.'));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', 'a', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', ' ', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '0', ','));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '_', ','));
+
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '\\', 'a'));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '\\', ' '));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '\\', '0'));
+            ExpectArgumentConditionNotTrueException("allowed set of characters",
+                () => new Tokenizer(dummyReader, '{', '}', '"', '"', '\\', '_'));
         }
     }
 }

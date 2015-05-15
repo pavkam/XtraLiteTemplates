@@ -48,5 +48,12 @@ namespace XtraLiteTemplates
         IReadOnlyDictionary<String, Object> SpecialKeywords { get; }
 
         String DecorateUnparsedText(String unparsedText);
+
+        Char StartTagCharacter { get; }
+        Char EndTagCharacter { get; }
+        Char StartStringLiteralCharacter { get; }
+        Char EndStringLiteralCharacter { get; }
+        Char StringLiteralEscapeCharacter { get; }
+        Char NumberDecimalSeparatorCharacter { get; }
     }
 }
