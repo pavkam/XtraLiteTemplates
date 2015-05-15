@@ -113,6 +113,13 @@ namespace XtraLiteTemplates
             throw new InvalidOperationException(String.Format("Operator '{0}' (or one of its identifying symbols) already registered.", @operator));
         }
 
+        internal static void SpecialCannotBeRegistered(String keyword)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(keyword));
+
+            throw new InvalidOperationException(String.Format("Special keyword '{0}' cannot be registered as it is currently in use by an operator.", keyword));
+        }
+
         internal static void CannotRegisterOperatorsForStartedExpression()
         {
             throw new InvalidOperationException("Operator registration must be performed before construction.");

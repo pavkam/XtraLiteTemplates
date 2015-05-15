@@ -44,6 +44,7 @@ namespace XtraLiteTemplates.Parsing
         private List<Operator> m_expressionOperators;
         private HashSet<String> m_unaryExpressionOperators;
         private HashSet<String> m_binaryExpressionOperators;
+        private Dictionary<String, Object> m_specials;
         private List<Tag> m_tags;
 
         private Token m_currentToken;
@@ -70,6 +71,7 @@ namespace XtraLiteTemplates.Parsing
             m_expressionOperators = new List<Operator>();
             m_unaryExpressionOperators = new HashSet<String>(comparer);
             m_binaryExpressionOperators = new HashSet<String>(comparer);
+            m_specials = new Dictionary<String, Object>();
         }
 
         public Lexer(ITokenizer tokenizer, IEqualityComparer<String> comparer)
@@ -95,6 +97,7 @@ namespace XtraLiteTemplates.Parsing
 
             InitializeLexer(new Tokenizer(new StringReader(text)), comparer);
         }
+
 
         public Lexer RegisterTag(Tag tag)
         {
@@ -152,6 +155,21 @@ namespace XtraLiteTemplates.Parsing
 
             return this;
         }
+
+        public Lexer RegisterSpecial(String keyword, Object value)
+        {
+            Expect.Identifier("keyword", keyword);
+            
+            if (m_unaryExpressionOperators.Contains(keyword) ||
+                m_binaryExpressionOperators.Contains(keyword))
+            {
+                ExceptionHelper.SpecialCannotBeRegistered(keyword);
+            }
+
+            m_specials[keyword] = value;
+            return this;
+        }
+
 
         private Boolean NextToken()
         {
@@ -292,7 +310,8 @@ namespace XtraLiteTemplates.Parsing
                     }
                 }
 
-                if (m_currentToken.Type == Token.TokenType.Word)
+                if (m_currentToken.Type == Token.TokenType.Word && 
+                    !m_specials.ContainsKey(m_currentToken.Value))
                 {
                     if (_previousToken.Type != Token.TokenType.StartTag &&
                         _previousToken.Type != Token.TokenType.Symbol && 
@@ -354,17 +373,11 @@ namespace XtraLiteTemplates.Parsing
                     {
                         if (this.m_currentToken.Type == Token.TokenType.Number)
                         {
-                            Int64 _integer;
-                            if (Int64.TryParse(this.m_currentToken.Value, out _integer))
-                                currentExpression.FeedLiteral(_integer);
+                            Double _float;
+                            if (Double.TryParse(this.m_currentToken.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out _float))
+                                currentExpression.FeedLiteral(_float);
                             else
-                            {
-                                Double _float;
-                                if (Double.TryParse(this.m_currentToken.Value, NumberStyles.Float, CultureInfo.InvariantCulture, out _float))
-                                    currentExpression.FeedLiteral(_float);
-                                else
-                                    ExceptionHelper.UnexpectedToken(this.m_currentToken);
-                            }
+                                ExceptionHelper.UnexpectedToken(this.m_currentToken);
                         }
                         else if (this.m_currentToken.Type == Token.TokenType.String)
                         {
@@ -372,7 +385,11 @@ namespace XtraLiteTemplates.Parsing
                         }
                         else
                         {
-                            currentExpression.FeedSymbol(this.m_currentToken.Value);
+                            Object keywordedLiteral;
+                            if (m_specials.TryGetValue(this.m_currentToken.Value, out keywordedLiteral))
+                                currentExpression.FeedLiteral(keywordedLiteral);
+                            else
+                                currentExpression.FeedSymbol(this.m_currentToken.Value);
                         }
                     }
                     catch (ExpressionException feedException)

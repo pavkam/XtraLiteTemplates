@@ -71,6 +71,14 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreEqual("John's age is 30!", result);
         }
+
+        [Test]
+        public void TestCaseEvaluationSingleTagDirective132()
+        {
+            var result = XLTemplate.Evaluate("{if true then}write me{end if}");
+
+            Assert.AreEqual("write me", result);
+        }
     }
 }
 

@@ -106,6 +106,11 @@ namespace XtraLiteTemplates.Evaluation
             return this;
         }
 
+        public Interpreter RegisterSpecial(String keyword, Object value)
+        {
+            m_lexer.RegisterSpecial(keyword, value);
+            return this;
+        }
 
         private void Interpret(CompositeNode compositeNode)
         {

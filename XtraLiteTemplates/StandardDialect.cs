@@ -71,7 +71,7 @@ namespace XtraLiteTemplates
         public IReadOnlyCollection<Operator> Operators { get; private set; }
         public IReadOnlyCollection<Directive> Directives { get; private set; }
         public IPrimitiveTypeConverter TypeConverter { get; private set; }
-
+        public IReadOnlyDictionary<String, Object> SpecialKeywords { get; private set; }
 
         private Object[] m_emptyParameters = new Object[0];
         private Type[] m_emptyTypeParameters = new Type[0];
@@ -132,6 +132,17 @@ namespace XtraLiteTemplates
             };
 
             Directives = directives.Where(p => p != null).ToList();
+
+            /* Special keywords. */
+            SpecialKeywords = new Dictionary<String, Object>()
+            {
+                { "true", true },
+                { "false", false },
+                { "NaN", Double.NaN },
+                { "Infinity", Double.PositiveInfinity },
+                { "PositiveInfinity", Double.PositiveInfinity },
+                { "NegativeInfinity", Double.NegativeInfinity },
+            };
         }
 
         public StandardDialect(CultureInfo culture, IEqualityComparer<String> comparer) :

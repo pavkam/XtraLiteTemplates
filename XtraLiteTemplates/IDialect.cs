@@ -45,6 +45,7 @@ namespace XtraLiteTemplates
 
         IReadOnlyCollection<Operator> Operators { get; }
         IReadOnlyCollection<Directive> Directives { get; }
+        IReadOnlyDictionary<String, Object> SpecialKeywords { get; }
 
         String DecorateUnparsedText(String unparsedText);
     }

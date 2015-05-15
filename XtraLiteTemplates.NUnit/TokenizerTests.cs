@@ -190,24 +190,36 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseInvalidNumberFormat_1()
+        public void TestCaseNumberFormats()
         {
-            const String test = "{100.}";
+            const String test = "{0 12 .3 .45 0.0 12.56 78..89 56.token token.56.5}";
             var tokenizer = new Tokenizer(test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
-            ExpectUnexpectedCharacterException(5, '}', () => tokenizer.ReadNext());
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.EndTag, 5, "}");
-        }
-
-        [Test]
-        public void TestCaseInvalidNumberFormat_2()
-        {
-            const String test = "{100.a}";
-            var tokenizer = new Tokenizer(test);
-
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
-            ExpectUnexpectedCharacterException(5, 'a', () => tokenizer.ReadNext());
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 1, "0");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 2, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 3, "12");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 5, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 6, ".3");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 8, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 9, ".45");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 12, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 13, "0.0");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 16, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 17, "12.56");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 22, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 23, "78");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 25, ".");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 26, ".89");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 29, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 30, "56");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 32, ".");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Word, 33, "token");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 38, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Word, 39, "token");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 44, ".56");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 47, ".5");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.EndTag, 49, "}");
         }
 
         [Test]

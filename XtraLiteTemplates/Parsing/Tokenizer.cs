@@ -86,9 +86,7 @@ namespace XtraLiteTemplates.Parsing
             this.StringEscapeCharacter = stringEscapeCharacter;
 
             this.m_parserState = ParserState.InText;
-
-            this.m_currentCharacterIndex = 0;
-            this.LoadCharacter();
+            this.m_currentCharacterIndex = -1;
         }
 
         public Tokenizer(TextReader reader, Char tagStartCharacter, Char tagEndCharacter, Char stringStartCharacter, 
@@ -107,38 +105,44 @@ namespace XtraLiteTemplates.Parsing
         {
         }
 
-        private void LoadCharacter()
-        {
-            var c = this.m_textReader.Read();
-            if (c == -1)
-            {
-                this.m_isEndOfStream = true;
-            }
-            else
-            {
-                this.m_currentCharacter = (Char)c;
-            }
-        }
-
         private TextReader m_textReader;
         private Int32 m_currentCharacterIndex;
         private Boolean m_isEndOfStream;
         private Char m_currentCharacter;
 
+        private Char PeekCharacter()
+        {
+            if (this.m_isEndOfStream)
+                ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
+
+            var peekedCharacter = this.m_textReader.Peek();
+            if (peekedCharacter == -1)
+            {
+                this.m_isEndOfStream = true;
+                ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex + 1);
+            }
+            else
+                return (Char)peekedCharacter;
+
+            Debug.Fail("PeekCharacter()");
+            return '\0';
+        }
+
         private Boolean NextCharacter(Boolean required)
         {
             if (this.m_isEndOfStream)
-            {
                 ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
-            }
 
-            this.LoadCharacter();
+            var readCharacter = this.m_textReader.Read();
             this.m_currentCharacterIndex++;
-
-            if (this.m_isEndOfStream && required)
+            if (readCharacter == -1)
             {
-                ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
+                this.m_isEndOfStream = true;
+                if (required)
+                    ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
             }
+            else
+                this.m_currentCharacter = (Char)readCharacter;
 
             return !this.m_isEndOfStream;
         }
@@ -325,16 +329,11 @@ namespace XtraLiteTemplates.Parsing
                         this.NextCharacter(true);
                     }
 
-                    if (this.m_currentCharacter == '.')
+                    if (this.m_currentCharacter == '.' && Char.IsDigit(PeekCharacter()))
                     {
                         /* This is a Decimal point. Read the remaining bits. */
                         tokenValue.Append(this.m_currentCharacter);
                         this.NextCharacter(true);
-
-                        if (!Char.IsDigit(this.m_currentCharacter))
-                        {
-                            ExceptionHelper.UnexpectedCharacter(this.m_currentCharacterIndex, this.m_currentCharacter);
-                        }
 
                         while (Char.IsDigit(this.m_currentCharacter))
                         {
@@ -361,8 +360,6 @@ namespace XtraLiteTemplates.Parsing
                         tokenValue.Append(this.m_currentCharacter);
                         this.NextCharacter(true);
                     }
-
-                    Debug.Assert(tokenValue.Length > 0);
 
                     if (tokenValue.Length > 1)
                     {
@@ -419,6 +416,10 @@ namespace XtraLiteTemplates.Parsing
 
         public Token ReadNext()
         {
+            /* Read first if required. */
+            if (m_currentCharacterIndex == -1)
+                NextCharacter(false);
+
             return ReadNextInternal();
         }
 

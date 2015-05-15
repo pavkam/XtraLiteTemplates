@@ -120,6 +120,9 @@ namespace XtraLiteTemplates
             foreach (var @operator in Dialect.Operators)
                 interpreter.RegisterOperator(@operator);
 
+            foreach (var keyword in Dialect.SpecialKeywords)
+                interpreter.RegisterSpecial(keyword.Key, keyword.Value);
+
             /* Construct the template and obtain the evaluable object. */
             return interpreter.Construct();
         }
