@@ -38,9 +38,21 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class RepeatDirective : StandardDirective
     {
+        private Int32 m_expressionIndex;
+
         public RepeatDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
+            Debug.Assert(Tags.Count == 2);
+
+            /* Find all expressions. */
+            var tag = Tags[0];
+            var expressionComponents = Enumerable.Range(0, tag.ComponentCount)
+                .Where(index => tag.MatchesExpression(index)).Select(index => index).ToArray();
+
+            Expect.IsTrue("one expression component", expressionComponents.Length == 1);
+
+            m_expressionIndex = expressionComponents[0];
         }
 
         public RepeatDirective(IPrimitiveTypeConverter typeConverter) :
@@ -53,6 +65,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
             text = null;
@@ -61,9 +74,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             {
                 /* Starting up. */
                 Debug.Assert(tagIndex == 0);
-                Debug.Assert(components.Length == 3);
-
-                remainingIterations = TypeConverter.ConvertToInteger(components[1]);
+                remainingIterations = TypeConverter.ConvertToInteger(components[m_expressionIndex]);
             }
             else if (tagIndex == 0)
             {

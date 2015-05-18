@@ -25,55 +25,13 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
-namespace XtraLiteTemplates.NUnit
+namespace XtraLiteTemplates.Dialects.Standard
 {
-    using System;
-    using System.Collections.Generic;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using System.Globalization;
-    using XtraLiteTemplates.Dialects.Standard;
-
-    [TestFixture]
-    public class XLTemplateTests : TestBase
+    public enum DialectCasing
     {
-        [Test]
-        public void TestCaseCaseSensitiveInvariantCulture()
-        {
-            const String text = @"
-{REPEAT 20.1}={END}{'  '}
-    {FOR index IN 0 : 100}
-        {IF index % 10.2 == 0}
-            {index / 10 + ': '}
-            {' ' + var1 + ' ' IF INDEX%20 == 0}
-            {' ' + VAR2 + ' ' IF index%30 == 0}
-            {if (inDex/10) % 2 == 0}
-                {' EVEN'}
-            {else}
-                {' ODD'}
-            {END} -- 
-
-            
-        {end}
-    {END}
-{'  '}{REPEAT 20.19}={END}
-";
-            var variables = new Dictionary<String, Object>()
-            {
-                { "var1", "<+>" },
-                { "var2", ">-<" },
-            };
-
-            var template = new XLTemplate(StandardDialect.InvariantCultureIgnoreCase, text.Replace("'", "\""));
-            var result = template.Evaluate(variables);
-
-            Assert.AreEqual("====================  0:  <+>  >-<  EVEN--1:  ODD--2:  <+>  EVEN--3:  >-<  ODD--4:  <+>  EVEN--5:  ODD--6:  <+>  >-<  EVEN--7:  ODD--8:  <+>  EVEN--9:  >-<  ODD--10:  <+>  EVEN--  ====================", result);
-        }
+        IgnoreCase,
+        UpperCase,
+        LowerCase,
     }
 }
-

@@ -39,9 +39,21 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class InterpolationDirective : StandardDirective
     {
+        private Int32 m_expressionIndex;
+
         public InterpolationDirective(String tagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(tagMarkup))
         {
+            Debug.Assert(Tags.Count == 1);
+
+            /* Find all expressions. */
+            var tag = Tags[0];
+            var expressionComponents = Enumerable.Range(0, tag.ComponentCount)
+                .Where(index => tag.MatchesExpression(index)).Select(index => index).ToArray();
+
+            Expect.IsTrue("one expression component", expressionComponents.Length == 1);
+
+            m_expressionIndex = expressionComponents[0];
         }
 
         public InterpolationDirective(IPrimitiveTypeConverter typeConverter)
@@ -55,10 +67,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);
             Debug.Assert(components != null);
-            Debug.Assert(components.Length == Tags[0].ComponentCount);
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
-            text = TypeConverter.ConvertToString(components[0]);
+            text = TypeConverter.ConvertToString(components[m_expressionIndex]);
             return FlowDecision.Terminate;
         }
     }

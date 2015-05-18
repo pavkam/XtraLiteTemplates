@@ -189,7 +189,7 @@ namespace XtraLiteTemplates
             Expect.NotNull("template", template);
             Expect.NotNull("variables", variables);
 
-            var dialect = ignoreCase ? StandardDialect.CurrentCultureIgnoreCase : StandardDialect.CurrentCulture;
+            var dialect = ignoreCase ? StandardDialect.InvariantCultureIgnoreCase : StandardDialect.InvariantCultureUpperCase;
             var instance = new XLTemplate(dialect, template);
 
             return instance.Evaluate(variables);

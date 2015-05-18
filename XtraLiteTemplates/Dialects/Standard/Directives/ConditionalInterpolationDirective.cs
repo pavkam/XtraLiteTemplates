@@ -39,13 +39,35 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class ConditionalInterpolationDirective : StandardDirective
     {
-        public ConditionalInterpolationDirective(String markup, IPrimitiveTypeConverter typeConverter)
+        private Int32 m_interpolatedExpressionIndex;
+        private Int32 m_conditionalExpressionIndex;
+
+        public ConditionalInterpolationDirective(String markup, Boolean invertExpressionOrder, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(markup))
         {
+            Debug.Assert(Tags.Count == 1);
+
+            /* Find all expressions. */
+            var tag = Tags[0];
+            var expressionComponents = Enumerable.Range(0, tag.ComponentCount)
+                .Where(index => tag.MatchesExpression(index)).Select(index => index).ToArray();
+
+            Expect.IsTrue("two expression components", expressionComponents.Length == 2);
+
+            if (invertExpressionOrder)
+            {
+                m_interpolatedExpressionIndex = expressionComponents[1];
+                m_conditionalExpressionIndex = expressionComponents[0];
+            }
+            else
+            {
+                m_interpolatedExpressionIndex = expressionComponents[0];
+                m_conditionalExpressionIndex = expressionComponents[1];
+            }
         }
 
         public ConditionalInterpolationDirective(IPrimitiveTypeConverter typeConverter)
-            : this("$ IF $", typeConverter)
+            : this("$ IF $", false, typeConverter)
         {
         }
 
@@ -55,11 +77,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);
             Debug.Assert(components != null);
-            Debug.Assert(components.Length == Tags[0].ComponentCount);
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
-            if (TypeConverter.ConvertToBoolean(components[2]))
-                text = TypeConverter.ConvertToString(components[0]);
+            if (TypeConverter.ConvertToBoolean(components[m_conditionalExpressionIndex]))
+                text = TypeConverter.ConvertToString(components[m_interpolatedExpressionIndex]);
             else
                 text = null;
 

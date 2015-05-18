@@ -39,9 +39,26 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class ForEachDirective : StandardDirective
     {
+        private Int32 m_expressionIndex;
+        private Int32 m_identifierIndex;
+
         public ForEachDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
+            Debug.Assert(Tags.Count == 2);
+
+            /* Find all expressions. */
+            var tag = Tags[0];
+            var expressionComponents = Enumerable.Range(0, tag.ComponentCount)
+                .Where(index => tag.MatchesExpression(index)).Select(index => index).ToArray();
+            var identifierComponents = Enumerable.Range(0, tag.ComponentCount)
+                .Where(index => tag.MatchesAnyIdentifier(index)).Select(index => index).ToArray();
+
+            Expect.IsTrue("one expression component", expressionComponents.Length == 1);
+            Expect.IsTrue("one identifier component", expressionComponents.Length == 1);
+
+            m_expressionIndex = expressionComponents[0];
+            m_identifierIndex = identifierComponents[0];
         }
 
         public ForEachDirective(IPrimitiveTypeConverter typeConverter) :
@@ -54,6 +71,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
             text = null;
@@ -63,12 +81,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             {
                 /* Starting up. */
                 Debug.Assert(tagIndex == 0);
-                Debug.Assert(components.Length == 5);
+                
 
-                if (components[4] == null)
+                if (components[m_expressionIndex] == null)
                     return FlowDecision.Terminate;
 
-                var enumerable = components[4] as IEnumerable;
+                var enumerable = components[m_expressionIndex] as IEnumerable;
                 if (enumerable == null)
                     enumerable = new Object[] { enumerable };
 
@@ -77,7 +95,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
             else if (tagIndex == 0)
             {
-                Debug.Assert(components.Length == 5);
                 enumerator = state as IEnumerator;
                 Debug.Assert(enumerator != null);
             }
@@ -88,7 +105,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 return FlowDecision.Terminate;
             else
             {
-                var variableName = components[2] as String;
+                var variableName = components[m_identifierIndex] as String;
                 Debug.Assert(variableName != null);
                 context.SetVariable(variableName, enumerator.Current);
                 return FlowDecision.Evaluate;

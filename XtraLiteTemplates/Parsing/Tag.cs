@@ -407,6 +407,15 @@ namespace XtraLiteTemplates.Parsing
             return _identifiers.Any(i => comparer.Equals(i, identifier));
         }
 
+        internal Boolean MatchesAnyIdentifier(Int32 index)
+        {
+            if (index >= m_components.Count || m_components[index] == null)
+                return false;
+
+            var stringComponent = m_components[index] as String;
+            return stringComponent == String.Empty;
+        }
+
         internal Boolean MatchesExpression(Int32 index)
         {
             return index < m_components.Count && m_components[index] == null;
