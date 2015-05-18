@@ -29,6 +29,7 @@
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
+    using System.IO;
     using System.Collections.Generic;
     using System.Linq;
     using System.Diagnostics;
@@ -36,8 +37,7 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
-    using System.IO;
-    using XtraLiteTemplates.Evaluation.Directives;
+
 
     public sealed class Interpreter
     {

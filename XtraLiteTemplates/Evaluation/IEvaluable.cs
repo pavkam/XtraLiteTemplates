@@ -31,7 +31,6 @@ namespace XtraLiteTemplates.Evaluation
     using System;
     using System.IO;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Evaluation.Directives;
 
     public interface IEvaluable
     {

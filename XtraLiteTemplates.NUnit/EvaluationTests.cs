@@ -33,12 +33,12 @@ namespace XtraLiteTemplates.NUnit
     using System.Collections.Generic;
     using System.IO;
     using System.Linq;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
     using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Evaluation.Directives.Standard;
     using XtraLiteTemplates.Parsing;
     using System.Globalization;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
     public class EvaluationTests : TestBase

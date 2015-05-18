@@ -33,9 +33,9 @@ namespace XtraLiteTemplates.NUnit
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
 
     [TestFixture]

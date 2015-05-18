@@ -32,7 +32,6 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.IO;
     using System.Linq;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Parsing;

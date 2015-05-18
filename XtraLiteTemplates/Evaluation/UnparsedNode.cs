@@ -32,7 +32,6 @@ namespace XtraLiteTemplates.Evaluation
     using System.Diagnostics;
     using System.IO;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
 
     internal sealed class UnparsedNode : TemplateNode, IEvaluable

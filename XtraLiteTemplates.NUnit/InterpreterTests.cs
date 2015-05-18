@@ -32,12 +32,11 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.IO;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.NUnit.Inside;
     using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
     using System.Globalization;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
     public class InterpreterTests : TestBase

@@ -34,10 +34,9 @@ namespace XtraLiteTemplates.NUnit
     using System.Linq;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Dialects.Standard;
 
     public class TestBase
     {

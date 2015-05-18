@@ -32,7 +32,7 @@ namespace XtraLiteTemplates.Evaluation
     using System.Globalization;
     using System.IO;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
 
     public interface IVariableContext : IVariableProvider
     {

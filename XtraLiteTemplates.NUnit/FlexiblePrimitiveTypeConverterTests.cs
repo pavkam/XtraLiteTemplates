@@ -33,8 +33,8 @@ namespace XtraLiteTemplates.NUnit
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
 
     [TestFixture]
     public class FlexiblePrimitiveTypeConverterTests : TestBase

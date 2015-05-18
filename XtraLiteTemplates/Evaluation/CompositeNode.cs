@@ -34,7 +34,6 @@ namespace XtraLiteTemplates.Evaluation
     using System.IO;
     using System.Text;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Evaluation.Directives;
 
     internal abstract class CompositeNode : TemplateNode, IEvaluable
     {

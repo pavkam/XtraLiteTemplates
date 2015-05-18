@@ -33,7 +33,7 @@ namespace XtraLiteTemplates.Expressions
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Nodes;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
 
     public sealed class Expression
     {

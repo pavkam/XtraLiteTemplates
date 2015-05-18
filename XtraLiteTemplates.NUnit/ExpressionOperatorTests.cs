@@ -33,8 +33,8 @@ namespace XtraLiteTemplates.NUnit
     using System.Collections;
     using System.Collections.Generic;
     using System.Globalization;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
 
     [TestFixture]
     public class ExpressionOperatorTests : TestBase

@@ -33,8 +33,8 @@ namespace XtraLiteTemplates.NUnit
     using System.Globalization;
     using System.IO;
     using System.Linq;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
     using XtraLiteTemplates.Parsing;
 
     [TestFixture]

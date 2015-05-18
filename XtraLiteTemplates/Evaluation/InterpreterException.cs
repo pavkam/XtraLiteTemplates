@@ -31,7 +31,6 @@ namespace XtraLiteTemplates.Evaluation
     using System;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Evaluation.Directives;
 
     public class InterpreterException : FormatException
     {

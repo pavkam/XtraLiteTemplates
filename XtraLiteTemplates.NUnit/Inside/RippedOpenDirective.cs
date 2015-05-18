@@ -35,7 +35,6 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System.Diagnostics;
     using System.Text;
     using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Evaluation;
 
     public sealed class RippedOpenDirective : Directive

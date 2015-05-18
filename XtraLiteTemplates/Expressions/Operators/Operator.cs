@@ -31,7 +31,7 @@ namespace XtraLiteTemplates.Expressions.Operators
     using System;
     using System.Linq;
     using System.Collections.Generic;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
 
     public abstract class Operator
     {

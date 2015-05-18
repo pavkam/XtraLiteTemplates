@@ -33,6 +33,8 @@ namespace XtraLiteTemplates
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
+    using XtraLiteTemplates.Dialects;
+    using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Parsing;
 

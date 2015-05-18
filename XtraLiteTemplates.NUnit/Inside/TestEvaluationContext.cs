@@ -36,8 +36,6 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System.IO;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Expressions.Operators.Standard;
-    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Evaluation;
 
     public class TestEvaluationContext : IVariableProvider, IEvaluationContext

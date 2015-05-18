@@ -35,7 +35,6 @@ namespace XtraLiteTemplates.Evaluation
     using System.Linq;
     using System.Text;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Evaluation.Directives;
     using XtraLiteTemplates.Parsing;
 
     internal sealed class DirectiveNode : CompositeNode, IEvaluable
