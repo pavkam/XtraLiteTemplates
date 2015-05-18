@@ -43,6 +43,23 @@ namespace XtraLiteTemplates.NUnit
     public class XLTemplateTests : TestBase
     {
         [Test]
+        public void TestCaseConstruction1()
+        {
+            ExpectArgumentNullException("dialect", () => new XLTemplate(null, ""));
+            ExpectArgumentNullException("template", () => new XLTemplate(StandardDialect.Default, null));
+        }
+
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var text = "{IF true THEN}Say True Baby!{END}";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+            
+            Assert.AreEqual(StandardDialect.DefaultIgnoreCase, template.Dialect);
+            Assert.AreEqual(text, template.Template);
+        }
+
+        [Test]
         public void TestCaseCaseSensitiveInvariantCulture()
         {
             const String text = @"
