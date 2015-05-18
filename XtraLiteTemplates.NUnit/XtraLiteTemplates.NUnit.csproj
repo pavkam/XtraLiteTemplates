@@ -34,6 +34,9 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Directives\StandardIfDirectiveTests.cs" />
+    <Compile Include="Directives\StandardForEachDirectiveTests.cs" />
+    <Compile Include="Directives\StandardConditionalInterpolationDirectiveTests.cs" />
     <Compile Include="FlexiblePrimitiveTypeConverterTests.cs" />
     <Compile Include="XLTemplateTests.cs" />
     <Compile Include="Inside\RippedOpenDirective.cs" />
@@ -41,7 +44,7 @@
     <Compile Include="Inside\TestExpressionEvaluationContext.cs" />
     <Compile Include="EvaluationTests.cs" />
     <Compile Include="InterpreterTests.cs" />
-    <Compile Include="DirectiveTests.cs" />
+    <Compile Include="Directives\DirectiveTests.cs" />
     <Compile Include="TagTests.cs" />
     <Compile Include="LexerTests.cs" />
     <Compile Include="TokenizerTests.cs" />

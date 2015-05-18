@@ -55,7 +55,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 .Where(index => tag.MatchesAnyIdentifier(index)).Select(index => index).ToArray();
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
-            Expect.IsTrue("one identifier component", expressionComponents.Length == 1);
+            Expect.IsTrue("one identifier component", identifierComponents.Length == 1);
 
             m_expressionIndex = expressionComponents[0];
             m_identifierIndex = identifierComponents[0];
@@ -88,7 +88,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
                 var enumerable = components[m_expressionIndex] as IEnumerable;
                 if (enumerable == null)
-                    enumerable = new Object[] { enumerable };
+                    enumerable = new Object[] { components[m_expressionIndex] };
 
                 enumerator = enumerable.GetEnumerator();
                 state = enumerator;

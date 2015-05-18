@@ -48,22 +48,6 @@ namespace XtraLiteTemplates.NUnit
             return new KeyValuePair<String, Object>(key, value);
         }
 
-        private String Evaluate(IEvaluable evaluable, StringComparer comparer, params KeyValuePair<String, Object>[] values)
-        {
-            var context = new TestEvaluationContext(values, comparer);
-
-            String result = null;
-            using (var sw = new StringWriter())
-            {
-                evaluable.Evaluate(sw, context);
-                result = sw.ToString();
-            }
-
-            return result;
-        }
-
-
-
         [Test]
         public void TestCaseEvaluationSingleTagDirective()
         {

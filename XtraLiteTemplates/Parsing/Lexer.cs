@@ -333,7 +333,7 @@ namespace XtraLiteTemplates.Parsing
                         /* Keyword si the next component. */
                         _components.Add(this.m_currentToken.Value);
                         continue;
-                    }                  
+                    }
                 }
 
                 if (m_currentToken.Type == Token.TokenType.Word ||

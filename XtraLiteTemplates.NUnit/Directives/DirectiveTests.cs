@@ -27,7 +27,7 @@
 //
 using NUnit.Framework;
 
-namespace XtraLiteTemplates.NUnit
+namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
     using System.IO;
@@ -35,6 +35,8 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.NUnit.Inside;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
+    using System.Globalization;
 
     [TestFixture]
     public class DirectiveTests : TestBase

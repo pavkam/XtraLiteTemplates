@@ -37,12 +37,43 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard;
+    using System.Collections.Generic;
+    using XtraLiteTemplates.NUnit.Inside;
+    using System.IO;
+using System.Diagnostics;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
 
     public class TestBase
     {
         protected static IPrimitiveTypeConverter CreateTypeConverter()
         {
             return new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+        }
+
+        protected String Evaluate(IEvaluable evaluable, StringComparer comparer, params KeyValuePair<String, Object>[] values)
+        {
+            var context = new TestEvaluationContext(values, comparer);
+
+            String result = null;
+            using (var sw = new StringWriter())
+            {
+                evaluable.Evaluate(sw, context);
+                result = sw.ToString();
+            }
+
+            return result;
+        }
+
+        protected String Evaluate(String template, Directive directive, params KeyValuePair<String, Object>[] values)
+        {
+            Debug.Assert(directive != null);
+
+            var evaluable = new Interpreter(new Tokenizer(template), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(directive)
+                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
+                .Construct();
+
+            return Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, values);
         }
 
         protected void ExpectArgumentNullException(String argument, Action action)
