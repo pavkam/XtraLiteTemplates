@@ -42,20 +42,19 @@ namespace XtraLiteTemplates.Dialects.Standard
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
-    public class StandardDialect : IDialect
+    public sealed class StandardDialect : IDialect
     {
-        public static IDialect InvariantCultureIgnoreCase { get; private set; }
-        public static IDialect InvariantCultureUpperCase { get; private set; }
-        public static IDialect InvariantCultureLowerCase { get; private set; }
+        public static IDialect DefaultIgnoreCase { get; private set; }
+        public static IDialect Default { get; private set; }
 
         static StandardDialect()
         {
-            InvariantCultureIgnoreCase = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
-            InvariantCultureUpperCase = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
-            InvariantCultureLowerCase = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.LowerCase);
+            DefaultIgnoreCase = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
+            Default = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
         }
 
         private IPrimitiveTypeConverter m_typeConverter;
+        private DialectCasing m_casing;
 
         public CultureInfo Culture { get; private set;  }
         public IEqualityComparer<String> IdentifierComparer { get; private set; }
@@ -72,7 +71,8 @@ namespace XtraLiteTemplates.Dialects.Standard
             /* Build culture-aware values.*/
             Culture = culture;
             m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture);
-            
+            m_casing = casing;
+
             var comparer = StringComparer.Create(culture, 
                 casing == DialectCasing.IgnoreCase);
 
@@ -117,11 +117,11 @@ namespace XtraLiteTemplates.Dialects.Standard
             Directives = new List<Directive>()
             {
                 new ConditionalInterpolationDirective(caseModifierFunc("$ IF $"), false, m_typeConverter),
-                new ForEachDirective(caseModifierFunc("FOR ? IN $"), caseModifierFunc("END"), m_typeConverter),
-                new IfDirective(caseModifierFunc("IF $"), caseModifierFunc("END"), m_typeConverter),
-                new IfElseDirective(caseModifierFunc("IF $"), caseModifierFunc("ELSE"), caseModifierFunc("END"), m_typeConverter),
+                new ForEachDirective(caseModifierFunc("FOR EACH ? IN $"), caseModifierFunc("END"), m_typeConverter),
+                new IfDirective(caseModifierFunc("IF $ THEN"), caseModifierFunc("END"), m_typeConverter),
+                new IfElseDirective(caseModifierFunc("IF $ THEN"), caseModifierFunc("ELSE"), caseModifierFunc("END"), m_typeConverter),
                 new InterpolationDirective(m_typeConverter),
-                new RepeatDirective(caseModifierFunc("REPEAT $"), caseModifierFunc("END"), m_typeConverter),
+                new RepeatDirective(caseModifierFunc("REPEAT $ TIMES"), caseModifierFunc("END"), m_typeConverter),
             };
 
             /* Special keywords. */
@@ -140,7 +140,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
         }
 
-        public virtual String DecorateUnparsedText(String unparsedText)
+        public String DecorateUnparsedText(String unparsedText)
         {
             if (String.IsNullOrEmpty(unparsedText))
                 return String.Empty;
@@ -148,8 +148,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return unparsedText.Trim();
         }
 
-
-        public virtual Char StartTagCharacter
+        public Char StartTagCharacter
         {
             get
             {
@@ -157,7 +156,7 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
-        public virtual Char EndTagCharacter
+        public Char EndTagCharacter
         {
             get 
             {
@@ -165,7 +164,7 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
-        public virtual Char StartStringLiteralCharacter
+        public Char StartStringLiteralCharacter
         {
             get
             {
@@ -173,7 +172,7 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
-        public virtual Char EndStringLiteralCharacter
+        public Char EndStringLiteralCharacter
         {
             get
             {
@@ -181,7 +180,7 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
-        public virtual Char StringLiteralEscapeCharacter
+        public Char StringLiteralEscapeCharacter
         {
             get
             {
@@ -189,7 +188,7 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
-        public virtual Char NumberDecimalSeparatorCharacter
+        public Char NumberDecimalSeparatorCharacter
         {
             get
             {
@@ -198,6 +197,45 @@ namespace XtraLiteTemplates.Dialects.Standard
                 else
                     return Culture.NumberFormat.NumberDecimalSeparator[0];
             }
+        }
+
+
+        public override String ToString()
+        {
+            String caseDescr = null;
+            switch (m_casing)
+            {
+                case DialectCasing.IgnoreCase:
+                    caseDescr = "Ignore Case";
+                    break;
+                case DialectCasing.LowerCase:
+                    caseDescr = "Lower Case";
+                    break;
+                case DialectCasing.UpperCase:
+                    caseDescr = "Upper Case";
+                    break;
+            }
+
+            if (String.IsNullOrEmpty(Culture.Name))
+                return String.Format("({0})", caseDescr);
+            else
+                return String.Format("{0} ({1})", Culture.Name, caseDescr);
+        }
+
+        public override Boolean Equals(Object obj)
+        {
+            var other = obj as StandardDialect;
+            return
+                other != null && 
+                other.m_casing.Equals(m_casing) &&
+                other.Culture.Equals(Culture);
+        }
+
+        public override Int32 GetHashCode()
+        {
+            return
+                m_casing.GetHashCode() ^
+                Culture.GetHashCode();
         }
     }
 }
