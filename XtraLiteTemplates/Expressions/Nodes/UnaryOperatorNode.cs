@@ -53,16 +53,18 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return (context) => Operator.Evaluate(childFunc(context));
         }
 
-        public override ExpressionNode Reduce()
+        protected override Boolean TryReduce(out Object value)
         {
-            /* Right side. */
-            RightNode = RightNode as LeafNode ?? RightNode.Reduce();
-            var leafRight = RightNode as LeafNode;
-
-            if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal)
-                return new LeafNode(Parent, Operator.Evaluate(leafRight.Operand), LeafNode.EvaluationType.Literal);
+            if (RightNode.Reduce())
+            {
+                value = Operator.Evaluate(RightNode.ReducedValue);
+                return true;
+            }
             else
-                return this;
+            {
+                value = null;
+                return false;
+            }
         }
 
         public override String ToString(ExpressionFormatStyle style)

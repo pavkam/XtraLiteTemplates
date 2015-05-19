@@ -281,7 +281,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterOperator(new ArithmeticSubtractOperator(CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticNegateOperator(CreateTypeConverter()));
 
-            AssertTagLex(lexer.ReadNext(), 0, 29, tag, "0");
+            AssertTagLex(lexer.ReadNext(), 0, 29, tag, "100 << -100 << 0.1 - ----0.1 << -1");
             Assert.IsNull(lexer.ReadNext());
         }
 
@@ -295,7 +295,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterTag(ifTag)
                 .RegisterOperator(new RelationalEqualsOperator(StringComparer.CurrentCulture, CreateTypeConverter()));
 
-            AssertTagLex(lexer.ReadNext(), 0, 13, ifTag, "IF|True");
+            AssertTagLex(lexer.ReadNext(), 0, 13, ifTag, "IF|10 == 10");
             Assert.IsNull(lexer.ReadNext());
         }
 
@@ -542,8 +542,8 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterOperator(new ArithmeticSumOperator(".", CreateTypeConverter()))
                 .RegisterOperator(new ArithmeticSumOperator(",", CreateTypeConverter()));
 
-            AssertTagLex(lexer_enUS.ReadNext(), 0, two_numbers.Length, exprTag, "23|KW|1.22");
-            AssertTagLex(lexer_roRO.ReadNext(), 0, two_numbers.Length, exprTag, "1.22|KW|23");
+            AssertTagLex(lexer_enUS.ReadNext(), 0, two_numbers.Length, exprTag, "1 , 22|KW|1.22");
+            AssertTagLex(lexer_roRO.ReadNext(), 0, two_numbers.Length, exprTag, "1.22|KW|1 . 22");
         }
     }
 }

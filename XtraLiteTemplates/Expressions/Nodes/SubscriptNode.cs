@@ -52,16 +52,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return RightNode.Build();
         }
 
-        public override ExpressionNode Reduce()
+        protected override Boolean TryReduce(out Object reducedValue)
         {
-            /* Right side. */
-            RightNode = RightNode as LeafNode ?? RightNode.Reduce();
-            var leafRight = RightNode as LeafNode;
+            if (RightNode.Reduce())
+            {
+                reducedValue = RightNode.ReducedValue;
+                return true;
+            }
 
-            if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal)
-                return leafRight;
-            else
-                return this;
+            reducedValue = null;
+            return false;
         }
 
         public override String ToString(ExpressionFormatStyle style)

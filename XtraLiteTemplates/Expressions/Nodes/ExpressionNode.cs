@@ -34,16 +34,47 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
     internal abstract class ExpressionNode
     {
-        public ExpressionNode Parent { get; internal set; }
+        public enum ReduceStatus
+        {
+            Untouched,
+            Reduced,
+            Unreducible,
+        }
+
+        public ExpressionNode Parent { get; set; }
+
+        public ReduceStatus Reducibility { get; private set; }
+        
+        public Object ReducedValue { get; private set; }
+
 
         protected ExpressionNode(ExpressionNode parent)
         {
             Parent = parent;
+            Reducibility = ReduceStatus.Untouched;
         }
 
-        public virtual ExpressionNode Reduce()
+        protected virtual Boolean TryReduce(out Object reducedValue)
         {
-            return this;
+            reducedValue = null;
+            return false;
+        }
+
+        public Boolean Reduce()
+        {
+            if (Reducibility == ReduceStatus.Untouched)
+            {
+                Object value;
+                if (TryReduce(out value))
+                {
+                    Reducibility = ReduceStatus.Reduced;
+                    ReducedValue = value;
+                }
+                else
+                    Reducibility = ReduceStatus.Unreducible;
+            }
+
+            return Reducibility == ReduceStatus.Reduced;
         }
 
         public abstract Func<IVariableProvider, Object> Build();

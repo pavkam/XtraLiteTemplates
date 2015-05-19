@@ -38,55 +38,7 @@ namespace XtraLiteTemplates.NUnit.Inside
 
     public sealed class TestExpressionEvaluationContext : IVariableProvider
     {
-        private Boolean m_gatherErrors;
         private Dictionary<String, Object> m_variables;
-
-        public Object HandleEvaluationError(Operator @operator, Object operand)
-        {
-            Assert.NotNull(@operator);
-
-            if (m_gatherErrors)
-            {
-                var tuple = operand as Tuple<String>;
-                String operandStr = null;
-                if (tuple != null)
-                    operandStr = tuple.Item1;
-                else if (operand != null)
-                    operandStr = operand.ToString();
-
-                return Tuple.Create(String.Format("{0}{1}", @operator.Symbol, operandStr));
-            }
-            else
-                return null;
-        }
-
-        public Object HandleEvaluationError(Operator @operator, Object leftOperand, Object rightOperand)
-        {
-            Assert.NotNull(@operator);
-
-            if (m_gatherErrors)
-            {
-                var leftTuple = leftOperand as Tuple<String>;
-                var rightTuple = rightOperand as Tuple<String>;
-
-                String leftOperandStr = null;
-                String rightOperandStr = null;
-
-                if (leftTuple != null)
-                    leftOperandStr = leftTuple.Item1;
-                else if (leftOperand != null)
-                    leftOperandStr = leftOperand.ToString();
-
-                if (rightTuple != null)
-                    rightOperandStr = rightTuple.Item1;
-                else if (rightOperand != null)
-                    rightOperandStr = rightOperand.ToString();
-
-                return Tuple.Create(String.Format("{0}{1}{2}", leftOperandStr, @operator.Symbol, rightOperandStr));
-            }
-            else
-                return null;
-        }
 
         public Object GetVariable(String identifier)
         {
@@ -99,13 +51,12 @@ namespace XtraLiteTemplates.NUnit.Inside
                 return null;
         }
 
-        public TestExpressionEvaluationContext(Boolean gatherErrors, IEqualityComparer<String> comparer, 
+        public TestExpressionEvaluationContext(IEqualityComparer<String> comparer, 
             IReadOnlyCollection<KeyValuePair<String, Object>> variables)
         {
             Debug.Assert(comparer != null);
             Debug.Assert(variables != null);
 
-            m_gatherErrors = gatherErrors;
             m_variables = variables.ToDictionary(k => k.Key, v => v.Value);
         }
     }

@@ -78,6 +78,18 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 return Operand.ToString();
         }
 
+        protected override Boolean TryReduce(out Object value)
+        {
+            if (Evaluation == EvaluationType.Literal)
+            {
+                value = Operand;
+                return true;
+            }
+
+            value = null;
+            return false;
+        }
+
         public void ConvertToIdentifier()
         {
             Debug.Assert(Evaluation == EvaluationType.Variable);

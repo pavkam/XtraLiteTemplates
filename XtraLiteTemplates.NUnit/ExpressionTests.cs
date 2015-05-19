@@ -111,7 +111,7 @@ namespace XtraLiteTemplates.NUnit
             return result;
         }
 
-        private IVariableProvider CreateStandardTestEvaluationContext(Expression e, Boolean gatherErrors = false)
+        private IVariableProvider CreateStandardTestEvaluationContext(Expression e)
         {
             var variables = new Dictionary<String, Object>()
             {
@@ -123,7 +123,7 @@ namespace XtraLiteTemplates.NUnit
                 { "s", "Hello World" },
             };
 
-            return new TestExpressionEvaluationContext(gatherErrors, e.Comparer, variables);
+            return new TestExpressionEvaluationContext(e.Comparer, variables);
         }
 
         [Test]
@@ -264,7 +264,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluation_2()
         {
             var expression = CreateTestExpression("1 + 2 * 3 + 4 / 5 - 6 + 7 + 8 / a + 9 % 10");
-            Assert.AreEqual("8.8 + 8 / @a + 9", expression.ToString());
+            Assert.AreEqual("1 + 2 * 3 + 4 / 5 - 6 + 7 + 8 / @a + 9 % 10", expression.ToString());
 
             var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
             Assert.AreEqual(13.8, result);
@@ -274,7 +274,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluation_3a()
         {
             var expression = CreateTestExpression("false && a > 0");
-            Assert.AreEqual("False", expression.ToString());
+            Assert.AreEqual("False && @a > 0", expression.ToString());
 
             var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
             Assert.AreEqual(false, result);
@@ -353,14 +353,12 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseEvaluationUndefined()
+        public void TestCaseEvaluationFull()
         {
             var expression = CreateTestExpression("true / 100.0 * string >> false >= -10 | something_else");
-            var result_wg = expression.Evaluate(CreateStandardTestEvaluationContext(expression, true));
-            var result_ng = expression.Evaluate(CreateStandardTestEvaluationContext(expression, false));
+            var result_wg = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
 
-            Assert.AreEqual("(True/100*string>>False>=-10|something_else)", result_wg.ToString());
-            Assert.IsNull(result_ng);
+            Assert.AreEqual("1", result_wg.ToString());
         }
 
         [Test]
@@ -397,9 +395,9 @@ namespace XtraLiteTemplates.NUnit
             var s_polish = expression.ToString(ExpressionFormatStyle.Polish);
 
             Assert.AreEqual(s_def, s_arithm);
-            Assert.AreEqual("@a + \"b\" % ( ( @c ) ) >> ( ( ( +++@t - 3 ) / True ) )", s_arithm);
-            Assert.AreEqual(">>{+{@a,%{\"b\",(){(){@c}}}},(){(){/{(){-{+{+{+{@t}}},3}},True}}}}", s_canon);
-            Assert.AreEqual(">> + @a % \"b\" ((@c)) ((/ (- +++@t 3) True))", s_polish);
+            Assert.AreEqual("@a + \"b\" % ( ( @c ) ) >> ( ( ( +++@t - 3 ) / !False ) )", s_arithm);
+            Assert.AreEqual(">>{+{@a,%{\"b\",(){(){@c}}}},(){(){/{(){-{+{+{+{@t}}},3}},!{False}}}}}", s_canon);
+            Assert.AreEqual(">> + @a % \"b\" ((@c)) ((/ (- +++@t 3) !False))", s_polish);
         }
 
         [Test]

@@ -49,26 +49,21 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        public override ExpressionNode Reduce()
+        protected override Boolean TryReduce(out Object reducedValue)
         {
-            /* Left side. */
-            LeftNode = LeftNode as LeafNode ?? LeftNode.Reduce();
-            RightNode = RightNode as LeafNode ?? RightNode.Reduce();
-
-            var leafLeft = LeftNode as LeafNode;
-            if (leafLeft != null && leafLeft.Evaluation == LeafNode.EvaluationType.Literal)
+            if (LeftNode.Reduce())
             {
-                Object reducedByLeft;
-                if (Operator.EvaluateLhs(leafLeft.Operand, out reducedByLeft))
-                    return new LeafNode(Parent, reducedByLeft, LeafNode.EvaluationType.Literal);
-
-                /* Right side. */
-                var leafRight = RightNode as LeafNode;
-                if (leafRight != null && leafRight.Evaluation == LeafNode.EvaluationType.Literal)
-                    return new LeafNode(Parent, Operator.Evaluate(leafLeft.Operand, leafRight.Operand), LeafNode.EvaluationType.Literal);
+                if (Operator.EvaluateLhs(LeftNode.ReducedValue, out reducedValue))
+                    return true;
+                else if (RightNode.Reduce())
+                {
+                    reducedValue = Operator.Evaluate(LeftNode.ReducedValue, RightNode.ReducedValue);
+                    return true;
+                }
             }
 
-            return this;
+            reducedValue = null;
+            return false;
         }
 
         public override Func<IVariableProvider, Object> Build()

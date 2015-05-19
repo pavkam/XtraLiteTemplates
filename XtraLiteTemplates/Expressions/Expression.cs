@@ -344,7 +344,7 @@ namespace XtraLiteTemplates.Expressions
                     ExceptionHelper.CannotConstructExpressionInvalidState();
 
                 /* Reduce the expression if so was desired. */
-                m_root = m_root.Reduce();
+                m_root.Reduce();
                 m_function = m_root.Build();
             }
         }
