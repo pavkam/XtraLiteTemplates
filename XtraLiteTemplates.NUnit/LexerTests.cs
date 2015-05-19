@@ -327,7 +327,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseAmbiguousTags()
+        public void TestCaseAmbiguousTags1()
         {
             const String test = "{IF SET Alpha}";
 
@@ -340,6 +340,104 @@ namespace XtraLiteTemplates.NUnit
 
             AssertTagLex(lexer.ReadNext(), 0, 14, ifTag2, "IF|SET|@Alpha");
             Assert.IsNull(lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags2()
+        {
+            const String var1 = "{1}";
+            const String var2 = "{A}";
+            const String var3 = "{1 THEN}";
+            const String var4 = "{A THEN}";
+
+            var tag1 = Tag.Parse("$");
+            var tag2 = Tag.Parse("$ THEN");
+
+            var lexer1 = new Lexer(new Tokenizer(var1), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(var2), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer3 = new Lexer(new Tokenizer(var3), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer4 = new Lexer(new Tokenizer(var4), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+
+            AssertTagLex(lexer1.ReadNext(), 0, 3, tag1, "1");
+            AssertTagLex(lexer2.ReadNext(), 0, 3, tag1, "@A");
+            AssertTagLex(lexer3.ReadNext(), 0, 8, tag2, "1|THEN");
+            AssertTagLex(lexer4.ReadNext(), 0, 8, tag2, "@A|THEN");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags3()
+        {
+            const String test = "{i}";
+
+            var tag1 = Tag.Parse("$");
+            var tag2 = Tag.Parse("?");
+
+            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer1.ReadNext(), 0, 3, tag2, "i");
+            AssertTagLex(lexer2.ReadNext(), 0, 3, tag2, "i");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags4()
+        {
+            const String test = "{i}";
+
+            var tag1 = Tag.Parse("$");
+            var tag2 = Tag.Parse("? THEN");
+
+            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer1.ReadNext(), 0, 3, tag1, "i");
+            AssertTagLex(lexer2.ReadNext(), 0, 3, tag1, "i");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags5()
+        {
+            const String test = "{a}";
+
+            var tag1 = Tag.Parse("?");
+            var tag2 = Tag.Parse("a");
+
+            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer1.ReadNext(), 0, 3, tag2, "a");
+            AssertTagLex(lexer2.ReadNext(), 0, 3, tag2, "a");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags6()
+        {
+            const String test = "{a}";
+
+            var tag1 = Tag.Parse("?");
+            var tag2 = Tag.Parse("A");
+
+            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal).RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer1.ReadNext(), 0, 3, tag1, "a");
+            AssertTagLex(lexer2.ReadNext(), 0, 3, tag1, "a");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags7()
+        {
+            const String test = "{a B}";
+
+            var tag1 = Tag.Parse("a b");
+            var tag2 = Tag.Parse("a B");
+            var tag3 = Tag.Parse("A b");
+            var tag4 = Tag.Parse("A B");
+
+            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal)
+                .RegisterTag(tag1).RegisterTag(tag2).RegisterTag(tag3).RegisterTag(tag4);
+
+            AssertTagLex(lexer1.ReadNext(), 0, 5, tag2, "a|B");
         }
 
         [Test]
