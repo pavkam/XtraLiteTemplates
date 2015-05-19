@@ -178,7 +178,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationStandardForEachDirective2()
         {
-            var evaluable = new Interpreter(new Tokenizer("{FOR EACH x IN 1:2}{FOR EACH y IN 3:4}{x + \"-\" + y},{END}{END}"), 
+            var evaluable = new Interpreter(new Tokenizer("{FOR EACH x IN 1..2}{FOR EACH y IN 3..4}{x + \"-\" + y},{END}{END}"), 
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
                 .RegisterDirective(new ForEachDirective(CreateTypeConverter()))

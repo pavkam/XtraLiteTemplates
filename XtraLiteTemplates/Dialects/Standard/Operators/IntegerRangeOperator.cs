@@ -39,7 +39,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         }
 
         public IntegerRangeOperator(IPrimitiveTypeConverter typeConverter)
-            : this(":", typeConverter)
+            : this("..", typeConverter)
         {
         }
 

@@ -140,7 +140,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
                 else if (@operator is MemberAccessOperator)
                     Assert.AreEqual(".", @operator.ToString());
                 else if (@operator is IntegerRangeOperator)
-                    Assert.AreEqual(":", @operator.ToString());
+                    Assert.AreEqual("..", @operator.ToString());
                 else if (@operator is SubscriptOperator)
                     Assert.AreEqual("()", @operator.ToString());
                 else

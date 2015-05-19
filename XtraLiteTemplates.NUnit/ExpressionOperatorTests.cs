@@ -118,7 +118,7 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentEmptyException("typeConverter", () => new IntegerRangeOperator(null));
 
             var standard = new IntegerRangeOperator(CreateTypeConverter());
-            Assert.AreEqual(":", standard.Symbol);
+            Assert.AreEqual("..", standard.Symbol);
 
             var op = new IntegerRangeOperator("operator", CreateTypeConverter());
             Assert.AreEqual("operator", op.Symbol);
