@@ -64,7 +64,7 @@ namespace XtraLiteTemplates.Evaluation
             Tag = lex.Tag;
         }
 
-        public Object[] Evaluate(IVariableProvider context)
+        public Object[] Evaluate(IExpressionEvaluationContext context)
         {
             Debug.Assert(context != null);
             Object[] result = new Object[Components.Length];

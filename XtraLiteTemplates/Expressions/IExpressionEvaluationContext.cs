@@ -30,8 +30,9 @@ namespace XtraLiteTemplates.Expressions
 {
     using System;
 
-    public interface IVariableProvider
+    public interface IExpressionEvaluationContext
     {
+        void SetVariable(String identifier, Object value);
         Object GetVariable(String identifier);
     }
 }

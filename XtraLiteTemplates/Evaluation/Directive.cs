@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.Evaluation
     using System.Diagnostics;
     using System.Text;
     using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Expressions;
 
     public abstract class Directive
     {
@@ -129,7 +130,8 @@ namespace XtraLiteTemplates.Evaluation
         }
 
 
-        protected internal abstract FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state, IVariableContext context, out String text);
+        protected internal abstract FlowDecision Execute(Int32 tagIndex, Object[] components, 
+            ref Object state, IExpressionEvaluationContext context, out String text);
     }
 }
 

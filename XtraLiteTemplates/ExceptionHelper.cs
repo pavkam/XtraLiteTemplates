@@ -170,13 +170,26 @@ namespace XtraLiteTemplates
                 String.Join(" or ", candidateDirectives.AsEnumerable()), firstCharaterIndex);
         }
 
-
         internal static void DirectiveEvaluationError(Directive directive, Exception exception)
         {
             Debug.Assert(directive != null);
             Debug.Assert(exception != null);
 
             throw new EvaluationException(exception, "Evaluation of directive {0} resulted in an error: {1}", directive, exception.Message);
+        }
+
+
+        internal static void InvalidObjectMemberName(String name)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(name));
+            throw new EvaluationException(null, "Property or method '{0}' could not be located in the provided object.", name);
+        }
+
+        internal static void ObjectMemberEvaluationError(Exception inner, String name)
+        {
+            Debug.Assert(inner != null);
+            Debug.Assert(!String.IsNullOrEmpty(name));
+            throw new EvaluationException(inner, "Evaluation of property or method '{0}' failed. An exception was raised: {1}", name, inner.Message);
         }
     }
 }

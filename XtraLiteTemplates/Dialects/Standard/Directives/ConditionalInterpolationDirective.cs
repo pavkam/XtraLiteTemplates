@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
 
     public sealed class ConditionalInterpolationDirective : StandardDirective
     {
@@ -72,7 +73,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         }
 
         protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components,
-            ref Object state, IVariableContext context, out String text)
+            ref Object state, IExpressionEvaluationContext context, out String text)
         {
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);

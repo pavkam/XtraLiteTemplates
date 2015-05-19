@@ -60,36 +60,95 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseCaseSensitiveInvariantCulture()
+        public void TestCaseEvaluate1()
         {
-            const String text = @"
-{REPEAT 20.1}={END}{'  '}
-    {FOR index IN 0 : 100}
-        {IF index % 10.2 == 0}
-            {index / 10 + ': '}
-            {' ' + var1 + ' ' IF INDEX%20 == 0}
-            {' ' + VAR2 + ' ' IF index%30 == 0}
-            {if (inDex/10) % 2 == 0}
-                {' EVEN'}
-            {else}
-                {' ODD'}
-            {END} -- 
+            var text = "contents are irrelevant";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
 
-            
-        {end}
-    {END}
-{'  '}{REPEAT 20.19}={END}
-";
             var variables = new Dictionary<String, Object>()
             {
-                { "var1", "<+>" },
-                { "var2", ">-<" },
             };
 
-            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text.Replace("'", "\""));
-            var result = template.Evaluate(variables);
+            ExpectArgumentNullException("variables", () => template.Evaluate(null));
+            ExpectArgumentNullException("writer", () => template.Evaluate(null, variables));
+        }
 
-            Assert.AreEqual("====================  0:  <+>  >-<  EVEN--1:  ODD--2:  <+>  EVEN--3:  >-<  ODD--4:  <+>  EVEN--5:  ODD--6:  <+>  >-<  EVEN--7:  ODD--8:  <+>  EVEN--9:  >-<  ODD--10:  <+>  EVEN--  ====================", result);
+        [Test]
+        public void TestCaseEvaluate2()
+        {
+            var text = "V = {variable}";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+
+            var variables = new Dictionary<String, Object>()
+            {
+                { "Variable", 1 }
+            };
+            
+            using (var writer = new StringWriter())
+            {
+                template.Evaluate(writer, variables);
+                Assert.AreEqual("V =1", writer.ToString());
+            }
+
+            Assert.AreEqual("V =1", template.Evaluate(variables));
+        }
+
+        [Test]
+        public void TestCaseEvaluate3()
+        {
+            var text = "V = {variable}";
+            var template = new XLTemplate(StandardDialect.Default, text);
+
+            var variables1 = new Dictionary<String, Object>()
+            {
+                { "Variable", 1 }
+            };
+            var variables2 = new Dictionary<String, Object>()
+            {
+                { "variable", 1 }
+            };
+            var variables3 = new Dictionary<String, Object>()
+            {
+                { "Variable", 1 },
+                { "variable", 2 }
+            };
+
+            Assert.AreEqual("V =undefined", template.Evaluate(variables1));
+            Assert.AreEqual("V =1", template.Evaluate(variables2));
+            Assert.AreEqual("V =2", template.Evaluate(variables3));
+        }
+
+        [Test]
+        public void TestCaseToString1()
+        {
+            var text = "{if true then}eat a cookie!{else}{variable}{end}";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+
+            Assert.AreEqual("(({if @true then}eat a cookie!{else}({@variable}){end}))", template.ToString());
+        }
+
+        [Test]
+        public void TestCaseToString2()
+        {
+            var text = "";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+
+            Assert.AreEqual("()", template.ToString());
+        }
+
+        [Test]
+        public void TestCaseStaticEvaluate1()
+        {
+            ExpectArgumentNullException("dialect", () => XLTemplate.Evaluate(null, ""));
+            ExpectArgumentNullException("template", () => XLTemplate.Evaluate(StandardDialect.Default, null));
+            ExpectArgumentNullException("arguments", () => XLTemplate.Evaluate(StandardDialect.Default, "", (Object[])null));
+        }
+
+        [Test]
+        public void TestCaseStaticEvaluate2()
+        {
+            var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{_0} -> {_1}", "string", 100.33);
+            Assert.AreEqual("string->100.33", result);
         }
     }
 }

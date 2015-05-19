@@ -32,8 +32,9 @@ namespace XtraLiteTemplates.Evaluation
     using System.Globalization;
     using System.IO;
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Expressions;
 
-    public interface IEvaluationContext : IVariableContext
+    public interface IEvaluationContext : IExpressionEvaluationContext
     {
         Boolean IgnoreEvaluationExceptions { get; }
         String ProcessUnparsedText(String value);

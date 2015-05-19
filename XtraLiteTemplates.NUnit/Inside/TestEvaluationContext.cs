@@ -38,7 +38,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Evaluation;
 
-    public class TestEvaluationContext : IVariableProvider, IEvaluationContext
+    public class TestEvaluationContext : IExpressionEvaluationContext, IEvaluationContext
     {
         private Stack<Dictionary<String, Object>> m_variableFrames;
 

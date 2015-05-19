@@ -47,7 +47,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        public override Func<IVariableProvider, Object> Build()
+        public override Func<IExpressionEvaluationContext, Object> Build()
         {
             return RightNode.Build();
         }

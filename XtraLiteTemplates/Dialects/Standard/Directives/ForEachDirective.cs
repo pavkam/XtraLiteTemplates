@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Collections;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
 
     public sealed class ForEachDirective : StandardDirective
     {
@@ -67,7 +68,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         }
 
         protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
-            IVariableContext context, out String text)
+            IExpressionEvaluationContext context, out String text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);

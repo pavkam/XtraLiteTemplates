@@ -608,6 +608,40 @@ using System.Diagnostics;
 
             Assert.Fail();
         }
+
+
+
+        protected static void ExpectInvalidObjectMemberNameException(String memberName, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(EvaluationException), e);
+                Assert.AreEqual(String.Format("Property or method '{0}' could not be located in the provided object.", memberName), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectObjectMemberEvaluationErrorException(String memberName, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(EvaluationException), e);
+                Assert.AreEqual(String.Format("Evaluation of property or method '{0}' failed. An exception was raised: Exception has been thrown by the target of an invocation.", memberName), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
     }
 }
 

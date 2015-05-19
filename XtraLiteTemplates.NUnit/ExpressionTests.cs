@@ -111,7 +111,7 @@ namespace XtraLiteTemplates.NUnit
             return result;
         }
 
-        private IVariableProvider CreateStandardTestEvaluationContext(Expression e)
+        private IExpressionEvaluationContext CreateStandardTestEvaluationContext(Expression e)
         {
             var variables = new Dictionary<String, Object>()
             {

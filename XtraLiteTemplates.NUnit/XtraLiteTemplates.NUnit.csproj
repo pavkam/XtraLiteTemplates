@@ -41,6 +41,7 @@
     <Compile Include="Directives\StandardIfDirectiveTests.cs" />
     <Compile Include="Directives\StandardForEachDirectiveTests.cs" />
     <Compile Include="Directives\StandardConditionalInterpolationDirectiveTests.cs" />
+    <Compile Include="SimpleTypeDisembowelerTests.cs" />
     <Compile Include="FlexiblePrimitiveTypeConverterTests.cs" />
     <Compile Include="XLTemplateTests.cs" />
     <Compile Include="Inside\RippedOpenDirective.cs" />

@@ -77,7 +77,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return Reducibility == ReduceStatus.Reduced;
         }
 
-        public abstract Func<IVariableProvider, Object> Build();
+        public abstract Func<IExpressionEvaluationContext, Object> Build();
 
         public abstract String ToString(ExpressionFormatStyle style);
 

@@ -184,26 +184,20 @@ namespace XtraLiteTemplates
         }
 
 
-        public static String Evaluate(String template, Boolean ignoreCase, IReadOnlyDictionary<String, Object> variables)
+        public static String Evaluate(IDialect dialect, String template, params Object[] arguments)
         {
+            Expect.NotNull("dialect", dialect);
             Expect.NotNull("template", template);
-            Expect.NotNull("variables", variables);
+            Expect.NotNull("arguments", arguments);
 
-            var dialect = ignoreCase ? StandardDialect.DefaultIgnoreCase : StandardDialect.Default;
             var instance = new XLTemplate(dialect, template);
 
+            /* Instatiate the variables */
+            var variables = new Dictionary<String, Object>();
+            for (var i = 0; i < arguments.Length; i++)
+                variables.Add(String.Format("_{0}", i), arguments[i]);
+            
             return instance.Evaluate(variables);
-        }
-
-        public static String Evaluate(String template, IReadOnlyDictionary<String, Object> variables)
-        {
-            return Evaluate(template, true, variables);
-        }
-
-        public static String Evaluate(String template, params Tuple<String, Object>[] variables)
-        {
-            Expect.NotNull("variables", variables);
-            return Evaluate(template, variables.ToDictionary(k => k.Item1, v => v.Item2));
         }
     }
 }

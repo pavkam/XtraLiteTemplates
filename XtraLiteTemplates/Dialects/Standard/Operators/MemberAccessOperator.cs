@@ -36,13 +36,17 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 
     public sealed class MemberAccessOperator : BinaryOperator
     {
+        private Dictionary<Type, SimpleTypeDisemboweler> m_disembowelers;
+
         public IEqualityComparer<String> Comparer { get; private set; }
 
         public MemberAccessOperator(String symbol, IEqualityComparer<String> comparer)
             : base(symbol, 0, Associativity.LeftToRight, false, true)
         {
             Expect.NotNull("comparer", comparer);
+
             Comparer = comparer;
+            m_disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
         }
 
         public MemberAccessOperator(IEqualityComparer<String> comparer)
@@ -57,13 +61,19 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 
             if (left != null)
             {
-                foreach (var property in left.GetType().GetProperties())
+                var type = left.GetType();
+
+                SimpleTypeDisemboweler disemboweler;
+                if (!m_disembowelers.TryGetValue(type, out disemboweler))
                 {
-                    if (!property.CanRead || property.GetIndexParameters().Length > 0 || !Comparer.Equals(property.Name, memberName))
-                        continue;
-                    
-                    return property.GetValue(left);
+                    disemboweler = new SimpleTypeDisemboweler(type,
+                        SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
+                        SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, Comparer);
+
+                    m_disembowelers.Add(type, disemboweler);
                 }
+
+                return disemboweler.Read(memberName, left);
             }
 
             return null;

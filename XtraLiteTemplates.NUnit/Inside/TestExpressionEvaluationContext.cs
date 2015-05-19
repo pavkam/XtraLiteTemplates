@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
 
-    public sealed class TestExpressionEvaluationContext : IVariableProvider
+    public sealed class TestExpressionEvaluationContext : IExpressionEvaluationContext
     {
         private Dictionary<String, Object> m_variables;
 
@@ -49,6 +49,11 @@ namespace XtraLiteTemplates.NUnit.Inside
                 return result;
             else
                 return null;
+        }
+
+        public void SetVariable(String identifier, Object value)
+        {
+            m_variables[identifier] = value;
         }
 
         public TestExpressionEvaluationContext(IEqualityComparer<String> comparer, 

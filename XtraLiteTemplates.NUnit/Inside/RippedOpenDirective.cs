@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System.Text;
     using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
 
     public sealed class RippedOpenDirective : Directive
     {
@@ -55,8 +56,8 @@ namespace XtraLiteTemplates.NUnit.Inside
             m_myTags = tags;
         }
 
-        protected override FlowDecision Execute(Int32 tagIndex, Object[] components, 
-            ref Object state, IVariableContext context, out String text)
+        protected override FlowDecision Execute(Int32 tagIndex, Object[] components,
+            ref Object state, IExpressionEvaluationContext context, out String text)
         {
             Assert.GreaterOrEqual(tagIndex, 0);
             Assert.Less(tagIndex, m_myTags.Length);

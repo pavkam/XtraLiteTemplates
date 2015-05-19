@@ -33,9 +33,9 @@
   <ItemGroup>
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
-    <Compile Include="Evaluation\IVariableContext.cs" />
+    <Compile Include="Dialects\Standard\SimpleTypeDisemboweler.cs" />
     <Compile Include="ExceptionHelper.cs" />
-    <Compile Include="Expressions\IVariableProvider.cs" />
+    <Compile Include="Expressions\IExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\Nodes\OperatorNode.cs" />
     <Compile Include="Dialects\Standard\Operators\IntegerRangeOperator.cs" />
