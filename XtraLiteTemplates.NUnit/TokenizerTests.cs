@@ -183,8 +183,7 @@ namespace XtraLiteTemplates.NUnit
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 23, ".99");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 26, ".2");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Word, 28, "B");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 29, ".");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 30, ".");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 29, "..");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Word, 31, "C");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.EndTag, 32, "}");
             Assert.IsNull(tokenizer.ReadNext());
@@ -210,8 +209,8 @@ namespace XtraLiteTemplates.NUnit
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 17, "12.56");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 22, " ");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 23, "78");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 25, ".");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 26, ".89");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 25, "..");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 27, "89");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 29, " ");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 30, "56");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 32, ".");
@@ -224,19 +223,49 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseLumpedSymbols()
+        {
+            const String test = "{+-.56==+. ... .. 1.2 3..4 5...6 /// $?#!\\!33.1}";
+            var tokenizer = new Tokenizer(test);
+
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 1, "+-");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 3, ".56");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 6, "==+.");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 10, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 11, "...");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 14, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 15, "..");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 17, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 18, "1.2");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 21, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 22, "3");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 23, "..");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 25, "4");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 26, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 27, "5");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 28, "...");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 31, "6");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 32, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 33, "///");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 36, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 37, "$?#!\\!");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 43, "33.1");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.EndTag, 47, "}");
+        }
+
+        [Test]
         public void TestCaseDirectiveWithSymbolsAndWhiteSpaces()
         {
             const String test = "{..  + /<200 ABC   }";
             var tokenizer = new Tokenizer(test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 1, ".");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 2, ".");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 1, "..");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 3, "  ");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 5, "+");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 6, " ");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 7, "/");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 8, "<");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 7, "/<");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 9, "200");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 12, " ");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Word, 13, "ABC");

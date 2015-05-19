@@ -196,6 +196,39 @@ namespace XtraLiteTemplates.Parsing
             return false;
         }
 
+        private void InterpretSymbolChainToken(Expression expression, Token token)
+        {
+            String _symbols = token.Value;
+
+            while (_symbols.Length > 0)
+            {
+                Boolean found = false;
+
+                for (var i = _symbols.Length; i > 0; i--)
+                {
+                    var potentialOperator = _symbols.Substring(0, i);
+                    if (KnownSymbol(potentialOperator))
+                    {
+                        try
+                        {
+                            expression.FeedSymbol(potentialOperator);
+                        }
+                        catch (ExpressionException feedException)
+                        {
+                            ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, token);
+                        }
+
+                        found = true;
+                        _symbols = _symbols.Substring(i);
+                        break;
+                    }
+                }
+
+                if (!found)
+                    ExceptionHelper.UnexpectedToken(token);
+            }
+        }
+
         public Lex ReadNext()
         {
             if (this.m_currentToken == null && !this.m_isEndOfStream)
@@ -226,7 +259,6 @@ namespace XtraLiteTemplates.Parsing
 
             var matchingTags = new HashSet<Tag>(m_tags);
             List<Token> _allTokens = new List<Token>() { this.m_currentToken }; 
-            List<Token> _symbolChain = new List<Token>();
             List<Object> _components = new List<Object>();
 
             Expression currentExpression = null;
@@ -238,39 +270,6 @@ namespace XtraLiteTemplates.Parsing
                     ExceptionHelper.UnexpectedEndOfStreamAfterToken(_previousToken);
 
                 _allTokens.Add(this.m_currentToken);
-
-                if (m_currentToken.Type != Token.TokenType.Symbol && _symbolChain.Count > 0)
-                {
-                    /* We have a chain of symbols before this token camne to life. Need to interpret them only as potential operators in the expression. */
-                    while (_symbolChain.Count > 0)
-                    {
-                        Boolean found = false;
-                        for (var i = _symbolChain.Count; i > 0; i--)
-                        {
-                            var potentialOperator = String.Join(String.Empty, _symbolChain.Take(i).Select(s => s.Value));
-                            if (KnownSymbol(potentialOperator))
-                            {
-                                try
-                                {
-                                    currentExpression.FeedSymbol(potentialOperator);
-                                }
-                                catch (ExpressionException feedException)
-                                {
-                                    var mergedToken = new Token(Token.TokenType.Symbol,
-                                        potentialOperator, _symbolChain[0].CharacterIndex, potentialOperator.Length);
-                                    ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, mergedToken);
-                                }
-
-                                found = true;
-                                _symbolChain.RemoveRange(0, i);
-                                break;
-                            }
-                        }
-
-                        if (!found)
-                            ExceptionHelper.UnexpectedToken(_symbolChain[0]);
-                    }
-                }
 
                 if (this.m_currentToken.Type == Token.TokenType.EndTag)
                 {
@@ -384,7 +383,7 @@ namespace XtraLiteTemplates.Parsing
                         ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, this.m_currentToken);
                     }
                 }
-                else if (m_currentToken.Type == Token.TokenType.Symbol)
+                else if (this.m_currentToken.Type == Token.TokenType.Symbol)
                 {
                     /* This must be part of an expression. */
                     if (currentExpression == null)
@@ -398,7 +397,7 @@ namespace XtraLiteTemplates.Parsing
                         _components.Add(currentExpression);
                     }
 
-                    _symbolChain.Add(m_currentToken);
+                    InterpretSymbolChainToken(currentExpression, this.m_currentToken);
                 }
             }
         }

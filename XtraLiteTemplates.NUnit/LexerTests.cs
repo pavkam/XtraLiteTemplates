@@ -68,6 +68,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(asText, allText);
         }
 
+
         [Test]
         public void TestCaseConstruction1()
         {
@@ -264,6 +265,23 @@ namespace XtraLiteTemplates.NUnit
             var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
             AssertTagLex(lexer.ReadNext(), 0, 6, tag, (1.33).ToString());
+            Assert.IsNull(lexer.ReadNext());
+        }
+
+        [Test]
+        public void TestCaseExoticSymbolOrdering()
+        {
+            const String test = "{100 <<-100<<.100-----.1<<-1}";
+
+            var tag = new Tag().Expression();
+            var lexer = new Lexer(new Tokenizer(test),
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag)
+                .RegisterOperator(new BitwiseShiftLeftOperator(CreateTypeConverter()))
+                .RegisterOperator(new ArithmeticSubtractOperator(CreateTypeConverter()))
+                .RegisterOperator(new ArithmeticNegateOperator(CreateTypeConverter()));
+
+            AssertTagLex(lexer.ReadNext(), 0, 29, tag, "0");
             Assert.IsNull(lexer.ReadNext());
         }
 

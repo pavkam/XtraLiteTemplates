@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.Parsing
     using System.Linq;
     using System.Diagnostics;
     using System.IO;
+using System.Globalization;
 
     public sealed class Tokenizer : ITokenizer, IDisposable
     {
@@ -156,12 +157,37 @@ namespace XtraLiteTemplates.Parsing
             return !this.m_isEndOfStream;
         }
 
+
+        private Boolean IsTagSpecialCharacter(Char c)
+        {
+            return
+                c == TagStartCharacter || c == TagEndCharacter || 
+                c == StringLiteralStartCharacter || c == StringLiteralEndCharacter;
+        }
+
+        private Boolean IsStandardSymbol(Char c)
+        {
+            if (IsTagSpecialCharacter(c))
+                return false;
+            else
+            {
+                var unicodeCategory = Char.GetUnicodeCategory(c);
+                return
+                    (unicodeCategory == UnicodeCategory.OtherPunctuation ||
+                     unicodeCategory == UnicodeCategory.CurrencySymbol ||
+                     unicodeCategory == UnicodeCategory.DashPunctuation ||
+                     unicodeCategory == UnicodeCategory.ModifierSymbol ||
+                     unicodeCategory == UnicodeCategory.MathSymbol);
+            }
+        }
+
         private Token ReadNextInternal()
         {
+            if (m_currentCharacterIndex == -1)
+                NextCharacter(false);
+
             if (this.m_isEndOfStream && this.m_parserState != ParserState.InTag)
-            {
                 return null;
-            }
 
             var tokenValue = new StringBuilder();
             Int32 tokenStartIndex = this.m_currentCharacterIndex;
@@ -360,30 +386,38 @@ namespace XtraLiteTemplates.Parsing
                 }
                 else if (this.m_currentCharacter == this.NumberLiteralDecimalSeparatorCharacter)
                 {
-                    /* dot-prefixed number may have started. */
+                    /* Dot-prefixed number may have started. */
                     tokenValue.Append(this.m_currentCharacter);
                     this.NextCharacter(true);
 
-                    while (Char.IsDigit(this.m_currentCharacter))
+                    if (Char.IsDigit(this.m_currentCharacter))
                     {
-                        tokenValue.Append(this.m_currentCharacter);
-                        this.NextCharacter(true);
-                    }
+                        /* Yes, this is a number! */
+                        while (Char.IsDigit(this.m_currentCharacter))
+                        {
+                            tokenValue.Append(this.m_currentCharacter);
+                            this.NextCharacter(true);
+                        }
 
-                    if (tokenValue.Length > 1)
-                    {
                         return new Token(
-                            Token.TokenType.Number, 
-                            tokenValue.ToString(), 
-                            tokenStartIndex, 
+                            Token.TokenType.Number,
+                            tokenValue.ToString(),
+                            tokenStartIndex,
                             this.m_currentCharacterIndex - tokenStartIndex);
                     }
                     else
                     {
+                        /* Lump toghether all "standard symbols" (if this one was a standard one). */
+                        while (this.IsStandardSymbol(this.m_currentCharacter))
+                        {
+                            tokenValue.Append(this.m_currentCharacter);
+                            this.NextCharacter(true);
+                        }
+
                         return new Token(
-                            Token.TokenType.Symbol, 
-                            tokenValue.ToString(), 
-                            tokenStartIndex, 
+                            Token.TokenType.Symbol,
+                            tokenValue.ToString(),
+                            tokenStartIndex,
                             this.m_currentCharacterIndex - tokenStartIndex);
                     }
                 }
@@ -404,11 +438,31 @@ namespace XtraLiteTemplates.Parsing
                         tokenStartIndex, 
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
-                else if (this.m_currentCharacter != TagStartCharacter && this.m_currentCharacter != TagEndCharacter)
+                else if (!this.IsTagSpecialCharacter(this.m_currentCharacter))
                 {
-                    /* Symbol character (unknown) detected. */
+                    /* Check if this is a "standard symbol" */
+                    var isStandardSymbol = this.IsStandardSymbol(this.m_currentCharacter);
+
+                    /* Add the symbol to the token value. */
                     tokenValue.Append(this.m_currentCharacter);
                     this.NextCharacter(true);
+
+                    if (isStandardSymbol)
+                    {
+                        /* Lump toghether all "standard symbols" (if this one was a standard one). */
+                        while (this.IsStandardSymbol(this.m_currentCharacter))
+                        {
+                            if (this.m_currentCharacter == NumberLiteralDecimalSeparatorCharacter)
+                            {
+                                /* Decimal separator. Special case. Peek the next char to see if its a digit. */
+                                if (Char.IsDigit(PeekCharacter()))
+                                    break;
+                            }
+
+                            tokenValue.Append(this.m_currentCharacter);
+                            this.NextCharacter(true);
+                        }
+                    }
 
                     Debug.Assert(tokenValue.Length > 0);
 
@@ -425,10 +479,6 @@ namespace XtraLiteTemplates.Parsing
 
         public Token ReadNext()
         {
-            /* Read first if required. */
-            if (m_currentCharacterIndex == -1)
-                NextCharacter(false);
-
             return ReadNextInternal();
         }
 
