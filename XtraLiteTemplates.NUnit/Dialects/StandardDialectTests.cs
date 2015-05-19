@@ -90,7 +90,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.Fail();
             }
 
-            Assert.AreEqual(25, dialect.Operators.Count);
+            Assert.AreEqual(26, dialect.Operators.Count);
             foreach (var @operator in dialect.Operators)
             {
                 if (@operator is RelationalEqualsOperator)
@@ -141,6 +141,8 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.AreEqual(".", @operator.ToString());
                 else if (@operator is IntegerRangeOperator)
                     Assert.AreEqual("..", @operator.ToString());
+                else if (@operator is ValueFormatOperator)
+                    Assert.AreEqual(":", @operator.ToString());
                 else if (@operator is SubscriptOperator)
                     Assert.AreEqual("()", @operator.ToString());
                 else

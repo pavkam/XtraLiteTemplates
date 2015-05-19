@@ -140,6 +140,36 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseStandardOperatorValueFormat()
+        {
+            ExpectArgumentNullException("symbol", () => new ValueFormatOperator(null, CultureInfo.CurrentCulture, CreateTypeConverter()));
+            ExpectArgumentEmptyException("symbol", () => new ValueFormatOperator(String.Empty, CultureInfo.CurrentCulture, CreateTypeConverter()));
+            ExpectArgumentEmptyException("formatProvider", () => new ValueFormatOperator("operator", null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("formatProvider", () => new ValueFormatOperator(null, CreateTypeConverter()));
+            ExpectArgumentEmptyException("typeConverter", () => new ValueFormatOperator("operator", CultureInfo.CurrentCulture, null));
+            ExpectArgumentEmptyException("typeConverter", () => new ValueFormatOperator(CultureInfo.CurrentCulture, null));
+
+            var standard = new ValueFormatOperator(CultureInfo.CurrentCulture, CreateTypeConverter());
+            Assert.AreEqual(":", standard.Symbol);
+            
+            var op = new ValueFormatOperator("operator", CultureInfo.InvariantCulture, CreateTypeConverter());
+            Assert.AreEqual("operator", op.Symbol);
+            Assert.AreEqual(2, op.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
+            Assert.AreEqual(false, op.ExpectLhsIdentifier);
+            Assert.AreEqual(false, op.ExpectRhsIdentifier);
+            Assert.AreEqual(CultureInfo.InvariantCulture, op.FormatProvider);
+
+            Assert.AreEqual("1.23", op.Evaluate(1.23, "N"));
+            Assert.IsNull(op.Evaluate(null, "N"));
+            Assert.IsNull(op.Evaluate("Hello", "8742398472984"));
+            Assert.IsNull(op.Evaluate("Hello", null));
+
+            var now = DateTime.Now;
+            Assert.AreEqual(now.ToString("g", CultureInfo.InvariantCulture), op.Evaluate(now, "g"));
+        }
+
+        [Test]
         public void TestCaseStandardOperatorLogicalAnd()
         {
             ExpectArgumentNullException("symbol", () => new LogicalAndOperator(null, CreateTypeConverter()));

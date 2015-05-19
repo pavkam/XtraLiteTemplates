@@ -47,9 +47,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        public override Func<IExpressionEvaluationContext, Object> Build()
+        protected override Func<IExpressionEvaluationContext, Object> Build()
         {
-            return RightNode.Build();
+            return RightNode.GetEvaluationFunction();
         }
 
         protected override Boolean TryReduce(out Object reducedValue)

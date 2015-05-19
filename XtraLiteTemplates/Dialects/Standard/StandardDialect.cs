@@ -110,6 +110,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new ArithmeticSumOperator(m_typeConverter),
                 new MemberAccessOperator(IdentifierComparer),
                 new IntegerRangeOperator(m_typeConverter),
+                new ValueFormatOperator(Culture, m_typeConverter),
                 new SubscriptOperator(),
             };
 

@@ -33,6 +33,7 @@
   <ItemGroup>
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
+    <Compile Include="Dialects\Standard\Operators\ValueFormatOperator.cs" />
     <Compile Include="Dialects\Standard\SimpleTypeDisemboweler.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Expressions\IExpressionEvaluationContext.cs" />

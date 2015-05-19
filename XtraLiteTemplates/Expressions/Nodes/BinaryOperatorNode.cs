@@ -66,10 +66,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        public override Func<IExpressionEvaluationContext, Object> Build()
+        protected override Func<IExpressionEvaluationContext, Object> Build()
         {
-            var leftFunc = LeftNode.Build();
-            var rightFunc = RightNode.Build();
+            var leftFunc = LeftNode.GetEvaluationFunction();
+            var rightFunc = RightNode.GetEvaluationFunction();
 
             return (context) =>
             {

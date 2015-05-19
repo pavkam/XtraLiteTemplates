@@ -34,16 +34,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
     internal abstract class ExpressionNode
     {
-        public enum ReduceStatus
-        {
-            Untouched,
-            Reduced,
-            Unreducible,
-        }
-
         public ExpressionNode Parent { get; set; }
 
-        public ReduceStatus Reducibility { get; private set; }
+        public Boolean IsReduced { get; private set; }
         
         public Object ReducedValue { get; private set; }
 
@@ -51,7 +44,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
         protected ExpressionNode(ExpressionNode parent)
         {
             Parent = parent;
-            Reducibility = ReduceStatus.Untouched;
         }
 
         protected virtual Boolean TryReduce(out Object reducedValue)
@@ -60,24 +52,31 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
+        protected abstract Func<IExpressionEvaluationContext, Object> Build();
+
+
         public Boolean Reduce()
         {
-            if (Reducibility == ReduceStatus.Untouched)
+            if (!IsReduced)
             {
                 Object value;
                 if (TryReduce(out value))
                 {
-                    Reducibility = ReduceStatus.Reduced;
+                    IsReduced = true;
                     ReducedValue = value;
                 }
-                else
-                    Reducibility = ReduceStatus.Unreducible;
             }
 
-            return Reducibility == ReduceStatus.Reduced;
+            return IsReduced;
         }
 
-        public abstract Func<IExpressionEvaluationContext, Object> Build();
+        public Func<IExpressionEvaluationContext, Object> GetEvaluationFunction()
+        {
+            if (IsReduced)
+                return context => ReducedValue;
+            else
+                return Build();
+        }
 
         public abstract String ToString(ExpressionFormatStyle style);
 

@@ -345,7 +345,7 @@ namespace XtraLiteTemplates.Expressions
 
                 /* Reduce the expression if so was desired. */
                 m_root.Reduce();
-                m_function = m_root.Build();
+                m_function = m_root.GetEvaluationFunction();
             }
         }
 

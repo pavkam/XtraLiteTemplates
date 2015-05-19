@@ -26,60 +26,42 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Expressions.Nodes
+namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
-    using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
 
-    internal sealed class UnaryOperatorNode : OperatorNode
+    public sealed class ValueFormatOperator : StandardBinaryOperator
     {
-        public new UnaryOperator Operator
+        public IFormatProvider FormatProvider { get; private set; }
+
+        public ValueFormatOperator(String symbol, IFormatProvider formatProvider, IPrimitiveTypeConverter typeConverter)
+            : base(symbol, 2, typeConverter)
         {
-            get
+            Expect.NotNull("formatProvider", formatProvider);
+
+            FormatProvider = formatProvider;
+        }
+
+        public ValueFormatOperator(IFormatProvider formatProvider, IPrimitiveTypeConverter typeConverter)
+            : this(":", formatProvider, typeConverter)
+        {
+        }
+
+        public override Object Evaluate(Object left, Object right)
+        {
+            var formattable = left as IFormattable;
+            if (formattable != null)
             {
-                return base.Operator as UnaryOperator;
+                try
+                {
+                    return formattable.ToString(TypeConverter.ConvertToString(right), FormatProvider);
+                }
+                catch
+                {
+                }
             }
-        }
 
-        public UnaryOperatorNode(ExpressionNode parent, UnaryOperator @operator)
-            : base(parent, @operator)
-        {
-        }
-
-        protected override Func<IExpressionEvaluationContext, Object> Build()
-        {
-            var childFunc = RightNode.GetEvaluationFunction();
-            return (context) => Operator.Evaluate(childFunc(context));
-        }
-
-        protected override Boolean TryReduce(out Object value)
-        {
-            if (RightNode.Reduce())
-            {
-                value = Operator.Evaluate(RightNode.ReducedValue);
-                return true;
-            }
-            else
-            {
-                value = null;
-                return false;
-            }
-        }
-
-        public override String ToString(ExpressionFormatStyle style)
-        {
-            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
-
-            String result = null;
-
-            if (style == ExpressionFormatStyle.Canonical)
-                result = String.Format("{0}{{{1}}}", Operator, childAsString);
-            else
-                result = String.Format("{0}{1}", Operator, childAsString);
-
-            Debug.Assert(result != null);
-            return result;
+            return null;
         }
     }
 }
