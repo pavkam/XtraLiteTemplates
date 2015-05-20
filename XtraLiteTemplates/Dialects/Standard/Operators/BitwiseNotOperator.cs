@@ -29,6 +29,8 @@
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
+    using System.Diagnostics;
+    using XtraLiteTemplates.Expressions;
 
     public sealed class BitwiseNotOperator : StandardUnaryOperator
     {
@@ -42,8 +44,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
         }
 
-        public override Object Evaluate(Object arg)
+        public override Object Evaluate(IExpressionEvaluationContext context, Object arg)
         {
+            Debug.Assert(context != null);
             return ~TypeConverter.ConvertToInteger(arg);
         }
     }

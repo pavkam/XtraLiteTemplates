@@ -52,9 +52,11 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return RightNode.GetEvaluationFunction();
         }
 
-        protected override Boolean TryReduce(out Object reducedValue)
+        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object reducedValue)
         {
-            if (RightNode.Reduce())
+            Debug.Assert(reduceContext != null);
+
+            if (RightNode.Reduce(reduceContext))
             {
                 reducedValue = RightNode.ReducedValue;
                 return true;

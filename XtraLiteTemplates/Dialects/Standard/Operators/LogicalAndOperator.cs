@@ -29,6 +29,8 @@
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
+    using System.Diagnostics;
+    using XtraLiteTemplates.Expressions;
 
     public sealed class LogicalAndOperator : StandardBinaryOperator
     {
@@ -42,13 +44,17 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
         }
 
-        public override Object Evaluate(Object left, Object right)
+        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
+            Debug.Assert(context != null);
+
             return TypeConverter.ConvertToBoolean(left) && TypeConverter.ConvertToBoolean(right);
         }
 
-        public override Boolean EvaluateLhs(Object left, out Object result)
+        public override Boolean EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
         {
+            Debug.Assert(context != null);
+
             result = false;
             return (TypeConverter.TypeOf(left) == PrimitiveType.Boolean && TypeConverter.ConvertToBoolean(left) == false);
         }

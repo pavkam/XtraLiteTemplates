@@ -50,14 +50,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
         protected override Func<IExpressionEvaluationContext, Object> Build()
         {
             var childFunc = RightNode.GetEvaluationFunction();
-            return (context) => Operator.Evaluate(childFunc(context));
+            return (context) => Operator.Evaluate(context, childFunc(context));
         }
 
-        protected override Boolean TryReduce(out Object value)
+        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
         {
-            if (RightNode.Reduce())
+            Debug.Assert(reduceContext != null);
+
+            if (RightNode.Reduce(reduceContext))
             {
-                value = Operator.Evaluate(RightNode.ReducedValue);
+                value = Operator.Evaluate(reduceContext, RightNode.ReducedValue);
                 return true;
             }
             else

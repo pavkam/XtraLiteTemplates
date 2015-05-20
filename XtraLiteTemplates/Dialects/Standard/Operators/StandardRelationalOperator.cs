@@ -30,6 +30,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using XtraLiteTemplates.Expressions;
 
     public abstract class StandardRelationalOperator : StandardBinaryOperator
     {
@@ -43,8 +45,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             StringComparer = stringComparer;
         }
 
-        public sealed override Object Evaluate(Object left, Object right)
+        public sealed override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
+            Debug.Assert(context != null);
+
             Int32 relation;
             if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)
                 relation = StringComparer.Compare(TypeConverter.ConvertToString(left), TypeConverter.ConvertToString(right));

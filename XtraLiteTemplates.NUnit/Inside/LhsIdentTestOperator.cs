@@ -30,6 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Inside
 {
     using System;
+    using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
 
 
@@ -40,8 +41,10 @@ namespace XtraLiteTemplates.NUnit.Inside
         {
         }
 
-        public override Object Evaluate(Object left, Object right)
+        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
+            Assert.NotNull(context);
+
             Assert.IsInstanceOf<String>(left);
             return String.Format("{0}-{1}", left, right);
         }

@@ -78,8 +78,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 return Operand.ToString();
         }
 
-        protected override Boolean TryReduce(out Object value)
+        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
         {
+            Debug.Assert(reduceContext != null);
+
             if (Evaluation == EvaluationType.Literal)
             {
                 value = Operand;

@@ -29,7 +29,9 @@
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
+    using System.Diagnostics;
     using System.Linq;
+    using XtraLiteTemplates.Expressions;
 
     public sealed class IntegerRangeOperator : StandardBinaryOperator
     {
@@ -43,8 +45,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
         }
 
-        public override Object Evaluate(Object left, Object right)
+        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
+            Debug.Assert(context != null);
+
             var min = TypeConverter.ConvertToInteger(left);
             var max = TypeConverter.ConvertToInteger(right);
 

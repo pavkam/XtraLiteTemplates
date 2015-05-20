@@ -49,15 +49,17 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        protected override Boolean TryReduce(out Object reducedValue)
+        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object reducedValue)
         {
-            if (LeftNode.Reduce())
+            Debug.Assert(reduceContext != null);
+
+            if (LeftNode.Reduce(reduceContext))
             {
-                if (Operator.EvaluateLhs(LeftNode.ReducedValue, out reducedValue))
+                if (Operator.EvaluateLhs(reduceContext, LeftNode.ReducedValue, out reducedValue))
                     return true;
-                else if (RightNode.Reduce())
+                else if (RightNode.Reduce(reduceContext))
                 {
-                    reducedValue = Operator.Evaluate(LeftNode.ReducedValue, RightNode.ReducedValue);
+                    reducedValue = Operator.Evaluate(reduceContext, LeftNode.ReducedValue, RightNode.ReducedValue);
                     return true;
                 }
             }
@@ -76,10 +78,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 var left = leftFunc(context);
                 Object evaluatedByLeft;
 
-                if (Operator.EvaluateLhs(left, out evaluatedByLeft))
+                if (Operator.EvaluateLhs(context, left, out evaluatedByLeft))
                     return evaluatedByLeft;
                 else
-                    return Operator.Evaluate(left, rightFunc(context));
+                    return Operator.Evaluate(context, left, rightFunc(context));
             };
         }
 

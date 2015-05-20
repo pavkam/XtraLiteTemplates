@@ -30,6 +30,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
     internal abstract class ExpressionNode
@@ -46,8 +47,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Parent = parent;
         }
 
-        protected virtual Boolean TryReduce(out Object reducedValue)
+        protected virtual Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object reducedValue)
         {
+            Debug.Assert(reduceContext != null);
+
             reducedValue = null;
             return false;
         }
@@ -55,12 +58,14 @@ namespace XtraLiteTemplates.Expressions.Nodes
         protected abstract Func<IExpressionEvaluationContext, Object> Build();
 
 
-        public Boolean Reduce()
+        public Boolean Reduce(IExpressionEvaluationContext reduceContext)
         {
+            Debug.Assert(reduceContext != null);
+
             if (!IsReduced)
             {
                 Object value;
-                if (TryReduce(out value))
+                if (TryReduce(reduceContext, out value))
                 {
                     IsReduced = true;
                     ReducedValue = value;

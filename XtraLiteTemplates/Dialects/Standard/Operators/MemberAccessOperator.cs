@@ -33,6 +33,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Collections.Generic;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Expressions;
 
     public sealed class MemberAccessOperator : BinaryOperator
     {
@@ -54,8 +55,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
         }
 
-        public override Object Evaluate(Object left, Object right)
+        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
+            Debug.Assert(context != null);
+
             var memberName = right as String;
             Debug.Assert(memberName != null);
 

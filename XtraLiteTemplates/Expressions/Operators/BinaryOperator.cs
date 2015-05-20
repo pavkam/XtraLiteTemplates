@@ -46,9 +46,9 @@ namespace XtraLiteTemplates.Expressions.Operators
             Associativity = associativity;
         }
 
-        public abstract Object Evaluate(Object left, Object right);
+        public abstract Object Evaluate(IExpressionEvaluationContext context, Object left, Object right);
 
-        public virtual Boolean EvaluateLhs(Object left, out Object result)
+        public virtual Boolean EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
         {
             result = null;
             return false;

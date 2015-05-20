@@ -36,6 +36,7 @@
     <Compile Include="Dialects\Standard\Operators\ValueFormatOperator.cs" />
     <Compile Include="Dialects\Standard\SimpleTypeDisemboweler.cs" />
     <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="Expressions\ReduceExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\IExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\Nodes\OperatorNode.cs" />

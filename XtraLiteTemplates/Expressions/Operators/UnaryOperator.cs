@@ -37,7 +37,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         {
         }
 
-        public abstract Object Evaluate(Object arg);
+        public abstract Object Evaluate(IExpressionEvaluationContext context, Object arg);
     }
 }
 
