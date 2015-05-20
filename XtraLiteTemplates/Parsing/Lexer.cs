@@ -123,18 +123,18 @@ namespace XtraLiteTemplates.Parsing
                     m_binaryExpressionOperators.Add(binaryOperator.Symbol);
             }
 
-            var subscriptOperator = @operator as SubscriptOperator;
-            if (subscriptOperator != null)
+            var groupOperator = @operator as GroupOperator;
+            if (groupOperator != null)
             {
-                if (m_unaryExpressionOperators.Contains(subscriptOperator.Symbol) ||
-                    m_binaryExpressionOperators.Contains(subscriptOperator.Terminator) ||
-                    m_specials.ContainsKey(subscriptOperator.Symbol) ||
-                    m_specials.ContainsKey(subscriptOperator.Terminator))
+                if (m_unaryExpressionOperators.Contains(groupOperator.Symbol) ||
+                    m_binaryExpressionOperators.Contains(groupOperator.Terminator) ||
+                    m_specials.ContainsKey(groupOperator.Symbol) ||
+                    m_specials.ContainsKey(groupOperator.Terminator))
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
                 else
                 {
-                    m_unaryExpressionOperators.Add(subscriptOperator.Symbol);
-                    m_binaryExpressionOperators.Add(subscriptOperator.Terminator);
+                    m_unaryExpressionOperators.Add(groupOperator.Symbol);
+                    m_binaryExpressionOperators.Add(groupOperator.Terminator);
                 }
             }
 
@@ -188,8 +188,8 @@ namespace XtraLiteTemplates.Parsing
                 if (Comparer.Equals(@operator.Symbol, symbolChain))
                     return true;
 
-                var subscriptOperator = @operator as SubscriptOperator;
-                if (subscriptOperator != null && Comparer.Equals(subscriptOperator.Terminator, symbolChain))
+                var groupOperator = @operator as GroupOperator;
+                if (groupOperator != null && Comparer.Equals(groupOperator.Terminator, symbolChain))
                     return true;
             }
 

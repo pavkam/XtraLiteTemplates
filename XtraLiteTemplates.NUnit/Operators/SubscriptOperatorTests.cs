@@ -68,6 +68,36 @@ namespace XtraLiteTemplates.NUnit.Operators
             Assert.AreEqual(Int32.MaxValue, @operator.Precedence);
             Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
         }
+
+        [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new SubscriptOperator();
+
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1));
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new SubscriptOperator();
+
+            Assert.AreSame(this, @operator.Evaluate(EmptyEvaluationContext, this));
+            Assert.IsNull(@operator.Evaluate(EmptyEvaluationContext, null));
+        }
+
+        [Test]
+        public void TestCaseEvaluationSeparator()
+        {
+            var @operator = new SubscriptOperator();
+            var separatorOperator = new SeparatorOperator(TypeConverter);
+
+            var group = separatorOperator.Evaluate(EmptyEvaluationContext, 1, 2);
+            Assert.IsNotInstanceOf<Object[]>(group);
+
+            var finalized = @operator.Evaluate(EmptyEvaluationContext, group);
+            Assert.IsInstanceOf<Object[]>(finalized);
+        }
     }
 }
 

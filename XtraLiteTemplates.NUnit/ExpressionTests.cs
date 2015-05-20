@@ -30,6 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
@@ -71,6 +72,7 @@ namespace XtraLiteTemplates.NUnit
                 new ArithmeticSumOperator(TypeConverter),
                 new SubscriptOperator(),
                 new IntegerRangeOperator(TypeConverter),
+                new SeparatorOperator(TypeConverter),
                 new ValueFormatOperator(CultureInfo.InvariantCulture, TypeConverter),
                 new MemberAccessOperator(comparer),
             };
@@ -698,6 +700,30 @@ namespace XtraLiteTemplates.NUnit
 
             var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
             Assert.AreEqual("*{!{.{.{@variable,length},some_else}},100}", canonical);
+        }
+
+
+        [Test]
+        public void TestCaseSeparatorEvaluation()
+        {
+            var expression = CreateTestExpression("( 1 , 2 , 3 + 4 , ( 1 , 4 , 6 ) )");
+            
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("(){,{,{,{1,2},+{3,4}},(){,{,{1,4},6}}}}", canonical);
+
+            var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
+            Assert.IsInstanceOf<IEnumerable<Object>>(result);
+
+            var list = (result as IEnumerable<Object>).ToArray();
+            Assert.AreEqual(1, list[0]);
+            Assert.AreEqual(2, list[1]);
+            Assert.AreEqual(7, list[2]);
+
+            Assert.IsInstanceOf<IEnumerable<Object>>(list[3]);
+            list = (list[3] as IEnumerable<Object>).ToArray();
+            Assert.AreEqual(1, list[0]);
+            Assert.AreEqual(4, list[1]);
+            Assert.AreEqual(6, list[2]);
         }
     }
 }

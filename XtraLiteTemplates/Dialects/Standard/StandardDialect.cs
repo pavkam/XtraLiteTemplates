@@ -112,6 +112,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new MemberAccessOperator(IdentifierComparer),
                 new IntegerRangeOperator(m_typeConverter),
                 new ValueFormatOperator(Culture, m_typeConverter),
+                new SeparatorOperator(m_typeConverter),
                 new SubscriptOperator(),
             };
 

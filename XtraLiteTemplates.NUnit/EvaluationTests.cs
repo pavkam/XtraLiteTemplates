@@ -218,6 +218,22 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreEqual("14", exo);
         }
+
+        [Test]
+        public void TestCaseEvaluationForEachInSeparatedGroup()
+        {
+            var evaluable = new Interpreter(new Tokenizer("{FOR EACH item IN (1,\"alex\",2,\"joe\",3,\"mary\")}{item}{end}"),
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new ForEachDirective(TypeConverter))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .RegisterOperator(new SubscriptOperator())
+                .RegisterOperator(new SeparatorOperator(TypeConverter))
+                .Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
+
+            Assert.AreEqual("1alex2joe3mary", exo);
+        }
     }
 }
 

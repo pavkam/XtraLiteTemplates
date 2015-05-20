@@ -32,24 +32,25 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal sealed class SubscriptNode : OperatorNode
+    internal sealed class GroupOperatorNode : OperatorNode
     {
-        public new SubscriptOperator Operator
+        public new GroupOperator Operator
         {
             get
             {
-                return base.Operator as SubscriptOperator;
+                return base.Operator as GroupOperator;
             }
         }
 
-        public SubscriptNode(ExpressionNode parent, SubscriptOperator @operator)
+        public GroupOperatorNode(ExpressionNode parent, GroupOperator @operator)
             : base(parent, @operator)
         {
         }
 
         protected override Func<IExpressionEvaluationContext, Object> Build()
         {
-            return RightNode.GetEvaluationFunction();
+            var childFunc = RightNode.GetEvaluationFunction();
+            return (context) => Operator.Evaluate(context, childFunc(context));
         }
 
         protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object reducedValue)
@@ -58,7 +59,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
             if (RightNode.Reduce(reduceContext))
             {
-                reducedValue = RightNode.ReducedValue;
+                reducedValue = Operator.Evaluate(reduceContext, RightNode.ReducedValue);
                 return true;
             }
 
