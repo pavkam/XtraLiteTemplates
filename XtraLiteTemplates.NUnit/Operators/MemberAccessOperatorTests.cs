@@ -40,28 +40,43 @@ namespace XtraLiteTemplates.NUnit.Operators
     public class MemberAccessOperatorTests : OperatorTestsBase
     {
         [Test]
-        public void TestCaseStandardOperatorMemberAccess()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentEmptyException("symbol", () => new MemberAccessOperator(null, StringComparer.Ordinal));
             ExpectArgumentEmptyException("symbol", () => new MemberAccessOperator(String.Empty, StringComparer.Ordinal));
             ExpectArgumentNullException("comparer", () => new MemberAccessOperator(".", null));
-
-            var standard = new MemberAccessOperator(StringComparer.Ordinal);
-            Assert.AreEqual(".", standard.Symbol);
-            Assert.AreEqual(StringComparer.Ordinal, standard.Comparer);
-
-            var op = new MemberAccessOperator("operator", StringComparer.InvariantCultureIgnoreCase);
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(0, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(StringComparer.InvariantCultureIgnoreCase, op.Comparer);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(true, op.ExpectRhsIdentifier);
-
-            Assert.AreEqual(10, op.Evaluate("1234567890", "Length"));
-            Assert.AreEqual(100, op.Evaluate(Tuple.Create(100), "Item1"));
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new MemberAccessOperator(StringComparer.Ordinal);
+
+            Assert.AreEqual(".", @operator.Symbol);
+            Assert.AreEqual(StringComparer.Ordinal, @operator.Comparer);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new MemberAccessOperator("operator", StringComparer.InvariantCultureIgnoreCase);
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(0, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(StringComparer.InvariantCultureIgnoreCase, @operator.Comparer);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(true, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new MemberAccessOperator("operator", StringComparer.InvariantCultureIgnoreCase);
+
+            Assert.AreEqual(10, @operator.Evaluate("1234567890", "Length"));
+            Assert.AreEqual(100, @operator.Evaluate(Tuple.Create(100), "Item1"));
+        }
     }
 }
 

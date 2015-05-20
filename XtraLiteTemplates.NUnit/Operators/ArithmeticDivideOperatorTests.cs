@@ -39,34 +39,46 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class ArithmeticDivideOperatorTests : OperatorTestsBase
     {
-       
         [Test]
-        public void TestCaseStandardOperatorArithmeticDivide()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticDivideOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new ArithmeticDivideOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticDivideOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticDivideOperator(null));
-
-            var standard = new ArithmeticDivideOperator(CreateTypeConverter());
-            Assert.AreEqual("/", standard.Symbol);
-
-            var op = new ArithmeticDivideOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(3, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Double>(op, Int64.MaxValue, Int64.MaxValue, 1);
-            AssertEvaluation<Double>(op, Int64.MaxValue, 1, Int64.MaxValue);
-            AssertEvaluation<Double>(op, 1, 2, (1.00 / 2.00));
-            AssertEvaluation<Double>(op, 5, -3, (5.00 / -3.00));
-            AssertEvaluation<Double>(op, 1, 0, Double.PositiveInfinity);
-            AssertEvaluation<Double>(op, -1, 0, Double.NegativeInfinity);
-            AssertEvaluation<Double>(op, 0, 0, Double.NaN);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var standard = new ArithmeticDivideOperator(CreateTypeConverter());
+            Assert.AreEqual("/", standard.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new ArithmeticDivideOperator("operator", CreateTypeConverter());
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(3, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new ArithmeticDivideOperator("operator", CreateTypeConverter());
+           
+            AssertEvaluation<Double>(@operator, Int64.MaxValue, Int64.MaxValue, 1);
+            AssertEvaluation<Double>(@operator, Int64.MaxValue, 1, Int64.MaxValue);
+            AssertEvaluation<Double>(@operator, 1, 2, (1.00 / 2.00));
+            AssertEvaluation<Double>(@operator, 5, -3, (5.00 / -3.00));
+            AssertEvaluation<Double>(@operator, 1, 0, Double.PositiveInfinity);
+            AssertEvaluation<Double>(@operator, -1, 0, Double.NegativeInfinity);
+            AssertEvaluation<Double>(@operator, 0, 0, Double.NaN);
+        }
     }
 }
 

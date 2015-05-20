@@ -39,27 +39,41 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class ArithmeticNegateOperatorTests : OperatorTestsBase
     {
-     
         [Test]
-        public void TestCaseStandardOperatorArithmeticNegate()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticNegateOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new ArithmeticNegateOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNegateOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNegateOperator(null));
-
-            var standard = new ArithmeticNegateOperator(CreateTypeConverter());
-            Assert.AreEqual("-", standard.Symbol);
-
-            var op = new ArithmeticNegateOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(1, op.Precedence);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Double>(op, 1.33, -1.33);
-            AssertEvaluation<Double>(op, 0, 0);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new ArithmeticNegateOperator(CreateTypeConverter());
+
+            Assert.AreEqual("-", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new ArithmeticNegateOperator("operator", CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(1, @operator.Precedence);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new ArithmeticNegateOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Double>(@operator, 1.33, -1.33);
+            AssertEvaluation<Double>(@operator, 0, 0);
+        }
     }
 }
 

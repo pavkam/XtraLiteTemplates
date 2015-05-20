@@ -39,9 +39,8 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class RelationalGreaterThanOperatorTests : OperatorTestsBase
     {
-       
         [Test]
-        public void TestCaseStandardOperatorRelationalGreaterThan()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new RelationalGreaterThanOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new RelationalGreaterThanOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
@@ -49,26 +48,40 @@ namespace XtraLiteTemplates.NUnit.Operators
             ExpectArgumentEmptyException("typeConverter", () => new RelationalGreaterThanOperator("operator", StringComparer.Ordinal, null));
             ExpectArgumentEmptyException("typeConverter", () => new RelationalGreaterThanOperator(null));
             ExpectArgumentEmptyException("stringComparer", () => new RelationalGreaterThanOperator(null, CreateTypeConverter()));
-
-            var standard = new RelationalGreaterThanOperator(CreateTypeConverter());
-            Assert.AreEqual(">", standard.Symbol);
-            Assert.AreEqual(StringComparer.CurrentCulture, standard.StringComparer);
-
-            var op = new RelationalGreaterThanOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(6, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-            Assert.AreEqual(StringComparer.Ordinal, op.StringComparer);
-
-            AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, false);
-            AssertEvaluation<Int64, Boolean>(op, 0, Int64.MinValue, true);
-
-            AssertEvaluation<Double, Boolean>(op, -0.5, -0.5, false);
-            AssertEvaluation<Double, Boolean>(op, 3.34, 3.33, true);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new RelationalGreaterThanOperator(CreateTypeConverter());
+
+            Assert.AreEqual(">", @operator.Symbol);
+            Assert.AreEqual(StringComparer.CurrentCulture, @operator.StringComparer);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new RelationalGreaterThanOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(6, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+            Assert.AreEqual(StringComparer.Ordinal, @operator.StringComparer);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new RelationalGreaterThanOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
+
+            AssertEvaluation<Int64, Boolean>(@operator, Int64.MaxValue, Int64.MaxValue, false);
+            AssertEvaluation<Int64, Boolean>(@operator, 0, Int64.MinValue, true);
+            AssertEvaluation<Double, Boolean>(@operator, -0.5, -0.5, false);
+            AssertEvaluation<Double, Boolean>(@operator, 3.34, 3.33, true);
+        }
     }
 }
 

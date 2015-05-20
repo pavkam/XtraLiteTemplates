@@ -39,32 +39,46 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class ArithmeticMultiplyOperatorTests : OperatorTestsBase
     {
-      
         [Test]
-        public void TestCaseStandardOperatorArithmeticMultiply()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticMultiplyOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new ArithmeticMultiplyOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticMultiplyOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticMultiplyOperator(null));
-
-            var standard = new ArithmeticMultiplyOperator(CreateTypeConverter());
-            Assert.AreEqual("*", standard.Symbol);
-
-            var op = new ArithmeticMultiplyOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(3, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Double>(op, 1, Int64.MaxValue, Int64.MaxValue);
-            AssertEvaluation<Double>(op, Int64.MinValue, 0, 0);
-            AssertEvaluation<Double>(op, 1.5, 2, 1.50 * 2.00);
-            AssertEvaluation<Double>(op, 0.33, 0, 0.33 * 0);
-            AssertEvaluation<Double>(op, -100, 0.5, -100 * 0.5);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new ArithmeticMultiplyOperator(CreateTypeConverter());
+
+            Assert.AreEqual("*", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new ArithmeticMultiplyOperator("operator", CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(3, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new ArithmeticMultiplyOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Double>(@operator, 1, Int64.MaxValue, Int64.MaxValue);
+            AssertEvaluation<Double>(@operator, Int64.MinValue, 0, 0);
+            AssertEvaluation<Double>(@operator, 1.5, 2, 1.50 * 2.00);
+            AssertEvaluation<Double>(@operator, 0.33, 0, 0.33 * 0);
+            AssertEvaluation<Double>(@operator, -100, 0.5, -100 * 0.5);
+        }
     }
 }
 

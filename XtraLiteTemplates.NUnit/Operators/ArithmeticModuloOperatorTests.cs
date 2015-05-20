@@ -39,30 +39,42 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class ArithmeticModuloOperatorTests : OperatorTestsBase
     {
-       
         [Test]
-        public void TestCaseStandardOperatorArithmeticModulo()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticModuloOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new ArithmeticModuloOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticModuloOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticModuloOperator(null));
-
-            var standard = new ArithmeticModuloOperator(CreateTypeConverter());
-            Assert.AreEqual("%", standard.Symbol);
-
-            var op = new ArithmeticModuloOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(3, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Double, Int32>(op, 1.8, 2, 1);
-            AssertEvaluation<Double, Int32>(op, -5.5, 3, -2);
-            AssertEvaluation<Double, Int32>(op, Int32.MaxValue, Int32.MaxValue, 0);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new ArithmeticModuloOperator(CreateTypeConverter());
+            Assert.AreEqual("%", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new ArithmeticModuloOperator("operator", CreateTypeConverter());
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(3, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new ArithmeticModuloOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Double, Int32>(@operator, 1.8, 2, 1);
+            AssertEvaluation<Double, Int32>(@operator, -5.5, 3, -2);
+            AssertEvaluation<Double, Int32>(@operator, Int32.MaxValue, Int32.MaxValue, 0);
+        }
     }
 }
 

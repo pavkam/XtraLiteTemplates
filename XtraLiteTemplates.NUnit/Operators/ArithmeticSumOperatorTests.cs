@@ -39,32 +39,46 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class ArithmeticSumOperatorTests : OperatorTestsBase
     {
-       
         [Test]
-        public void TestCaseStandardOperatorArithmeticSum()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticSumOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new ArithmeticSumOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSumOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSumOperator(null));
-
-            var standard = new ArithmeticSumOperator(CreateTypeConverter());
-            Assert.AreEqual("+", standard.Symbol);
-
-            var op = new ArithmeticSumOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(4, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Double>(op, 0, 100, 100);
-            AssertEvaluation<Double>(op, 0, 0, 0);
-            AssertEvaluation<Double>(op, -1, -2, -3);
-
-            AssertEvaluation<String>(op, "Hello ", "World", "Hello World");
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new ArithmeticSumOperator(CreateTypeConverter());
+
+            Assert.AreEqual("+", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new ArithmeticSumOperator("operator", CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(4, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new ArithmeticSumOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Double>(@operator, 0, 100, 100);
+            AssertEvaluation<Double>(@operator, 0, 0, 0);
+            AssertEvaluation<Double>(@operator, -1, -2, -3);
+
+            AssertEvaluation<String>(@operator, "Hello ", "World", "Hello World");
+        }
     }
 }
 

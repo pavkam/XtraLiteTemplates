@@ -39,9 +39,8 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class RelationalEqualsOperatorTests : OperatorTestsBase
     {
-      
         [Test]
-        public void TestCaseStandardOperatorRelationalEquals()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new RelationalEqualsOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new RelationalEqualsOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
@@ -49,32 +48,44 @@ namespace XtraLiteTemplates.NUnit.Operators
             ExpectArgumentEmptyException("typeConverter", () => new RelationalEqualsOperator("operator", StringComparer.Ordinal, null));
             ExpectArgumentEmptyException("typeConverter", () => new RelationalEqualsOperator(null));
             ExpectArgumentEmptyException("stringComparer", () => new RelationalEqualsOperator(null, CreateTypeConverter()));
-
-            var standard = new RelationalEqualsOperator(CreateTypeConverter());
-            Assert.AreEqual("==", standard.Symbol);
-            Assert.AreEqual(StringComparer.CurrentCulture, standard.StringComparer);
-
-            var op = new RelationalEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(7, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-            Assert.AreEqual(StringComparer.Ordinal, op.StringComparer);
-
-            AssertEvaluation<Int64, Boolean>(op, Int64.MaxValue, Int64.MaxValue, true);
-            AssertEvaluation<Int64, Boolean>(op, Int64.MinValue, 0, false);
-
-            AssertEvaluation<Double, Boolean>(op, -0.5, -0.5, true);
-            AssertEvaluation<Double, Boolean>(op, 3.33, 3.34, false);
-
-            AssertEvaluation<String, Boolean>(op, "Hello", "Hello", true);
-            AssertEvaluation<String, Boolean>(op, "world", "WORLD", false);
-
-            AssertEvaluation<Boolean, Boolean>(op, false, false, true);
-            AssertEvaluation<Boolean, Boolean>(op, true, false, false);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new RelationalEqualsOperator(CreateTypeConverter());
+
+            Assert.AreEqual("==", @operator.Symbol);
+            Assert.AreEqual(StringComparer.CurrentCulture, @operator.StringComparer);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new RelationalEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(7, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+            Assert.AreEqual(StringComparer.Ordinal, @operator.StringComparer);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new RelationalEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
+
+            AssertEvaluation<Int64, Boolean>(@operator, Int64.MaxValue, Int64.MaxValue, true);
+            AssertEvaluation<Int64, Boolean>(@operator, Int64.MinValue, 0, false);
+            AssertEvaluation<Double, Boolean>(@operator, -0.5, -0.5, true);
+            AssertEvaluation<Double, Boolean>(@operator, 3.33, 3.34, false);
+            AssertEvaluation<String, Boolean>(@operator, "Hello", "Hello", true);
+            AssertEvaluation<String, Boolean>(@operator, "world", "WORLD", false);
+            AssertEvaluation<Boolean, Boolean>(@operator, false, false, true);
+            AssertEvaluation<Boolean, Boolean>(@operator, true, false, false);
+        }
     }
 }
 

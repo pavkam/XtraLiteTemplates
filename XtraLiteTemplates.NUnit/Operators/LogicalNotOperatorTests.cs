@@ -39,27 +39,41 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class LogicalNotOperatorTests : OperatorTestsBase
     {
-      
         [Test]
-        public void TestCaseStandardOperatorLogicalNot()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new LogicalNotOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new LogicalNotOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalNotOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalNotOperator(null));
-
-            var standard = new LogicalNotOperator(CreateTypeConverter());
-            Assert.AreEqual("!", standard.Symbol);
-
-            var op = new LogicalNotOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(1, op.Precedence);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Boolean>(op, true, false);
-            AssertEvaluation<Boolean>(op, false, true);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new LogicalNotOperator(CreateTypeConverter());
+
+            Assert.AreEqual("!", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new LogicalNotOperator("operator", CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(1, @operator.Precedence);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new LogicalNotOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Boolean>(@operator, true, false);
+            AssertEvaluation<Boolean>(@operator, false, true);
+        }
     }
 }
 

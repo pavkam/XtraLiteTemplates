@@ -39,29 +39,42 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class ArithmeticNeutralOperatorTests : OperatorTestsBase
     {
-     
         [Test]
-        public void TestCaseStandardOperatorArithmeticNeutral()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticNeutralOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new ArithmeticNeutralOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNeutralOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNeutralOperator(null));
-
-            var standard = new ArithmeticNeutralOperator(CreateTypeConverter());
-            Assert.AreEqual("+", standard.Symbol);
-
-            var op = new ArithmeticNeutralOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(1, op.Precedence);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Double>(op, 0, 0);
-            AssertEvaluation<Double>(op, Double.NaN, Double.NaN);
-            AssertEvaluation<Double>(op, -Double.NaN, -Double.NaN);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new ArithmeticNeutralOperator(CreateTypeConverter());
 
+            Assert.AreEqual("+", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new ArithmeticNeutralOperator("operator", CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(1, @operator.Precedence);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new ArithmeticNeutralOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Double>(@operator, 0, 0);
+            AssertEvaluation<Double>(@operator, Double.NaN, Double.NaN);
+            AssertEvaluation<Double>(@operator, -Double.NaN, -Double.NaN);
+        }
     }
 }
 

@@ -39,30 +39,43 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class BitwiseShiftRightOperatorTests : OperatorTestsBase
     {
-        
         [Test]
-        public void TestCaseStandardOperatorBitwiseShiftRight()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new BitwiseShiftRightOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new BitwiseShiftRightOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseShiftRightOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseShiftRightOperator(null));
-
-            var standard = new BitwiseShiftRightOperator(CreateTypeConverter());
-            Assert.AreEqual(">>", standard.Symbol);
-
-            var op = new BitwiseShiftRightOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(5, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Int32>(op, 0xFFAA, 4, 0x0FFA);
-            AssertEvaluation<Int32>(op, 0x10, 64, 0x10);
-            AssertEvaluation<Int32>(op, 4, 1, 2);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new BitwiseShiftRightOperator(CreateTypeConverter());
+            Assert.AreEqual(">>", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new BitwiseShiftRightOperator("operator", CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(5, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new BitwiseShiftRightOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Int32>(@operator, 0xFFAA, 4, 0x0FFA);
+            AssertEvaluation<Int32>(@operator, 0x10, 64, 0x10);
+            AssertEvaluation<Int32>(@operator, 4, 1, 2);
+        }
     }
 }
 

@@ -39,28 +39,42 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class BitwiseNotOperatorTests : OperatorTestsBase
     {
-      
         [Test]
-        public void TestCaseStandardOperatorBitwiseNot()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new BitwiseNotOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new BitwiseNotOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseNotOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new BitwiseNotOperator(null));
-
-            var standard = new BitwiseNotOperator(CreateTypeConverter());
-            Assert.AreEqual("~", standard.Symbol);
-
-            var op = new BitwiseNotOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(1, op.Precedence);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Int32>(op, 1, ~1);
-            AssertEvaluation<Int32>(op, 0, ~0);
-            AssertEvaluation<Int32>(op, Int32.MinValue, ~Int32.MinValue);
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new BitwiseNotOperator(CreateTypeConverter());
+
+            Assert.AreEqual("~", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new BitwiseNotOperator("operator", CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(1, @operator.Precedence);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new BitwiseNotOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Int32>(@operator, 1, ~1);
+            AssertEvaluation<Int32>(@operator, 0, ~0);
+            AssertEvaluation<Int32>(@operator, Int32.MinValue, ~Int32.MinValue);
+        }
     }
 }
 

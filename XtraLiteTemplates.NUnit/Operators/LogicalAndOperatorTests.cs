@@ -39,35 +39,49 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class LogicalAndOperatorTests : OperatorTestsBase
     {
-      
         [Test]
-        public void TestCaseStandardOperatorLogicalAnd()
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new LogicalAndOperator(null, CreateTypeConverter()));
             ExpectArgumentEmptyException("symbol", () => new LogicalAndOperator(String.Empty, CreateTypeConverter()));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalAndOperator("operator", null));
             ExpectArgumentEmptyException("typeConverter", () => new LogicalAndOperator(null));
-
-            var standard = new LogicalAndOperator(CreateTypeConverter());
-            Assert.AreEqual("&&", standard.Symbol);
-
-            var op = new LogicalAndOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(11, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Boolean>(op, true, true, true);
-            AssertEvaluation<Boolean>(op, true, false, false);
-            AssertEvaluation<Boolean>(op, false, true, false);
-            AssertEvaluation<Boolean>(op, false, false, false);
-
-            Object result;
-            Assert.IsFalse(op.EvaluateLhs(true, out result));
-            Assert.IsTrue(op.EvaluateLhs(false, out result) && result.Equals(false));
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new LogicalAndOperator(CreateTypeConverter());
+
+            Assert.AreEqual("&&", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new LogicalAndOperator("operator", CreateTypeConverter());
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(11, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new LogicalAndOperator("operator", CreateTypeConverter());
+
+            AssertEvaluation<Boolean>(@operator, true, true, true);
+            AssertEvaluation<Boolean>(@operator, true, false, false);
+            AssertEvaluation<Boolean>(@operator, false, true, false);
+            AssertEvaluation<Boolean>(@operator, false, false, false);
+
+            Object result;
+            Assert.IsFalse(@operator.EvaluateLhs(true, out result));
+            Assert.IsTrue(@operator.EvaluateLhs(false, out result) && result.Equals(false));
+        }
     }
 }
 
