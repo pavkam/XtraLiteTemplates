@@ -57,10 +57,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 
         public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
-            Debug.Assert(context != null);
-
-            var memberName = right as String;
-            Debug.Assert(memberName != null);
+            Expect.NotNull("context", context);
+            Expect.NotNull("right", right);
+            Expect.Identifier("right", right.ToString());
 
             if (left != null)
             {
@@ -76,7 +75,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
                     m_disembowelers.Add(type, disemboweler);
                 }
 
-                return disemboweler.Read(memberName, left);
+                return disemboweler.Read(right.ToString(), left);
             }
 
             return null;

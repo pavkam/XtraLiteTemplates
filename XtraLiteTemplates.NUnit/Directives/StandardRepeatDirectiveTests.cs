@@ -45,32 +45,32 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseConstructor1()
         {
-            ExpectInvalidTagMarkupException(null, () => new RepeatDirective(null, "END", CreateTypeConverter()));
-            ExpectInvalidTagMarkupException(null, () => new RepeatDirective("TIMES $", null, CreateTypeConverter()));
+            ExpectInvalidTagMarkupException(null, () => new RepeatDirective(null, "END", TypeConverter));
+            ExpectInvalidTagMarkupException(null, () => new RepeatDirective("TIMES $", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new RepeatDirective("$ TIMES", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new RepeatDirective("$ TIME $", "END", CreateTypeConverter()));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new RepeatDirective("? AND THEN", "END", CreateTypeConverter()));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new RepeatDirective("$ TIME $", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new RepeatDirective("? AND THEN", "END", TypeConverter));
         }
 
         [Test]
         public void TestCaseConstructor2()
         {
-            var directive = new RepeatDirective(CreateTypeConverter());
+            var directive = new RepeatDirective(TypeConverter);
             Assert.AreEqual("{REPEAT $ TIMES}...{END}", directive.ToString());
         }
 
         [Test]
         public void TestCaseConstructor3()
         {
-            var directive = new RepeatDirective("DO $ TIMES", "TERMINATE", CreateTypeConverter());
+            var directive = new RepeatDirective("DO $ TIMES", "TERMINATE", TypeConverter);
             Assert.AreEqual("{DO $ TIMES}...{TERMINATE}", directive.ToString());
         }
 
         [Test]
         public void TestCaseEvaluation1()
         {
-            var directive = new RepeatDirective("REP $", "BEER", CreateTypeConverter());
+            var directive = new RepeatDirective("REP $", "BEER", TypeConverter);
 
             Assert.AreEqual("aaaaaaaaaa", Evaluate("{REP 10}a{BEER}", directive));
         }
@@ -78,7 +78,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation2()
         {
-            var directive = new RepeatDirective("REP $", "BEER", CreateTypeConverter());
+            var directive = new RepeatDirective("REP $", "BEER", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{REP 0}a{BEER}", directive));
         }
@@ -86,7 +86,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation3()
         {
-            var directive = new RepeatDirective("DO $ TIMES", "BEER", CreateTypeConverter());
+            var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", -10)));
         }
@@ -94,7 +94,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation4()
         {
-            var directive = new RepeatDirective("DO $ TIMES", "BEER", CreateTypeConverter());
+            var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
             Assert.AreEqual("a", Evaluate("{DO 1.99 TIMES}a{BEER}", directive));
         }
@@ -102,7 +102,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation5()
         {
-            var directive = new RepeatDirective("DO $ TIMES", "BEER", CreateTypeConverter());
+            var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", null)));
         }
@@ -110,7 +110,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation6()
         {
-            var directive = new RepeatDirective("DO $ TIMES", "BEER", CreateTypeConverter());
+            var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
             Assert.AreEqual("a", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", true)));
         }
@@ -118,7 +118,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation7()
         {
-            var directive = new RepeatDirective("DO $ TIMES", "BEER", CreateTypeConverter());
+            var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", Double.NaN)));
         }
@@ -126,7 +126,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation8()
         {
-            var directive = new RepeatDirective("DO $ TIMES", "BEER", CreateTypeConverter());
+            var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", Double.PositiveInfinity)));
         }

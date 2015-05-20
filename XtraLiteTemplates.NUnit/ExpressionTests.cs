@@ -41,36 +41,37 @@ namespace XtraLiteTemplates.NUnit
     [TestFixture]
     public class ExpressionTests : TestBase
     { 
-        private static Expression CreateBloatedExpression()
+        private Expression CreateBloatedExpression()
         {
-            var typeConverter = CreateTypeConverter();
             var comparer = StringComparer.Ordinal;
 
             var operators = new List<Operator>()
             {
-                new RelationalEqualsOperator(comparer, typeConverter),
-                new RelationalNotEqualsOperator(comparer, typeConverter),
-                new RelationalGreaterThanOperator(comparer, typeConverter),
-                new RelationalGreaterThanOrEqualsOperator(comparer, typeConverter),
-                new RelationalLowerThanOperator(comparer, typeConverter),
-                new RelationalLowerThanOrEqualsOperator(comparer, typeConverter),
-                new LogicalAndOperator(typeConverter),
-                new LogicalOrOperator(typeConverter),
-                new LogicalNotOperator(typeConverter),
-                new BitwiseAndOperator(typeConverter),
-                new BitwiseNotOperator(typeConverter),
-                new BitwiseOrOperator(typeConverter),
-                new BitwiseXorOperator(typeConverter),
-                new BitwiseShiftLeftOperator(typeConverter),
-                new BitwiseShiftRightOperator(typeConverter),
-                new ArithmeticDivideOperator(typeConverter),
-                new ArithmeticModuloOperator(typeConverter),
-                new ArithmeticMultiplyOperator(typeConverter),
-                new ArithmeticNegateOperator(typeConverter),
-                new ArithmeticNeutralOperator(typeConverter),
-                new ArithmeticSubtractOperator(typeConverter),
-                new ArithmeticSumOperator(typeConverter),
+                new RelationalEqualsOperator(comparer, TypeConverter),
+                new RelationalNotEqualsOperator(comparer, TypeConverter),
+                new RelationalGreaterThanOperator(comparer, TypeConverter),
+                new RelationalGreaterThanOrEqualsOperator(comparer, TypeConverter),
+                new RelationalLowerThanOperator(comparer, TypeConverter),
+                new RelationalLowerThanOrEqualsOperator(comparer, TypeConverter),
+                new LogicalAndOperator(TypeConverter),
+                new LogicalOrOperator(TypeConverter),
+                new LogicalNotOperator(TypeConverter),
+                new BitwiseAndOperator(TypeConverter),
+                new BitwiseNotOperator(TypeConverter),
+                new BitwiseOrOperator(TypeConverter),
+                new BitwiseXorOperator(TypeConverter),
+                new BitwiseShiftLeftOperator(TypeConverter),
+                new BitwiseShiftRightOperator(TypeConverter),
+                new ArithmeticDivideOperator(TypeConverter),
+                new ArithmeticModuloOperator(TypeConverter),
+                new ArithmeticMultiplyOperator(TypeConverter),
+                new ArithmeticNegateOperator(TypeConverter),
+                new ArithmeticNeutralOperator(TypeConverter),
+                new ArithmeticSubtractOperator(TypeConverter),
+                new ArithmeticSumOperator(TypeConverter),
                 new SubscriptOperator(),
+                new IntegerRangeOperator(TypeConverter),
+                new ValueFormatOperator(CultureInfo.InvariantCulture, TypeConverter),
                 new MemberAccessOperator(comparer),
             };
 
@@ -83,7 +84,7 @@ namespace XtraLiteTemplates.NUnit
             return expression;
         }
 
-        private static Expression CreateTestExpression(String exprString)
+        private Expression CreateTestExpression(String exprString)
         {
             Debug.Assert(!String.IsNullOrEmpty(exprString));
             var split = exprString.Split(' ');
@@ -123,7 +124,13 @@ namespace XtraLiteTemplates.NUnit
                 { "s", "Hello World" },
             };
 
-            return new TestExpressionEvaluationContext(e.Comparer, variables);
+            var result = new TestEvaluationContext(e.Comparer);
+
+            result.OpenEvaluationFrame();
+            foreach(var kvp in variables)
+                result.SetVariable(kvp.Key, kvp.Value);
+
+            return result;
         }
 
         [Test]
@@ -146,8 +153,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            var neutral = new ArithmeticNeutralOperator(CreateTypeConverter());
-            var sum = new ArithmeticSumOperator(CreateTypeConverter());
+            var neutral = new ArithmeticNeutralOperator(TypeConverter);
+            var sum = new ArithmeticSumOperator(TypeConverter);
             var subscript = new SubscriptOperator();
 
             /* Unary */
@@ -169,7 +176,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.IsTrue(expression.IsSupportedOperator(subscript.Symbol));
             Assert.IsTrue(expression.IsSupportedOperator(subscript.Terminator));
 
-            ExpectArgumentEmptyException("symbol", () => expression.IsSupportedOperator(null));
+            ExpectArgumentNullException("symbol", () => expression.IsSupportedOperator(null));
             ExpectArgumentEmptyException("symbol", () => expression.IsSupportedOperator(String.Empty));
         }
 
@@ -178,8 +185,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            var unaryOp_plus = new ArithmeticNeutralOperator("+", CreateTypeConverter());
-            var binaryOp_plus = new ArithmeticSumOperator("+", CreateTypeConverter());
+            var unaryOp_plus = new ArithmeticNeutralOperator("+", TypeConverter);
+            var binaryOp_plus = new ArithmeticSumOperator("+", TypeConverter);
             var groupOp_plus = new SubscriptOperator("+", "-");
 
             expression.RegisterOperator(unaryOp_plus);
@@ -194,8 +201,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            var neutral = new ArithmeticNeutralOperator(CreateTypeConverter());
-            var sum = new ArithmeticSumOperator(CreateTypeConverter());
+            var neutral = new ArithmeticNeutralOperator(TypeConverter);
+            var sum = new ArithmeticSumOperator(TypeConverter);
             var subscript = new SubscriptOperator();
 
             expression.RegisterOperator(neutral);
@@ -227,7 +234,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.IsFalse(expression1.Constructed);
             ExpectCannotConstructExpressionInvalidStateException(() => expression1.Construct());
 
-            expression1.RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()));
+            expression1.RegisterOperator(new ArithmeticSumOperator(TypeConverter));
 
             expression1.FeedLiteral(1);
             Assert.IsTrue(expression1.Started);
@@ -235,7 +242,7 @@ namespace XtraLiteTemplates.NUnit
 
             var context = CreateStandardTestEvaluationContext(expression1);
 
-            ExpectCannotRegisterOperatorsForStartedExpressionException(() => expression1.RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter())));
+            ExpectCannotRegisterOperatorsForStartedExpressionException(() => expression1.RegisterOperator(new ArithmeticSumOperator(TypeConverter)));
             ExpectCannotEvaluateUnconstructedExpressionException(() => expression1.Evaluate(context));
 
             expression1.Construct();
@@ -367,7 +374,7 @@ namespace XtraLiteTemplates.NUnit
             var expression_ins = new Expression(StringComparer.OrdinalIgnoreCase);
             var expression_sens = new Expression(StringComparer.Ordinal);
 
-            var testOperator = new ArithmeticNeutralOperator("lower_case_operator", CreateTypeConverter());
+            var testOperator = new ArithmeticNeutralOperator("lower_case_operator", TypeConverter);
 
             expression_ins.RegisterOperator(testOperator);
             expression_sens.RegisterOperator(testOperator);
@@ -534,7 +541,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            expression.RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()));
+            expression.RegisterOperator(new ArithmeticSumOperator(TypeConverter));
             expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
 
             expression.FeedSymbol("symbol_1");
@@ -553,7 +560,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            expression.RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()));
+            expression.RegisterOperator(new ArithmeticSumOperator(TypeConverter));
             expression.RegisterOperator(new LhsIdentTestOperator(".", 100));
 
             expression.FeedSymbol("symbol_1");
@@ -568,8 +575,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            expression.RegisterOperator(new ArithmeticMultiplyOperator(CreateTypeConverter()));
-            expression.RegisterOperator(new LogicalAndOperator(CreateTypeConverter()));
+            expression.RegisterOperator(new ArithmeticMultiplyOperator(TypeConverter));
+            expression.RegisterOperator(new LogicalAndOperator(TypeConverter));
             expression.RegisterOperator(new LhsRhsIdentTestOperator("."));
 
             expression.FeedSymbol("a");

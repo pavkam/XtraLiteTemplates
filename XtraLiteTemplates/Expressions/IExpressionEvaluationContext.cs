@@ -34,5 +34,10 @@ namespace XtraLiteTemplates.Expressions
     {
         void SetVariable(String identifier, Object value);
         Object GetVariable(String identifier);
+
+
+        void AddStateObject(Object state);
+        void RemoveStateObject(Object state);
+        Boolean ContainsStateObject(Object state);
     }
 }

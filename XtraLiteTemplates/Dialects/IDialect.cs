@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.Dialects
     using System.Text;
     using System.Threading.Tasks;
     using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
 
     public interface IDialect
@@ -47,7 +48,7 @@ namespace XtraLiteTemplates.Dialects
         IReadOnlyCollection<Directive> Directives { get; }
         IReadOnlyDictionary<String, Object> SpecialKeywords { get; }
 
-        String DecorateUnparsedText(String unparsedText);
+        String DecorateUnparsedText(IExpressionEvaluationContext context, String unparsedText);
 
         Char StartTagCharacter { get; }
         Char EndTagCharacter { get; }

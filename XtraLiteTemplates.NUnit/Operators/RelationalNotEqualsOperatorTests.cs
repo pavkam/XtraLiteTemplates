@@ -42,18 +42,18 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new RelationalNotEqualsOperator(null, StringComparer.Ordinal, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new RelationalNotEqualsOperator(String.Empty, StringComparer.Ordinal, CreateTypeConverter()));
-            ExpectArgumentNullException("stringComparer", () => new RelationalNotEqualsOperator("operator", null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new RelationalNotEqualsOperator("operator", StringComparer.Ordinal, null));
-            ExpectArgumentEmptyException("typeConverter", () => new RelationalNotEqualsOperator(null));
-            ExpectArgumentEmptyException("stringComparer", () => new RelationalNotEqualsOperator(null, CreateTypeConverter()));
+            ExpectArgumentNullException("symbol", () => new RelationalNotEqualsOperator(null, StringComparer.Ordinal, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new RelationalNotEqualsOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
+            ExpectArgumentNullException("stringComparer", () => new RelationalNotEqualsOperator("operator", null, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new RelationalNotEqualsOperator("operator", StringComparer.Ordinal, null));
+            ExpectArgumentNullException("typeConverter", () => new RelationalNotEqualsOperator(null));
+            ExpectArgumentNullException("stringComparer", () => new RelationalNotEqualsOperator(null, TypeConverter));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new RelationalNotEqualsOperator(CreateTypeConverter());
+            var @operator = new RelationalNotEqualsOperator(TypeConverter);
 
             Assert.AreEqual("!=", @operator.Symbol);
             Assert.AreEqual(StringComparer.CurrentCulture, @operator.StringComparer);
@@ -62,7 +62,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new RelationalNotEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
+            var @operator = new RelationalNotEqualsOperator("operator", StringComparer.Ordinal, TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(7, @operator.Precedence);
@@ -73,9 +73,19 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new RelationalNotEqualsOperator(TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new RelationalNotEqualsOperator("operator", StringComparer.Ordinal, CreateTypeConverter());
+            var @operator = new RelationalNotEqualsOperator(StringComparer.Ordinal, TypeConverter);
 
             AssertEvaluation<Int64, Boolean>(@operator, Int64.MaxValue, Int64.MaxValue, false);
             AssertEvaluation<Int64, Boolean>(@operator, Int64.MinValue, 0, true);

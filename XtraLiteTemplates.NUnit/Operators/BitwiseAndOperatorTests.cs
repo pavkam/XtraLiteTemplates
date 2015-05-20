@@ -42,16 +42,16 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseAndOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseAndOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new BitwiseAndOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new BitwiseAndOperator(null));
+            ExpectArgumentNullException("symbol", () => new BitwiseAndOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseAndOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new BitwiseAndOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new BitwiseAndOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new BitwiseAndOperator(CreateTypeConverter());
+            var @operator = new BitwiseAndOperator(TypeConverter);
 
             Assert.AreEqual("&", @operator.Symbol);
         }
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new BitwiseAndOperator("operator", CreateTypeConverter());
+            var @operator = new BitwiseAndOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(9, @operator.Precedence);
@@ -69,9 +69,19 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new BitwiseAndOperator(TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new BitwiseAndOperator("operator", CreateTypeConverter());
+            var @operator = new BitwiseAndOperator(TypeConverter);
 
             AssertEvaluation<Int32>(@operator, 0xEEAAFF, 0xFF0000, 0xEE0000);
             AssertEvaluation<Int32>(@operator, 0x7FFFFFFF, 0, 0);

@@ -35,13 +35,17 @@ namespace XtraLiteTemplates.NUnit.Operators
     using System.Globalization;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.NUnit.Inside;
 
     [TestFixture]
     public class OperatorTestsBase : TestBase
     {
+        protected readonly TestEvaluationContext EmptyEvaluationContext = new TestEvaluationContext(StringComparer.OrdinalIgnoreCase);
+
+
         protected void AssertEvaluation<T, R>(UnaryOperator @operator, T arg, R expected)
         {
-            Object result = @operator.Evaluate(arg);
+            Object result = @operator.Evaluate(EmptyEvaluationContext, arg);
             Assert.IsInstanceOf<R>(result);
             Assert.AreEqual(expected, result);
         }
@@ -53,7 +57,7 @@ namespace XtraLiteTemplates.NUnit.Operators
 
         protected void AssertEvaluation<T, R>(BinaryOperator @operator, T left, T right, R expected)
         {
-            Object result = @operator.Evaluate(left, right);
+            Object result = @operator.Evaluate(EmptyEvaluationContext, left, right);
             Assert.IsInstanceOf<R>(result);
             Assert.AreEqual(expected, result);
         }

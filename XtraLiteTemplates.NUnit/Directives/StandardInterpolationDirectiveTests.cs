@@ -45,30 +45,30 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseConstructor1()
         {
-            ExpectInvalidTagMarkupException(null, () => new InterpolationDirective(null, CreateTypeConverter()));
+            ExpectInvalidTagMarkupException(null, () => new InterpolationDirective(null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new InterpolationDirective("$", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new InterpolationDirective("$ A $", CreateTypeConverter()));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new InterpolationDirective("$ A $", TypeConverter));
         }
 
         [Test]
         public void TestCaseConstructor2()
         {
-            var directive = new InterpolationDirective(CreateTypeConverter());
+            var directive = new InterpolationDirective(TypeConverter);
             Assert.AreEqual("{$}", directive.ToString());
         }
 
         [Test]
         public void TestCaseConstructor3()
         {
-            var directive = new InterpolationDirective("INSERT $ INTO THE MIX", CreateTypeConverter());
+            var directive = new InterpolationDirective("INSERT $ INTO THE MIX", TypeConverter);
             Assert.AreEqual("{INSERT $ INTO THE MIX}", directive.ToString());
         }
 
         [Test]
         public void TestCaseEvaluation1()
         {
-            var directive = new InterpolationDirective("__ $ __", CreateTypeConverter());
+            var directive = new InterpolationDirective("__ $ __", TypeConverter);
 
             Assert.AreEqual("100", Evaluate("{__ 100 __}", directive));
             Assert.AreEqual("test", Evaluate("{__ \"test\" __}", directive));

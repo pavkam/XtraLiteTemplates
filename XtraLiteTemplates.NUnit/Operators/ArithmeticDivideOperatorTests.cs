@@ -42,23 +42,23 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticDivideOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticDivideOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticDivideOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticDivideOperator(null));
+            ExpectArgumentNullException("symbol", () => new ArithmeticDivideOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticDivideOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticDivideOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticDivideOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var standard = new ArithmeticDivideOperator(CreateTypeConverter());
+            var standard = new ArithmeticDivideOperator(TypeConverter);
             Assert.AreEqual("/", standard.Symbol);
         }
 
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new ArithmeticDivideOperator("operator", CreateTypeConverter());
+            var @operator = new ArithmeticDivideOperator("operator", TypeConverter);
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(3, @operator.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
@@ -67,9 +67,19 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new ArithmeticDivideOperator(TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new ArithmeticDivideOperator("operator", CreateTypeConverter());
+            var @operator = new ArithmeticDivideOperator(TypeConverter);
            
             AssertEvaluation<Double>(@operator, Int64.MaxValue, Int64.MaxValue, 1);
             AssertEvaluation<Double>(@operator, Int64.MaxValue, 1, Int64.MaxValue);

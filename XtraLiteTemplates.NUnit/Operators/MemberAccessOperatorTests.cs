@@ -42,7 +42,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentEmptyException("symbol", () => new MemberAccessOperator(null, StringComparer.Ordinal));
+            ExpectArgumentNullException("symbol", () => new MemberAccessOperator(null, StringComparer.Ordinal));
             ExpectArgumentEmptyException("symbol", () => new MemberAccessOperator(String.Empty, StringComparer.Ordinal));
             ExpectArgumentNullException("comparer", () => new MemberAccessOperator(".", null));
         }
@@ -70,12 +70,42 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new MemberAccessOperator(StringComparer.InvariantCultureIgnoreCase);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, "ident"));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+
+            ExpectArgumentNullException("right", () => @operator.Evaluate(EmptyEvaluationContext, this, null));
+            ExpectArgumentEmptyException("right", () => @operator.Evaluate(EmptyEvaluationContext, this, String.Empty));
+            ExpectArgumentNotIdentifierException("right", () => @operator.Evaluate(EmptyEvaluationContext, this, 11));
+            ExpectArgumentNotIdentifierException("right", () => @operator.Evaluate(EmptyEvaluationContext, this, this));
+        }
+
+        [Test]
+        public void TestCaseEvaluationIgnoreCase()
+        {
+            var @operator = new MemberAccessOperator(StringComparer.InvariantCultureIgnoreCase);
+
+            Assert.AreEqual(10, @operator.Evaluate(EmptyEvaluationContext, "1234567890", "length"));
+            Assert.AreEqual(10, @operator.Evaluate(EmptyEvaluationContext, "1234567890", "Length"));
+
+            Assert.AreEqual(100, @operator.Evaluate(EmptyEvaluationContext, Tuple.Create(100), "Item1"));
+            Assert.AreEqual(99, @operator.Evaluate(EmptyEvaluationContext, Tuple.Create(99), "ITEM1"));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new MemberAccessOperator("operator", StringComparer.InvariantCultureIgnoreCase);
+            var @operator = new MemberAccessOperator(StringComparer.Ordinal);
 
-            Assert.AreEqual(10, @operator.Evaluate("1234567890", "Length"));
-            Assert.AreEqual(100, @operator.Evaluate(Tuple.Create(100), "Item1"));
+            Assert.IsNull(@operator.Evaluate(EmptyEvaluationContext, "1234567890", "length"));
+            Assert.AreEqual(10, @operator.Evaluate(EmptyEvaluationContext, "1234567890", "Length"));
+
+            Assert.AreEqual(100, @operator.Evaluate(EmptyEvaluationContext, Tuple.Create(100), "Item1"));
+            Assert.IsNull(@operator.Evaluate(EmptyEvaluationContext, Tuple.Create(99), "ITEM1"));
         }
     }
 }

@@ -36,19 +36,27 @@ namespace XtraLiteTemplates
     using XtraLiteTemplates.Dialects;
     using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Parsing;
 
     public sealed class XLTemplate
     {
         private sealed class EvaluationContext : IEvaluationContext
         {
-            private Stack<Dictionary<String, Object>> m_frames;
+            private sealed class Frame
+            {
+                public Dictionary<String, Object> Variables;
+                public HashSet<Object> StateObjects;
+            }
+
+            private Stack<Frame> m_frames;
+
             private IEqualityComparer<String> m_identifierComparer;
             private Boolean m_ignoreEvaluationExceptions;
-            private Func<String, String> m_unparsedTextHandler;
+            private Func<IExpressionEvaluationContext, String, String> m_unparsedTextHandler;
 
             public EvaluationContext(Boolean ignoreEvaluationExceptions, 
-                IEqualityComparer<String> identifierComparer, Func<String, String> unparsedTextHandler)
+                IEqualityComparer<String> identifierComparer, Func<IExpressionEvaluationContext, String, String> unparsedTextHandler)
             {
                 Debug.Assert(identifierComparer != null);
                 Debug.Assert(unparsedTextHandler != null);
@@ -57,17 +65,27 @@ namespace XtraLiteTemplates
                 m_ignoreEvaluationExceptions = ignoreEvaluationExceptions;
                 m_unparsedTextHandler = unparsedTextHandler;
 
-                m_frames = new Stack<Dictionary<String, Object>>();
+                m_frames = new Stack<Frame>();
             }
-        
+
             public String ProcessUnparsedText(String value)
             {
-                return m_unparsedTextHandler(value);
+                return m_unparsedTextHandler(this, value);
             }
+
+            private Frame TopFrame
+            {
+                get
+                {
+                    Debug.Assert(m_frames.Count > 0);
+                    return m_frames.Peek();
+                }
+            }
+
 
             public void OpenEvaluationFrame()
             {
-                m_frames.Push(new Dictionary<String, Object>(m_identifierComparer));
+                m_frames.Push(new Frame());
             }
 
             public void CloseEvaluationFrame()
@@ -78,10 +96,11 @@ namespace XtraLiteTemplates
 
             public void SetVariable(String identifier, Object value)
             {
-                Debug.Assert(m_frames.Count > 0);
+                var topFrame = TopFrame;
+                if (topFrame.Variables == null)
+                    topFrame.Variables = new Dictionary<String, Object>(m_identifierComparer);
 
-                var topFrame = m_frames.Peek();
-                topFrame[identifier] = value;
+                topFrame.Variables[identifier] = value;
             }
 
             public Object GetVariable(String identifier)
@@ -89,7 +108,7 @@ namespace XtraLiteTemplates
                 foreach (var frame in m_frames)
                 {
                     Object result;
-                    if (frame.TryGetValue(identifier, out result))
+                    if (frame.Variables != null && frame.Variables.TryGetValue(identifier, out result))
                         return result;
                 }
 
@@ -102,6 +121,29 @@ namespace XtraLiteTemplates
                 {
                     return m_ignoreEvaluationExceptions;
                 }
+            }
+
+
+            public void AddStateObject(Object state)
+            {
+                var topFrame = TopFrame;
+                if (topFrame.StateObjects == null)
+                    topFrame.StateObjects = new HashSet<Object>();
+
+                topFrame.StateObjects.Add(state);
+            }
+
+            public void RemoveStateObject(Object state)
+            {
+                var topFrame = TopFrame;
+                if (topFrame.StateObjects != null)
+                    topFrame.StateObjects.Remove(state);
+            }
+
+            public bool ContainsStateObject(Object state)
+            {
+                var topFrame = TopFrame;
+                return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
             }
         }
 

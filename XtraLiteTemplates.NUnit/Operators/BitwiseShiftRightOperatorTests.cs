@@ -42,23 +42,23 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseShiftRightOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseShiftRightOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new BitwiseShiftRightOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new BitwiseShiftRightOperator(null));
+            ExpectArgumentNullException("symbol", () => new BitwiseShiftRightOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseShiftRightOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new BitwiseShiftRightOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new BitwiseShiftRightOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new BitwiseShiftRightOperator(CreateTypeConverter());
+            var @operator = new BitwiseShiftRightOperator(TypeConverter);
             Assert.AreEqual(">>", @operator.Symbol);
         }
 
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new BitwiseShiftRightOperator("operator", CreateTypeConverter());
+            var @operator = new BitwiseShiftRightOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(5, @operator.Precedence);
@@ -68,9 +68,19 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new BitwiseShiftRightOperator(TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new BitwiseShiftRightOperator("operator", CreateTypeConverter());
+            var @operator = new BitwiseShiftRightOperator(TypeConverter);
 
             AssertEvaluation<Int32>(@operator, 0xFFAA, 4, 0x0FFA);
             AssertEvaluation<Int32>(@operator, 0x10, 64, 0x10);

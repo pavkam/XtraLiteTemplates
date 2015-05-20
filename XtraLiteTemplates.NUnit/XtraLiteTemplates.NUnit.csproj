@@ -35,6 +35,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Dialects\StandardDialectTests.cs" />
+    <Compile Include="Directives\StandardPreformattedDirectiveTests.cs" />
     <Compile Include="Directives\StandardRepeatDirectiveTests.cs" />
     <Compile Include="Directives\StandardInterpolationDirectiveTests.cs" />
     <Compile Include="Directives\StandardIfElseDirectiveTests.cs" />
@@ -73,7 +74,6 @@
     <Compile Include="XLTemplateTests.cs" />
     <Compile Include="Inside\RippedOpenDirective.cs" />
     <Compile Include="Inside\TestEvaluationContext.cs" />
-    <Compile Include="Inside\TestExpressionEvaluationContext.cs" />
     <Compile Include="EvaluationTests.cs" />
     <Compile Include="InterpreterTests.cs" />
     <Compile Include="Directives\DirectiveTests.cs" />

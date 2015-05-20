@@ -25,44 +25,52 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
-namespace XtraLiteTemplates.NUnit.Inside
+namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
+    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Linq;
+    using System.Text;
+    using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
 
-    public sealed class TestExpressionEvaluationContext : IExpressionEvaluationContext
+    public sealed class PreFormattedUnparsedTextDirective : StandardDirective    
     {
-        private Dictionary<String, Object> m_variables;
-
-        public Object GetVariable(String identifier)
+        public PreFormattedUnparsedTextDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter)
+            : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Assert.IsNotEmpty(identifier);
+            Debug.Assert(Tags.Count == 2);
+        }
 
-            Object result;
-            if (m_variables.TryGetValue(identifier, out result))
-                return result;
+        public PreFormattedUnparsedTextDirective(IPrimitiveTypeConverter typeConverter)
+            : this("PREFORMATTED", "END", typeConverter)
+        {
+        }
+
+        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
+            IExpressionEvaluationContext context, out String text)
+        {
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);            
+            Debug.Assert(components != null);
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
+            Debug.Assert(context != null);
+
+            text = null;
+            if (tagIndex == 0)
+            {
+                context.AddStateObject(this);
+                return FlowDecision.Evaluate;
+            }
             else
-                return null;
-        }
-
-        public void SetVariable(String identifier, Object value)
-        {
-            m_variables[identifier] = value;
-        }
-
-        public TestExpressionEvaluationContext(IEqualityComparer<String> comparer, 
-            IReadOnlyCollection<KeyValuePair<String, Object>> variables)
-        {
-            Debug.Assert(comparer != null);
-            Debug.Assert(variables != null);
-
-            m_variables = variables.ToDictionary(k => k.Key, v => v.Value);
+            {
+                context.RemoveStateObject(this);
+                return FlowDecision.Terminate;
+            }
         }
     }
 }
+

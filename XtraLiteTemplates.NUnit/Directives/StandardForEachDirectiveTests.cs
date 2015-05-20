@@ -45,34 +45,34 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseConstructor1()
         {
-            ExpectInvalidTagMarkupException(null, () => new ForEachDirective(null, "END", CreateTypeConverter()));
-            ExpectInvalidTagMarkupException(null, () => new ForEachDirective("? IN $", null, CreateTypeConverter()));
+            ExpectInvalidTagMarkupException(null, () => new ForEachDirective(null, "END", TypeConverter));
+            ExpectInvalidTagMarkupException(null, () => new ForEachDirective("? IN $", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ForEachDirective("? IN $", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new ForEachDirective("?", "END", CreateTypeConverter()));
-            ExpectArgumentConditionNotTrueException("one identifier component", () => new ForEachDirective("$", "END", CreateTypeConverter()));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new ForEachDirective("$ AND $ THEN ?", "END", CreateTypeConverter()));
-            ExpectArgumentConditionNotTrueException("one identifier component", () => new ForEachDirective("? AND ? THEN $", "END", CreateTypeConverter()));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new ForEachDirective("?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("one identifier component", () => new ForEachDirective("$", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new ForEachDirective("$ AND $ THEN ?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("one identifier component", () => new ForEachDirective("? AND ? THEN $", "END", TypeConverter));
         }
 
         [Test]
         public void TestCaseConstructor2()
         {
-            var directive = new ForEachDirective(CreateTypeConverter());
+            var directive = new ForEachDirective(TypeConverter);
             Assert.AreEqual("{FOR EACH ? IN $}...{END}", directive.ToString());
         }
 
         [Test]
         public void TestCaseConstructor3()
         {
-            var directive = new ForEachDirective("OVER $ GET EACH ?", "TERMINATE", CreateTypeConverter());
+            var directive = new ForEachDirective("OVER $ GET EACH ?", "TERMINATE", TypeConverter);
             Assert.AreEqual("{OVER $ GET EACH ?}...{TERMINATE}", directive.ToString());
         }
 
         [Test]
         public void TestCaseEvaluation1()
         {
-            var directive = new ForEachDirective("BOO ? OF $", "BEER", CreateTypeConverter());
+            var directive = new ForEachDirective("BOO ? OF $", "BEER", TypeConverter);
 
             Assert.AreEqual("1", Evaluate("{BOO I OF 1}{I}{BEER}", directive));
         }
@@ -80,7 +80,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation2()
         {
-            var directive = new ForEachDirective("BOO ? OF $", "BEER", CreateTypeConverter());
+            var directive = new ForEachDirective("BOO ? OF $", "BEER", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{BOO I OF undefined}{I}{BEER}", directive, new KeyValuePair<String, Object>("undefined", null)));
         }
@@ -88,7 +88,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation3()
         {
-            var directive = new ForEachDirective("BOO ? OF $", "BEER", CreateTypeConverter());
+            var directive = new ForEachDirective("BOO ? OF $", "BEER", TypeConverter);
 
             Assert.AreEqual("123456789", Evaluate("{BOO I OF \"123456789\"}{I}{BEER}", directive));
         }
@@ -96,7 +96,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation4()
         {
-            var directive = new ForEachDirective("BOO ? OF $", "BEER", CreateTypeConverter());
+            var directive = new ForEachDirective("BOO ? OF $", "BEER", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{BOO I OF \"\"}{I}{BEER}", directive));
         }
@@ -104,7 +104,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation5()
         {
-            var directive = new ForEachDirective("BOO ? OF $", "BEER", CreateTypeConverter());
+            var directive = new ForEachDirective("BOO ? OF $", "BEER", TypeConverter);
 
             Assert.AreEqual("102030", Evaluate("{BOO I OF list}{I}{BEER}", directive, new KeyValuePair<String, Object>("list", new Int32[] { 10, 20, 30 })));
         }

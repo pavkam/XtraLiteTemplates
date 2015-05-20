@@ -42,16 +42,16 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticNeutralOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticNeutralOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNeutralOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNeutralOperator(null));
+            ExpectArgumentNullException("symbol", () => new ArithmeticNeutralOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticNeutralOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticNeutralOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticNeutralOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new ArithmeticNeutralOperator(CreateTypeConverter());
+            var @operator = new ArithmeticNeutralOperator(TypeConverter);
 
             Assert.AreEqual("+", @operator.Symbol);
         }
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new ArithmeticNeutralOperator("operator", CreateTypeConverter());
+            var @operator = new ArithmeticNeutralOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(1, @operator.Precedence);
@@ -67,9 +67,17 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new ArithmeticNeutralOperator(TypeConverter);
+
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new ArithmeticNeutralOperator("operator", CreateTypeConverter());
+            var @operator = new ArithmeticNeutralOperator(TypeConverter);
 
             AssertEvaluation<Double>(@operator, 0, 0);
             AssertEvaluation<Double>(@operator, Double.NaN, Double.NaN);

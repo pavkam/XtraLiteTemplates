@@ -39,30 +39,54 @@ namespace XtraLiteTemplates.NUnit.Operators
     [TestFixture]
     public class ArithmeticSubtractOperatorTests : OperatorTestsBase
     {
-      
         [Test]
-        public void TestCaseStandardOperatorArithmeticSubtract()
+        public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticSubtractOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticSubtractOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSubtractOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSubtractOperator(null));
-
-            var standard = new ArithmeticSubtractOperator(CreateTypeConverter());
-            Assert.AreEqual("-", standard.Symbol);
-
-            var op = new ArithmeticSubtractOperator("operator", CreateTypeConverter());
-            Assert.AreEqual("operator", op.Symbol);
-            Assert.AreEqual(4, op.Precedence);
-            Assert.AreEqual(Associativity.LeftToRight, op.Associativity);
-            Assert.AreEqual(false, op.ExpectLhsIdentifier);
-            Assert.AreEqual(false, op.ExpectRhsIdentifier);
-
-            AssertEvaluation<Double>(op, 0, 100, -100);
-            AssertEvaluation<Double>(op, 0, 0, 0);
-            AssertEvaluation<Double>(op, -1, -2, 1);
+            ExpectArgumentNullException("symbol", () => new ArithmeticSubtractOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticSubtractOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticSubtractOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticSubtractOperator(null));
         }
 
+        [Test]
+        public void TestCaseConstruction2()
+        {
+            var @operator = new ArithmeticSubtractOperator(TypeConverter);
+
+            Assert.AreEqual("-", @operator.Symbol);
+        }
+
+        [Test]
+        public void TestCaseConstruction3()
+        {
+            var @operator = new ArithmeticSubtractOperator("operator", TypeConverter);
+
+            Assert.AreEqual("operator", @operator.Symbol);
+            Assert.AreEqual(4, @operator.Precedence);
+            Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
+            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
+            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
+        }
+
+        [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new ArithmeticSubtractOperator(TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
+        public void TestCaseEvaluation()
+        {
+            var @operator = new ArithmeticSubtractOperator(TypeConverter);
+
+            AssertEvaluation<Double>(@operator, 0, 100, -100);
+            AssertEvaluation<Double>(@operator, 0, 0, 0);
+            AssertEvaluation<Double>(@operator, -1, -2, 1);
+        }
     }
 }
 

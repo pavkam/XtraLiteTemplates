@@ -97,7 +97,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluable = new Interpreter(new Tokenizer("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}"), 
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
                 .Construct();
 
@@ -117,10 +117,10 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluable = new Interpreter(new Tokenizer("{\"DEAR\" + \" \" IF Dude.IsDear}{Dude.FirstName} {Dude.LastName}"), 
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
-                .RegisterDirective(new ConditionalInterpolationDirective(CreateTypeConverter()))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .RegisterDirective(new ConditionalInterpolationDirective(TypeConverter))
                 .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
-                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
 
             var dude = new
@@ -151,8 +151,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluable = new Interpreter(new Tokenizer("{REPEAT 5 TIMES}text-{END}"), 
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new RepeatDirective(CreateTypeConverter()))
-                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .RegisterDirective(new RepeatDirective(TypeConverter))
+                .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
@@ -165,8 +165,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluable = new Interpreter(new Tokenizer("{FOR EACH name IN names}{name},{END}"), 
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
-                .RegisterDirective(new ForEachDirective(CreateTypeConverter()))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .RegisterDirective(new ForEachDirective(TypeConverter))
                 .Construct();
 
             String[] name = new String[] { "Mary", "Joe", "Peter" };
@@ -180,10 +180,10 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluable = new Interpreter(new Tokenizer("{FOR EACH x IN 1..2}{FOR EACH y IN 3..4}{x + \"-\" + y},{END}{END}"), 
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
-                .RegisterDirective(new ForEachDirective(CreateTypeConverter()))
-                .RegisterOperator(new IntegerRangeOperator(CreateTypeConverter()))
-                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .RegisterDirective(new ForEachDirective(TypeConverter))
+                .RegisterOperator(new IntegerRangeOperator(TypeConverter))
+                .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
@@ -196,8 +196,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluable = new Interpreter(new Tokenizer("{IF true THEN}this{IF true THEN}_will_{END}evaluate{END}{IF false THEN}but this won't!{END}"), 
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new IfDirective(CreateTypeConverter()))
-                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .RegisterDirective(new IfDirective(TypeConverter))
+                .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("true", true), kw("false", false));
@@ -210,8 +210,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluable = new Interpreter(new Tokenizer("{IF true THEN}1{ELSE}2{END}{IF false THEN}3{ELSE}4{END}"), 
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(new IfElseDirective(CreateTypeConverter()))
-                .RegisterOperator(new ArithmeticSumOperator(CreateTypeConverter()))
+                .RegisterDirective(new IfElseDirective(TypeConverter))
+                .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("true", true), kw("false", false));

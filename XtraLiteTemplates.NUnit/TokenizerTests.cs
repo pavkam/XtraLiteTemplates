@@ -416,7 +416,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConstructionExceptions()
         {
-            ExpectArgumentEmptyException("reader", () => new Tokenizer((TextReader)null));
+            ExpectArgumentNullException("reader", () => new Tokenizer((TextReader)null));
         }
 
         [Test]

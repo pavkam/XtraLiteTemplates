@@ -45,14 +45,15 @@ using System.Diagnostics;
 
     public class TestBase
     {
-        protected static IPrimitiveTypeConverter CreateTypeConverter()
-        {
-            return new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
-        }
+        protected IPrimitiveTypeConverter TypeConverter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+
 
         protected String Evaluate(IEvaluable evaluable, StringComparer comparer, params KeyValuePair<String, Object>[] values)
         {
-            var context = new TestEvaluationContext(values, comparer);
+            var context = new TestEvaluationContext(comparer);
+            context.OpenEvaluationFrame();
+            foreach (var kvp in values)
+                context.SetVariable(kvp.Key, kvp.Value);
 
             String result = null;
             using (var sw = new StringWriter())
@@ -70,7 +71,7 @@ using System.Diagnostics;
 
             var evaluable = new Interpreter(new Tokenizer(template), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive)
-                .RegisterDirective(new InterpolationDirective(CreateTypeConverter()))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .Construct();
 
             return Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, values);
@@ -102,20 +103,10 @@ using System.Diagnostics;
             }
             catch (Exception e)
             {
-                if (e is ArgumentNullException)
-                {
-                    Assert.IsTrue(e.Message.StartsWith(
-                            String.Format("Argument \"{0}\" cannot be null.", argument), 
-                            StringComparison.CurrentCulture));
-                }
-                else
-                {
-                    Assert.IsInstanceOf(typeof(ArgumentException), e);
-                    Assert.IsTrue(e.Message.StartsWith(
-                            String.Format("Argument \"{0}\" cannot be empty.", argument), 
-                            StringComparison.CurrentCulture));
-                }
-
+                Assert.IsInstanceOf(typeof(ArgumentException), e);
+                Assert.IsTrue(e.Message.StartsWith(
+                        String.Format("Argument \"{0}\" cannot be empty.", argument),
+                        StringComparison.CurrentCulture));
                 return;
             }
 
@@ -130,23 +121,8 @@ using System.Diagnostics;
             }
             catch (Exception e)
             {
-                if (e is ArgumentNullException)
-                {
-                    Assert.IsTrue(e.Message.StartsWith(
-                            String.Format("Argument \"{0}\" cannot be null.", argument),
-                            StringComparison.CurrentCulture));
-                }
-                else 
-                {
-                    Assert.IsInstanceOf(typeof(ArgumentException), e);
-
-                    var isGoodOne = 
-                        e.Message.StartsWith(String.Format("Argument \"{0}\" cannot be empty.", argument), StringComparison.CurrentCulture) ||
-                        e.Message.StartsWith(String.Format("Argument \"{0}\" does not represent a valid identifer.", argument), StringComparison.CurrentCulture);
-
-                    Assert.IsTrue(isGoodOne);
-                }
-
+                Assert.IsInstanceOf(typeof(ArgumentException), e);
+                Assert.IsTrue(e.Message.StartsWith(String.Format("Argument \"{0}\" does not represent a valid identifer.", argument), StringComparison.CurrentCulture));
                 return;
             }
 

@@ -51,7 +51,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 
         public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
-            Debug.Assert(context != null);
+            Expect.NotNull("context", context);
 
             var formattable = left as IFormattable;
             if (formattable != null)

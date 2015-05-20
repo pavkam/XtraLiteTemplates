@@ -32,96 +32,118 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Globalization;
-    using System.IO;
+    using System.Linq;
+    using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Evaluation;
 
-    public class TestEvaluationContext : IExpressionEvaluationContext, IEvaluationContext
+    public class TestEvaluationContext : IEvaluationContext
     {
-        private Stack<Dictionary<String, Object>> m_variableFrames;
-
-        public TestEvaluationContext(IEnumerable<KeyValuePair<String, Object>> variables, IEqualityComparer<String> comparer)
+        private sealed class Frame
         {
-            Debug.Assert(variables != null);
-            Debug.Assert(comparer != null);
-
-            m_variableFrames = new Stack<Dictionary<String, Object>>();
-
-            var zeroFramevariables = new Dictionary<String, Object>(comparer);
-            foreach (var kvp in variables)
-                zeroFramevariables[kvp.Key] = kvp.Value;
-
-            m_variableFrames.Push(zeroFramevariables);
+            public Dictionary<String, Object> Variables;
+            public HashSet<Object> StateObjects;
         }
 
-        public TestEvaluationContext(IEnumerable<KeyValuePair<String, Object>> variables)
-            : this(variables, StringComparer.OrdinalIgnoreCase)
+        private Stack<Frame> m_frames;
+
+        private IEqualityComparer<String> m_identifierComparer;
+        private Boolean m_ignoreEvaluationExceptions;
+
+        public TestEvaluationContext(IEqualityComparer<String> identifierComparer)
         {
+            Debug.Assert(identifierComparer != null);
+
+            m_identifierComparer = identifierComparer;
+            m_frames = new Stack<Frame>();
         }
-
-        public TestEvaluationContext(String variable, Object value)
-            : this(new KeyValuePair<String, Object>[] { new KeyValuePair<String, Object>(variable, value) })
-        {
-        }
-
-        public TestEvaluationContext(IEqualityComparer<String> comparer)
-            : this(new KeyValuePair<String, Object>[] { }, comparer)
-        {
-        }
-
-        public Object HandleEvaluationError(Operator @operator, Object operand)
-        {
-            Assert.NotNull(@operator);
-
-            return null;
-        }
-
-        public Object HandleEvaluationError(Operator @operator, Object leftOperand, Object rightOperand)
-        {
-            Assert.NotNull(@operator);
-
-            return null;
-        }
-
-
-        public void OpenEvaluationFrame()
-        {
-            var newFrame = new Dictionary<String, Object>(m_variableFrames.Peek(), m_variableFrames.Peek().Comparer);
-            m_variableFrames.Push(newFrame);
-        }
-
-        public void CloseEvaluationFrame()
-        {
-            Assert.Greater(m_variableFrames.Count, 1);
-            m_variableFrames.Pop();
-        }
-
-        public void SetVariable(String identifier, Object value)
-        {
-            m_variableFrames.Peek()[identifier] = value;
-        }
-
-        public Object GetVariable(String identifier)
-        {
-            Assert.IsNotEmpty(identifier);
-
-            return m_variableFrames.Peek()[identifier];
-        }
-
 
         public String ProcessUnparsedText(String value)
         {
             return value;
         }
 
-        public Boolean IgnoreEvaluationExceptions
+        private Frame TopFrame
         {
-            get 
+            get
             {
-                return false;
+                Assert.Greater(m_frames.Count, 0);
+
+                return m_frames.Peek();
             }
+        }
+
+        public void OpenEvaluationFrame()
+        {
+            m_frames.Push(new Frame());
+        }
+
+        public void CloseEvaluationFrame()
+        {
+            Assert.Greater(m_frames.Count, 0);
+
+            m_frames.Pop();
+        }
+
+        public void SetVariable(String identifier, Object value)
+        {
+            Assert.IsNotEmpty(identifier);
+
+            var topFrame = TopFrame;
+            if (topFrame.Variables == null)
+                topFrame.Variables = new Dictionary<String, Object>(m_identifierComparer);
+
+            topFrame.Variables[identifier] = value;
+        }
+
+        public Object GetVariable(String identifier)
+        {
+            Assert.IsNotEmpty(identifier);
+
+            foreach (var frame in m_frames)
+            {
+                Object result;
+                if (frame.Variables != null && frame.Variables.TryGetValue(identifier, out result))
+                    return result;
+            }
+
+            return null;
+        }
+
+        public bool IgnoreEvaluationExceptions
+        {
+            get
+            {
+                return true;
+            }
+        }
+
+        public void AddStateObject(Object state)
+        {
+            Assert.NotNull(state);
+
+            var topFrame = TopFrame;
+            if (topFrame.StateObjects == null)
+                topFrame.StateObjects = new HashSet<Object>();
+
+            topFrame.StateObjects.Add(state);
+        }
+
+        public void RemoveStateObject(Object state)
+        {
+            Assert.NotNull(state);
+
+            var topFrame = TopFrame;
+            if (topFrame.StateObjects != null)
+                topFrame.StateObjects.Remove(state);
+        }
+
+        public Boolean ContainsStateObject(Object state)
+        {
+            Assert.NotNull(state);
+
+            var topFrame = TopFrame;
+            return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
         }
     }
 }

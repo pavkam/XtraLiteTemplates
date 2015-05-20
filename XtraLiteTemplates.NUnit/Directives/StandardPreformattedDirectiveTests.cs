@@ -25,37 +25,52 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
+using NUnit.Framework;
 
-namespace XtraLiteTemplates.Dialects.Standard.Operators
+namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
-    using System.Diagnostics;
+    using System.IO;
     using System.Linq;
-    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.NUnit.Inside;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Parsing;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
+    using System.Globalization;
+    using System.Collections.Generic;
 
-    public sealed class IntegerRangeOperator : StandardBinaryOperator
+    [TestFixture]
+    public class StandardPreFormattedUnparsedTextDirectiveTests : TestBase
     {
-        public IntegerRangeOperator(String symbol, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, 2, typeConverter)
+        [Test]
+        public void TestCaseConstructor1()
         {
+            ExpectInvalidTagMarkupException(null, () => new PreFormattedUnparsedTextDirective(null, "END", TypeConverter));
+            ExpectInvalidTagMarkupException(null, () => new PreFormattedUnparsedTextDirective("PREF", null, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new PreFormattedUnparsedTextDirective("PREF", "END", null));
         }
 
-        public IntegerRangeOperator(IPrimitiveTypeConverter typeConverter)
-            : this("..", typeConverter)
+        [Test]
+        public void TestCaseConstructor2()
         {
+            var directive = new PreFormattedUnparsedTextDirective(TypeConverter);
+            Assert.AreEqual("{PREFORMATTED}...{END}", directive.ToString());
         }
 
-        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
+        [Test]
+        public void TestCaseConstructor3()
         {
-            Expect.NotNull("context", context);
+            var directive = new PreFormattedUnparsedTextDirective("PREPRE", "SUPPAPRE", TypeConverter);
+            Assert.AreEqual("{PREPRE}...{SUPPAPRE}", directive.ToString());
+        }
 
-            var min = TypeConverter.ConvertToInteger(left);
-            var max = TypeConverter.ConvertToInteger(right);
+        [Test]
+        public void TestCaseEvaluation1()
+        {
+            var directive = new PreFormattedUnparsedTextDirective("P", "E", TypeConverter);
 
-            if (min <= max)
-                return Enumerable.Range(min, max - min + 1);
-            else
-                return null;
+            Assert.AreEqual("   1   ", Evaluate("{P}   1   {E}", directive));
+            Assert.AreEqual("\n\r1   ", Evaluate("{P}\n\r1   {E}", directive));
         }
     }
 }

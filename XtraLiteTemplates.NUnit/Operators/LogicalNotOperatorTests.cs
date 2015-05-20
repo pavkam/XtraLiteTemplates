@@ -42,16 +42,16 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalNotOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new LogicalNotOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalNotOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalNotOperator(null));
+            ExpectArgumentNullException("symbol", () => new LogicalNotOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new LogicalNotOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new LogicalNotOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new LogicalNotOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new LogicalNotOperator(CreateTypeConverter());
+            var @operator = new LogicalNotOperator(TypeConverter);
 
             Assert.AreEqual("!", @operator.Symbol);
         }
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new LogicalNotOperator("operator", CreateTypeConverter());
+            var @operator = new LogicalNotOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(1, @operator.Precedence);
@@ -67,9 +67,17 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new LogicalNotOperator(TypeConverter);
+
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new LogicalNotOperator("operator", CreateTypeConverter());
+            var @operator = new LogicalNotOperator(TypeConverter);
 
             AssertEvaluation<Boolean>(@operator, true, false);
             AssertEvaluation<Boolean>(@operator, false, true);

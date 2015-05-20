@@ -46,7 +46,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 
         public override Object Evaluate(IExpressionEvaluationContext context, Object arg)
         {
-            Debug.Assert(context != null);
+            Expect.NotNull("context", context);
+
             return ~TypeConverter.ConvertToInteger(arg);
         }
     }

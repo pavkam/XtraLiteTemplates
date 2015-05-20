@@ -46,14 +46,14 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 
         public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
-            Debug.Assert(context != null);
+            Expect.NotNull("context", context);
 
             return TypeConverter.ConvertToBoolean(left) || TypeConverter.ConvertToBoolean(right);
         }
 
         public override Boolean EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
         {
-            Debug.Assert(context != null);
+            Expect.NotNull("context", context);
 
             result = true;
             return (TypeConverter.TypeOf(left) == PrimitiveType.Boolean && TypeConverter.ConvertToBoolean(left) == true);

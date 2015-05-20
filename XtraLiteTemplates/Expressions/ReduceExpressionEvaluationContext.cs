@@ -45,5 +45,21 @@ namespace XtraLiteTemplates.Expressions
             Debug.Fail("Invlaid operation.");
             return null;
         }
+
+        public void AddStateObject(Object state)
+        {
+            Debug.Fail("Invlaid operation.");
+        }
+
+        public void RemoveStateObject(Object state)
+        {
+            Debug.Fail("Invlaid operation.");
+        }
+
+        public bool ContainsStateObject(Object state)
+        {
+            Debug.Fail("Invlaid operation.");
+            return false;
+        }
     }
 }

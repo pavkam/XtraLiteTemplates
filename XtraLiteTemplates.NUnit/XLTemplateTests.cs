@@ -150,6 +150,31 @@ namespace XtraLiteTemplates.NUnit
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{_0} -> {_1}", "string", 100.33);
             Assert.AreEqual("string->100.33", result);
         }
+
+        [Test]
+        public void TestCasePreformattedEvaluate()
+        {
+            var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{preformatted}{_0} -> {_1}{end}", "string", 100.33);
+            Assert.AreEqual("string -> 100.33", result);
+        }
+
+        [Test]
+        public void TestCaseEvaluationFrames()
+        {
+            String template = @"
+            {_0} /
+            {FOR EACH _0 IN 1..2}
+                {_0} /
+                {FOR EACH _0 IN 3 ..4}
+                {preformatted}  {_0}  {end}    /
+                {END}
+                {_0} /
+            {END}
+            {_0}";
+
+            var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, template, "initial");
+            Assert.AreEqual("initial/1/  3  /  4  /1/2/  3  /  4  /2/initial", result);
+        }
     }
 }
 

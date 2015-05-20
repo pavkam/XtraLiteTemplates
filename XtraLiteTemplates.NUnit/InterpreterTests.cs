@@ -67,23 +67,23 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentNullException("directive", () => interpreter.RegisterDirective(null));
             ExpectArgumentNullException("operator", () => interpreter.RegisterOperator(null));
 
-            interpreter.RegisterOperator(new ArithmeticNeutralOperator("A", CreateTypeConverter()));
-            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("A", CreateTypeConverter())));
-            interpreter.RegisterOperator(new ArithmeticSumOperator("A", CreateTypeConverter()));
-            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new ArithmeticSumOperator("A", CreateTypeConverter())));
+            interpreter.RegisterOperator(new ArithmeticNeutralOperator("A", TypeConverter));
+            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("A", TypeConverter)));
+            interpreter.RegisterOperator(new ArithmeticSumOperator("A", TypeConverter));
+            ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new ArithmeticSumOperator("A", TypeConverter)));
             interpreter.RegisterOperator(new SubscriptOperator("O", "C"));
             ExpectOperatorAlreadyRegisteredException("OC", () => interpreter.RegisterOperator(new SubscriptOperator("O", "C")));
             ExpectOperatorAlreadyRegisteredException("AM", () => interpreter.RegisterOperator(new SubscriptOperator("A", "M")));
 
-            interpreter.RegisterOperator(new ArithmeticSumOperator("L", CreateTypeConverter()));
+            interpreter.RegisterOperator(new ArithmeticSumOperator("L", TypeConverter));
             ExpectOperatorAlreadyRegisteredException("KL", () => interpreter.RegisterOperator(new SubscriptOperator("K", "L")));
-            interpreter.RegisterOperator(new ArithmeticNeutralOperator("L", CreateTypeConverter()));
+            interpreter.RegisterOperator(new ArithmeticNeutralOperator("L", TypeConverter));
 
             interpreter.RegisterOperator(new SubscriptOperator("W", "V"));
-            ExpectOperatorAlreadyRegisteredException("W", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("W", CreateTypeConverter())));
-            ExpectOperatorAlreadyRegisteredException("V", () => interpreter.RegisterOperator(new ArithmeticSumOperator("V", CreateTypeConverter())));
-            interpreter.RegisterOperator(new ArithmeticNeutralOperator("V", CreateTypeConverter()));
-            interpreter.RegisterOperator(new ArithmeticSumOperator("W", CreateTypeConverter()));
+            ExpectOperatorAlreadyRegisteredException("W", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("W", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException("V", () => interpreter.RegisterOperator(new ArithmeticSumOperator("V", TypeConverter)));
+            interpreter.RegisterOperator(new ArithmeticNeutralOperator("V", TypeConverter));
+            interpreter.RegisterOperator(new ArithmeticSumOperator("W", TypeConverter));
 
             var d1 = new RippedOpenDirective(Tag.Parse("HELLO"));
             var d2 = new RippedOpenDirective(Tag.Parse("WORLD"));

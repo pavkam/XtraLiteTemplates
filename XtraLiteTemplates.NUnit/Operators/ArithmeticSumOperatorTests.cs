@@ -42,16 +42,16 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticSumOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticSumOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSumOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticSumOperator(null));
+            ExpectArgumentNullException("symbol", () => new ArithmeticSumOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticSumOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticSumOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticSumOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new ArithmeticSumOperator(CreateTypeConverter());
+            var @operator = new ArithmeticSumOperator(TypeConverter);
 
             Assert.AreEqual("+", @operator.Symbol);
         }
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new ArithmeticSumOperator("operator", CreateTypeConverter());
+            var @operator = new ArithmeticSumOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(4, @operator.Precedence);
@@ -69,9 +69,19 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new ArithmeticSumOperator(TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new ArithmeticSumOperator("operator", CreateTypeConverter());
+            var @operator = new ArithmeticSumOperator(TypeConverter);
 
             AssertEvaluation<Double>(@operator, 0, 100, 100);
             AssertEvaluation<Double>(@operator, 0, 0, 0);

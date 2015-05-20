@@ -44,32 +44,32 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseConstructor1()
         {
-            ExpectInvalidTagMarkupException(null, () => new ConditionalInterpolationDirective(null, false, CreateTypeConverter()));
+            ExpectInvalidTagMarkupException(null, () => new ConditionalInterpolationDirective(null, false, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ConditionalInterpolationDirective("$ __ $", false, null));
 
-            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("$ A $ B $", false, CreateTypeConverter()));
-            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("$", false, CreateTypeConverter()));
-            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("A $ B ? C $ D $", false, CreateTypeConverter()));
+            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("$ A $ B $", false, TypeConverter));
+            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("$", false, TypeConverter));
+            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("A $ B ? C $ D $", false, TypeConverter));
         }
 
         [Test]
         public void TestCaseConstructor2()
         {
-            var directive = new ConditionalInterpolationDirective(CreateTypeConverter());
+            var directive = new ConditionalInterpolationDirective(TypeConverter);
             Assert.AreEqual("{$ IF $}", directive.ToString());
         }
 
         [Test]
         public void TestCaseConstructor3()
         {
-            var directive = new ConditionalInterpolationDirective("$ THEN $", true, CreateTypeConverter());
+            var directive = new ConditionalInterpolationDirective("$ THEN $", true, TypeConverter);
             Assert.AreEqual("{$ THEN $}", directive.ToString());
         }
 
         [Test]
         public void TestCaseEvaluation1()
         {
-            var directive = new ConditionalInterpolationDirective("$ IF $", false, CreateTypeConverter());
+            var directive = new ConditionalInterpolationDirective("$ IF $", false, TypeConverter);
 
             Assert.AreEqual("100", Evaluate("{100 IF 1}", directive));
             Assert.AreEqual("", Evaluate("{100 IF 0}", directive));
@@ -78,7 +78,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation2()
         {
-            var directive = new ConditionalInterpolationDirective("$ THEN $", true, CreateTypeConverter());
+            var directive = new ConditionalInterpolationDirective("$ THEN $", true, TypeConverter);
 
             Assert.AreEqual("100", Evaluate("{1 THEN 100}", directive));
             Assert.AreEqual("", Evaluate("{0 THEN 100}", directive));

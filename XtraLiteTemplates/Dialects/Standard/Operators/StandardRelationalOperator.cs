@@ -47,7 +47,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 
         public sealed override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
-            Debug.Assert(context != null);
+            Expect.NotNull("context", context);
 
             Int32 relation;
             if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)

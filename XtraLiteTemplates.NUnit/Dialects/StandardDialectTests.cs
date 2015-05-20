@@ -71,7 +71,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("NAN")) && dialect.SpecialKeywords[transformer("NAN")].Equals(Double.NaN));
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("INFINITY")) && dialect.SpecialKeywords[transformer("INFINITY")].Equals(Double.PositiveInfinity));
 
-            Assert.AreEqual(6, dialect.Directives.Count);
+            Assert.AreEqual(7, dialect.Directives.Count);
             foreach (var directive in dialect.Directives)
             {
                 if (directive is ConditionalInterpolationDirective)
@@ -86,6 +86,8 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.AreEqual("{$}", directive.ToString());
                 else if (directive is RepeatDirective)
                     Assert.AreEqual(transformer("{REPEAT $ TIMES}...{END}"), directive.ToString());
+                else if (directive is PreFormattedUnparsedTextDirective)
+                    Assert.AreEqual(transformer("{PREFORMATTED}...{END}"), directive.ToString());
                 else
                     Assert.Fail();
             }
@@ -280,6 +282,21 @@ namespace XtraLiteTemplates.NUnit.Dialects
 
             Assert.AreEqual(iic, StandardDialect.DefaultIgnoreCase);
             Assert.AreEqual(iic.GetHashCode(), StandardDialect.DefaultIgnoreCase.GetHashCode());
+        }
+
+
+        [Test]
+        public void TestCaseUnparsedTextDecoration()
+        {
+            var dialect = new StandardDialect();
+            var context = new TestEvaluationContext(StringComparer.OrdinalIgnoreCase);
+            context.OpenEvaluationFrame();
+
+            ExpectArgumentNullException("context", () => dialect.DecorateUnparsedText(null, String.Empty));
+
+            Assert.AreEqual("", dialect.DecorateUnparsedText(context, null));
+            Assert.AreEqual("", dialect.DecorateUnparsedText(context, String.Empty));
+            Assert.AreEqual("", dialect.DecorateUnparsedText(context, "    \r\n"));
         }
     }
 }

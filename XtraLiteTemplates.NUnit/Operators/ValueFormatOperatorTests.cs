@@ -42,18 +42,18 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new ValueFormatOperator(null, CultureInfo.CurrentCulture, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new ValueFormatOperator(String.Empty, CultureInfo.CurrentCulture, CreateTypeConverter()));
-            ExpectArgumentEmptyException("formatProvider", () => new ValueFormatOperator("operator", null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("formatProvider", () => new ValueFormatOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new ValueFormatOperator("operator", CultureInfo.CurrentCulture, null));
-            ExpectArgumentEmptyException("typeConverter", () => new ValueFormatOperator(CultureInfo.CurrentCulture, null));
+            ExpectArgumentNullException("symbol", () => new ValueFormatOperator(null, CultureInfo.CurrentCulture, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ValueFormatOperator(String.Empty, CultureInfo.CurrentCulture, TypeConverter));
+            ExpectArgumentNullException("formatProvider", () => new ValueFormatOperator("operator", null, TypeConverter));
+            ExpectArgumentNullException("formatProvider", () => new ValueFormatOperator(null, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new ValueFormatOperator("operator", CultureInfo.CurrentCulture, null));
+            ExpectArgumentNullException("typeConverter", () => new ValueFormatOperator(CultureInfo.CurrentCulture, null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new ValueFormatOperator(CultureInfo.CurrentCulture, CreateTypeConverter());
+            var @operator = new ValueFormatOperator(CultureInfo.CurrentCulture, TypeConverter);
 
             Assert.AreEqual(":", @operator.Symbol);
         }
@@ -61,7 +61,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new ValueFormatOperator("operator", CultureInfo.InvariantCulture, CreateTypeConverter());
+            var @operator = new ValueFormatOperator("operator", CultureInfo.InvariantCulture, TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(2, @operator.Precedence);
@@ -72,17 +72,27 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new ValueFormatOperator(CultureInfo.InvariantCulture, TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new ValueFormatOperator("operator", CultureInfo.InvariantCulture, CreateTypeConverter());
+            var @operator = new ValueFormatOperator(CultureInfo.InvariantCulture, TypeConverter);
 
-            Assert.AreEqual("1.23", @operator.Evaluate(1.23, "N"));
-            Assert.IsNull(@operator.Evaluate(null, "N"));
-            Assert.IsNull(@operator.Evaluate("Hello", "8742398472984"));
-            Assert.IsNull(@operator.Evaluate("Hello", null));
+            Assert.AreEqual("1.23", @operator.Evaluate(EmptyEvaluationContext, 1.23, "N"));
+            Assert.IsNull(@operator.Evaluate(EmptyEvaluationContext, null, "N"));
+            Assert.IsNull(@operator.Evaluate(EmptyEvaluationContext, "Hello", "8742398472984"));
+            Assert.IsNull(@operator.Evaluate(EmptyEvaluationContext, "Hello", null));
 
             var now = DateTime.Now;
-            Assert.AreEqual(now.ToString("g", CultureInfo.InvariantCulture), @operator.Evaluate(now, "g"));
+            Assert.AreEqual(now.ToString("g", CultureInfo.InvariantCulture), @operator.Evaluate(EmptyEvaluationContext, now, "g"));
         }
     }
 }

@@ -37,20 +37,14 @@ namespace XtraLiteTemplates
         public static void NotNull(String name, Object value)
         {
             if (value == null)
-            {
-                throw new ArgumentNullException(
-                    name, 
-                    String.Format("Argument \"{0}\" cannot be null.", name));
-            }
+                ExceptionHelper.ArgumentIsNull(name);
         }
 
         public static void NotEmpty<T>(String name, IEnumerable<T> value)
         {
             NotNull(name, value);
             if (!value.Any())
-            {
-                throw new ArgumentException(String.Format("Argument \"{0}\" cannot be empty.", name), name);
-            }
+                ExceptionHelper.ArgumentIsEmpty(name);
         }
 
         public static void Identifier(String name, String value)
@@ -62,68 +56,43 @@ namespace XtraLiteTemplates
                 value.All(c => Char.IsLetterOrDigit(c) || c == '_');
 
             if (!isValid)
-            {
-                throw new ArgumentException(String.Format("Argument \"{0}\" does not represent a valid identifer.", name), name);
-            }
+                ExceptionHelper.ArgumentIsNotValidIdentifier(name);
         }
 
         public static void NotEqual<T>(String name1, String name2, T value1, T value2)
         {
             if (EqualityComparer<T>.Default.Equals(value1, value2))
-            {
-                throw new ArgumentException(String.Format("Arguments \"{0}\" and \"{1}\" cannot be equal.", name1, name2), 
-                    String.Format("{0}, {1}", name1, name2));
-            }
+                ExceptionHelper.ArgumentsAreEqual(name1, name2);
         }
 
         public static void GreaterThan<T>(String name, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) <= 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    name, 
-                    String.Format("Argument \"{0}\" is expected to be greater than {1}.", name, than));
-            }
+                ExceptionHelper.ArgumentNotGreaterThan(name, than == null ? null : than.ToString());
         }
 
         public static void GreaterThanOrEqual<T>(String name, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) < 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    name, 
-                    String.Format("Argument \"{0}\" is expected to be greater than or equal to {1}.", name, than));
-            }
+                ExceptionHelper.ArgumentNotGreaterThanOrEqual(name, than == null ? null : than.ToString());
         }
 
         public static void LessThan<T>(String name, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) >= 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    name, 
-                    String.Format("Argument \"{0}\" is expected to be less than {1}.", name, than));
-            }
+                ExceptionHelper.ArgumentNotLessThan(name, than == null ? null : than.ToString());
         }
 
         public static void LessThanOrEqual<T>(String name, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) > 0)
-            {
-                throw new ArgumentOutOfRangeException(
-                    name, 
-                    String.Format("Argument \"{0}\" is expected to be less than or equal to {1}.", name, than));
-            }
+                ExceptionHelper.ArgumentNotLessThanOrEqual(name, than == null ? null : than.ToString());
         }
 
         public static void IsTrue(String name, Boolean condition)
         {
             if (!condition)
-            {
-                throw new ArgumentException(
-                    String.Format("Argument condition \"{0}\" failed to be validated as true.", name), 
-                    name);
-            }
+                ExceptionHelper.ConditionFailed(name);
         }
     }
 }

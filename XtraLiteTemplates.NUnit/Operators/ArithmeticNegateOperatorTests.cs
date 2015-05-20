@@ -42,16 +42,16 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new ArithmeticNegateOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticNegateOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNegateOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new ArithmeticNegateOperator(null));
+            ExpectArgumentNullException("symbol", () => new ArithmeticNegateOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticNegateOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticNegateOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new ArithmeticNegateOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new ArithmeticNegateOperator(CreateTypeConverter());
+            var @operator = new ArithmeticNegateOperator(TypeConverter);
 
             Assert.AreEqual("-", @operator.Symbol);
         }
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new ArithmeticNegateOperator("operator", CreateTypeConverter());
+            var @operator = new ArithmeticNegateOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(1, @operator.Precedence);
@@ -67,9 +67,17 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new ArithmeticNegateOperator(TypeConverter);
+
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new ArithmeticNegateOperator("operator", CreateTypeConverter());
+            var @operator = new ArithmeticNegateOperator(TypeConverter);
 
             AssertEvaluation<Double>(@operator, 1.33, -1.33);
             AssertEvaluation<Double>(@operator, 0, 0);

@@ -42,16 +42,16 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new IntegerRangeOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new IntegerRangeOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new IntegerRangeOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new IntegerRangeOperator(null));
+            ExpectArgumentNullException("symbol", () => new IntegerRangeOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new IntegerRangeOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new IntegerRangeOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new IntegerRangeOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new IntegerRangeOperator(CreateTypeConverter());
+            var @operator = new IntegerRangeOperator(TypeConverter);
 
             Assert.AreEqual("..", @operator.Symbol);
         }
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new IntegerRangeOperator("operator", CreateTypeConverter());
+            var @operator = new IntegerRangeOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(2, @operator.Precedence);
@@ -69,19 +69,29 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new IntegerRangeOperator(TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new IntegerRangeOperator("operator", CreateTypeConverter());
+            var @operator = new IntegerRangeOperator(TypeConverter);
 
-            var enumerable = @operator.Evaluate(1.8, 2.1) as IEnumerable<Int32>;
+            var enumerable = @operator.Evaluate(EmptyEvaluationContext, 1.8, 2.1) as IEnumerable<Int32>;
             Assert.IsNotNull(enumerable);
             Assert.AreEqual("1,2", String.Join(",", enumerable));
 
-            enumerable = @operator.Evaluate(1.1, 1.8) as IEnumerable<Int32>;
+            enumerable = @operator.Evaluate(EmptyEvaluationContext, 1.1, 1.8) as IEnumerable<Int32>;
             Assert.IsNotNull(enumerable);
             Assert.AreEqual("1", String.Join(",", enumerable));
 
-            enumerable = @operator.Evaluate(2, 1) as IEnumerable<Int32>;
+            enumerable = @operator.Evaluate(EmptyEvaluationContext, 2, 1) as IEnumerable<Int32>;
             Assert.IsNull(enumerable);
         }
     }

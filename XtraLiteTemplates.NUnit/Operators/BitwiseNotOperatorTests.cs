@@ -42,16 +42,16 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new BitwiseNotOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseNotOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new BitwiseNotOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new BitwiseNotOperator(null));
+            ExpectArgumentNullException("symbol", () => new BitwiseNotOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseNotOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new BitwiseNotOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new BitwiseNotOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new BitwiseNotOperator(CreateTypeConverter());
+            var @operator = new BitwiseNotOperator(TypeConverter);
 
             Assert.AreEqual("~", @operator.Symbol);
         }
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new BitwiseNotOperator("operator", CreateTypeConverter());
+            var @operator = new BitwiseNotOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(1, @operator.Precedence);
@@ -67,9 +67,17 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new BitwiseNotOperator(TypeConverter);
+
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new BitwiseNotOperator("operator", CreateTypeConverter());
+            var @operator = new BitwiseNotOperator(TypeConverter);
 
             AssertEvaluation<Int32>(@operator, 1, ~1);
             AssertEvaluation<Int32>(@operator, 0, ~0);

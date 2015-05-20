@@ -42,16 +42,16 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("symbol", () => new LogicalAndOperator(null, CreateTypeConverter()));
-            ExpectArgumentEmptyException("symbol", () => new LogicalAndOperator(String.Empty, CreateTypeConverter()));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalAndOperator("operator", null));
-            ExpectArgumentEmptyException("typeConverter", () => new LogicalAndOperator(null));
+            ExpectArgumentNullException("symbol", () => new LogicalAndOperator(null, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new LogicalAndOperator(String.Empty, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new LogicalAndOperator("operator", null));
+            ExpectArgumentNullException("typeConverter", () => new LogicalAndOperator(null));
         }
 
         [Test]
         public void TestCaseConstruction2()
         {
-            var @operator = new LogicalAndOperator(CreateTypeConverter());
+            var @operator = new LogicalAndOperator(TypeConverter);
 
             Assert.AreEqual("&&", @operator.Symbol);
         }
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction3()
         {
-            var @operator = new LogicalAndOperator("operator", CreateTypeConverter());
+            var @operator = new LogicalAndOperator("operator", TypeConverter);
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(11, @operator.Precedence);
@@ -69,18 +69,34 @@ namespace XtraLiteTemplates.NUnit.Operators
         }
 
         [Test]
+        public void TestCaseEvaluationExceptions()
+        {
+            var @operator = new LogicalAndOperator(TypeConverter);
+
+            Object dummy;
+            ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
+            ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
+        }
+
+        [Test]
         public void TestCaseEvaluation()
         {
-            var @operator = new LogicalAndOperator("operator", CreateTypeConverter());
+            var @operator = new LogicalAndOperator(TypeConverter);
 
             AssertEvaluation<Boolean>(@operator, true, true, true);
             AssertEvaluation<Boolean>(@operator, true, false, false);
             AssertEvaluation<Boolean>(@operator, false, true, false);
             AssertEvaluation<Boolean>(@operator, false, false, false);
+        }
+
+        [Test]
+        public void TestCaseLhsEvaluation()
+        {
+            var @operator = new LogicalAndOperator(TypeConverter);
 
             Object result;
-            Assert.IsFalse(@operator.EvaluateLhs(true, out result));
-            Assert.IsTrue(@operator.EvaluateLhs(false, out result) && result.Equals(false));
+            Assert.IsFalse(@operator.EvaluateLhs(EmptyEvaluationContext, true, out result));
+            Assert.IsTrue(@operator.EvaluateLhs(EmptyEvaluationContext, false, out result) && result.Equals(false));
         }
     }
 }

@@ -39,6 +39,76 @@ namespace XtraLiteTemplates
 
     internal static class ExceptionHelper
     {
+        internal static void ArgumentIsNull(String argumentName)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(argumentName));
+
+            throw new ArgumentNullException(argumentName, String.Format("Argument \"{0}\" cannot be null.", argumentName));
+        }
+
+        internal static void ArgumentIsEmpty(String argumentName)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(argumentName));
+
+            throw new ArgumentException(String.Format("Argument \"{0}\" cannot be empty.", argumentName), argumentName);
+        }
+
+        internal static void ArgumentIsNotValidIdentifier(String argumentName)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(argumentName));
+
+            throw new ArgumentException(String.Format("Argument \"{0}\" does not represent a valid identifer.", argumentName), argumentName);
+        }
+
+        internal static void ArgumentsAreEqual(String argumentName1, String argumentName2)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(argumentName1));
+            Debug.Assert(!String.IsNullOrEmpty(argumentName2));
+
+            throw new ArgumentException(String.Format("Arguments \"{0}\" and \"{1}\" cannot be equal.", argumentName1, argumentName2), argumentName1);
+        }
+
+
+        internal static void ArgumentNotGreaterThan(String argumentName, String comparand)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(argumentName));
+            Debug.Assert(!String.IsNullOrEmpty(comparand));
+
+            throw new ArgumentOutOfRangeException(argumentName, String.Format("Argument \"{0}\" is expected to be greater than {1}.", argumentName, comparand));
+        }
+
+        internal static void ArgumentNotGreaterThanOrEqual(String argumentName, String comparand)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(argumentName));
+            Debug.Assert(!String.IsNullOrEmpty(comparand));
+
+            throw new ArgumentOutOfRangeException(argumentName, String.Format("Argument \"{0}\" is expected to be greater than or equal to {1}.", argumentName, comparand));
+        }
+
+        internal static void ArgumentNotLessThan(String argumentName, String comparand)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(argumentName));
+            Debug.Assert(!String.IsNullOrEmpty(comparand));
+
+            throw new ArgumentOutOfRangeException(argumentName, String.Format("Argument \"{0}\" is expected to be less than {1}.", argumentName, comparand));
+        }
+
+        internal static void ArgumentNotLessThanOrEqual(String argumentName, String comparand)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(argumentName));
+            Debug.Assert(!String.IsNullOrEmpty(comparand));
+
+            throw new ArgumentOutOfRangeException(argumentName, String.Format("Argument \"{0}\" is expected to be less than or equal to {1}.", argumentName, comparand));
+        }
+
+        internal static void ConditionFailed(String conditionName)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(conditionName));
+
+            throw new ArgumentException(String.Format("Argument condition \"{0}\" failed to be validated as true.", conditionName), conditionName);
+        }
+
+
         internal static void UnexpectedCharacter(Int32 characterIndex, Char character)
         {
             throw new ParseException(characterIndex, "Unexpected character '{0}' found at position {1}.", character, characterIndex);

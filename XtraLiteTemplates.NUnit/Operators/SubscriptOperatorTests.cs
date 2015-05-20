@@ -42,9 +42,8 @@ namespace XtraLiteTemplates.NUnit.Operators
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(null, ")"));
-            ExpectArgumentEmptyException("terminator", () => new SubscriptOperator("(", null));
-            ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(null, null));
+            ExpectArgumentNullException("symbol", () => new SubscriptOperator(null, ")"));
+            ExpectArgumentNullException("terminator", () => new SubscriptOperator("(", null));
             ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(String.Empty, ")"));
             ExpectArgumentEmptyException("terminator", () => new SubscriptOperator("(", String.Empty));
             ExpectArgumentEmptyException("symbol", () => new SubscriptOperator(String.Empty, String.Empty));

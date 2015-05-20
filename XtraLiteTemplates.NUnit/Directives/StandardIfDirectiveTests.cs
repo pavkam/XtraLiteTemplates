@@ -45,32 +45,32 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseConstructor1()
         {
-            ExpectInvalidTagMarkupException(null, () => new IfDirective(null, "END", CreateTypeConverter()));
-            ExpectInvalidTagMarkupException(null, () => new IfDirective("IF $", null, CreateTypeConverter()));
+            ExpectInvalidTagMarkupException(null, () => new IfDirective(null, "END", TypeConverter));
+            ExpectInvalidTagMarkupException(null, () => new IfDirective("IF $", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new IfDirective("IF $", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new IfDirective("?", "END", CreateTypeConverter()));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new IfDirective("$ AND $ THEN ?", "END", CreateTypeConverter()));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new IfDirective("?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new IfDirective("$ AND $ THEN ?", "END", TypeConverter));
         }
 
         [Test]
         public void TestCaseConstructor2()
         {
-            var directive = new IfDirective(CreateTypeConverter());
+            var directive = new IfDirective(TypeConverter);
             Assert.AreEqual("{IF $ THEN}...{END}", directive.ToString());
         }
 
         [Test]
         public void TestCaseConstructor3()
         {
-            var directive = new IfDirective("MAYBE $ IN WHICH CASE", "TERMINATE", CreateTypeConverter());
+            var directive = new IfDirective("MAYBE $ IN WHICH CASE", "TERMINATE", TypeConverter);
             Assert.AreEqual("{MAYBE $ IN WHICH CASE}...{TERMINATE}", directive.ToString());
         }
 
         [Test]
         public void TestCaseEvaluation1()
         {
-            var directive = new IfDirective("MAYBE $", "DONE", CreateTypeConverter());
+            var directive = new IfDirective("MAYBE $", "DONE", TypeConverter);
 
             Assert.AreEqual("yes", Evaluate("{MAYBE 1}yes{DONE}", directive));
         }
@@ -78,7 +78,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation2()
         {
-            var directive = new IfDirective("MAYBE $", "DONE", CreateTypeConverter());
+            var directive = new IfDirective("MAYBE $", "DONE", TypeConverter);
 
             Assert.AreEqual("yes", Evaluate("{MAYBE \"text\"}yes{DONE}", directive));
         }
@@ -86,7 +86,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation3()
         {
-            var directive = new IfDirective("MAYBE $", "DONE", CreateTypeConverter());
+            var directive = new IfDirective("MAYBE $", "DONE", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{MAYBE \"\"}no{DONE}", directive));
         }
@@ -94,7 +94,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation4()
         {
-            var directive = new IfDirective("MAYBE $", "DONE", CreateTypeConverter());
+            var directive = new IfDirective("MAYBE $", "DONE", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{MAYBE 0}no{DONE}", directive));
         }
@@ -102,7 +102,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation5()
         {
-            var directive = new IfDirective("MAYBE $", "DONE", CreateTypeConverter());
+            var directive = new IfDirective("MAYBE $", "DONE", TypeConverter);
 
             Assert.AreEqual("", Evaluate("{MAYBE undefined}no{DONE}", directive, new KeyValuePair<String, Object>("undefined", null)));
         }
@@ -110,7 +110,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseEvaluation6()
         {
-            var directive = new IfDirective("MAYBE $", "DONE", CreateTypeConverter());
+            var directive = new IfDirective("MAYBE $", "DONE", TypeConverter);
 
             Assert.AreEqual("yes", Evaluate("{MAYBE defined}yes{DONE}", directive, new KeyValuePair<String, Object>("defined", this)));
         }

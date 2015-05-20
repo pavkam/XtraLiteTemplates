@@ -51,7 +51,7 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentLessThanException("firstCharacterIndex", 0, () => new UnparsedLex("100", -1, 1));
             ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new UnparsedLex("100", 1, 0));
 
-            ExpectArgumentEmptyException("unparsedText", () => new UnparsedLex(null, 0, 1));
+            ExpectArgumentNullException("unparsedText", () => new UnparsedLex(null, 0, 1));
             ExpectArgumentEmptyException("unparsedText", () => new UnparsedLex(String.Empty, 0, 1));
         }
 

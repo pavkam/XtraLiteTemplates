@@ -55,6 +55,7 @@ namespace XtraLiteTemplates.Dialects.Standard
 
         private IPrimitiveTypeConverter m_typeConverter;
         private DialectCasing m_casing;
+        private Object m_preformattedStateObject;
 
         public CultureInfo Culture { get; private set;  }
         public IEqualityComparer<String> IdentifierComparer { get; private set; }
@@ -115,6 +116,8 @@ namespace XtraLiteTemplates.Dialects.Standard
             };
 
             /* Create all directives. */
+            var pre = new PreFormattedUnparsedTextDirective(caseModifierFunc("PREFORMATTED"), caseModifierFunc("END"), m_typeConverter);
+            m_preformattedStateObject = pre;
             Directives = new List<Directive>()
             {
                 new ConditionalInterpolationDirective(caseModifierFunc("$ IF $"), false, m_typeConverter),
@@ -123,6 +126,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new IfElseDirective(caseModifierFunc("IF $ THEN"), caseModifierFunc("ELSE"), caseModifierFunc("END"), m_typeConverter),
                 new InterpolationDirective(m_typeConverter),
                 new RepeatDirective(caseModifierFunc("REPEAT $ TIMES"), caseModifierFunc("END"), m_typeConverter),
+                pre,
             };
 
             /* Special keywords. */
@@ -141,12 +145,44 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
         }
 
-        public String DecorateUnparsedText(String unparsedText)
+        public String DecorateUnparsedText(IExpressionEvaluationContext context, String unparsedText)
         {
-            if (String.IsNullOrEmpty(unparsedText))
-                return String.Empty;
+            Expect.NotNull("context", context);
+
+            if (context.ContainsStateObject(m_preformattedStateObject))
+                return unparsedText;
             else
-                return unparsedText.Trim();
+            {
+                if (String.IsNullOrEmpty(unparsedText))
+                    return String.Empty;
+                else
+                {
+                    /* Trim all 1+ white spaces to one space character. */
+                    StringBuilder result = new StringBuilder();
+                    Boolean putSpace = false;
+                    foreach(var c in unparsedText)
+                    {
+                        if (Char.IsWhiteSpace(c))
+                        {
+                            if (putSpace)
+                            {
+                                putSpace = false;
+                                result.Append(' ');
+                            }
+                        }
+                        else
+                        {
+                            result.Append(c);
+                            putSpace = true;
+                        }
+                    }
+
+                    if (result.Length > 0 && Char.IsWhiteSpace(result[result.Length - 1]))
+                        result.Length -= 1;
+
+                    return result.ToString();
+                }
+            }
         }
 
         public Char StartTagCharacter

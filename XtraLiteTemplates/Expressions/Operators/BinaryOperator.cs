@@ -50,6 +50,8 @@ namespace XtraLiteTemplates.Expressions.Operators
 
         public virtual Boolean EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
         {
+            Expect.NotNull("context", context);
+
             result = null;
             return false;
         }
