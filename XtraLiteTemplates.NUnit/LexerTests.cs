@@ -441,6 +441,70 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseAmbiguousTags8()
+        {
+            const String test = "{IF A THEN B}";
+
+            var tag1 = Tag.Parse("IF ? THEN $");
+            var tag2 = Tag.Parse("IF $ THEN ?");
+
+            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer1.ReadNext(), 0, 13, tag1, "IF|A|THEN|@B");
+            AssertTagLex(lexer2.ReadNext(), 0, 13, tag1, "IF|A|THEN|@B");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags9()
+        {
+            const String test = "{IF A THEN 1}";
+
+            var tag1 = Tag.Parse("IF $ THEN ?");
+            var tag2 = Tag.Parse("IF $ THEN $");
+
+            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+
+            AssertTagLex(lexer1.ReadNext(), 0, 13, tag2, "IF|@A|THEN|1");
+            AssertTagLex(lexer2.ReadNext(), 0, 13, tag2, "IF|@A|THEN|1");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags10()
+        {
+            const String test = "{IF A THEN}";
+
+            var tag1 = Tag.Parse("IF ? THEN OTHER");
+            var tag2 = Tag.Parse("IF (A B C) THEN");
+            var tag3 = Tag.Parse("IF $ THEN");
+
+            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag1)
+                .RegisterTag(tag2)
+                .RegisterTag(tag3);
+
+            AssertTagLex(lexer.ReadNext(), 0, 11, tag2, "IF|A|THEN");
+        }
+
+        [Test]
+        public void TestCaseAmbiguousTags11()
+        {
+            const String test = "{IF A THEN}";
+
+            var tag1 = Tag.Parse("IF ? THEN OTHER");
+            var tag2 = Tag.Parse("IF (A B C) THEN SOME");
+            var tag3 = Tag.Parse("IF $ THEN");
+
+            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                .RegisterTag(tag1)
+                .RegisterTag(tag2)
+                .RegisterTag(tag3);
+
+            AssertTagLex(lexer.ReadNext(), 0, 11, tag2, "IF|@A|THEN");
+        }
+
+        [Test]
         public void TestCaseBadTokenOrder()
         {
             var tag = new Tag().Expression();

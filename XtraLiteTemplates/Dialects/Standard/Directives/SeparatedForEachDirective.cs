@@ -38,15 +38,21 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
-    public sealed class ForEachDirective : StandardDirective
+    public sealed class SeparatedForEachDirective : StandardDirective
     {
+        private class State
+        {
+            public IEnumerator<Object> Enumerator;
+            public Boolean IsLast;
+        }
+
         private Int32 m_expressionIndex;
         private Int32 m_identifierIndex;
 
-        public ForEachDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
-            base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
+        public SeparatedForEachDirective(String startTagMarkup, String separatorTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+            base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(separatorTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(Tags.Count == 2);
+            Debug.Assert(Tags.Count == 3);
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -62,51 +68,66 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             m_identifierIndex = identifierComponents[0];
         }
 
-        public ForEachDirective(IPrimitiveTypeConverter typeConverter) :
-            this("FOR EACH ? IN $", "END", typeConverter)
+        public SeparatedForEachDirective(IPrimitiveTypeConverter typeConverter) :
+            this("FOR EACH ? IN $", "WITH", "END", typeConverter)
         {
         }
 
         protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
             IExpressionEvaluationContext context, out String text)
         {
-            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
             Debug.Assert(components != null);
             Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
             text = null;
-           
-            IEnumerator enumerator;
-            if (state == null)
+            if (tagIndex == 0)
             {
-                /* Starting up. */
-                Debug.Assert(tagIndex == 0);
-                
-                var sequence = TypeConverter.ConvertToSequence(components[m_expressionIndex]);
-                if (sequence == null)
-                    return FlowDecision.Terminate;
+                if (state == null)
+                {
+                    var sequence = TypeConverter.ConvertToSequence(components[m_expressionIndex]);
+                    if (sequence == null)
+                        return FlowDecision.Terminate;
 
-                enumerator = sequence.GetEnumerator();
-                state = enumerator;
+                    var enumerator = sequence.GetEnumerator();
+                    if (!enumerator.MoveNext())
+                        return FlowDecision.Terminate;
+
+                    context.SetVariable(components[m_identifierIndex] as String, enumerator.Current);
+                    state = new State
+                    {
+                        Enumerator = enumerator,
+                        IsLast = !enumerator.MoveNext(),
+                    };
+
+                    return FlowDecision.Evaluate;
+                }
+                else
+                {
+                    var sstate = state as State;
+
+                    Debug.Assert(sstate != null);
+                    Debug.Assert(sstate.Enumerator != null);
+                    Debug.Assert(!sstate.IsLast);
+
+                    context.SetVariable(components[m_identifierIndex] as String, sstate.Enumerator.Current);
+                    sstate.IsLast = !sstate.Enumerator.MoveNext();
+
+                    return FlowDecision.Evaluate;
+                }
             }
-            else if (tagIndex == 0)
+            else if (tagIndex == 1)
             {
-                enumerator = state as IEnumerator<Object>;
-                Debug.Assert(enumerator != null);
+                var sstate = state as State;
+
+                Debug.Assert(sstate != null);
+                Debug.Assert(sstate.Enumerator != null);
+
+                return sstate.IsLast ? FlowDecision.Terminate : FlowDecision.Evaluate;
             }
             else
                 return FlowDecision.Restart;
-
-            if (!enumerator.MoveNext())
-                return FlowDecision.Terminate;
-            else
-            {
-                var variableName = components[m_identifierIndex] as String;
-                Debug.Assert(variableName != null);
-                context.SetVariable(variableName, enumerator.Current);
-                return FlowDecision.Evaluate;
-            }
         }
     }
 }

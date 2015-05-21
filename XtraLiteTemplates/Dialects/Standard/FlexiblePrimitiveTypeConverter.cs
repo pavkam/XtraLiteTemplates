@@ -29,7 +29,9 @@
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using System.IO;
     using XtraLiteTemplates.Dialects.Standard.Operators;
@@ -44,7 +46,20 @@ namespace XtraLiteTemplates.Dialects.Standard
 
             FormatProvider = formatProvider;
         }
-        
+
+        private IEnumerable<Object> UpgradeEnumerable(IEnumerable enumerable)
+        {
+            Debug.Assert(enumerable != null);
+            foreach (var o in enumerable)
+            {
+                yield return o;
+            }
+        }
+
+        private IEnumerable<Object> ObjectToSequence(Object obj)
+        {
+            yield return obj;
+        }
 
         private Object ReduceObject(Object obj)
         {
@@ -154,6 +169,18 @@ namespace XtraLiteTemplates.Dialects.Standard
                 result = true;
 
             return result;
+        }
+
+        public virtual IEnumerable<Object> ConvertToSequence(Object obj)
+        {
+            if (obj == null)
+                return null;
+            else if (obj is IEnumerable<Object>)
+                return (IEnumerable<Object>)obj;
+            else if (obj is IEnumerable)
+                return UpgradeEnumerable((IEnumerable)obj);
+            else
+                return ObjectToSequence(obj);
         }
 
         public PrimitiveType TypeOf(Object obj)

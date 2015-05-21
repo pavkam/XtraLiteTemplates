@@ -30,6 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
     using System.Linq;
@@ -177,6 +178,39 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(-10, converter.ConvertToInteger("-10.88"));
             Assert.AreEqual(0, converter.ConvertToInteger(null));
             Assert.AreEqual(0, converter.ConvertToInteger(this));
+        }
+
+        [Test]
+        public void TestCaseConvertToSequence()
+        {
+            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+
+            /* Undefined */
+            Assert.IsNull(converter.ConvertToSequence(null));
+
+            /* Single element */
+            var sequence = converter.ConvertToSequence(-10);
+            Assert.IsInstanceOf<IEnumerable<Object>>(sequence);
+            var consolidated = (sequence as IEnumerable<Object>).ToArray();
+            Assert.AreEqual(1, consolidated.Length);
+            Assert.AreEqual(-10, consolidated[0]);
+
+            /* Two objects */
+            sequence = converter.ConvertToSequence(new String[] { "Hello", "World" });
+            Assert.IsInstanceOf<IEnumerable<Object>>(sequence);
+            consolidated = (sequence as IEnumerable<Object>).ToArray();
+            Assert.AreEqual(2, consolidated.Length);
+            Assert.AreEqual("Hello", consolidated[0]);
+            Assert.AreEqual("World", consolidated[1]);
+
+            /* String */
+            sequence = converter.ConvertToSequence("STR");
+            Assert.IsInstanceOf<IEnumerable<Object>>(sequence);
+            consolidated = (sequence as IEnumerable<Object>).ToArray();
+            Assert.AreEqual(3, consolidated.Length);
+            Assert.AreEqual('S', consolidated[0]);
+            Assert.AreEqual('T', consolidated[1]);
+            Assert.AreEqual('R', consolidated[2]);
         }
 
         [Test]

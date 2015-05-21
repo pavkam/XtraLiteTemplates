@@ -42,17 +42,17 @@ namespace XtraLiteTemplates.NUnit.Dialects
     using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
-    public class StandardDialectTests : TestBase
+    public class CodeMonkeyDialectTests : TestBase
     {
-        private StandardDialect TestDialect(CultureInfo culture, DialectCasing casing)
+        private CodeMonkeyDialect TestDialect(DialectCasing casing)
         {
-            var dialect = new StandardDialect(culture, casing);
+            var dialect = new CodeMonkeyDialect(casing);
 
-            Assert.AreEqual(dialect.Culture, culture);
-            Assert.AreEqual('"', dialect.EndStringLiteralCharacter);
+            Assert.AreEqual(dialect.Culture, CultureInfo.InvariantCulture);
+            Assert.AreEqual('\'', dialect.EndStringLiteralCharacter);
             Assert.AreEqual('}', dialect.EndTagCharacter);
-            Assert.AreEqual(culture.NumberFormat.CurrencyDecimalSeparator[0], dialect.NumberDecimalSeparatorCharacter);
-            Assert.AreEqual('"', dialect.StartStringLiteralCharacter);
+            Assert.AreEqual('.', dialect.NumberDecimalSeparatorCharacter);
+            Assert.AreEqual('\'', dialect.StartStringLiteralCharacter);
             Assert.AreEqual('{', dialect.StartTagCharacter);
             Assert.AreEqual('\\', dialect.StringLiteralEscapeCharacter);
 
@@ -62,7 +62,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
 
             Func<String, String> transformer = input => input;
             if (casing == DialectCasing.LowerCase)
-                transformer = input => input.ToLower(culture);
+                transformer = input => input.ToLowerInvariant();
 
             Assert.AreEqual(5, dialect.SpecialKeywords.Count);
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("TRUE")) && dialect.SpecialKeywords[transformer("TRUE")].Equals(true));
@@ -76,18 +76,18 @@ namespace XtraLiteTemplates.NUnit.Dialects
             {
                 if (directive is ConditionalInterpolationDirective)
                     Assert.AreEqual(transformer("{$ IF $}"), directive.ToString());
+                else if (directive is ForDirective)
+                    Assert.AreEqual(transformer("{FOR $}...{END}"), directive.ToString());
                 else if (directive is ForEachDirective)
-                    Assert.AreEqual(transformer("{FOR EACH ? IN $}...{END}"), directive.ToString());
+                    Assert.AreEqual(transformer("{FOR ? IN $}...{END}"), directive.ToString());
                 else if (directive is IfDirective)
-                    Assert.AreEqual(transformer("{IF $ THEN}...{END}"), directive.ToString());
+                    Assert.AreEqual(transformer("{IF $}...{END}"), directive.ToString());
                 else if (directive is IfElseDirective)
-                    Assert.AreEqual(transformer("{IF $ THEN}...{ELSE}...{END}"), directive.ToString());
+                    Assert.AreEqual(transformer("{IF $}...{ELSE}...{END}"), directive.ToString());
                 else if (directive is InterpolationDirective)
                     Assert.AreEqual("{$}", directive.ToString());
-                else if (directive is RepeatDirective)
-                    Assert.AreEqual(transformer("{REPEAT $ TIMES}...{END}"), directive.ToString());
                 else if (directive is PreFormattedUnparsedTextDirective)
-                    Assert.AreEqual(transformer("{PREFORMATTED}...{END}"), directive.ToString());
+                    Assert.AreEqual(transformer("{PRE}...{END}"), directive.ToString());
                 else
                     Assert.Fail();
             }
@@ -157,64 +157,34 @@ namespace XtraLiteTemplates.NUnit.Dialects
         }
 
         [Test]
-        public void TestCaseConstructor1()
-        {
-            ExpectArgumentNullException("culture", () => new StandardDialect(null, DialectCasing.IgnoreCase));
-        }
-
-        [Test]
         public void TestCaseNewInvariantIgnoreCase()
         {
-            var dialect = TestDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
+            var dialect = TestDialect(DialectCasing.IgnoreCase);
 
-            Assert.AreEqual("Standard (Ignore Case)", dialect.ToString());
+            Assert.AreEqual("Code Monkey (Ignore Case)", dialect.ToString());
         }
 
         [Test]
         public void TestCaseNewInvariantUpperCase()
         {
-            var dialect = TestDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
-            Assert.AreEqual("Standard (Upper Case)", dialect.ToString());
+            var dialect = TestDialect(DialectCasing.UpperCase);
+            Assert.AreEqual("Code Monkey (Upper Case)", dialect.ToString());
         }
 
         [Test]
         public void TestCaseNewInvariantLowerCase()
         {
-            var dialect = TestDialect(CultureInfo.InvariantCulture, DialectCasing.LowerCase);
-            Assert.AreEqual("Standard (Lower Case)", dialect.ToString());
-        }
-
-        [Test]
-        public void TestCaseNewCurrentIgnoreCase()
-        {
-            var dialect = TestDialect(CultureInfo.CurrentCulture, DialectCasing.IgnoreCase);
-            Assert.AreEqual(String.Format("Standard ({0}, Ignore Case)", CultureInfo.CurrentCulture.Name), dialect.ToString());
-        }
-
-        [Test]
-        public void TestCaseNewCurrentLowerCase()
-        {
-            var dialect = TestDialect(CultureInfo.CurrentCulture, DialectCasing.LowerCase);
-            Assert.AreEqual(String.Format("Standard ({0}, Lower Case)", CultureInfo.CurrentCulture.Name), dialect.ToString());
-        }
-
-        [Test]
-        public void TestCaseNewCurrentUpperCase()
-        {
-            var dialect = TestDialect(CultureInfo.CurrentCulture, DialectCasing.UpperCase);
-            Assert.AreEqual(String.Format("Standard ({0}, Upper Case)", CultureInfo.CurrentCulture.Name), dialect.ToString());
+            var dialect = TestDialect(DialectCasing.LowerCase);
+            Assert.AreEqual("Code Monkey (Lower Case)", dialect.ToString());
         }
 
         [Test]
         public void TestCaseEquality()
         {
             /* Build dialects. */
-            var iic = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
-            var iuc = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
-            var ilc = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.LowerCase);
-            var ccic = new StandardDialect(CultureInfo.CurrentCulture, DialectCasing.IgnoreCase);
-            var ccuc = new StandardDialect(CultureInfo.CurrentCulture, DialectCasing.UpperCase);
-            var cclc = new StandardDialect(CultureInfo.CurrentCulture, DialectCasing.LowerCase);
+            var iic = new CodeMonkeyDialect(DialectCasing.IgnoreCase);
+            var iuc = new CodeMonkeyDialect(DialectCasing.UpperCase);
+            var ilc = new CodeMonkeyDialect(DialectCasing.LowerCase);
 
             /* 1 */
             Assert.AreEqual(iic, iic);           
@@ -222,75 +192,41 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.AreNotEqual(iic.GetHashCode(), iuc.GetHashCode());
             Assert.AreNotEqual(iic, ilc);
             Assert.AreNotEqual(iic.GetHashCode(), ilc.GetHashCode());
-            Assert.AreNotEqual(iic, ccic);
-            Assert.AreNotEqual(iic.GetHashCode(), ccic.GetHashCode());
-            Assert.AreNotEqual(iic, ccuc);
-            Assert.AreNotEqual(iic.GetHashCode(), ccuc.GetHashCode());
-            Assert.AreNotEqual(iic, cclc);
-            Assert.AreNotEqual(iic.GetHashCode(), cclc.GetHashCode());
 
             /* 2 */
             Assert.AreEqual(iuc, iuc);
             Assert.AreNotEqual(iuc, ilc);
             Assert.AreNotEqual(iuc.GetHashCode(), ilc.GetHashCode());
-            Assert.AreNotEqual(iuc, ccic);
-            Assert.AreNotEqual(iuc.GetHashCode(), ccic.GetHashCode());
-            Assert.AreNotEqual(iuc, ccuc);
-            Assert.AreNotEqual(iuc.GetHashCode(), ccuc.GetHashCode());
-            Assert.AreNotEqual(iuc, cclc);
-            Assert.AreNotEqual(iuc.GetHashCode(), cclc.GetHashCode());
 
             /* 3 */
             Assert.AreEqual(ilc, ilc);
-            Assert.AreNotEqual(ilc, ccic);
-            Assert.AreNotEqual(ilc.GetHashCode(), ccic.GetHashCode());
-            Assert.AreNotEqual(ilc, ccuc);
-            Assert.AreNotEqual(ilc.GetHashCode(), ccuc.GetHashCode());
-            Assert.AreNotEqual(ilc, cclc);
-            Assert.AreNotEqual(ilc.GetHashCode(), cclc.GetHashCode());
-
-            /* 4 */
-            Assert.AreEqual(ccic, ccic);            
-            Assert.AreNotEqual(ccic, ccuc);
-            Assert.AreNotEqual(ccic.GetHashCode(), ccuc.GetHashCode());
-            Assert.AreNotEqual(ccic, cclc);
-            Assert.AreNotEqual(ccic.GetHashCode(), cclc.GetHashCode());
-
-            /* 5 */
-            Assert.AreEqual(ccuc, ccuc);
-            Assert.AreNotEqual(ccuc, cclc);
-            Assert.AreNotEqual(ccuc.GetHashCode(), cclc.GetHashCode());
-
-            /* 6 */
-            Assert.AreEqual(cclc, cclc);
 
             /* Special */
-            Assert.AreNotEqual(cclc, this);
-            Assert.AreNotEqual(cclc, null);
+            Assert.AreNotEqual(iic, this);
+            Assert.AreNotEqual(iic, null);
         }
 
         [Test]
         public void TestCaseDefaultConstructedAndStatic()
         {
-            var parameterless = new StandardDialect();
-            var iic = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
-            var iuc = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
+            var parameterless = new CodeMonkeyDialect();
+            var iic = new CodeMonkeyDialect(DialectCasing.IgnoreCase);
+            var iuc = new CodeMonkeyDialect(DialectCasing.UpperCase);
 
             Assert.AreEqual(iic, parameterless);
             Assert.AreEqual(iic.GetHashCode(), parameterless.GetHashCode());
 
-            Assert.AreEqual(iuc, StandardDialect.Default);
-            Assert.AreEqual(iuc.GetHashCode(), StandardDialect.Default.GetHashCode());
+            Assert.AreEqual(iuc, CodeMonkeyDialect.Default);
+            Assert.AreEqual(iuc.GetHashCode(), CodeMonkeyDialect.Default.GetHashCode());
 
-            Assert.AreEqual(iic, StandardDialect.DefaultIgnoreCase);
-            Assert.AreEqual(iic.GetHashCode(), StandardDialect.DefaultIgnoreCase.GetHashCode());
+            Assert.AreEqual(iic, CodeMonkeyDialect.DefaultIgnoreCase);
+            Assert.AreEqual(iic.GetHashCode(), CodeMonkeyDialect.DefaultIgnoreCase.GetHashCode());
         }
-
 
         [Test]
         public void TestCaseUnparsedTextDecoration()
         {
-            var dialect = new StandardDialect();
+            var dialect = new CodeMonkeyDialect();
             var context = new TestEvaluationContext(StringComparer.OrdinalIgnoreCase);
             context.OpenEvaluationFrame();
 
@@ -299,6 +235,21 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.AreEqual("", dialect.DecorateUnparsedText(context, null));
             Assert.AreEqual("", dialect.DecorateUnparsedText(context, String.Empty));
             Assert.AreEqual("", dialect.DecorateUnparsedText(context, "    \r\n"));
+        }
+
+        [Test]
+        public void TestCaseShowcase1()
+        {
+            var customer = new
+            {
+                FirstName = "John",
+                LastName = "McMann",
+                Age = 31,
+                Loves = new String [] { "Apples", "Bikes", "Everything Nice" }
+            };
+
+            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{pre}Hello, {_0.FirstName} {_0.LastName}. You are {_0.Age} years old and you love: {for entity in _0.loves}{entity}, {end}{end}", customer);
+            Assert.AreEqual("Hello, John McMann. You are 31 years old and you love: Apples,Bikes,Everything Nice,", result);
         }
     }
 }

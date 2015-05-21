@@ -40,14 +40,20 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class PreFormattedUnparsedTextDirective : StandardDirective    
     {
-        public PreFormattedUnparsedTextDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter)
+        private Object m_stateObject;
+
+        public PreFormattedUnparsedTextDirective(String startTagMarkup, String endTagMarkup, Object stateObject, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2);
+
+            Expect.NotNull("stateObject", stateObject);
+
+            m_stateObject = stateObject;
         }
 
-        public PreFormattedUnparsedTextDirective(IPrimitiveTypeConverter typeConverter)
-            : this("PREFORMATTED", "END", typeConverter)
+        public PreFormattedUnparsedTextDirective(Object stateObject, IPrimitiveTypeConverter typeConverter)
+            : this("PREFORMATTED", "END", stateObject, typeConverter)
         {
         }
 
@@ -62,12 +68,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             text = null;
             if (tagIndex == 0)
             {
-                context.AddStateObject(this);
+                context.AddStateObject(m_stateObject);
                 return FlowDecision.Evaluate;
             }
             else
             {
-                context.RemoveStateObject(this);
+                context.RemoveStateObject(m_stateObject);
                 return FlowDecision.Terminate;
             }
         }

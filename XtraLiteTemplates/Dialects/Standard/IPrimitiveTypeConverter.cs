@@ -14,5 +14,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         Double ConvertToNumber(Object obj);
         String ConvertToString(Object obj);
         Boolean ConvertToBoolean(Object obj);
+        IEnumerable<Object> ConvertToSequence(Object obj);
     }
 }

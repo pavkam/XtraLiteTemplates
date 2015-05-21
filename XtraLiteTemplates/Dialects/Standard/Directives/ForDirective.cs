@@ -38,12 +38,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
-    public sealed class ForEachDirective : StandardDirective
+    public sealed class ForDirective : StandardDirective
     {
         private Int32 m_expressionIndex;
-        private Int32 m_identifierIndex;
 
-        public ForEachDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+        public ForDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2);
@@ -52,18 +51,14 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             var tag = Tags[0];
             var expressionComponents = Enumerable.Range(0, tag.ComponentCount)
                 .Where(index => tag.MatchesExpression(index)).Select(index => index).ToArray();
-            var identifierComponents = Enumerable.Range(0, tag.ComponentCount)
-                .Where(index => tag.MatchesAnyIdentifier(index)).Select(index => index).ToArray();
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
-            Expect.IsTrue("one identifier component", identifierComponents.Length == 1);
 
             m_expressionIndex = expressionComponents[0];
-            m_identifierIndex = identifierComponents[0];
         }
 
-        public ForEachDirective(IPrimitiveTypeConverter typeConverter) :
-            this("FOR EACH ? IN $", "END", typeConverter)
+        public ForDirective(IPrimitiveTypeConverter typeConverter) :
+            this("FOR $", "END", typeConverter)
         {
         }
 
@@ -101,12 +96,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             if (!enumerator.MoveNext())
                 return FlowDecision.Terminate;
             else
-            {
-                var variableName = components[m_identifierIndex] as String;
-                Debug.Assert(variableName != null);
-                context.SetVariable(variableName, enumerator.Current);
                 return FlowDecision.Evaluate;
-            }
         }
     }
 }

@@ -40,39 +40,71 @@ namespace XtraLiteTemplates.NUnit.Directives
     using System.Collections.Generic;
 
     [TestFixture]
-    public class StandardPreFormattedUnparsedTextDirectiveTests : TestBase
+    public class StandardForDirectiveTests : TestBase
     {
         [Test]
         public void TestCaseConstructor1()
         {
-            ExpectInvalidTagMarkupException(null, () => new PreFormattedUnparsedTextDirective(null, "END", String.Empty, TypeConverter));
-            ExpectInvalidTagMarkupException(null, () => new PreFormattedUnparsedTextDirective("PREF", null, String.Empty, TypeConverter));
+            ExpectInvalidTagMarkupException(null, () => new ForDirective(null, "END", TypeConverter));
+            ExpectInvalidTagMarkupException(null, () => new ForDirective("$", null, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new ForDirective("$", "END", null));
 
-            ExpectArgumentNullException("stateObject", () => new PreFormattedUnparsedTextDirective("PREF", "END", null, TypeConverter));
-            ExpectArgumentNullException("typeConverter", () => new PreFormattedUnparsedTextDirective("PREF", "END", String.Empty, null));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new ForDirective("?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("one expression component", () => new ForDirective("$ AND $ THEN ?", "END", TypeConverter));
         }
 
         [Test]
         public void TestCaseConstructor2()
         {
-            var directive = new PreFormattedUnparsedTextDirective(String.Empty, TypeConverter);
-            Assert.AreEqual("{PREFORMATTED}...{END}", directive.ToString());
+            var directive = new ForDirective(TypeConverter);
+            Assert.AreEqual("{FOR $}...{END}", directive.ToString());
         }
 
         [Test]
         public void TestCaseConstructor3()
         {
-            var directive = new PreFormattedUnparsedTextDirective("PREPRE", "SUPPAPRE", String.Empty, TypeConverter);
-            Assert.AreEqual("{PREPRE}...{SUPPAPRE}", directive.ToString());
+            var directive = new ForDirective("OVER $", "TERMINATE", TypeConverter);
+            Assert.AreEqual("{OVER $}...{TERMINATE}", directive.ToString());
         }
 
         [Test]
         public void TestCaseEvaluation1()
         {
-            var directive = new PreFormattedUnparsedTextDirective("P", "E", String.Empty, TypeConverter);
+            var directive = new ForDirective("BOO $", "BEER", TypeConverter);
 
-            Assert.AreEqual("   1   ", Evaluate("{P}   1   {E}", directive));
-            Assert.AreEqual("\n\r1   ", Evaluate("{P}\n\r1   {E}", directive));
+            Assert.AreEqual(".", Evaluate("{BOO 1}.{BEER}", directive));
+        }
+
+        [Test]
+        public void TestCaseEvaluation2()
+        {
+            var directive = new ForDirective("BOO $", "BEER", TypeConverter);
+
+            Assert.AreEqual("", Evaluate("{BOO undefined}.{BEER}", directive, new KeyValuePair<String, Object>("undefined", null)));
+        }
+
+        [Test]
+        public void TestCaseEvaluation3()
+        {
+            var directive = new ForDirective("BOO $", "BEER", TypeConverter);
+
+            Assert.AreEqual(".........", Evaluate("{BOO \"123456789\"}.{BEER}", directive));
+        }
+
+        [Test]
+        public void TestCaseEvaluation4()
+        {
+            var directive = new ForDirective("BOO $", "BEER", TypeConverter);
+
+            Assert.AreEqual("", Evaluate("{BOO \"\"}.{BEER}", directive));
+        }
+
+        [Test]
+        public void TestCaseEvaluation5()
+        {
+            var directive = new ForDirective("BOO $", "BEER", TypeConverter);
+
+            Assert.AreEqual("...", Evaluate("{BOO list}.{BEER}", directive, new KeyValuePair<String, Object>("list", new Int32[] { 1,2,3 })));
         }
     }
 }
