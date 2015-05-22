@@ -35,75 +35,21 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal class LeafNode : ExpressionNode
+    internal abstract class LeafNode : ExpressionNode
     {
-        public enum EvaluationType
-        {
-            Literal,
-            Variable,
-            Indentifier,
-        }
-
-        public Object Operand { get; private set; }
-
-        public EvaluationType Evaluation { get; private set; }
-
-        public LeafNode(ExpressionNode parent, Object operand, EvaluationType type)
+        public LeafNode(ExpressionNode parent)
             : base(parent)
         {
-            Debug.Assert(type == EvaluationType.Literal || operand is String);
-
-            Operand = operand;
-            Evaluation = type;
         }
 
-        public override String ToString(ExpressionFormatStyle style)
+        public override PermittedContinuations Continuity
         {
-            if (Evaluation == EvaluationType.Indentifier)
-                return (String)Operand;
-            else if (Evaluation == EvaluationType.Variable)
-                return String.Format("@{0}", Operand);
-            else if (Operand is String)
+            get
             {
-                using (var writer = new StringWriter())
-                {
-                    using (var provider = CodeDomProvider.CreateProvider("CSharp"))
-                    {
-                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Operand), writer, null);
-                        return writer.ToString();
-                    }
-                }
+                return
+                    PermittedContinuations.BinaryOperator |
+                    PermittedContinuations.CloseGroup;
             }
-            else
-                return Operand.ToString();
-        }
-
-        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
-        {
-            Debug.Assert(reduceContext != null);
-
-            if (Evaluation == EvaluationType.Literal)
-            {
-                value = Operand;
-                return true;
-            }
-
-            value = null;
-            return false;
-        }
-
-        public void ConvertToIdentifier()
-        {
-            Debug.Assert(Evaluation == EvaluationType.Variable);
-            Evaluation = EvaluationType.Indentifier;
-        }
-
-        protected override Func<IExpressionEvaluationContext, Object> Build()
-        {
-            if (Evaluation == EvaluationType.Variable)
-                return context => context.GetVariable((String)Operand);
-            else
-                return context => Operand;
         }
     }
 }

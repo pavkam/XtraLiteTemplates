@@ -35,70 +35,44 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal class DisembowelerNode : ExpressionNode
+    internal class LiteralNode : LeafNode
     {
-        public ExpressionNode ObjectNode { get; private set; }
+        public Object Literal { get; private set; }
 
-        public String MemberName { get; internal set; }
-
-        internal DisembowelerNode(ExpressionNode parent, ExpressionNode objectNode)
+        public LiteralNode(ExpressionNode parent, Object literal)
             : base(parent)
         {
-            Debug.Assert(objectNode != null);
-
-            ObjectNode = objectNode;
-        }
-
-        public override PermittedContinuations Continuity
-        {
-            get
-            {
-                if (MemberName == null)
-                {
-                    return PermittedContinuations.Identifier;
-                } 
-                else
-                {
-                    return
-                       PermittedContinuations.BinaryOperator |
-                       PermittedContinuations.CloseGroup;
-                }
-            }
+            Literal = literal;
         }
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            var memberName = MemberName ?? "??";
-
-            if (style == ExpressionFormatStyle.Arithmetic)
-                return String.Format("{0} . {1}", ObjectNode.ToString(style), memberName);
-            else if (style == ExpressionFormatStyle.Canonical)
-                return String.Format(".{{{0},{1}}}", ObjectNode.ToString(style), memberName);
-            else if (style == ExpressionFormatStyle.Polish)
-                return String.Format(". {0} {1}", ObjectNode.ToString(style), memberName);
-
-            Debug.Fail("Unreachable code.");
-            return null;
+            if (Literal is String)
+            {
+                using (var writer = new StringWriter())
+                {
+                    using (var provider = CodeDomProvider.CreateProvider("CSharp"))
+                    {
+                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Literal), writer, null);
+                        return writer.ToString();
+                    }
+                }
+            }
+            else
+                return Literal.ToString();
         }
 
         protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
         {
             Debug.Assert(reduceContext != null);
 
-            ObjectNode.Reduce(reduceContext);
-
-            value = null;
-            return false;
+            value = Literal;
+            return true;
         }
 
         protected override Func<IExpressionEvaluationContext, Object> Build()
         {
-            var objectFunc = ObjectNode.GetEvaluationFunction();
-            return context =>
-            {
-                var variable = objectFunc(context);
-                return variable == null ? null : context.GetProperty(variable, MemberName);
-            };
+            return context => Literal;
         }
     }
 }

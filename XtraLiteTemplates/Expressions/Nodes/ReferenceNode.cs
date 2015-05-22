@@ -35,57 +35,26 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal class DisembowelerNode : ExpressionNode
+    internal class ReferenceNode : LeafNode
     {
-        public ExpressionNode ObjectNode { get; private set; }
+        public String Identifier { get; private set; }
 
-        public String MemberName { get; internal set; }
-
-        internal DisembowelerNode(ExpressionNode parent, ExpressionNode objectNode)
+        public ReferenceNode(ExpressionNode parent, String identifier)
             : base(parent)
         {
-            Debug.Assert(objectNode != null);
+            Debug.Assert(!String.IsNullOrEmpty(identifier));
 
-            ObjectNode = objectNode;
-        }
-
-        public override PermittedContinuations Continuity
-        {
-            get
-            {
-                if (MemberName == null)
-                {
-                    return PermittedContinuations.Identifier;
-                } 
-                else
-                {
-                    return
-                       PermittedContinuations.BinaryOperator |
-                       PermittedContinuations.CloseGroup;
-                }
-            }
+            Identifier = identifier;
         }
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            var memberName = MemberName ?? "??";
-
-            if (style == ExpressionFormatStyle.Arithmetic)
-                return String.Format("{0} . {1}", ObjectNode.ToString(style), memberName);
-            else if (style == ExpressionFormatStyle.Canonical)
-                return String.Format(".{{{0},{1}}}", ObjectNode.ToString(style), memberName);
-            else if (style == ExpressionFormatStyle.Polish)
-                return String.Format(". {0} {1}", ObjectNode.ToString(style), memberName);
-
-            Debug.Fail("Unreachable code.");
-            return null;
+            return String.Format("@{0}", Identifier);
         }
 
         protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
         {
             Debug.Assert(reduceContext != null);
-
-            ObjectNode.Reduce(reduceContext);
 
             value = null;
             return false;
@@ -93,12 +62,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override Func<IExpressionEvaluationContext, Object> Build()
         {
-            var objectFunc = ObjectNode.GetEvaluationFunction();
-            return context =>
-            {
-                var variable = objectFunc(context);
-                return variable == null ? null : context.GetProperty(variable, MemberName);
-            };
+            return context => context.GetVariable(Identifier);
         }
     }
 }

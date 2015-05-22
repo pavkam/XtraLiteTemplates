@@ -53,6 +53,18 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return (context) => Operator.Evaluate(context, childFunc(context));
         }
 
+        public override PermittedContinuations Continuity
+        {
+            get
+            {
+                return
+                    PermittedContinuations.UnaryOperator |
+                    PermittedContinuations.Literal |
+                    PermittedContinuations.Identifier |
+                    PermittedContinuations.NewGroup;
+            }
+        }
+
         protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
         {
             Debug.Assert(reduceContext != null);

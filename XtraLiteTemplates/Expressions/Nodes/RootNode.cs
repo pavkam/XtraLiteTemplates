@@ -78,6 +78,27 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Closed = true;
         }
 
+        public override PermittedContinuations Continuity
+        {
+            get
+            {
+                if (Closed && Parent != null)
+                {
+                    return
+                        PermittedContinuations.BinaryOperator |
+                        PermittedContinuations.CloseGroup;
+                }
+                else
+                {
+                    return
+                        PermittedContinuations.UnaryOperator |
+                        PermittedContinuations.Literal |
+                        PermittedContinuations.Identifier |
+                        PermittedContinuations.NewGroup;
+                }
+            }
+        }
+
         public override String ToString(ExpressionFormatStyle style)
         {
             String result = String.Join(" , ", m_children.Select(s => s.ToString(style)));

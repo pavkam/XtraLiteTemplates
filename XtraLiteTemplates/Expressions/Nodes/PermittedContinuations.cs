@@ -29,69 +29,19 @@
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
-    internal abstract class ExpressionNode
+    [Flags]
+    internal enum PermittedContinuations
     {
-        public ExpressionNode Parent { get; set; }
-
-        public Boolean IsReduced { get; private set; }
-        
-        public Object ReducedValue { get; private set; }
-
-
-        protected ExpressionNode(ExpressionNode parent)
-        {
-            Parent = parent;
-        }
-
-        protected virtual Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object reducedValue)
-        {
-            Debug.Assert(reduceContext != null);
-
-            reducedValue = null;
-            return false;
-        }
-
-        protected abstract Func<IExpressionEvaluationContext, Object> Build();
-
-
-        public abstract PermittedContinuations Continuity { get; }
-
-
-        public Boolean Reduce(IExpressionEvaluationContext reduceContext)
-        {
-            Debug.Assert(reduceContext != null);
-
-            if (!IsReduced)
-            {
-                Object value;
-                if (TryReduce(reduceContext, out value))
-                {
-                    IsReduced = true;
-                    ReducedValue = value;
-                }
-            }
-
-            return IsReduced;
-        }
-
-        public Func<IExpressionEvaluationContext, Object> GetEvaluationFunction()
-        {
-            if (IsReduced)
-                return context => ReducedValue;
-            else
-                return Build();
-        }
-
-        public abstract String ToString(ExpressionFormatStyle style);
-
-        public override String ToString()
-        {
-            return ToString(ExpressionFormatStyle.Arithmetic);
-        }
+        Literal = 0x01,
+        Identifier = 0x02,        
+        UnaryOperator = 0x04,
+        BinaryOperator = 0x08,
+        NewGroup = 0x10,
+        CloseGroup = 0x20,
+        ContinueGroup = CloseGroup,
     }
 }
 

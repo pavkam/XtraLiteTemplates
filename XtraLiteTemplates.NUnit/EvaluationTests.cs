@@ -232,5 +232,18 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreEqual("1alex2joe3mary", exo);
         }
+
+        [Test]
+        public void TestCaseEvaluationMemberAccess1()
+        {
+            var evaluable = new Interpreter(new Tokenizer("{a} {(a)} {a.b} {(a).b} {(a.b)} {a.b.c} {(a).b.c} {(a.b).c} {(a.b.c)}"),
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .Construct();
+
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("a", new { b = new { c = "exists" } }));
+
+            Assert.AreEqual("{ b = { c = exists } } { b = { c = exists } } { c = exists } { c = exists } { c = exists } exists exists exists exists", exo);
+        }
     }
 }
