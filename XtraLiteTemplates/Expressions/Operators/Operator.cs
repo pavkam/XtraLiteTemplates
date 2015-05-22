@@ -39,14 +39,11 @@ namespace XtraLiteTemplates.Expressions.Operators
 
         public Int32 Precedence { get; private set; }
 
-        public Boolean ExpectRhsIdentifier { get; private set; }
-
-        protected Operator(String symbol, Int32 precedence, Boolean expectRhsIdentifier)
+        protected Operator(String symbol, Int32 precedence)
         {
             Expect.NotEmpty("symbol", symbol);
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
 
-            ExpectRhsIdentifier = expectRhsIdentifier;
             Symbol = symbol;
             Precedence = precedence;
         }

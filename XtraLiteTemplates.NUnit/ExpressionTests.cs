@@ -72,7 +72,6 @@ namespace XtraLiteTemplates.NUnit
                 new ArithmeticSumOperator(TypeConverter),
                 new IntegerRangeOperator(TypeConverter),
                 new ValueFormatOperator(CultureInfo.InvariantCulture, TypeConverter),
-                new MemberAccessOperator(comparer),
             };
 
             var expression = new Expression(ExpressionFlowSymbols.Default, StringComparer.Ordinal);
@@ -475,147 +474,6 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseMemberLhs1a()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
-
-            expression.FeedLiteral(1);
-            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
-        }
-
-        [Test]
-        public void TestCaseMemberLhs1b()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
-
-            expression.FeedLiteral(1.00);
-            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
-        }
-
-        [Test]
-        public void TestCaseMemberLhs1c()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
-
-            expression.FeedLiteral(true);
-            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
-        }
-
-        [Test]
-        public void TestCaseMemberLhs1d()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
-
-            expression.FeedLiteral("term");
-            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
-        }
-
-        [Test]
-        public void TestCaseMemberLhs1e()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
-
-            expression.FeedSymbol("symbol_1");
-            expression.FeedSymbol(".");
-            expression.FeedLiteral("literal_1");
-            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
-
-            expression.Construct();
-        }
-
-        [Test]
-        public void TestCaseMemberLhs1f()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
-
-            expression.FeedSymbol("symbol_1");
-            expression.FeedSymbol(".");
-            expression.FeedSymbol("symbol_2");
-            expression.FeedSymbol(".");
-            expression.FeedSymbol("symbol_3");
-            expression.Construct();
-
-            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
-            Assert.AreEqual(".{symbol_1,.{symbol_2,@symbol_3}}", canonical);
-        }
-
-        [Test]
-        public void TestCaseMemberLhs1g()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new ArithmeticSumOperator(TypeConverter));
-            expression.RegisterOperator(new LhsIdentTestOperator(".", 0));
-
-            expression.FeedSymbol("symbol_1");
-            expression.FeedSymbol("+");
-            expression.FeedSymbol("symbol_2");
-            expression.FeedSymbol(".");
-            expression.FeedSymbol("symbol_3");
-            expression.Construct();
-
-            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
-            Assert.AreEqual("+{@symbol_1,.{symbol_2,@symbol_3}}", canonical);
-        }
-
-        [Test]
-        public void TestCaseMemberLhs1h()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new ArithmeticSumOperator(TypeConverter));
-            expression.RegisterOperator(new LhsIdentTestOperator(".", 100));
-
-            expression.FeedSymbol("symbol_1");
-            expression.FeedSymbol("+");
-            expression.FeedSymbol("symbol_2");
-
-            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
-        }
-
-        [Test]
-        public void TestCaseMemberLhsRhsComplex()
-        {
-            var expression = new Expression();
-
-            expression.RegisterOperator(new ArithmeticMultiplyOperator(TypeConverter));
-            expression.RegisterOperator(new LogicalAndOperator(TypeConverter));
-            expression.RegisterOperator(new LhsRhsIdentTestOperator("."));
-
-            expression.FeedSymbol("a");
-            expression.FeedSymbol(".");
-            expression.FeedSymbol("b");
-            ExpectUnexpectedExpressionTermException("*", () => expression.FeedSymbol("*"));
-            expression.FeedSymbol("&&");
-            expression.FeedSymbol("c");
-            expression.FeedSymbol(".");
-            expression.FeedSymbol("d");
-            expression.FeedSymbol("&&");
-            expression.FeedSymbol("e");
-            expression.FeedSymbol("*");
-            expression.FeedSymbol("f");
-            ExpectUnexpectedExpressionTermException(".", () => expression.FeedSymbol("."));
-
-            expression.Construct();
-
-            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
-            Assert.AreEqual("&&{&&{.{a,b},.{c,d}},*{@e,@f}}", canonical);
-        }
-
-
-        [Test]
         public void TestCaseAssociativityRtl()
         {
             var expression = new Expression();
@@ -715,14 +573,13 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("*{!{.{.{@variable,length},some_else}},100}", canonical);
         }
 
-
         [Test]
         public void TestCaseSeparatorEvaluation()
         {
             var expression = CreateTestExpression("( 1 , 2 , 3 + 4 , ( 1 , 4 , 6 ) )");
             
             var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
-            Assert.AreEqual("(){,{,{,{1,2},+{3,4}},(){,{,{1,4},6}}}}", canonical);
+            Assert.AreEqual("(){1 , 2 , +{3,4} , (){1 , 4 , 6}}", canonical);
 
             var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
             Assert.IsInstanceOf<IEnumerable<Object>>(result);

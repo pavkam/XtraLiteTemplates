@@ -26,59 +26,62 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Dialects.Standard.Operators
+namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
-    using System.Reflection;
-    using System.Collections.Generic;
+    using System.CodeDom;
+    using System.CodeDom.Compiler;
+    using System.IO;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Expressions;
 
-    public sealed class MemberAccessOperator : BinaryOperator
+    internal class DisembowelerNode : ExpressionNode
     {
-        private Dictionary<Type, SimpleTypeDisemboweler> m_disembowelers;
+        public ExpressionNode ObjectNode { get; private set; }
 
-        public IEqualityComparer<String> Comparer { get; private set; }
+        public String MemberName { get; internal set; }
 
-        public MemberAccessOperator(String symbol, IEqualityComparer<String> comparer)
-            : base(symbol, 0, Associativity.LeftToRight, false, true)
+        internal DisembowelerNode(ExpressionNode parent, ExpressionNode objectNode)
+            : base(parent)
         {
-            Expect.NotNull("comparer", comparer);
+            Debug.Assert(objectNode != null);
 
-            Comparer = comparer;
-            m_disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
+            ObjectNode = objectNode;
         }
 
-        public MemberAccessOperator(IEqualityComparer<String> comparer)
-            : this(".", comparer)
+        public override String ToString(ExpressionFormatStyle style)
         {
-        }
+            var memberName = MemberName ?? "??";
 
-        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
-        {
-            Expect.NotNull("context", context);
-            Expect.NotNull("right", right);
-            Expect.Identifier("right", right.ToString());
+            if (style == ExpressionFormatStyle.Arithmetic)
+                return String.Format("{0} . {1}", ObjectNode.ToString(style), memberName);
+            else if (style == ExpressionFormatStyle.Canonical)
+                return String.Format(".{{{0},{1}}}", ObjectNode.ToString(style), memberName);
+            else if (style == ExpressionFormatStyle.Polish)
+                return String.Format(". {0} {1}", ObjectNode.ToString(style), memberName);
 
-            if (left != null)
-            {
-                var type = left.GetType();
-
-                SimpleTypeDisemboweler disemboweler;
-                if (!m_disembowelers.TryGetValue(type, out disemboweler))
-                {
-                    disemboweler = new SimpleTypeDisemboweler(type,
-                        SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
-                        SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, Comparer);
-
-                    m_disembowelers.Add(type, disemboweler);
-                }
-
-                return disemboweler.Read(right.ToString(), left);
-            }
-
+            Debug.Fail("Unreachable code.");
             return null;
+        }
+
+        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
+        {
+            Debug.Assert(reduceContext != null);
+
+            ObjectNode.Reduce(reduceContext);
+
+            value = null;
+            return false;
+        }
+
+        protected override Func<IExpressionEvaluationContext, Object> Build()
+        {
+            var objectFunc = ObjectNode.GetEvaluationFunction();
+            return context =>
+            {
+                var variable = objectFunc(context);
+                return variable == null ? null : context.GetProperty(variable, MemberName);
+            };
         }
     }
 }

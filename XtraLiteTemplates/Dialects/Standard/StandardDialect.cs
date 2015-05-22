@@ -81,7 +81,6 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new ArithmeticNeutralOperator(typeConverter),
                 new ArithmeticSubtractOperator(typeConverter),
                 new ArithmeticSumOperator(typeConverter),
-                new MemberAccessOperator(IdentifierComparer),
                 new IntegerRangeOperator(typeConverter),
                 new ValueFormatOperator(Culture, typeConverter),
             };

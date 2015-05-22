@@ -36,13 +36,13 @@
     <Compile Include="Dialects\Standard\Directives\PreFormattedUnparsedTextDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
-    <Compile Include="Dialects\Standard\OperandProtoGroup.cs" />
     <Compile Include="Dialects\Standard\Operators\ValueFormatOperator.cs" />
-    <Compile Include="Dialects\Standard\SimpleTypeDisemboweler.cs" />
+    <Compile Include="SimpleTypeDisemboweler.cs" />
     <Compile Include="Dialects\Standard\CodeMonkeyDialect.cs" />
     <Compile Include="Dialects\Standard\StandardDialectBase.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Expressions\ExpressionFlowSymbols.cs" />
+    <Compile Include="Expressions\Nodes\DisembowelerNode.cs" />
     <Compile Include="Expressions\Nodes\RootNode.cs" />
     <Compile Include="Expressions\ReduceExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\IExpressionEvaluationContext.cs" />
@@ -55,7 +55,6 @@
     <Compile Include="Dialects\Standard\Operators\StandardRelationalOperator.cs" />
     <Compile Include="Dialects\Standard\PrimitiveType.cs" />
     <Compile Include="Dialects\Standard\IPrimitiveTypeConverter.cs" />
-    <Compile Include="Dialects\Standard\Operators\MemberAccessOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\BitwiseShiftRightOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\BitwiseShiftLeftOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\RelationalGreaterThanOrEqualsOperator.cs" />

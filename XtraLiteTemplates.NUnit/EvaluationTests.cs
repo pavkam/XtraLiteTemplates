@@ -56,7 +56,7 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T"));
 
             var evaluable = new Interpreter(new Tokenizer("{T}"), ExpressionFlowSymbols.Default,
-                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive).Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
@@ -71,7 +71,7 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T2"));
 
             var evaluable = new Interpreter(new Tokenizer("{T1}text{T2}"), ExpressionFlowSymbols.Default, 
-                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive).Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
@@ -87,7 +87,7 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T3"));
 
             var evaluable = new Interpreter(new Tokenizer("{T1}first{T2}second{T3}"), 
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive).Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
@@ -98,9 +98,8 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardInterpolationDirective()
         {
             var evaluable = new Interpreter(new Tokenizer("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}"), 
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
-                .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
                 .Construct();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, 
@@ -118,10 +117,9 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardConditionalInterpolationDirective()
         {
             var evaluable = new Interpreter(new Tokenizer("{\"DEAR\" + \" \" IF Dude.IsDear}{Dude.FirstName} {Dude.LastName}"),
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .RegisterDirective(new ConditionalInterpolationDirective(TypeConverter))
-                .RegisterOperator(new MemberAccessOperator(StringComparer.OrdinalIgnoreCase))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
 
@@ -152,7 +150,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardRepeatDirective()
         {
             var evaluable = new Interpreter(new Tokenizer("{REPEAT 5 TIMES}text-{END}"),
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new RepeatDirective(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
@@ -166,7 +164,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardForEachDirective1()
         {
             var evaluable = new Interpreter(new Tokenizer("{FOR EACH name IN names}{name},{END}"),
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .RegisterDirective(new ForEachDirective(TypeConverter))
                 .Construct();
@@ -181,7 +179,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardForEachDirective2()
         {
             var evaluable = new Interpreter(new Tokenizer("{FOR EACH x IN 1..2}{FOR EACH y IN 3..4}{x + \"-\" + y},{END}{END}"),
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .RegisterDirective(new ForEachDirective(TypeConverter))
                 .RegisterOperator(new IntegerRangeOperator(TypeConverter))
@@ -197,7 +195,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardIfDirective()
         {
             var evaluable = new Interpreter(new Tokenizer("{IF true THEN}this{IF true THEN}_will_{END}evaluate{END}{IF false THEN}but this won't!{END}"),
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new IfDirective(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
@@ -211,7 +209,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationStandardIfElseDirective()
         {
             var evaluable = new Interpreter(new Tokenizer("{IF true THEN}1{ELSE}2{END}{IF false THEN}3{ELSE}4{END}"),
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new IfElseDirective(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
@@ -225,7 +223,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationForEachInSeparatedGroup()
         {
             var evaluable = new Interpreter(new Tokenizer("{FOR EACH item IN (1,\"alex\",2,\"joe\",3,\"mary\")}{item}{end}"),
-                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new ForEachDirective(TypeConverter))
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .Construct();
@@ -236,4 +234,3 @@ namespace XtraLiteTemplates.NUnit
         }
     }
 }
-

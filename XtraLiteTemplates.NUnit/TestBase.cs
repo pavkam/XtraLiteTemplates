@@ -70,7 +70,7 @@ using System.Diagnostics;
             Debug.Assert(directive != null);
 
             var evaluable = new Interpreter(new Tokenizer(template), ExpressionFlowSymbols.Default, 
-                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+                StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .Construct();

@@ -143,25 +143,21 @@ namespace XtraLiteTemplates.Expressions
         }
 
 
+        private Boolean ExpectingIdentifier
+        {
+            get
+            {
+                var disem = m_current as DisembowelerNode;
+                return disem != null && disem.MemberName == null;
+            }
+        }
 
         private void OpenNewGroup()
         {
-            /* Opening a new ROOT */
-            if (m_current is UnaryOperatorNode)
+            if (m_current is OperatorNode)
             {
-                var _current = (UnaryOperatorNode)m_current;
+                var _current = (OperatorNode)m_current;
                 Debug.Assert(_current.RightNode == null);
-
-                /* Flip to the new root */
-                m_root = new RootNode(_current);
-                _current.RightNode = m_root;
-                m_current = m_root;
-            }
-            else if (m_current is BinaryOperatorNode)
-            {
-                var _current = (BinaryOperatorNode)m_current;
-                Debug.Assert(_current.RightNode == null);
-                Debug.Assert(_current.LeftNode != null);
 
                 /* Flip to the new root */
                 m_root = new RootNode(_current);
@@ -189,7 +185,7 @@ namespace XtraLiteTemplates.Expressions
 
         private void CloseExistingGroup()
         {
-            if (m_current is LeafNode || m_current is RootNode)
+            if ((m_current is LeafNode || m_current is RootNode || m_current is DisembowelerNode) && !ExpectingIdentifier)
             {
                 if (m_current == m_root || m_root.Parent == null)
                     ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupClose);
@@ -210,7 +206,7 @@ namespace XtraLiteTemplates.Expressions
 
         private void ContinueExistingGroup()
         {
-            if (m_current is LeafNode || m_current is RootNode)
+            if ((m_current is LeafNode || m_current is RootNode) && !ExpectingIdentifier)
             {
                 if (m_current == m_root)
                     ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.Separator);
@@ -223,18 +219,9 @@ namespace XtraLiteTemplates.Expressions
 
         private void StartUnary(UnaryOperator unaryOperator)
         {
-            if (m_current is UnaryOperatorNode)
+            if (m_current is OperatorNode)
             {
-                var _current = m_current as UnaryOperatorNode;
-                Debug.Assert(_current.RightNode == null);
-
-                _current.RightNode = new UnaryOperatorNode(_current, unaryOperator);
-                m_current = _current.RightNode;
-            }
-            else if (m_current is BinaryOperatorNode)
-            {
-                var _current = m_current as BinaryOperatorNode;
-                Debug.Assert(_current.LeftNode != null);
+                var _current = m_current as OperatorNode;
                 Debug.Assert(_current.RightNode == null);
 
                 _current.RightNode = new UnaryOperatorNode(_current, unaryOperator);
@@ -256,7 +243,7 @@ namespace XtraLiteTemplates.Expressions
 
         private void StartBinary(BinaryOperator binaryOperator)
         {
-            if (m_current is LeafNode || m_current is RootNode)
+            if ((m_current is LeafNode || m_current is RootNode || m_current is DisembowelerNode) && !ExpectingIdentifier)
             {
                 var _root = m_current as RootNode;
                 if (_root != null && !_root.Closed)
@@ -273,19 +260,6 @@ namespace XtraLiteTemplates.Expressions
                 }
 
                 var leftNodeParentOperatorNode = leftNode.Parent as OperatorNode;
-
-                /* Check that we do not push the RHS identifier off the parent. */
-                if (leftNodeParentOperatorNode != null && leftNodeParentOperatorNode.Operator.ExpectRhsIdentifier)
-                    ExceptionHelper.UnexpectedExpressionTerm(binaryOperator.Symbol);
-
-                if (binaryOperator.ExpectLhsIdentifier)
-                {
-                    var leftLeafNode = leftNode as LeafNode;
-                    if (leftLeafNode == null || leftLeafNode.Evaluation == LeafNode.EvaluationType.Literal)
-                        ExceptionHelper.UnexpectedExpressionTerm(binaryOperator.Symbol);
-                    else if (leftLeafNode.Evaluation == LeafNode.EvaluationType.Variable)
-                        leftLeafNode.ConvertToIdentifier();
-                }
 
                 m_current = new BinaryOperatorNode(leftNode.Parent, binaryOperator)
                 {
@@ -315,9 +289,6 @@ namespace XtraLiteTemplates.Expressions
                 var _current = m_current as OperatorNode;
                 Debug.Assert(_current.RightNode == null);
 
-                if (_current.Operator.ExpectRhsIdentifier)
-                    newNode.ConvertToIdentifier();
-
                 _current.RightNode = newNode;
                 m_current = newNode;
             }
@@ -329,6 +300,14 @@ namespace XtraLiteTemplates.Expressions
 
                 _current.AddChild(newNode);
                 m_current = newNode;
+            }
+            else if (m_current is DisembowelerNode && ExpectingIdentifier)
+            {
+                var _current = m_current as DisembowelerNode;
+
+                Debug.Assert(_current.ObjectNode != null);
+
+                _current.MemberName = symbol;
             }
             else
                 ExceptionHelper.InvalidExpressionTerm(symbol);
@@ -344,9 +323,6 @@ namespace XtraLiteTemplates.Expressions
 
                 Debug.Assert(_current.RightNode == null);
 
-                if (_current.Operator.ExpectRhsIdentifier)
-                    ExceptionHelper.UnexpectedExpressionTerm(literal);
-
                 _current.RightNode = newNode;
                 m_current = newNode;
             }
@@ -361,6 +337,34 @@ namespace XtraLiteTemplates.Expressions
             }
             else
                 ExceptionHelper.UnexpectedExpressionTerm(literal);
+        }
+
+        private void ContinueWithMemberAccess()
+        {
+            if ((m_current is LeafNode || m_current is RootNode || m_current is DisembowelerNode) && !ExpectingIdentifier)
+            {
+                var _root = m_current as RootNode;
+                if (_root != null && !_root.Closed)
+                    ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.MemberAccess);
+
+                /* Left side now becomes the "object" of disembowlement and the right side will be the member name */
+                var newNode = new DisembowelerNode(m_current.Parent, m_current);
+                var parentOperatorNode = m_current.Parent as OperatorNode;
+                if (parentOperatorNode != null)
+                {
+                    Debug.Assert(parentOperatorNode.RightNode == m_current);
+                    parentOperatorNode.RightNode = newNode;
+                }
+                else if (m_current.Parent == m_root)
+                {
+                    Debug.Assert(m_root.LastChild == m_current);
+                    m_root.LastChild = newNode;
+                }
+
+                m_current = newNode;
+            }
+            else 
+                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.MemberAccess);
         }
 
 
@@ -382,7 +386,9 @@ namespace XtraLiteTemplates.Expressions
             {
                 String symbol = (String)term;
 
-                if (symbol == FlowSymbols.GroupOpen)
+                if (symbol == FlowSymbols.MemberAccess)
+                    ContinueWithMemberAccess();
+                else if (symbol == FlowSymbols.GroupOpen)
                     OpenNewGroup();
                 else if (symbol == FlowSymbols.GroupClose)
                     CloseExistingGroup();
@@ -402,7 +408,7 @@ namespace XtraLiteTemplates.Expressions
                         }
                     }
 
-                    var acceptsBinary = ((m_current is RootNode) && ((RootNode)m_current).Closed) || (m_current is LeafNode);
+                    var acceptsBinary = ((m_current is RootNode) && ((RootNode)m_current).Closed) || (m_current is LeafNode) || (m_current is DisembowelerNode);
                     BinaryOperator binaryOperator;
                     if (m_binaryOperatorSymbols.TryGetValue(symbol, out binaryOperator))
                     {
@@ -451,15 +457,15 @@ namespace XtraLiteTemplates.Expressions
             if (!Constructed)
             {
                 Boolean fail = false;
-                if (m_root.Parent != null)
+                if (m_root.Parent != null || ExpectingIdentifier)
                     fail = true;
                 else
                 {
                     var _currentAsRoot = m_current as RootNode;
                     if (_currentAsRoot != null)
                         fail = !_currentAsRoot.Closed;
-                    else if (!(m_current is LeafNode))
-                        fail = true;
+                    else
+                        fail = !(m_current is LeafNode) && !(m_current is DisembowelerNode);
                 }
 
                 if (fail)

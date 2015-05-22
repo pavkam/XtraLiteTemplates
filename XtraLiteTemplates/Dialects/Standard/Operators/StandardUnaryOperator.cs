@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         protected IPrimitiveTypeConverter TypeConverter { get; private set; }
 
         protected StandardUnaryOperator(String symbol, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, false)
+            : base(symbol)
         {
             Expect.NotNull("typeConverter", typeConverter);
 

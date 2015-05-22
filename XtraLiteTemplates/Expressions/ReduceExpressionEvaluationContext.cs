@@ -37,28 +37,34 @@ namespace XtraLiteTemplates.Expressions
 
         public void SetVariable(String identifier, Object value)
         {
-            Debug.Fail("Invlaid operation.");
+            Debug.Fail("Invalid operation.");
         }
 
         public Object GetVariable(String identifier)
         {
-            Debug.Fail("Invlaid operation.");
+            Debug.Fail("Invalid operation.");
             return null;
         }
 
         public void AddStateObject(Object state)
         {
-            Debug.Fail("Invlaid operation.");
+            Debug.Fail("Invalid operation.");
         }
 
         public void RemoveStateObject(Object state)
         {
-            Debug.Fail("Invlaid operation.");
+            Debug.Fail("Invalid operation.");
         }
 
         public bool ContainsStateObject(Object state)
         {
-            Debug.Fail("Invlaid operation.");
+            Debug.Fail("Invalid operation.");
+            return false;
+        }
+
+        public Object GetProperty(Object variable, String memberName)
+        {
+            Debug.Fail("Invalid operation.");
             return false;
         }
     }

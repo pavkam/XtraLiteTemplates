@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.Expressions
         void SetVariable(String identifier, Object value);
         Object GetVariable(String identifier);
 
+        Object GetProperty(Object variable, String memberName);
 
         void AddStateObject(Object state);
         void RemoveStateObject(Object state);

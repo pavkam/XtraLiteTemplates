@@ -32,17 +32,13 @@ namespace XtraLiteTemplates.Expressions.Operators
 
     public abstract class BinaryOperator : Operator
     {
-        public Boolean ExpectLhsIdentifier { get; private set; }
 
         public Associativity Associativity { get; private set; }
 
-        protected BinaryOperator(String symbol, Int32 precedence, Associativity associativity,
-            Boolean expectLhsIdentifier, Boolean expectRhsIdentifier)
-            : base(symbol, precedence, expectRhsIdentifier)
+        protected BinaryOperator(String symbol, Int32 precedence, Associativity associativity)
+            : base(symbol, precedence)
         {
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
-
-            ExpectLhsIdentifier = expectLhsIdentifier;
             Associativity = associativity;
         }
 

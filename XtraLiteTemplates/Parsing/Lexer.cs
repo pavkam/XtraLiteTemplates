@@ -53,8 +53,6 @@ namespace XtraLiteTemplates.Parsing
 
         public ITokenizer Tokenizer { get; private set; }
 
-        public IFormatProvider FormatProvider { get; private set; }
-
         public IEqualityComparer<String> Comparer { get; private set; }
 
         public IReadOnlyCollection<Tag> Tags
@@ -65,15 +63,12 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
-        public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IFormatProvider formatProvider, 
-            IEqualityComparer<String> comparer)
+        public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<String> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
             Expect.NotNull("comparer", comparer);
-            Expect.NotNull("formatProvider", formatProvider);
             Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
 
-            FormatProvider = formatProvider;
             Tokenizer = tokenizer;
             Comparer = comparer;
 
@@ -429,7 +424,7 @@ namespace XtraLiteTemplates.Parsing
                         if (this.m_currentToken.Type == Token.TokenType.Number)
                         {
                             Double _float;
-                            if (Double.TryParse(this.m_currentToken.Value, NumberStyles.Number, FormatProvider, out _float))
+                            if (Double.TryParse(this.m_currentToken.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out _float))
                                 currentExpression.FeedLiteral(_float);
                             else
                                 ExceptionHelper.UnexpectedToken(this.m_currentToken);

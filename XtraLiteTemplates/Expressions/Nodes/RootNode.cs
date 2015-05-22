@@ -99,9 +99,26 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(reduceContext != null);
 
-            /* Cannot be reduced but still... */
-            foreach (var child in m_children)
-                child.Reduce(reduceContext);
+            if (m_children.Count == 1)
+            {
+                if (m_children[0].Reduce(reduceContext))
+                {
+                    reducedValue = m_children[0].ReducedValue;
+                    return true;
+                }
+            }
+            else
+            {
+                Boolean allReduced = true;
+                foreach (var child in m_children)
+                    allReduced &= child.Reduce(reduceContext);
+
+                if (allReduced)
+                {
+                    reducedValue = m_children.Select(s => s.ReducedValue).ToArray();
+                    return true;
+                }
+            }
 
             reducedValue = null;
             return false;
@@ -110,14 +127,24 @@ namespace XtraLiteTemplates.Expressions.Nodes
         protected override Func<IExpressionEvaluationContext, Object> Build()
         {
             var childFuncs = m_children.Select(s => s.GetEvaluationFunction()).ToArray();
-            return context =>
-            {
-                Object[] array = new Object[childFuncs.Length];
-                for (var i = 0; i < childFuncs.Length; i++)
-                    array[i] = childFuncs[i](context);
 
-                return array;
-            };
+            if (childFuncs.Length == 1)
+            {
+                /* We're transparent */
+                var childFunc = childFuncs[0];
+                return context => childFunc(context);
+            }
+            else
+            {
+                return context =>
+                {
+                    Object[] array = new Object[childFuncs.Length];
+                    for (var i = 0; i < childFuncs.Length; i++)
+                        array[i] = childFuncs[i](context);
+
+                    return array;
+                };
+            }
         }
     }
 }

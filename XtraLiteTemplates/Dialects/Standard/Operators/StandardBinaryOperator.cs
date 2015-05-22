@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         protected IPrimitiveTypeConverter TypeConverter { get; private set; }
 
         protected StandardBinaryOperator(String symbol, Int32 precedence, IPrimitiveTypeConverter typeConverter)
-            : base(symbol, precedence, Associativity.LeftToRight, false, false)
+            : base(symbol, precedence, Associativity.LeftToRight)
         {
             Expect.NotNull("typeConverter", typeConverter);
 

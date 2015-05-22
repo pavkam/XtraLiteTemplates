@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace XtraLiteTemplates.Dialects.Standard
+namespace XtraLiteTemplates
 {
     public sealed class SimpleTypeDisemboweler
     {

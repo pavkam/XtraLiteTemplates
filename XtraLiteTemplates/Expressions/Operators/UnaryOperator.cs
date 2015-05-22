@@ -32,8 +32,8 @@ namespace XtraLiteTemplates.Expressions.Operators
 
     public abstract class UnaryOperator : Operator
     {
-        protected UnaryOperator(String symbol, Boolean expectRhsIdentifier)
-            : base(symbol, 1, expectRhsIdentifier) 
+        protected UnaryOperator(String symbol)
+            : base(symbol, 1) 
         {
         }
 

@@ -63,7 +63,6 @@ namespace XtraLiteTemplates.NUnit.Operators
 
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(1, @operator.Precedence);
-            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
         }
 
         [Test]

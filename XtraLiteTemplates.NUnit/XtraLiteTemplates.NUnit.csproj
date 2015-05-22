@@ -45,6 +45,7 @@
     <Compile Include="Directives\StandardIfDirectiveTests.cs" />
     <Compile Include="Directives\StandardForEachDirectiveTests.cs" />
     <Compile Include="Directives\StandardConditionalInterpolationDirectiveTests.cs" />
+    <Compile Include="ExpressionFlowSymbolsTests.cs" />
     <Compile Include="Operators\ArithmeticNeutralOperatorTests.cs" />
     <Compile Include="Operators\ArithmeticNegateOperatorTests.cs" />
     <Compile Include="Operators\ArithmeticMultiplyOperatorTests.cs" />
@@ -69,7 +70,6 @@
     <Compile Include="Operators\BitwiseNotOperatorTests.cs" />
     <Compile Include="Operators\ValueFormatOperatorTests.cs" />
     <Compile Include="Operators\IntegerRangeOperatorTests.cs" />
-    <Compile Include="Operators\MemberAccessOperatorTests.cs" />
     <Compile Include="Operators\OperatorTestsBase.cs" />
     <Compile Include="SimpleTypeDisembowelerTests.cs" />
     <Compile Include="FlexiblePrimitiveTypeConverterTests.cs" />
@@ -87,9 +87,7 @@
     <Compile Include="TokenTests.cs" />
     <Compile Include="ExpressionTests.cs" />
     <Compile Include="Inside\RtlAssocTestOperator.cs" />
-    <Compile Include="Inside\LhsIdentTestOperator.cs" />
     <Compile Include="Inside\LtrAssocTestOperator.cs" />
-    <Compile Include="Inside\LhsRhsIdentTestOperator.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>

@@ -50,7 +50,7 @@ namespace XtraLiteTemplates
             }
 
             private Stack<Frame> m_frames;
-
+            private Dictionary<Type, SimpleTypeDisemboweler> m_disembowelers;
             private IEqualityComparer<String> m_identifierComparer;
             private Boolean m_ignoreEvaluationExceptions;
             private Func<IExpressionEvaluationContext, String, String> m_unparsedTextHandler;
@@ -65,6 +65,7 @@ namespace XtraLiteTemplates
                 m_ignoreEvaluationExceptions = ignoreEvaluationExceptions;
                 m_unparsedTextHandler = unparsedTextHandler;
 
+                m_disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
                 m_frames = new Stack<Frame>();
             }
 
@@ -115,6 +116,30 @@ namespace XtraLiteTemplates
                 return null;
             }
 
+            public Object GetProperty(Object variable, String memberName)
+            {
+                Expect.Identifier("memberName", memberName);
+
+                if (variable != null)
+                {
+                    var type = variable.GetType();
+
+                    SimpleTypeDisemboweler disemboweler;
+                    if (!m_disembowelers.TryGetValue(type, out disemboweler))
+                    {
+                        disemboweler = new SimpleTypeDisemboweler(type,
+                            SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
+                            SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, m_identifierComparer);
+
+                        m_disembowelers.Add(type, disemboweler);
+                    }
+
+                    return disemboweler.Read(memberName, variable);
+                }
+                else
+                    return null;
+            }
+
             public bool IgnoreEvaluationExceptions
             {
                 get
@@ -160,7 +185,7 @@ namespace XtraLiteTemplates
                     Dialect.StartStringLiteralCharacter, Dialect.EndStringLiteralCharacter, Dialect.StringLiteralEscapeCharacter, 
                     Dialect.NumberDecimalSeparatorCharacter);
 
-                var interpreter = new Interpreter(tokenizer, Dialect.FlowSymbols, Dialect.Culture, Dialect.IdentifierComparer);
+                var interpreter = new Interpreter(tokenizer, Dialect.FlowSymbols, Dialect.IdentifierComparer);
 
                 /* Register all directives and operators into the interpreter. */
                 foreach (var directive in Dialect.Directives)

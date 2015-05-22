@@ -367,7 +367,7 @@ using System.Globalization;
                     if (this.m_currentCharacter == this.NumberLiteralDecimalSeparatorCharacter && Char.IsDigit(PeekCharacter()))
                     {
                         /* This is a Decimal point. Read the remaining bits. */
-                        tokenValue.Append(this.m_currentCharacter);
+                        tokenValue.Append(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
                         this.NextCharacter(true);
 
                         while (Char.IsDigit(this.m_currentCharacter))
@@ -387,11 +387,13 @@ using System.Globalization;
                 else if (this.m_currentCharacter == this.NumberLiteralDecimalSeparatorCharacter)
                 {
                     /* Dot-prefixed number may have started. */
-                    tokenValue.Append(this.m_currentCharacter);
+                    var dot = this.m_currentCharacter;
                     this.NextCharacter(true);
 
                     if (Char.IsDigit(this.m_currentCharacter))
                     {
+                        tokenValue.Append(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
+
                         /* Yes, this is a number! */
                         while (Char.IsDigit(this.m_currentCharacter))
                         {
@@ -407,6 +409,8 @@ using System.Globalization;
                     }
                     else
                     {
+                        tokenValue.Append(dot);
+
                         /* Lump toghether all "standard symbols" (if this one was a standard one). */
                         while (this.IsStandardSymbol(this.m_currentCharacter))
                         {

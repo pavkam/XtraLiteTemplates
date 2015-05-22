@@ -40,7 +40,7 @@ namespace XtraLiteTemplates.Expressions
 
         static ExpressionFlowSymbols()
         {
-            Default = new ExpressionFlowSymbols(",", "[", "(", ")");
+            Default = new ExpressionFlowSymbols(",", ".", "(", ")");
         }
 
         public String Separator { get; private set; }

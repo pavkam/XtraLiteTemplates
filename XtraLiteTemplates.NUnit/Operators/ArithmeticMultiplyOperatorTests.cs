@@ -64,8 +64,6 @@ namespace XtraLiteTemplates.NUnit.Operators
             Assert.AreEqual("operator", @operator.Symbol);
             Assert.AreEqual(3, @operator.Precedence);
             Assert.AreEqual(Associativity.LeftToRight, @operator.Associativity);
-            Assert.AreEqual(false, @operator.ExpectLhsIdentifier);
-            Assert.AreEqual(false, @operator.ExpectRhsIdentifier);
         }
 
         [Test]

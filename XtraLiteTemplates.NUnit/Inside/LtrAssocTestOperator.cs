@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     public sealed class LtrAssocTestOperator : BinaryOperator
     {
         public LtrAssocTestOperator(String symbol)
-            : base(symbol, 5, Associativity.LeftToRight, false, false)
+            : base(symbol, 5, Associativity.LeftToRight)
         {
         }
 

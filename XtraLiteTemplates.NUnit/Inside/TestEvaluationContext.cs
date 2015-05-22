@@ -46,7 +46,7 @@ namespace XtraLiteTemplates.NUnit.Inside
         }
 
         private Stack<Frame> m_frames;
-
+        private Dictionary<Type, SimpleTypeDisemboweler> m_disembowelers;
         private IEqualityComparer<String> m_identifierComparer;
         private Boolean m_ignoreEvaluationExceptions;
 
@@ -56,6 +56,7 @@ namespace XtraLiteTemplates.NUnit.Inside
 
             m_identifierComparer = identifierComparer;
             m_frames = new Stack<Frame>();
+            m_disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
         }
 
         public String ProcessUnparsedText(String value)
@@ -144,6 +145,31 @@ namespace XtraLiteTemplates.NUnit.Inside
 
             var topFrame = TopFrame;
             return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
+        }
+
+
+        public Object GetProperty(Object variable, String memberName)
+        {
+            Assert.IsNotEmpty(memberName);
+
+            if (variable != null)
+            {
+                var type = variable.GetType();
+
+                SimpleTypeDisemboweler disemboweler;
+                if (!m_disembowelers.TryGetValue(type, out disemboweler))
+                {
+                    disemboweler = new SimpleTypeDisemboweler(type,
+                        SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
+                        SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, m_identifierComparer);
+
+                    m_disembowelers.Add(type, disemboweler);
+                }
+
+                return disemboweler.Read(memberName, variable);
+            }
+            else
+                return null;
         }
     }
 }
