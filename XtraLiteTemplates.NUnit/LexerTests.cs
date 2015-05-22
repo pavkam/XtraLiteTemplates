@@ -390,8 +390,8 @@ namespace XtraLiteTemplates.NUnit
             var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
             var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
 
-            AssertTagLex(lexer1.ReadNext(), 0, 3, tag1, "i");
-            AssertTagLex(lexer2.ReadNext(), 0, 3, tag1, "i");
+            AssertTagLex(lexer1.ReadNext(), 0, 3, tag1, "@i");
+            AssertTagLex(lexer2.ReadNext(), 0, 3, tag1, "@i");
         }
 
         [Test]
@@ -451,8 +451,8 @@ namespace XtraLiteTemplates.NUnit
             var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
             var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
 
-            AssertTagLex(lexer1.ReadNext(), 0, 13, tag1, "IF|A|THEN|@B");
-            AssertTagLex(lexer2.ReadNext(), 0, 13, tag1, "IF|A|THEN|@B");
+            AssertTagLex(lexer1.ReadNext(), 0, 13, tag2, "IF|@A|THEN|B");
+            AssertTagLex(lexer2.ReadNext(), 0, 13, tag2, "IF|@A|THEN|B");
         }
 
         [Test]
@@ -501,7 +501,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterTag(tag2)
                 .RegisterTag(tag3);
 
-            AssertTagLex(lexer.ReadNext(), 0, 11, tag2, "IF|@A|THEN");
+            AssertTagLex(lexer.ReadNext(), 0, 11, tag3, "IF|@A|THEN");
         }
 
         [Test]

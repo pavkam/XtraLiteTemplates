@@ -248,7 +248,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
                 Loves = new String [] { "Apples", "Bikes", "Everything Nice" }
             };
 
-            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{pre}Hello, {_0.FirstName} {_0.LastName}. You are {_0.Age} years old and you love: {for entity in _0.loves}{entity}, {end}{end}", customer);
+            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{pre}Hello, {_0.FirstName} {_0.LastName}. You are {_0.Age} years old and you love: {for entity in _0.loves}{entity}, {end}{end}", customer);            
             Assert.AreEqual("Hello, John McMann. You are 31 years old and you love: Apples,Bikes,Everything Nice,", result);
         }
     }

@@ -279,8 +279,9 @@ namespace XtraLiteTemplates.Parsing
                         ExceptionHelper.UnexpectedToken(this.m_currentToken);
                     else
                     {
-                        if (currentExpression != null)
+                        if (matchingTag.MatchesExpression(_components.Count - 1))
                         {
+                            Debug.Assert(currentExpression != null);
                             try
                             {
                                 currentExpression.Construct();
@@ -291,8 +292,31 @@ namespace XtraLiteTemplates.Parsing
                             }
                         }
 
+                        Object[] actualComponents = new Object[_components.Count];
+                        for (var i = 0; i < _components.Count; i++)
+                        {
+                            var component = _components[i];
+
+                            var tuple = component as Tuple<String, Expression>;
+                            if (tuple != null)
+                            {
+                                if (matchingTag.MatchesExpression(i))
+                                {
+                                    Debug.Assert(tuple.Item2.Constructed);
+                                    actualComponents[i] = tuple.Item2;
+                                }
+                                else
+                                    actualComponents[i] = tuple.Item1;
+                            }
+                            else
+                            {
+                                Debug.Assert(component is String || (component is Expression && ((Expression)component).Constructed));
+                                actualComponents[i] = component;
+                            }
+                        }
+
                         NextToken();
-                        return new TagLex(matchingTag, _components.ToArray(), _allTokens[0].CharacterIndex, _allTokens.Sum(s => s.OriginalLength));
+                        return new TagLex(matchingTag, actualComponents, _allTokens[0].CharacterIndex, _allTokens.Sum(s => s.OriginalLength));
                     }
                 }
 
@@ -305,23 +329,20 @@ namespace XtraLiteTemplates.Parsing
                         ExceptionHelper.UnexpectedToken(m_currentToken);
 
                     /* This is either a keyword or part of an expression. Reflect that. */
-                    var matchesByKeyword = matchingTags.Where(p => p.MatchesKeyword(_components.Count, Comparer, this.m_currentToken.Value)).ToList();
-                    var matchesByIdentifier = matchingTags.Where(p => p.MatchesIdentifier(_components.Count, Comparer, this.m_currentToken.Value)).ToList();
-
-                    if (matchesByKeyword.Count > 0 || matchesByIdentifier.Count > 0)
+                    var matchesByKeyword = matchingTags.Where(p => p.MatchesKeyword(_components.Count, Comparer, this.m_currentToken.Value)).ToArray();
+                    if (matchesByKeyword.Length > 0)
                     {
-                        /* Keyword or identifier (prioritize the keyword matches) */
-                        if (matchesByKeyword.Count > 0)
+                        /* Keyword match. All the rest is now history. */
+                        if (matchesByKeyword.Length > 0)
                             matchingTags = new HashSet<Tag>(matchesByKeyword);
-                        else
-                            matchingTags = new HashSet<Tag>(matchesByIdentifier);
 
-                        if (currentExpression != null)
+                        var previousComponentWasExpression = matchingTags.Any(p => p.MatchesExpression(_components.Count - 1));
+                        if (previousComponentWasExpression)
                         {
+                            Debug.Assert(currentExpression != null);
                             try
                             {
                                 currentExpression.Construct();
-                                currentExpression = null;
                             }
                             catch (ExpressionException constructException)
                             {
@@ -329,9 +350,59 @@ namespace XtraLiteTemplates.Parsing
                             }
                         }
 
-                        /* Keyword si the next component. */
+                        currentExpression = null;
                         _components.Add(this.m_currentToken.Value);
                         continue;
+                    }
+                    else
+                    {
+                        var matchesByIdentifier = matchingTags.Where(p => p.MatchesIdentifier(_components.Count, Comparer, this.m_currentToken.Value)).ToArray();
+                        if (matchesByIdentifier.Length > 0)
+                        {
+                            if (currentExpression == null)
+                            {
+                                var matchesByExpression = matchingTags.Where(p => p.MatchesExpression(_components.Count)).ToArray();
+                                if (matchesByExpression.Length > 0)
+                                {
+                                    currentExpression = CreateExpression();
+                                    try
+                                    {
+                                        currentExpression.FeedSymbol(this.m_currentToken.Value);
+                                    }
+                                    catch (ExpressionException feedException)
+                                    {
+                                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, this.m_currentToken);
+                                    }
+
+                                    _components.Add(Tuple.Create(this.m_currentToken.Value, currentExpression));
+                                }
+                                else
+                                    _components.Add(this.m_currentToken.Value);
+
+                                matchingTags = new HashSet<Tag>(matchesByIdentifier.Concat(matchesByExpression));
+                            }
+                            else
+                            {
+                                var previousComponentWasExpression = matchesByIdentifier.Any(p => p.MatchesExpression(_components.Count - 1));
+                                if (previousComponentWasExpression)
+                                {
+                                    Debug.Assert(currentExpression != null);
+                                    try
+                                    {
+                                        currentExpression.Construct();
+                                        currentExpression = null;
+                                    }
+                                    catch (ExpressionException constructException)
+                                    {
+                                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, m_currentToken);
+                                    }
+                                }
+
+                                _components.Add(this.m_currentToken.Value);
+                            }
+
+                            continue;
+                        }
                     }
                 }
 

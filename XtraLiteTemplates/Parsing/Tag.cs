@@ -384,7 +384,7 @@ namespace XtraLiteTemplates.Parsing
             Debug.Assert(comparer != null);
             Debug.Assert(!String.IsNullOrEmpty(keyword));
 
-            if (index >= m_components.Count || m_components[index] == null)
+            if (index < 0 || index >= m_components.Count || m_components[index] == null)
                 return false;
 
             String stringComponent = m_components[index] as String;
@@ -396,7 +396,7 @@ namespace XtraLiteTemplates.Parsing
             Debug.Assert(comparer != null);
             Debug.Assert(!String.IsNullOrEmpty(identifier));
 
-            if (index >= m_components.Count || m_components[index] == null)
+            if (index < 0 || index >= m_components.Count || m_components[index] == null)
                 return false;
 
             var stringComponent = m_components[index] as String;
@@ -409,7 +409,7 @@ namespace XtraLiteTemplates.Parsing
 
         internal Boolean MatchesAnyIdentifier(Int32 index)
         {
-            if (index >= m_components.Count || m_components[index] == null)
+            if (index < 0 || index >= m_components.Count || m_components[index] == null)
                 return false;
 
             var stringComponent = m_components[index] as String;
@@ -418,7 +418,7 @@ namespace XtraLiteTemplates.Parsing
 
         internal Boolean MatchesExpression(Int32 index)
         {
-            return index < m_components.Count && m_components[index] == null;
+            return index >= 0 && index < m_components.Count && m_components[index] == null;
         }
     }
 }
