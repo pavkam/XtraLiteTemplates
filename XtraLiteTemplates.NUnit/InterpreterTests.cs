@@ -37,6 +37,7 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Parsing;
     using System.Globalization;
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Expressions;
 
     [TestFixture]
     public class InterpreterTests : TestBase
@@ -44,15 +45,16 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseInterpreterConstructionExceptions()
         {
-            ExpectArgumentNullException("tokenizer", () => new Interpreter((ITokenizer)null, CultureInfo.InvariantCulture, StringComparer.Ordinal));
-            ExpectArgumentNullException("formatProvider", () => new Interpreter(new Tokenizer("irrelevant"), null, StringComparer.Ordinal));
-            ExpectArgumentNullException("comparer", () => new Interpreter(new Tokenizer("irrelevant"), CultureInfo.InvariantCulture, null));
+            ExpectArgumentNullException("tokenizer", () => new Interpreter((ITokenizer)null, ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.Ordinal));
+            ExpectArgumentNullException("expressionFlowSymbols", () => new Interpreter((ITokenizer)null, null, CultureInfo.InvariantCulture, StringComparer.Ordinal));
+            ExpectArgumentNullException("formatProvider", () => new Interpreter(new Tokenizer("irrelevant"), ExpressionFlowSymbols.Default, null, StringComparer.Ordinal));
+            ExpectArgumentNullException("comparer", () => new Interpreter(new Tokenizer("irrelevant"), ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, null));
         }
 
         [Test]
         public void TestCaseInterpreterConstruction()
         {
-            var interpreter = new Interpreter(new Tokenizer("irrelevant"), 
+            var interpreter = new Interpreter(new Tokenizer("irrelevant"), ExpressionFlowSymbols.Default,
                 CultureInfo.InvariantCulture, StringComparer.CurrentCulture);
 
             Assert.AreEqual(StringComparer.CurrentCulture, interpreter.Comparer);
@@ -62,7 +64,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseInterpreterRegistrationAndExceptions()
         {
-            var interpreter = new Interpreter(new Tokenizer("irrelevant"), CultureInfo.InvariantCulture, StringComparer.CurrentCulture);
+            var interpreter = new Interpreter(new Tokenizer("irrelevant"), ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.CurrentCulture);
 
             ExpectArgumentNullException("directive", () => interpreter.RegisterDirective(null));
             ExpectArgumentNullException("operator", () => interpreter.RegisterOperator(null));
@@ -71,22 +73,20 @@ namespace XtraLiteTemplates.NUnit
             ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("A", TypeConverter)));
             interpreter.RegisterOperator(new ArithmeticSumOperator("A", TypeConverter));
             ExpectOperatorAlreadyRegisteredException("A", () => interpreter.RegisterOperator(new ArithmeticSumOperator("A", TypeConverter)));
-            interpreter.RegisterOperator(new SubscriptOperator("O", "C"));
-            ExpectOperatorAlreadyRegisteredException("OC", () => interpreter.RegisterOperator(new SubscriptOperator("O", "C")));
-            ExpectOperatorAlreadyRegisteredException("AM", () => interpreter.RegisterOperator(new SubscriptOperator("A", "M")));
 
-            interpreter.RegisterOperator(new ArithmeticSumOperator("L", TypeConverter));
-            ExpectOperatorAlreadyRegisteredException("KL", () => interpreter.RegisterOperator(new SubscriptOperator("K", "L")));
-            interpreter.RegisterOperator(new ArithmeticNeutralOperator("L", TypeConverter));
+            ExpectOperatorAlreadyRegisteredException("(", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("(", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(")", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator(")", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(".", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator(".", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(",", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator(",", TypeConverter)));
 
-            interpreter.RegisterOperator(new SubscriptOperator("W", "V"));
-            ExpectOperatorAlreadyRegisteredException("W", () => interpreter.RegisterOperator(new ArithmeticNeutralOperator("W", TypeConverter)));
-            ExpectOperatorAlreadyRegisteredException("V", () => interpreter.RegisterOperator(new ArithmeticSumOperator("V", TypeConverter)));
-            interpreter.RegisterOperator(new ArithmeticNeutralOperator("V", TypeConverter));
-            interpreter.RegisterOperator(new ArithmeticSumOperator("W", TypeConverter));
+            ExpectOperatorAlreadyRegisteredException("(", () => interpreter.RegisterOperator(new ArithmeticSumOperator("(", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(")", () => interpreter.RegisterOperator(new ArithmeticSumOperator(")", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(".", () => interpreter.RegisterOperator(new ArithmeticSumOperator(".", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(",", () => interpreter.RegisterOperator(new ArithmeticSumOperator(",", TypeConverter)));
 
             var d1 = new RippedOpenDirective(Tag.Parse("HELLO"));
             var d2 = new RippedOpenDirective(Tag.Parse("WORLD"));
+
             interpreter.RegisterDirective(d1);
             interpreter.RegisterDirective(d2);
             interpreter.RegisterDirective(d1);
@@ -99,7 +99,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("OPEN"),
                 Tag.Parse("CLOSE"));
 
-            var interpreter = new Interpreter(new Tokenizer("{OPEN}text goes here"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{OPEN}text goes here"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive);
 
             ExpectUnmatchedDirectiveTagException(new Directive[] { directive }, 0, () => interpreter.Construct());
@@ -113,7 +114,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("INSIDE"),
                 Tag.Parse("CLOSE"));
 
-            var interpreter = new Interpreter(new Tokenizer("{OPEN}text goes{INSIDE}here"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{OPEN}text goes{INSIDE}here"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive);
 
             ExpectUnmatchedDirectiveTagException(new Directive[] { directive }, 0, () => interpreter.Construct());
@@ -129,7 +131,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T1"),
                 Tag.Parse("T3"));
 
-            var interpreter = new Interpreter(new Tokenizer("{T1}multiple choice"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{T1}multiple choice"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
             ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
@@ -145,7 +148,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T1"),
                 Tag.Parse("T3"));
 
-            var interpreter = new Interpreter(new Tokenizer("{T1}{T1}{T3}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{T1}{T1}{T3}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
             ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
@@ -161,7 +165,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T2"),
                 Tag.Parse("T"));
 
-            var interpreter = new Interpreter(new Tokenizer("{T1}{T2}{T}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{T1}{T2}{T}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
             ExpectUnmatchedDirectiveTagException(new Directive[] { directive1 }, 0, () => interpreter.Construct());
@@ -177,7 +182,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("T"),
                 Tag.Parse("T2"));
 
-            var interpreter = new Interpreter(new Tokenizer("{T}{T}{T2}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{T}{T}{T2}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
             ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
@@ -190,7 +196,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("A"),
                 Tag.Parse("B"));
 
-            var interpreter = new Interpreter(new Tokenizer("{B}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{B}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive);
 
             ExpectUnexpectedTagException("B", 0, () => interpreter.Construct());
@@ -204,7 +211,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("B"),
                 Tag.Parse("C"));
 
-            var interpreter = new Interpreter(new Tokenizer("{A}{C}{B}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{A}{C}{B}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive);
 
             ExpectUnexpectedTagException("C", 3, () => interpreter.Construct());
@@ -220,7 +228,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("C"),
                 Tag.Parse("D"));
 
-            var interpreter = new Interpreter(new Tokenizer("{A}..{D}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{A}..{D}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
             ExpectUnexpectedTagException("D", 5, () => interpreter.Construct());
@@ -236,7 +245,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("C"),
                 Tag.Parse("D"));
 
-            var interpreter = new Interpreter(new Tokenizer("{A}1{C}2{A}3{B}4{D}5{B}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter = new Interpreter(new Tokenizer("{A}1{C}2{A}3{B}4{D}5{B}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
             var evaluable = interpreter.Construct();
@@ -251,9 +261,11 @@ namespace XtraLiteTemplates.NUnit
             var directive1 = new RippedOpenDirective(Tag.Parse("MATCH ME ?"));
             var directive2 = new RippedOpenDirective(Tag.Parse("MATCH ME $"));
 
-            var interpreter1 = new Interpreter(new Tokenizer("{MATCH ME identifier}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter1 = new Interpreter(new Tokenizer("{MATCH ME identifier}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
-            var interpreter2 = new Interpreter(new Tokenizer("{MATCH ME identifier}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var interpreter2 = new Interpreter(new Tokenizer("{MATCH ME identifier}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive2).RegisterDirective(directive1);
 
             var repr1 = interpreter1.Construct().ToString();
@@ -275,7 +287,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("MID"),
                 Tag.Parse("OTHER END"));
 
-            var repr = new Interpreter(new Tokenizer("{START}{MID}{OTHER END}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var repr = new Interpreter(new Tokenizer("{START}{MID}{OTHER END}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1)
                 .RegisterDirective(directive2)
                 .Construct()
@@ -295,7 +308,8 @@ namespace XtraLiteTemplates.NUnit
                 Tag.Parse("ELSE"),
                 Tag.Parse("END"));
 
-            var repr = new Interpreter(new Tokenizer("{IF A}1{IF B}2{ELSE}3{END}4{IF A}5{END}6{END}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var repr = new Interpreter(new Tokenizer("{IF A}1{IF B}2{ELSE}3{END}4{IF A}5{END}6{END}"), 
+                ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1)
                 .RegisterDirective(directive2)
                 .Construct()

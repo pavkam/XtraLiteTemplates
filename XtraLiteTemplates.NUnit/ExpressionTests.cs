@@ -70,14 +70,12 @@ namespace XtraLiteTemplates.NUnit
                 new ArithmeticNeutralOperator(TypeConverter),
                 new ArithmeticSubtractOperator(TypeConverter),
                 new ArithmeticSumOperator(TypeConverter),
-                new SubscriptOperator(),
                 new IntegerRangeOperator(TypeConverter),
-                new SeparatorOperator(TypeConverter),
                 new ValueFormatOperator(CultureInfo.InvariantCulture, TypeConverter),
                 new MemberAccessOperator(comparer),
             };
 
-            var expression = new Expression(StringComparer.Ordinal);
+            var expression = new Expression(ExpressionFlowSymbols.Default, StringComparer.Ordinal);
             foreach (var op in operators)
             {
                 expression.RegisterOperator(op);
@@ -138,13 +136,15 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseContruction_1()
         {
-            ExpectArgumentNullException("comparer", () => new Expression(null));
+            ExpectArgumentNullException("comparer", () => new Expression(ExpressionFlowSymbols.Default, null));
+            ExpectArgumentNullException("flowSymbols", () => new Expression(null, StringComparer.InvariantCulture));
 
             var expression_default = new Expression();
             Assert.AreEqual(StringComparer.OrdinalIgnoreCase, expression_default.Comparer);
 
-            var expression_withCulture = new Expression(StringComparer.CurrentCulture);
+            var expression_withCulture = new Expression(ExpressionFlowSymbols.Default, StringComparer.CurrentCulture);
             Assert.AreEqual(StringComparer.CurrentCulture, expression_withCulture.Comparer);
+            Assert.AreEqual(ExpressionFlowSymbols.Default, expression_withCulture.FlowSymbols);
 
             Assert.AreEqual(0, expression_default.SupportedOperators.Count);
             Assert.AreEqual(0, expression_withCulture.SupportedOperators.Count);
@@ -157,7 +157,6 @@ namespace XtraLiteTemplates.NUnit
 
             var neutral = new ArithmeticNeutralOperator(TypeConverter);
             var sum = new ArithmeticSumOperator(TypeConverter);
-            var subscript = new SubscriptOperator();
 
             /* Unary */
             expression.RegisterOperator(neutral);
@@ -171,13 +170,6 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(sum, expression.SupportedOperators[1]);
             Assert.IsTrue(expression.IsSupportedOperator(sum.Symbol));
 
-            /* Group */
-            expression.RegisterOperator(subscript);
-            Assert.AreEqual(3, expression.SupportedOperators.Count);
-            Assert.AreEqual(subscript, expression.SupportedOperators[2]);
-            Assert.IsTrue(expression.IsSupportedOperator(subscript.Symbol));
-            Assert.IsTrue(expression.IsSupportedOperator(subscript.Terminator));
-
             ExpectArgumentNullException("symbol", () => expression.IsSupportedOperator(null));
             ExpectArgumentEmptyException("symbol", () => expression.IsSupportedOperator(String.Empty));
         }
@@ -189,11 +181,9 @@ namespace XtraLiteTemplates.NUnit
 
             var unaryOp_plus = new ArithmeticNeutralOperator("+", TypeConverter);
             var binaryOp_plus = new ArithmeticSumOperator("+", TypeConverter);
-            var groupOp_plus = new SubscriptOperator("+", "-");
 
             expression.RegisterOperator(unaryOp_plus);
             ExpectOperatorAlreadyRegisteredException(unaryOp_plus.ToString(), () => expression.RegisterOperator(unaryOp_plus));
-            ExpectOperatorAlreadyRegisteredException(groupOp_plus.ToString(), () => expression.RegisterOperator(groupOp_plus));
             expression.RegisterOperator(binaryOp_plus);
             ExpectOperatorAlreadyRegisteredException(binaryOp_plus.ToString(), () => expression.RegisterOperator(binaryOp_plus));
         }
@@ -203,29 +193,25 @@ namespace XtraLiteTemplates.NUnit
         {
             var expression = new Expression();
 
-            var neutral = new ArithmeticNeutralOperator(TypeConverter);
-            var sum = new ArithmeticSumOperator(TypeConverter);
-            var subscript = new SubscriptOperator();
+            var unary_1 = new ArithmeticNeutralOperator("(", TypeConverter);
+            var unary_2 = new ArithmeticNeutralOperator(")", TypeConverter);
+            var unary_3 = new ArithmeticNeutralOperator(".", TypeConverter);
+            var unary_4 = new ArithmeticNeutralOperator(",", TypeConverter);
 
-            expression.RegisterOperator(neutral);
-            expression.RegisterOperator(sum);
-            expression.RegisterOperator(subscript);
+            var binary_1 = new ArithmeticSumOperator("(", TypeConverter);
+            var binary_2 = new ArithmeticSumOperator(")", TypeConverter);
+            var binary_3 = new ArithmeticSumOperator(".", TypeConverter);
+            var binary_4 = new ArithmeticSumOperator(",", TypeConverter);
 
-            ExpectOperatorAlreadyRegisteredException(neutral.ToString(), () => expression.RegisterOperator(neutral));
-            ExpectOperatorAlreadyRegisteredException(sum.ToString(), () => expression.RegisterOperator(sum));
-            ExpectOperatorAlreadyRegisteredException(subscript.ToString(), () => expression.RegisterOperator(subscript));
+            ExpectOperatorAlreadyRegisteredException(unary_1.ToString(), () => expression.RegisterOperator(unary_1));
+            ExpectOperatorAlreadyRegisteredException(unary_2.ToString(), () => expression.RegisterOperator(unary_2));
+            ExpectOperatorAlreadyRegisteredException(unary_3.ToString(), () => expression.RegisterOperator(unary_3));
+            ExpectOperatorAlreadyRegisteredException(unary_4.ToString(), () => expression.RegisterOperator(unary_4));
 
-            var _ss1 = new SubscriptOperator("+", ">");
-            ExpectOperatorAlreadyRegisteredException(_ss1.ToString(), () => expression.RegisterOperator(_ss1));
-
-            var _ss2 = new SubscriptOperator("<", "+");
-            ExpectOperatorAlreadyRegisteredException(_ss2.ToString(), () => expression.RegisterOperator(_ss2));
-
-            var _ss3 = new SubscriptOperator("(", ">");
-            ExpectOperatorAlreadyRegisteredException(_ss3.ToString(), () => expression.RegisterOperator(_ss3));
-
-            var _ss4 = new SubscriptOperator("<", ")");
-            ExpectOperatorAlreadyRegisteredException(_ss4.ToString(), () => expression.RegisterOperator(_ss4));
+            ExpectOperatorAlreadyRegisteredException(binary_1.ToString(), () => expression.RegisterOperator(binary_1));
+            ExpectOperatorAlreadyRegisteredException(binary_2.ToString(), () => expression.RegisterOperator(binary_2));
+            ExpectOperatorAlreadyRegisteredException(binary_3.ToString(), () => expression.RegisterOperator(binary_3));
+            ExpectOperatorAlreadyRegisteredException(binary_4.ToString(), () => expression.RegisterOperator(binary_4));
         }
 
         [Test]
@@ -300,39 +286,50 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseEvaluation_EmptyGroup()
+        public void TestCaseFeedingErrors1()
         {
             var expression = CreateBloatedExpression();
-
-            expression.FeedSymbol("(");            
-            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
-        }
-
-        [Test]
-        public void TestCaseFeedingErrors()
-        {
-            var expression = CreateBloatedExpression();
-            ExpectInvalidExpressionTermException("*", () => expression.FeedSymbol("*"));
-            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectUnexpectedExpressionTermException("*", () => expression.FeedSymbol("*"));
+            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
 
             expression.FeedLiteral("Hello");
-            ExpectInvalidExpressionTermException("!", () => expression.FeedSymbol("!"));
-            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
-            ExpectInvalidExpressionTermException("World", () => expression.FeedLiteral("World"));
+            ExpectUnexpectedExpressionTermException("!", () => expression.FeedSymbol("!"));
+            ExpectUnexpectedExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectUnexpectedExpressionTermException("World", () => expression.FeedLiteral("World"));
             ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
 
             expression.FeedSymbol("+");
-            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
             expression.FeedSymbol("(");
-            ExpectInvalidExpressionTermException("/", () => expression.FeedSymbol("/"));
+            ExpectUnexpectedExpressionTermException("/", () => expression.FeedSymbol("/"));
             expression.FeedLiteral(100);
-            ExpectInvalidExpressionTermException(200, () => expression.FeedLiteral(200));
+            ExpectUnexpectedExpressionTermException(200, () => expression.FeedLiteral(200));
             ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
             expression.FeedSymbol(")");
-            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
-            ExpectInvalidExpressionTermException("!", () => expression.FeedSymbol("!"));
-            ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
-            ExpectInvalidExpressionTermException(true, () => expression.FeedLiteral(true));
+            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectUnexpectedExpressionTermException("!", () => expression.FeedSymbol("!"));
+            ExpectUnexpectedExpressionTermException("reference", () => expression.FeedSymbol("reference"));
+            ExpectUnexpectedExpressionTermException(true, () => expression.FeedLiteral(true));
+        }
+
+        [Test]
+        public void TestCaseFeedingErrors2()
+        {
+            var expression = CreateBloatedExpression();
+
+            expression.FeedSymbol("(");
+            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectUnexpectedExpressionTermException(",", () => expression.FeedSymbol(","));
+            expression.FeedSymbol("a");
+            ExpectUnexpectedExpressionTermException("(", () => expression.FeedSymbol("("));
+            expression.FeedSymbol(",");
+            ExpectUnexpectedExpressionTermException(",", () => expression.FeedSymbol(","));
+            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
+            expression.FeedSymbol("b");
+            expression.FeedSymbol(")");
+            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
+
+            Assert.AreEqual("(){@a , @b}", expression.ToString(ExpressionFormatStyle.Canonical));
         }
 
         [Test]
@@ -373,8 +370,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseCaseSensitivity()
         {
-            var expression_ins = new Expression(StringComparer.OrdinalIgnoreCase);
-            var expression_sens = new Expression(StringComparer.Ordinal);
+            var expression_ins = new Expression(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase);
+            var expression_sens = new Expression(ExpressionFlowSymbols.Default, StringComparer.Ordinal);
 
             var testOperator = new ArithmeticNeutralOperator("lower_case_operator", TypeConverter);
 
@@ -432,6 +429,22 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("!\"a\"", def3);
             Assert.AreEqual("!\"a\" + ??", def4);
             Assert.AreEqual("!\"a\" + \"5\"", def5);
+        }
+
+        [Test]
+        public void TestCaseCaseToString_3()
+        {
+            var expression = CreateTestExpression("a + b , 1 + ( c - d - - e , 2 , 3 , ( m , n , o ) )");
+
+            var s_def = expression.ToString();
+            var s_arithm = expression.ToString(ExpressionFormatStyle.Arithmetic);
+            var s_canon = expression.ToString(ExpressionFormatStyle.Canonical);
+            var s_polish = expression.ToString(ExpressionFormatStyle.Polish);
+
+            Assert.AreEqual(s_def, s_arithm);
+            Assert.AreEqual("@a + @b , 1 + ( @c - @d - -@e , 2 , 3 , ( @m , @n , @o ) )", s_arithm);
+            Assert.AreEqual("+{@a,@b} , +{1,(){-{-{@c,@d},-{@e}} , 2 , 3 , (){@m , @n , @o}}}", s_canon);
+            Assert.AreEqual("+ @a @b , + 1 (- - @c @d -@e , 2 , 3 , (@m , @n , @o))", s_polish);
         }
 
         [Test]

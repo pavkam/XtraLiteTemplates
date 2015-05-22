@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.NUnit
     using System.IO;
     using System.Linq;
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
 
@@ -74,11 +75,12 @@ namespace XtraLiteTemplates.NUnit
         {
             var tokenizer = new Tokenizer("irrelevant");
 
-            ExpectArgumentNullException("tokenizer", () => new Lexer(null, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase));
-            ExpectArgumentNullException("formatProvider", () => new Lexer(tokenizer, null, StringComparer.OrdinalIgnoreCase));
-            ExpectArgumentNullException("comparer", () => new Lexer(tokenizer, CultureInfo.InvariantCulture, null));
+            ExpectArgumentNullException("tokenizer", () => new Lexer(null, ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase));
+            ExpectArgumentNullException("expressionFlowSymbols", () => new Lexer(tokenizer, null, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase));
+            ExpectArgumentNullException("formatProvider", () => new Lexer(tokenizer, ExpressionFlowSymbols.Default, null, StringComparer.OrdinalIgnoreCase));
+            ExpectArgumentNullException("comparer", () => new Lexer(tokenizer, ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, null));
 
-            var lexer = new Lexer(tokenizer, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
+            var lexer = new Lexer(tokenizer, ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
 
             Assert.AreSame(tokenizer, lexer.Tokenizer);
             Assert.AreSame(StringComparer.OrdinalIgnoreCase, lexer.Comparer);
@@ -89,7 +91,8 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseTagRegistration()
         {
             var tokenizer = new Tokenizer("irrelevant");
-            var lexer = new Lexer(tokenizer, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
+            var lexer = new Lexer(tokenizer, ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
             var emptyTag = new Tag();
 
             Assert.AreEqual(0, lexer.Tags.Count);
@@ -109,7 +112,8 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseOperatorRegistration()
         {
             var tokenizer = new Tokenizer("irrelevant");
-            var lexer = new Lexer(tokenizer, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
+            var lexer = new Lexer(tokenizer, ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
 
             var neutral = new ArithmeticNeutralOperator(TypeConverter);
             var sum = new ArithmeticSumOperator(TypeConverter);
@@ -118,43 +122,35 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreEqual(lexer, lexer.RegisterOperator(neutral));
             Assert.AreEqual(lexer, lexer.RegisterOperator(sum));
-            Assert.AreEqual(lexer, lexer.RegisterOperator(new SubscriptOperator("<", ">")));
 
             ExpectOperatorAlreadyRegisteredException(neutral.ToString(), () => lexer.RegisterOperator(neutral));
             ExpectOperatorAlreadyRegisteredException(sum.ToString(), () => lexer.RegisterOperator(sum));
-
-            var _ss1 = new SubscriptOperator("+", ")");
-            ExpectOperatorAlreadyRegisteredException(_ss1.ToString(), () => lexer.RegisterOperator(_ss1));
-
-            var _ss2 = new SubscriptOperator("(", "+");
-            ExpectOperatorAlreadyRegisteredException(_ss2.ToString(), () => lexer.RegisterOperator(_ss2));
-
-            var _ss3 = new SubscriptOperator("<", ")");
-            ExpectOperatorAlreadyRegisteredException(_ss3.ToString(), () => lexer.RegisterOperator(_ss3));
-
-            var _ss4 = new SubscriptOperator("(", ">");
-            ExpectOperatorAlreadyRegisteredException(_ss4.ToString(), () => lexer.RegisterOperator(_ss4));
-
 
             /* Clashing with specials */
             lexer.RegisterSpecial("FALSE", false);
 
             var clashingOp1 = new ArithmeticNeutralOperator("FALSE", TypeConverter);
             var clashingOp2 = new ArithmeticSumOperator("FALSE", TypeConverter);
-            var clashingOp3 = new SubscriptOperator("FALSE", "ABRA");
-            var clashingOp4 = new SubscriptOperator("CADABRA", "FALSE");
 
             ExpectOperatorAlreadyRegisteredException(clashingOp1.ToString(), () => lexer.RegisterOperator(clashingOp1));
             ExpectOperatorAlreadyRegisteredException(clashingOp2.ToString(), () => lexer.RegisterOperator(clashingOp2));
-            ExpectOperatorAlreadyRegisteredException(clashingOp3.ToString(), () => lexer.RegisterOperator(clashingOp3));
-            ExpectOperatorAlreadyRegisteredException(clashingOp4.ToString(), () => lexer.RegisterOperator(clashingOp4));
+
+            /* Flow */
+            ExpectOperatorAlreadyRegisteredException("(", () => lexer.RegisterOperator(new ArithmeticNeutralOperator("(", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(")", () => lexer.RegisterOperator(new ArithmeticNeutralOperator(")", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(".", () => lexer.RegisterOperator(new ArithmeticNeutralOperator(".", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(",", () => lexer.RegisterOperator(new ArithmeticNeutralOperator(",", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException("(", () => lexer.RegisterOperator(new ArithmeticSumOperator("(", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(")", () => lexer.RegisterOperator(new ArithmeticSumOperator(")", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(".", () => lexer.RegisterOperator(new ArithmeticSumOperator(".", TypeConverter)));
+            ExpectOperatorAlreadyRegisteredException(",", () => lexer.RegisterOperator(new ArithmeticSumOperator(",", TypeConverter)));
         }
 
         [Test]
         public void TestCaseSpecialRegistration()
         {
             var tokenizer = new Tokenizer("irrelevant");
-            var lexer = new Lexer(tokenizer, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
+            var lexer = new Lexer(tokenizer, ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
 
             /* Exceptions */
             ExpectArgumentNullException("keyword", () => lexer.RegisterSpecial(null, null));
@@ -163,13 +159,9 @@ namespace XtraLiteTemplates.NUnit
 
             var clashingOp1 = new ArithmeticNeutralOperator("T1", TypeConverter);
             var clashingOp2 = new ArithmeticSumOperator("T2", TypeConverter);
-            var clashingOp3 = new SubscriptOperator("T3", "ABRA");
-            var clashingOp4 = new SubscriptOperator("CADABRA", "T4");
 
             lexer.RegisterOperator(clashingOp1);
             lexer.RegisterOperator(clashingOp2);
-            lexer.RegisterOperator(clashingOp3);
-            lexer.RegisterOperator(clashingOp4);
 
             ExpectSpecialCannotBeRegisteredException("T1", () => lexer.RegisterSpecial("T1", true));
             ExpectSpecialCannotBeRegisteredException("T2", () => lexer.RegisterSpecial("T2", true));
@@ -184,7 +176,8 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEmptyInputString()
         {
             const String test = "";
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
 
             Assert.IsNull(lexer.ReadNext());
         }
@@ -193,7 +186,8 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseUparsedOnlyInputString()
         {
             const String test = "unparsed text is here baby {{ and some other {{{{ tokens also.";
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
 
             AssertUnparsedLex(lexer.ReadNext(), 0, test.Length, test.Replace("{{", "{"));
             Assert.IsNull(lexer.ReadNext());
@@ -204,7 +198,8 @@ namespace XtraLiteTemplates.NUnit
         {
             const String test = "{TAG}";
             var tag = new Tag().Keyword("TAG");
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
             AssertTagLex(lexer.ReadNext(), 0, test.Length, tag, "TAG");
             Assert.IsNull(lexer.ReadNext());
@@ -218,7 +213,8 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = new Tag().Keyword("K1").Keyword("K2");
             var tag2 = new Tag().Keyword("K1").Keyword("K3");
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).
                 RegisterTag(tag1).
                 RegisterTag(tag2);
 
@@ -233,7 +229,8 @@ namespace XtraLiteTemplates.NUnit
         {
             const String test = "{}";
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase);
             ExpectUnexpectedTokenException(1, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
         }
 
@@ -242,7 +239,8 @@ namespace XtraLiteTemplates.NUnit
         {
             const String test = "{BAG}";
             var tag = new Tag().Keyword("TAG");
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
             ExpectUnexpectedTokenException(1, "BAG", Token.TokenType.Word, () => lexer.ReadNext());
         }
@@ -252,7 +250,8 @@ namespace XtraLiteTemplates.NUnit
         {
             const String test = "{TAG AHA}";
             var tag = new Tag().Keyword("TAG");
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
             ExpectUnexpectedTokenException(5, "AHA", Token.TokenType.Word, () => lexer.ReadNext());
         }
@@ -262,7 +261,8 @@ namespace XtraLiteTemplates.NUnit
         {
             const String test = "{1.33}";
             var tag = new Tag().Expression();
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
             AssertTagLex(lexer.ReadNext(), 0, 6, tag, (1.33).ToString());
             Assert.IsNull(lexer.ReadNext());
@@ -274,7 +274,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{100 <<-100<<.100-----.1<<-1}";
 
             var tag = new Tag().Expression();
-            var lexer = new Lexer(new Tokenizer(test),
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default,
                 CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag)
                 .RegisterOperator(new BitwiseShiftLeftOperator(TypeConverter))
@@ -291,7 +291,8 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{IF 10 == 10}";
 
             var ifTag = new Tag().Keyword("IF").Expression();
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(ifTag)
                 .RegisterOperator(new RelationalEqualsOperator(StringComparer.CurrentCulture, TypeConverter));
 
@@ -305,7 +306,8 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{IF TRUE}";
 
             var ifTag = new Tag().Keyword("IF").Expression();
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(ifTag)
                 .RegisterSpecial("TRUE", 100.5);
 
@@ -319,7 +321,8 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{IF TRUE}";
 
             var ifTag = new Tag().Keyword("IF").Keyword("TRUE").Expression();
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(ifTag)
                 .RegisterSpecial("TRUE", 100.5);
 
@@ -334,7 +337,8 @@ namespace XtraLiteTemplates.NUnit
             var ifTag1 = new Tag().Keyword("IF").Expression();
             var ifTag2 = new Tag().Keyword("IF").Keyword("SET").Expression();
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(ifTag1)
                 .RegisterTag(ifTag2);
 
@@ -353,10 +357,14 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = Tag.Parse("$");
             var tag2 = Tag.Parse("$ THEN");
 
-            var lexer1 = new Lexer(new Tokenizer(var1), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer2 = new Lexer(new Tokenizer(var2), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer3 = new Lexer(new Tokenizer(var3), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer4 = new Lexer(new Tokenizer(var4), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer1 = new Lexer(new Tokenizer(var1), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(var2), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer3 = new Lexer(new Tokenizer(var3), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer4 = new Lexer(new Tokenizer(var4), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
 
             AssertTagLex(lexer1.ReadNext(), 0, 3, tag1, "1");
             AssertTagLex(lexer2.ReadNext(), 0, 3, tag1, "@A");
@@ -372,8 +380,10 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = Tag.Parse("$");
             var tag2 = Tag.Parse("?");
 
-            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+            var lexer1 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer1.ReadNext(), 0, 3, tag2, "i");
             AssertTagLex(lexer2.ReadNext(), 0, 3, tag2, "i");
@@ -387,8 +397,10 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = Tag.Parse("$");
             var tag2 = Tag.Parse("? THEN");
 
-            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+            var lexer1 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer1.ReadNext(), 0, 3, tag1, "@i");
             AssertTagLex(lexer2.ReadNext(), 0, 3, tag1, "@i");
@@ -402,8 +414,10 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = Tag.Parse("?");
             var tag2 = Tag.Parse("a");
 
-            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+            var lexer1 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer1.ReadNext(), 0, 3, tag2, "a");
             AssertTagLex(lexer2.ReadNext(), 0, 3, tag2, "a");
@@ -417,8 +431,10 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = Tag.Parse("?");
             var tag2 = Tag.Parse("A");
 
-            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal).RegisterTag(tag2).RegisterTag(tag1);
+            var lexer1 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.Ordinal).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.Ordinal).RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer1.ReadNext(), 0, 3, tag1, "a");
             AssertTagLex(lexer2.ReadNext(), 0, 3, tag1, "a");
@@ -434,7 +450,8 @@ namespace XtraLiteTemplates.NUnit
             var tag3 = Tag.Parse("A b");
             var tag4 = Tag.Parse("A B");
 
-            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal)
+            var lexer1 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.Ordinal)
                 .RegisterTag(tag1).RegisterTag(tag2).RegisterTag(tag3).RegisterTag(tag4);
 
             AssertTagLex(lexer1.ReadNext(), 0, 5, tag2, "a|B");
@@ -448,8 +465,10 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = Tag.Parse("IF ? THEN $");
             var tag2 = Tag.Parse("IF $ THEN ?");
 
-            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+            var lexer1 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer1.ReadNext(), 0, 13, tag2, "IF|@A|THEN|B");
             AssertTagLex(lexer2.ReadNext(), 0, 13, tag2, "IF|@A|THEN|B");
@@ -463,8 +482,10 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = Tag.Parse("IF $ THEN ?");
             var tag2 = Tag.Parse("IF $ THEN $");
 
-            var lexer1 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
-            var lexer2 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
+            var lexer1 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag1).RegisterTag(tag2);
+            var lexer2 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer1.ReadNext(), 0, 13, tag2, "IF|@A|THEN|1");
             AssertTagLex(lexer2.ReadNext(), 0, 13, tag2, "IF|@A|THEN|1");
@@ -479,7 +500,8 @@ namespace XtraLiteTemplates.NUnit
             var tag2 = Tag.Parse("IF (A B C) THEN");
             var tag3 = Tag.Parse("IF $ THEN");
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag1)
                 .RegisterTag(tag2)
                 .RegisterTag(tag3);
@@ -496,7 +518,8 @@ namespace XtraLiteTemplates.NUnit
             var tag2 = Tag.Parse("IF (A B C) THEN SOME");
             var tag3 = Tag.Parse("IF $ THEN");
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag1)
                 .RegisterTag(tag2)
                 .RegisterTag(tag3);
@@ -509,22 +532,28 @@ namespace XtraLiteTemplates.NUnit
         {
             var tag = new Tag().Expression();
 
-            var lexer = new Lexer(new Tokenizer("{10ALPHA}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            var lexer = new Lexer(new Tokenizer("{10ALPHA}"), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
             ExpectUnexpectedTokenException(3, "ALPHA", Token.TokenType.Word, () => lexer.ReadNext());
 
-            lexer = new Lexer(new Tokenizer("{10\"ALPHA\"}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            lexer = new Lexer(new Tokenizer("{10\"ALPHA\"}"), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
             ExpectUnexpectedTokenException(3, "ALPHA", Token.TokenType.String, () => lexer.ReadNext());
 
-            lexer = new Lexer(new Tokenizer("{AB\"ALPHA\"}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            lexer = new Lexer(new Tokenizer("{AB\"ALPHA\"}"), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
             ExpectUnexpectedTokenException(3, "ALPHA", Token.TokenType.String, () => lexer.ReadNext());
 
-            lexer = new Lexer(new Tokenizer("{\"ALPHA\"AB}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            lexer = new Lexer(new Tokenizer("{\"ALPHA\"AB}"), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
             ExpectUnexpectedTokenException(8, "AB", Token.TokenType.Word, () => lexer.ReadNext());
 
-            lexer = new Lexer(new Tokenizer("{\"ALPHA\"10}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            lexer = new Lexer(new Tokenizer("{\"ALPHA\"10}"), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
             ExpectUnexpectedTokenException(8, "10", Token.TokenType.Number, () => lexer.ReadNext());
 
-            lexer = new Lexer(new Tokenizer("{\"ALPHA\"\"BETA\"}"), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            lexer = new Lexer(new Tokenizer("{\"ALPHA\"\"BETA\"}"), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
             ExpectUnexpectedTokenException(8, "BETA", Token.TokenType.String, () => lexer.ReadNext());
         }
 
@@ -534,7 +563,8 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{A any B 2 C }";
 
             var tag = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C").Keyword("D");
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
             ExpectUnexpectedTokenException(13, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
         }
@@ -547,7 +577,8 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C").Keyword("D");
             var tag2 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag1).RegisterTag(tag2);
 
             AssertTagLex(lexer.ReadNext(), 0, 14, tag2, "A|any|B|2|C");
@@ -561,9 +592,11 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
             var tag2 = new Tag().Keyword("A").Expression().Keyword("B").Expression().Keyword("C");
 
-            var lexer12 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer12 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag1).RegisterTag(tag2);
-            var lexer21 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer21 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer12.ReadNext(), 0, 14, tag1, "A|any|B|2|C");
@@ -578,9 +611,11 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
             var tag2 = new Tag().Keyword("A").Identifier("any").Keyword("B").Expression().Keyword("C");
 
-            var lexer12 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer12 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag1).RegisterTag(tag2);
-            var lexer21 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer21 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer12.ReadNext(), 0, 14, tag1, "A|any|B|2|C");
@@ -595,9 +630,11 @@ namespace XtraLiteTemplates.NUnit
             var tag1 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
             var tag2 = new Tag().Keyword("A").Identifier().Keyword("B").Expression().Keyword("C");
 
-            var lexer12 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer12 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag1).RegisterTag(tag2);
-            var lexer21 = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer21 = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(tag2).RegisterTag(tag1);
 
             AssertTagLex(lexer12.ReadNext(), 0, 14, tag1, "A|any|B|2|C");
@@ -611,7 +648,8 @@ namespace XtraLiteTemplates.NUnit
 
             var exprTag = new Tag().Expression();
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(exprTag).RegisterOperator(new ArithmeticSumOperator(TypeConverter));
 
             ExpectUnbalancedExpressionCannotBeFinalizedException(4, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
@@ -624,7 +662,8 @@ namespace XtraLiteTemplates.NUnit
 
             var exprTag = new Tag().Expression().Keyword("END");
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.OrdinalIgnoreCase)
                 .RegisterTag(exprTag).RegisterOperator(new ArithmeticSumOperator(TypeConverter));
 
             ExpectUnbalancedExpressionCannotBeFinalizedException(5, "END", Token.TokenType.Word, () => lexer.ReadNext());
@@ -636,7 +675,8 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{tag}";
             var tag = new Tag().Keyword("TAG");
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.Ordinal)
                 .RegisterTag(tag);
 
             ExpectUnexpectedTokenException(1, "tag", Token.TokenType.Word, () => lexer.ReadNext());
@@ -648,7 +688,8 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{keyword identifier}";
             var tag = new Tag().Keyword("keyword").Identifier("IDENTIFIER", "identifier");
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
+                CultureInfo.InvariantCulture, StringComparer.Ordinal)
                 .RegisterTag(tag);
 
             AssertTagLex(lexer.ReadNext(), 0, test.Length, tag, "keyword|identifier");
@@ -663,7 +704,7 @@ namespace XtraLiteTemplates.NUnit
             var tag3 = new Tag().Keyword("K").Identifier("W");
             var tag4 = new Tag().Keyword("k").Identifier("w");
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.Ordinal)
                 .RegisterTag(tag1)
                 .RegisterTag(tag2)
                 .RegisterTag(tag3)
@@ -678,7 +719,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{1 SHL 2}";
             var exprTag = new Tag().Expression();
 
-            var lexer = new Lexer(new Tokenizer(test), CultureInfo.InvariantCulture, StringComparer.Ordinal)
+            var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, CultureInfo.InvariantCulture, StringComparer.Ordinal)
                 .RegisterTag(exprTag).RegisterOperator(new BitwiseShiftLeftOperator("shl", TypeConverter));
 
             ExpectUnexpectedOrInvalidExpressionTokenException(3, "SHL", Token.TokenType.Word, () => lexer.ReadNext());
@@ -694,12 +735,14 @@ namespace XtraLiteTemplates.NUnit
             var enUS = CultureInfo.GetCultureInfo("en-US");
             var roRO = CultureInfo.GetCultureInfo("ro-RO");
 
-            var lexer_enUS = new Lexer(new Tokenizer(new StringReader(two_numbers), '{', '}', '"', '"', '\\', enUS.NumberFormat.CurrencyDecimalSeparator[0]), enUS, StringComparer.Ordinal)
+            var lexer_enUS = new Lexer(new Tokenizer(new StringReader(two_numbers), '{', '}', '"', '"', '\\', enUS.NumberFormat.CurrencyDecimalSeparator[0]), 
+                ExpressionFlowSymbols.Default, enUS, StringComparer.Ordinal)
                 .RegisterTag(exprTag)
                 .RegisterOperator(new ArithmeticSumOperator(".", TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(",", TypeConverter));
 
-            var lexer_roRO = new Lexer(new Tokenizer(new StringReader(two_numbers), '{', '}', '"', '"', '\\', roRO.NumberFormat.CurrencyDecimalSeparator[0]), roRO, StringComparer.Ordinal)
+            var lexer_roRO = new Lexer(new Tokenizer(new StringReader(two_numbers), '{', '}', '"', '"', '\\', roRO.NumberFormat.CurrencyDecimalSeparator[0]), 
+                ExpressionFlowSymbols.Default, roRO, StringComparer.Ordinal)
                 .RegisterTag(exprTag)
                 .RegisterOperator(new ArithmeticSumOperator(".", TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(",", TypeConverter));

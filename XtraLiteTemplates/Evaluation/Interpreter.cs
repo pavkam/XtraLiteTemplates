@@ -60,13 +60,15 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        public Interpreter(ITokenizer tokenizer, IFormatProvider formatProvider, IEqualityComparer<String> comparer)
+        public Interpreter(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IFormatProvider formatProvider, 
+            IEqualityComparer<String> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
             Expect.NotNull("formatProvider", formatProvider);
             Expect.NotNull("comparer", comparer);
+            Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
 
-            m_lexer = new Lexer(tokenizer, formatProvider, comparer);
+            m_lexer = new Lexer(tokenizer, expressionFlowSymbols, formatProvider, comparer);
             m_directives = new List<Directive>();
         }
 

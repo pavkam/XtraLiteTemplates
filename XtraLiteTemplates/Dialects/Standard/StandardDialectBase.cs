@@ -76,7 +76,15 @@ namespace XtraLiteTemplates.Dialects.Standard
         public IEqualityComparer<String> IdentifierComparer { get; private set; }
         public IComparer<String> StringLiteralComparer { get; private set; }
         public String Name { get; private set; }
-        
+
+        public ExpressionFlowSymbols FlowSymbols
+        {
+            get 
+            {
+                return ExpressionFlowSymbols.Default;
+            }
+        }
+
         public IReadOnlyCollection<Operator> Operators
         { 
             get

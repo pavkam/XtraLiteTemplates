@@ -37,14 +37,11 @@ namespace XtraLiteTemplates.Expressions
     public sealed class Expression
     {
         private ExpressionNode m_current;
-        private ExpressionNode m_root;
+        private RootNode m_root;
         private List<Operator> m_supportedOperators;
         private Func<IExpressionEvaluationContext, Object> m_function;
-        private Stack<GroupOperatorNode> m_openGroups;
         private Dictionary<String, UnaryOperator> m_unaryOperatorSymbols;
         private Dictionary<String, BinaryOperator> m_binaryOperatorSymbols;
-        private Dictionary<String, GroupOperator> m_groupOperatorSymbols;
-        private Dictionary<String, GroupOperator> m_groupOperatorsTerminators;
 
         public Boolean Constructed
         {
@@ -67,10 +64,7 @@ namespace XtraLiteTemplates.Expressions
             Expect.NotEmpty("symbol", symbol);
 
             return
-                m_unaryOperatorSymbols.ContainsKey(symbol) ||
-                m_binaryOperatorSymbols.ContainsKey(symbol) ||
-                m_groupOperatorSymbols.ContainsKey(symbol) ||
-                m_groupOperatorsTerminators.ContainsKey(symbol);
+                m_unaryOperatorSymbols.ContainsKey(symbol) || m_binaryOperatorSymbols.ContainsKey(symbol);
         }
 
         public IReadOnlyList<Operator> SupportedOperators
@@ -81,25 +75,26 @@ namespace XtraLiteTemplates.Expressions
             }
         }
 
+        public ExpressionFlowSymbols FlowSymbols { get; private set; }
 
         public IEqualityComparer<String> Comparer { get; private set; }
 
-        public Expression(IEqualityComparer<String> comparer)
+        public Expression(ExpressionFlowSymbols flowSymbols, IEqualityComparer<String> comparer)
         {
             Expect.NotNull("comparer", comparer);
+            Expect.NotNull("flowSymbols", flowSymbols);
+
+            FlowSymbols = flowSymbols;
 
             m_unaryOperatorSymbols = new Dictionary<String, UnaryOperator>(comparer);
             m_binaryOperatorSymbols = new Dictionary<String, BinaryOperator>(comparer);
-            m_groupOperatorSymbols = new Dictionary<String, GroupOperator>();
-            m_groupOperatorsTerminators = new Dictionary<String, GroupOperator>();
             m_supportedOperators = new List<Operator>();
-            m_openGroups = new Stack<GroupOperatorNode>();
 
             Comparer = comparer;
         }
 
         public Expression()
-            : this(StringComparer.OrdinalIgnoreCase)
+            : this(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
         {
         }
 
@@ -112,11 +107,17 @@ namespace XtraLiteTemplates.Expressions
 
             Debug.Assert(!Constructed);
 
+            /* Standards. */
+            if (@operator.Symbol == FlowSymbols.Separator || 
+                @operator.Symbol == FlowSymbols.GroupClose ||
+                @operator.Symbol == FlowSymbols.GroupOpen ||
+                @operator.Symbol == FlowSymbols.MemberAccess)
+                ExceptionHelper.OperatorAlreadyRegistered(@operator);
+
             if (@operator is UnaryOperator)
             {
                 var unaryOperator = (UnaryOperator)@operator;
-                if (m_unaryOperatorSymbols.ContainsKey(unaryOperator.Symbol) ||
-                    m_groupOperatorSymbols.ContainsKey(unaryOperator.Symbol))
+                if (m_unaryOperatorSymbols.ContainsKey(unaryOperator.Symbol))
                 {
                     ExceptionHelper.OperatorAlreadyRegistered(unaryOperator);
                 }
@@ -126,30 +127,13 @@ namespace XtraLiteTemplates.Expressions
             else if (@operator is BinaryOperator)
             {
                 var binaryOperator = (BinaryOperator)@operator;
-                if (m_binaryOperatorSymbols.ContainsKey(binaryOperator.Symbol) ||
-                    m_groupOperatorsTerminators.ContainsKey(binaryOperator.Symbol))
+                if (m_binaryOperatorSymbols.ContainsKey(binaryOperator.Symbol))
                 {
                     ExceptionHelper.OperatorAlreadyRegistered(binaryOperator);
                 }
 
 
                 m_binaryOperatorSymbols.Add(@operator.Symbol, binaryOperator);
-            }
-            else if (@operator is GroupOperator)
-            {
-                var groupOperator = (GroupOperator)@operator;
-                if (m_unaryOperatorSymbols.ContainsKey(groupOperator.Symbol) ||
-                    m_binaryOperatorSymbols.ContainsKey(groupOperator.Terminator) ||
-                    m_groupOperatorSymbols.ContainsKey(groupOperator.Symbol) ||
-                    m_groupOperatorSymbols.ContainsKey(groupOperator.Terminator) ||
-                    m_groupOperatorsTerminators.ContainsKey(groupOperator.Symbol) ||
-                    m_groupOperatorsTerminators.ContainsKey(groupOperator.Terminator))
-                {
-                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
-                }
-
-                m_groupOperatorSymbols.Add(groupOperator.Symbol, groupOperator);
-                m_groupOperatorsTerminators.Add(groupOperator.Terminator, groupOperator);
             }
             else
                 Debug.Assert(false, "Unsupported operator type.");
@@ -158,26 +142,225 @@ namespace XtraLiteTemplates.Expressions
             return this;
         }
 
-        private Boolean GroupStartOrUnaryOperatorOrLiteralExpected
+
+
+        private void OpenNewGroup()
         {
-            get
+            /* Opening a new ROOT */
+            if (m_current is UnaryOperatorNode)
             {
-                return
-                    (m_current == null) ||
-                    (m_current is UnaryOperatorNode) ||
-                    (m_current is BinaryOperatorNode) ||
-                    (m_current is GroupOperatorNode && ((GroupOperatorNode)m_current).RightNode == null);
+                var _current = (UnaryOperatorNode)m_current;
+                Debug.Assert(_current.RightNode == null);
+
+                /* Flip to the new root */
+                m_root = new RootNode(_current);
+                _current.RightNode = m_root;
+                m_current = m_root;
             }
+            else if (m_current is BinaryOperatorNode)
+            {
+                var _current = (BinaryOperatorNode)m_current;
+                Debug.Assert(_current.RightNode == null);
+                Debug.Assert(_current.LeftNode != null);
+
+                /* Flip to the new root */
+                m_root = new RootNode(_current);
+                _current.RightNode = m_root;
+                m_current = m_root;
+            }
+            else if (m_current is RootNode)
+            {
+                var _current = (RootNode)m_current;
+                Debug.Assert(_current == m_root);
+
+                if (_current.Closed)
+                    ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupOpen);
+                else
+                {
+                    /* Flip to the new root */
+                    m_root = new RootNode(_current);
+                    _current.AddChild(m_root);
+                    m_current = m_root;
+                }
+            }
+            else
+                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupOpen);
         }
 
-        private Boolean GroupEndOrBinaryOperatorExpected
+        private void CloseExistingGroup()
         {
-            get
+            if (m_current is LeafNode || m_current is RootNode)
             {
-                return
-                    (m_current is LeafNode) ||
-                    (m_current is GroupOperatorNode && ((GroupOperatorNode)m_current).RightNode != null);
+                if (m_current == m_root || m_root.Parent == null)
+                    ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupClose);
+
+                m_root.Close();
+                m_current = m_root;
+
+                /* Find the actual root now. */
+                var _root = m_root.Parent;
+                while (!(_root is RootNode))
+                    _root = _root.Parent;
+
+                m_root = (RootNode)_root;
             }
+            else
+                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupClose);
+        }
+
+        private void ContinueExistingGroup()
+        {
+            if (m_current is LeafNode || m_current is RootNode)
+            {
+                if (m_current == m_root)
+                    ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.Separator);
+
+                m_current = m_root;
+            }
+            else
+                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.Separator);
+        }
+
+        private void StartUnary(UnaryOperator unaryOperator)
+        {
+            if (m_current is UnaryOperatorNode)
+            {
+                var _current = m_current as UnaryOperatorNode;
+                Debug.Assert(_current.RightNode == null);
+
+                _current.RightNode = new UnaryOperatorNode(_current, unaryOperator);
+                m_current = _current.RightNode;
+            }
+            else if (m_current is BinaryOperatorNode)
+            {
+                var _current = m_current as BinaryOperatorNode;
+                Debug.Assert(_current.LeftNode != null);
+                Debug.Assert(_current.RightNode == null);
+
+                _current.RightNode = new UnaryOperatorNode(_current, unaryOperator);
+                m_current = _current.RightNode;
+            }
+            else if (m_current is RootNode)
+            {
+                var _current = m_current as RootNode;
+                if (_current.Closed)
+                    ExceptionHelper.UnexpectedExpressionTerm(unaryOperator.Symbol);
+
+                var newNode = new UnaryOperatorNode(_current, unaryOperator);
+                _current.AddChild(newNode);
+                m_current = newNode;
+            }
+            else
+                ExceptionHelper.UnexpectedExpressionTerm(unaryOperator.Symbol);
+        }
+
+        private void StartBinary(BinaryOperator binaryOperator)
+        {
+            if (m_current is LeafNode || m_current is RootNode)
+            {
+                var _root = m_current as RootNode;
+                if (_root != null && !_root.Closed)
+                    ExceptionHelper.UnexpectedExpressionTerm(binaryOperator.Symbol);
+
+                var leftNode = m_current;
+                var comparand = binaryOperator.Associativity == Associativity.LeftToRight ? 0 : -1;
+
+                /* Go up the tree while the precedence allows. */
+                while (leftNode.Parent is OperatorNode &&
+                       ((OperatorNode)leftNode.Parent).Operator.Precedence.CompareTo(binaryOperator.Precedence) <= comparand)
+                {
+                    leftNode = leftNode.Parent;
+                }
+
+                var leftNodeParentOperatorNode = leftNode.Parent as OperatorNode;
+
+                /* Check that we do not push the RHS identifier off the parent. */
+                if (leftNodeParentOperatorNode != null && leftNodeParentOperatorNode.Operator.ExpectRhsIdentifier)
+                    ExceptionHelper.UnexpectedExpressionTerm(binaryOperator.Symbol);
+
+                if (binaryOperator.ExpectLhsIdentifier)
+                {
+                    var leftLeafNode = leftNode as LeafNode;
+                    if (leftLeafNode == null || leftLeafNode.Evaluation == LeafNode.EvaluationType.Literal)
+                        ExceptionHelper.UnexpectedExpressionTerm(binaryOperator.Symbol);
+                    else if (leftLeafNode.Evaluation == LeafNode.EvaluationType.Variable)
+                        leftLeafNode.ConvertToIdentifier();
+                }
+
+                m_current = new BinaryOperatorNode(leftNode.Parent, binaryOperator)
+                {
+                    LeftNode = leftNode,
+                };
+
+                /* Re-jig the tree. */
+                if (leftNodeParentOperatorNode != null)
+                    leftNodeParentOperatorNode.RightNode = m_current;
+
+                leftNode.Parent = m_current;
+                if (m_root.LastChild == leftNode)
+                    m_root.LastChild = m_current;
+
+                return;
+            }
+            else
+                ExceptionHelper.UnexpectedExpressionTerm(binaryOperator.Symbol);
+        }
+
+        private void CompleteWithSymbol(String symbol)
+        {
+            var newNode = new LeafNode(m_current, symbol, LeafNode.EvaluationType.Variable);
+
+            if (m_current is OperatorNode)
+            {
+                var _current = m_current as OperatorNode;
+                Debug.Assert(_current.RightNode == null);
+
+                if (_current.Operator.ExpectRhsIdentifier)
+                    newNode.ConvertToIdentifier();
+
+                _current.RightNode = newNode;
+                m_current = newNode;
+            }
+            else if (m_current is RootNode)
+            {
+                var _current = m_current as RootNode;
+                if (_current.Closed)
+                    ExceptionHelper.UnexpectedExpressionTerm(symbol);
+
+                _current.AddChild(newNode);
+                m_current = newNode;
+            }
+            else
+                ExceptionHelper.InvalidExpressionTerm(symbol);
+        }
+
+        private void CompleteWithLiteral(Object literal)
+        {
+            var newNode = new LeafNode(m_current, literal, LeafNode.EvaluationType.Literal);
+
+            if (m_current is OperatorNode)
+            {
+                var _current = m_current as OperatorNode;
+
+                Debug.Assert(_current.RightNode == null);
+
+                if (_current.Operator.ExpectRhsIdentifier)
+                    ExceptionHelper.UnexpectedExpressionTerm(literal);
+
+                _current.RightNode = newNode;
+                m_current = newNode;
+            }
+            else if (m_current is RootNode)
+            {
+                var _current = m_current as RootNode;
+                if (_current.Closed)
+                    ExceptionHelper.UnexpectedExpressionTerm(literal);
+
+                _current.AddChild(newNode);
+                m_current = newNode;
+            }
+            else
+                ExceptionHelper.UnexpectedExpressionTerm(literal);
         }
 
 
@@ -185,134 +368,59 @@ namespace XtraLiteTemplates.Expressions
         {
             Debug.Assert(isLiteral || term is String);
 
+            if (m_root == null)
+            {
+                /* Init! */
+                m_root = new RootNode(null);
+                m_current = m_root;
+            }
+
             if (Constructed)
                 ExceptionHelper.CannotModifyAConstructedExpression();
 
-            if (GroupStartOrUnaryOperatorOrLiteralExpected)
+            if (!isLiteral)
             {
-                ExpressionNode continuationNode = null;
-                if (isLiteral)
-                    continuationNode = new LeafNode(m_current, term, LeafNode.EvaluationType.Literal);
+                String symbol = (String)term;
+
+                if (symbol == FlowSymbols.GroupOpen)
+                    OpenNewGroup();
+                else if (symbol == FlowSymbols.GroupClose)
+                    CloseExistingGroup();
+                else if (symbol == FlowSymbols.Separator)
+                    ContinueExistingGroup();
                 else
                 {
-                    var _symbol = (String)term;
+                    var acceptsUnary = ((m_current is RootNode) && !((RootNode)m_current).Closed) || (m_current is OperatorNode);
 
-                    /* Good cases. */
-                    UnaryOperator _unaryOperator;
-                    if (m_unaryOperatorSymbols.TryGetValue(_symbol, out _unaryOperator))
-                        continuationNode = new UnaryOperatorNode(m_current, _unaryOperator);
-
-                    GroupOperator _groupOperator;
-                    if (m_groupOperatorSymbols.TryGetValue(_symbol, out _groupOperator))
+                    UnaryOperator unaryOperator;
+                    if (m_unaryOperatorSymbols.TryGetValue(symbol, out unaryOperator))
                     {
-                        continuationNode = new GroupOperatorNode(m_current, _groupOperator);
-                        m_openGroups.Push((GroupOperatorNode)continuationNode);
-                    }
-
-                    /* Invalid cases. */
-                    if (continuationNode == null && !m_groupOperatorsTerminators.ContainsKey(_symbol) && !m_binaryOperatorSymbols.ContainsKey(_symbol))
-                    {
-                        var evaluationType = m_current != null && ((OperatorNode)m_current).Operator.ExpectRhsIdentifier ? 
-                            LeafNode.EvaluationType.Indentifier : LeafNode.EvaluationType.Variable;
-                        continuationNode = new LeafNode(m_current, _symbol, evaluationType);
-                    }
-                }
-
-                if (continuationNode != null)
-                {
-                    var operatorNode = m_current as OperatorNode;
-                    if (operatorNode != null)
-                    {
-                        Debug.Assert(operatorNode.RightNode == null);
-
-                        if (operatorNode.Operator.ExpectRhsIdentifier && (isLiteral || !(continuationNode is LeafNode)))
-                            ExceptionHelper.UnexpectedExpressionTerm(term);
-                        
-                        operatorNode.RightNode = continuationNode;
-                    }
-
-                    m_current = continuationNode;
-                    m_root = m_root ?? m_current;
-
-                    return;
-                }
-            }
-            else if (GroupEndOrBinaryOperatorExpected)
-            {
-                if (!isLiteral)
-                {
-                    var _symbol = (String)term;
-
-                    GroupOperator _groupOperator;
-                    if (m_groupOperatorsTerminators.TryGetValue(_symbol, out _groupOperator))
-                    {
-                        var _currentlyOpenGroupNode = m_openGroups.Count > 0 ? m_openGroups.Pop() : null;
-                        if (_currentlyOpenGroupNode != null && _currentlyOpenGroupNode.Operator == _groupOperator)
+                        if (acceptsUnary)
                         {
-                            m_current = _currentlyOpenGroupNode;
+                            StartUnary(unaryOperator);
                             return;
                         }
                     }
-                    /*
-                    if (m_current is LeafNode && ((LeafNode)m_current).Evaluation == LeafNode.EvaluationType.Variable &&
-                        m_startGroupOperators.TryGetValue(_symbol, out _groupOperator) && _groupOperator.Function)
+
+                    var acceptsBinary = ((m_current is RootNode) && ((RootNode)m_current).Closed) || (m_current is LeafNode);
+                    BinaryOperator binaryOperator;
+                    if (m_binaryOperatorSymbols.TryGetValue(symbol, out binaryOperator))
                     {
-                        m_openGroups.Push(_groupOperator);
-
-                        m_current = _currentlyOpenGroupNode;
-                        return;
-                    }
-*/
-                    BinaryOperator _binaryOperator;
-                    if (m_binaryOperatorSymbols.TryGetValue(_symbol, out _binaryOperator))
-                    {
-                        var leftNode = m_current;
-
-                        var comparand = _binaryOperator.Associativity == Associativity.LeftToRight ? 0 : -1;
-
-                        /* Go up the tree while the precedence allows. */
-                        while (leftNode.Parent != null &&
-                               ((OperatorNode)leftNode.Parent).Operator.Precedence.CompareTo(_binaryOperator.Precedence) <= comparand)
+                        if (acceptsBinary)
                         {
-                            leftNode = leftNode.Parent;
+                            StartBinary(binaryOperator);
+                            return;
                         }
-
-                        var leftNodeParentOperatorNode = leftNode.Parent as OperatorNode;
-
-                        /* Check that we do not push the RHS identifier off the parent. */
-                        if (leftNodeParentOperatorNode != null && leftNodeParentOperatorNode.Operator.ExpectRhsIdentifier)
-                            ExceptionHelper.UnexpectedExpressionTerm(_symbol);
-
-                        if (_binaryOperator.ExpectLhsIdentifier)
-                        {
-                            var leftLeafNode = leftNode as LeafNode;
-                            if (leftLeafNode == null || leftLeafNode.Evaluation == LeafNode.EvaluationType.Literal)
-                                ExceptionHelper.UnexpectedExpressionTerm(_symbol);
-                            else if (leftLeafNode.Evaluation == LeafNode.EvaluationType.Variable)
-                                leftLeafNode.ConvertToIdentifier();
-                        }
-
-                        m_current = new BinaryOperatorNode(leftNode.Parent, _binaryOperator)
-                        {
-                            LeftNode = leftNode,
-                        };
-
-                        /* Re-jig the tree. */
-                        if (leftNodeParentOperatorNode != null)
-                            leftNodeParentOperatorNode.RightNode = m_current;
-                       
-                        leftNode.Parent = m_current;
-                        if (m_root == leftNode)
-                            m_root = m_current;
-                        if (m_openGroups.Count > 0 && m_openGroups.Peek().RightNode == leftNode)
-                            m_openGroups.Peek().RightNode = m_current;
-
-                        return;
                     }
+
+                    if (unaryOperator != null || binaryOperator != null)
+                        ExceptionHelper.UnexpectedExpressionTerm(symbol);
+                    else
+                        CompleteWithSymbol(symbol);
                 }
             }
-
-            ExceptionHelper.InvalidExpressionTerm(term);
+            else
+                CompleteWithLiteral(term);
         }
 
         public Expression FeedLiteral(Object literal)
@@ -337,9 +445,24 @@ namespace XtraLiteTemplates.Expressions
 
         public void Construct()
         {
+            if (!Started)
+                ExceptionHelper.CannotConstructExpressionInvalidState();
+
             if (!Constructed)
             {
-                if (GroupStartOrUnaryOperatorOrLiteralExpected || m_openGroups.Count > 0)
+                Boolean fail = false;
+                if (m_root.Parent != null)
+                    fail = true;
+                else
+                {
+                    var _currentAsRoot = m_current as RootNode;
+                    if (_currentAsRoot != null)
+                        fail = !_currentAsRoot.Closed;
+                    else if (!(m_current is LeafNode))
+                        fail = true;
+                }
+
+                if (fail)
                     ExceptionHelper.CannotConstructExpressionInvalidState();
 
                 /* Reduce the expression if so was desired. */

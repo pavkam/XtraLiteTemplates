@@ -56,6 +56,12 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.AreEqual('{', dialect.StartTagCharacter);
             Assert.AreEqual('\\', dialect.StringLiteralEscapeCharacter);
 
+            Assert.NotNull(dialect.FlowSymbols);
+            Assert.AreEqual("(", dialect.FlowSymbols.GroupOpen);
+            Assert.AreEqual(")", dialect.FlowSymbols.GroupClose);
+            Assert.AreEqual(",", dialect.FlowSymbols.Separator);
+            Assert.AreEqual(".", dialect.FlowSymbols.MemberAccess);
+
             var expectedComparer = StringComparer.Create(dialect.Culture, casing == DialectCasing.IgnoreCase);
             Assert.AreEqual(dialect.IdentifierComparer, expectedComparer);
             Assert.AreEqual(dialect.StringLiteralComparer, expectedComparer);
@@ -92,7 +98,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.Fail();
             }
 
-            Assert.AreEqual(27, dialect.Operators.Count);
+            Assert.AreEqual(25, dialect.Operators.Count);
             foreach (var @operator in dialect.Operators)
             {
                 if (@operator is RelationalEqualsOperator)
@@ -145,10 +151,6 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.AreEqual("..", @operator.ToString());
                 else if (@operator is ValueFormatOperator)
                     Assert.AreEqual(":", @operator.ToString());
-                else if (@operator is SeparatorOperator)
-                    Assert.AreEqual(",", @operator.ToString());
-                else if (@operator is SubscriptOperator)
-                    Assert.AreEqual("()", @operator.ToString());
                 else
                     Assert.Fail();
             }

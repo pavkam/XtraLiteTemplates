@@ -37,13 +37,13 @@
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
     <Compile Include="Dialects\Standard\OperandProtoGroup.cs" />
-    <Compile Include="Dialects\Standard\Operators\SeparatorOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\SubscriptOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\ValueFormatOperator.cs" />
     <Compile Include="Dialects\Standard\SimpleTypeDisemboweler.cs" />
     <Compile Include="Dialects\Standard\CodeMonkeyDialect.cs" />
     <Compile Include="Dialects\Standard\StandardDialectBase.cs" />
     <Compile Include="ExceptionHelper.cs" />
+    <Compile Include="Expressions\ExpressionFlowSymbols.cs" />
+    <Compile Include="Expressions\Nodes\RootNode.cs" />
     <Compile Include="Expressions\ReduceExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\IExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
@@ -113,8 +113,6 @@
     <Compile Include="Dialects\Standard\Operators\LogicalNotOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\ArithmeticSumOperator.cs" />
     <Compile Include="Expressions\Operators\Associativity.cs" />
-    <Compile Include="Expressions\Operators\GroupOperator.cs" />
-    <Compile Include="Expressions\Nodes\GroupOperatorNode.cs" />
     <Compile Include="Parsing\ITokenizer.cs" />
     <Compile Include="Parsing\ParseException.cs" />
     <Compile Include="Parsing\Token.cs" />

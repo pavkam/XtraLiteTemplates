@@ -44,6 +44,7 @@ namespace XtraLiteTemplates.Dialects
 
         IEqualityComparer<String> IdentifierComparer { get; }
 
+        ExpressionFlowSymbols FlowSymbols { get; }
         IReadOnlyCollection<Operator> Operators { get; }
         IReadOnlyCollection<Directive> Directives { get; }
         IReadOnlyDictionary<String, Object> SpecialKeywords { get; }

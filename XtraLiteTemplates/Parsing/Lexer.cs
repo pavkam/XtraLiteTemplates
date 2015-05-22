@@ -41,6 +41,7 @@ namespace XtraLiteTemplates.Parsing
 
     public sealed class Lexer
     {
+        private ExpressionFlowSymbols m_expressionFlowSymbols;
         private List<Operator> m_expressionOperators;
         private HashSet<String> m_unaryExpressionOperators;
         private HashSet<String> m_binaryExpressionOperators;
@@ -64,11 +65,13 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
-        public Lexer(ITokenizer tokenizer, IFormatProvider formatProvider, IEqualityComparer<String> comparer)
+        public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IFormatProvider formatProvider, 
+            IEqualityComparer<String> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
             Expect.NotNull("comparer", comparer);
             Expect.NotNull("formatProvider", formatProvider);
+            Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
 
             FormatProvider = formatProvider;
             Tokenizer = tokenizer;
@@ -79,8 +82,15 @@ namespace XtraLiteTemplates.Parsing
             m_unaryExpressionOperators = new HashSet<String>(comparer);
             m_binaryExpressionOperators = new HashSet<String>(comparer);
             m_specials = new Dictionary<String, Object>();
-        }
 
+            m_expressionFlowSymbols = expressionFlowSymbols;
+
+            /* Register the flow symbols in */
+            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.Separator);
+            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.MemberAccess);
+            m_unaryExpressionOperators.Add(m_expressionFlowSymbols.GroupOpen);
+            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.GroupClose);
+        }
 
         public Lexer RegisterTag(Tag tag)
         {
@@ -123,21 +133,6 @@ namespace XtraLiteTemplates.Parsing
                     m_binaryExpressionOperators.Add(binaryOperator.Symbol);
             }
 
-            var groupOperator = @operator as GroupOperator;
-            if (groupOperator != null)
-            {
-                if (m_unaryExpressionOperators.Contains(groupOperator.Symbol) ||
-                    m_binaryExpressionOperators.Contains(groupOperator.Terminator) ||
-                    m_specials.ContainsKey(groupOperator.Symbol) ||
-                    m_specials.ContainsKey(groupOperator.Terminator))
-                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
-                else
-                {
-                    m_unaryExpressionOperators.Add(groupOperator.Symbol);
-                    m_binaryExpressionOperators.Add(groupOperator.Terminator);
-                }
-            }
-
             m_expressionOperators.Add(@operator);
 
             return this;
@@ -172,24 +167,27 @@ namespace XtraLiteTemplates.Parsing
 
         private Expression CreateExpression()
         {
-            var expression = new Expression(Comparer);
+            var expression = new Expression(m_expressionFlowSymbols, Comparer);
+
             foreach (var @operator in m_expressionOperators)
                 expression.RegisterOperator(@operator);
 
             return expression;
         }
 
-        private Boolean KnownSymbol(String symbolChain)
+        private Boolean KnownSymbol(String symbol)
         {
-            Debug.Assert(!String.IsNullOrEmpty(symbolChain));
+            Debug.Assert(!String.IsNullOrEmpty(symbol));
+
+            if (Comparer.Equals(symbol, m_expressionFlowSymbols.GroupClose) ||
+                Comparer.Equals(symbol, m_expressionFlowSymbols.GroupOpen) ||
+                Comparer.Equals(symbol, m_expressionFlowSymbols.Separator) ||
+                Comparer.Equals(symbol, m_expressionFlowSymbols.MemberAccess))
+                return true;
 
             foreach (var @operator in m_expressionOperators)
             {
-                if (Comparer.Equals(@operator.Symbol, symbolChain))
-                    return true;
-
-                var groupOperator = @operator as GroupOperator;
-                if (groupOperator != null && Comparer.Equals(groupOperator.Terminator, symbolChain))
+                if (Comparer.Equals(@operator.Symbol, symbol))
                     return true;
             }
 

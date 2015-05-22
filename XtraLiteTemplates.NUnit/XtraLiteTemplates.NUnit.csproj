@@ -67,12 +67,10 @@
     <Compile Include="Operators\LogicalOrOperatorTests.cs" />
     <Compile Include="Operators\LogicalAndOperatorTests.cs" />
     <Compile Include="Operators\BitwiseNotOperatorTests.cs" />
-    <Compile Include="Operators\SeparatorOperatorTests.cs" />
     <Compile Include="Operators\ValueFormatOperatorTests.cs" />
     <Compile Include="Operators\IntegerRangeOperatorTests.cs" />
     <Compile Include="Operators\MemberAccessOperatorTests.cs" />
     <Compile Include="Operators\OperatorTestsBase.cs" />
-    <Compile Include="Operators\SubscriptOperatorTests.cs" />
     <Compile Include="SimpleTypeDisembowelerTests.cs" />
     <Compile Include="FlexiblePrimitiveTypeConverterTests.cs" />
     <Compile Include="XLTemplateTests.cs" />
