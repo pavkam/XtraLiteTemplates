@@ -319,6 +319,34 @@ using System.Diagnostics;
             Assert.Fail();
         }
 
+        protected static void ExpectNoMatchingTagsLeftException(Object[] components, Int32 index, String token, Token.TokenType type, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ParseException), e);
+
+                if (components != null && components.Length > 0)
+                {
+                    Assert.AreEqual(String.Format("No matching tags composed of {{{3}}} found that can be continued with the token '{0}' (type: {1}) found at position {2}.", 
+                        token, type, index, String.Join(" ", components)), e.Message);
+                }
+                else
+                {
+                    Assert.AreEqual(String.Format("No matching tags found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
+                        token, type, index), e.Message);
+                }
+
+                Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
         protected static void ExpectCannotRegisterTagWithNoComponentsException(Action action)
         {
             try

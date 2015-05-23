@@ -220,7 +220,7 @@ namespace XtraLiteTemplates.NUnit
             const String test = "{}";
 
             var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase);
-            ExpectUnexpectedTokenException(1, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
+            ExpectNoMatchingTagsLeftException(null, 1, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
         }
 
         [Test]
@@ -230,7 +230,7 @@ namespace XtraLiteTemplates.NUnit
             var tag = new Tag().Keyword("TAG");
             var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
-            ExpectUnexpectedTokenException(1, "BAG", Token.TokenType.Word, () => lexer.ReadNext());
+            ExpectNoMatchingTagsLeftException(null, 1, "BAG", Token.TokenType.Word, () => lexer.ReadNext());
         }
 
         [Test]
@@ -240,7 +240,7 @@ namespace XtraLiteTemplates.NUnit
             var tag = new Tag().Keyword("TAG");
             var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
-            ExpectUnexpectedTokenException(5, "AHA", Token.TokenType.Word, () => lexer.ReadNext());
+            ExpectNoMatchingTagsLeftException(new Object[] { "TAG" }, 5, "AHA", Token.TokenType.Word, () => lexer.ReadNext());
         }
 
         [Test]
@@ -308,7 +308,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterTag(ifTag)
                 .RegisterSpecial("TRUE", 100.5);
 
-            ExpectUnexpectedTokenException(4, "TRUE", Token.TokenType.Word, () => lexer.ReadNext());
+            ExpectNoMatchingTagsLeftException(new Object[] { "IF" }, 4, "TRUE", Token.TokenType.Word, () => lexer.ReadNext());
         }
 
         [Test]
@@ -547,7 +547,7 @@ namespace XtraLiteTemplates.NUnit
             var lexer = new Lexer(new Tokenizer(test), ExpressionFlowSymbols.Default, 
                 StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
-            ExpectUnexpectedTokenException(13, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
+            ExpectNoMatchingTagsLeftException(new Object[] {"A", "any", "B", "2", "C" }, 13, "}", Token.TokenType.EndTag, () => lexer.ReadNext());
         }
 
         [Test]
@@ -660,7 +660,7 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.Ordinal)
                 .RegisterTag(tag);
 
-            ExpectUnexpectedTokenException(1, "tag", Token.TokenType.Word, () => lexer.ReadNext());
+            ExpectNoMatchingTagsLeftException(null, 1, "tag", Token.TokenType.Word, () => lexer.ReadNext());
         }
 
         [Test]

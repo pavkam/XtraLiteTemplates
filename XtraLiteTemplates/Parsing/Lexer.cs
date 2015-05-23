@@ -326,7 +326,7 @@ namespace XtraLiteTemplates.Parsing
                     var matchingTag = matchingTags.Where(p => p.ComponentCount == _components.Count).FirstOrDefault();
 
                     if (matchingTag == null)
-                        ExceptionHelper.UnexpectedToken(this.m_currentToken);
+                        ExceptionHelper.NoMatchingTagsLeft(_components, this.m_currentToken);
                     else
                     {
                         if (matchingTag.MatchesExpression(_components.Count - 1))
@@ -470,7 +470,7 @@ namespace XtraLiteTemplates.Parsing
                         /* Starting an expression. */
                         matchingTags.RemoveWhere(p => !p.MatchesExpression(_components.Count));
                         if (matchingTags.Count == 0)
-                            ExceptionHelper.UnexpectedToken(this.m_currentToken);
+                            ExceptionHelper.NoMatchingTagsLeft(_components, this.m_currentToken);
 
                         currentExpression = CreateExpression();
                         _components.Add(currentExpression);
@@ -512,7 +512,7 @@ namespace XtraLiteTemplates.Parsing
                         /* Starting an expression. */
                         matchingTags.RemoveWhere(p => !p.MatchesExpression(_components.Count));
                         if (matchingTags.Count == 0)
-                            ExceptionHelper.UnexpectedToken(this.m_currentToken);
+                            ExceptionHelper.NoMatchingTagsLeft(_components, this.m_currentToken);
 
                         currentExpression = CreateExpression();
                         _components.Add(currentExpression);

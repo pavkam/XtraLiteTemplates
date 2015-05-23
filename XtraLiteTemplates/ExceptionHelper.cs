@@ -132,6 +132,25 @@ namespace XtraLiteTemplates
                 "Unexpected token '{0}' (type: {1}) found at position {2}.", token.Value, token.Type, token.CharacterIndex);
         }
 
+        internal static void NoMatchingTagsLeft(IReadOnlyList<Object> components, Token token)
+        {
+            Debug.Assert(token != null);
+            Debug.Assert(components != null);
+
+            if (components.Count > 0)
+            {
+                throw new ParseException(null, token.CharacterIndex,
+                    "No matching tags composed of {{{3}}} found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
+                        token.Value, token.Type, token.CharacterIndex, String.Join(" ", components));
+            }
+            else
+            {
+                throw new ParseException(null, token.CharacterIndex,
+                    "No matching tags found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
+                        token.Value, token.Type, token.CharacterIndex);
+            }
+        }
+
         internal static void UnexpectedOrInvalidExpressionToken(ExpressionException innerException, Token token)
         {
             Debug.Assert(token != null);
