@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
+    <id>XtraLiteTemplates</id>
+    <version>@build.number@</version>
+    <authors>Alexandru Ciobanu (alex@ciobanu.org)</authors>
+    <owners>Alexandru Ciobanu (alex@ciobanu.org)</owners>
+    <licenseUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/pavkam/XtraLiteTemplates</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A highly customizable and lightweight templating engine for Microsoft .NET and Mono.</description>
+    <releaseNotes>@releaseNotes@</releaseNotes>
+    <copyright>Copyright Alexandru Ciobanu (alex@ciobanu.org) 2015</copyright>
+    <tags>Template Domain Language Expression Parser</tags>
+    <dependencies>
+      <group targetFramework="net45">
+      </group>
+      <group targetFramework="netcore45">
+      </group>
+    </dependencies>
+  </metadata>
+</package>
+
