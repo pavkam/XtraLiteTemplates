@@ -28,8 +28,15 @@
 
 namespace XtraLiteTemplates.Parsing
 {
+    /// <summary>
+    /// Defines the commont traits of a tokenizer.
+    /// </summary>
     public interface ITokenizer
     {
+        /// <summary>
+        /// Reads the next <see cref="XtraLiteTemplates.Parsing.Token"/> object from the input template.
+        /// </summary>
+        /// <returns>The next read token, or <c>null</c> if the end of template was reached.</returns>
         Token ReadNext();
     }
 }

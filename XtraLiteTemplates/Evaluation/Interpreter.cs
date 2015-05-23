@@ -38,7 +38,6 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
 
-
     public sealed class Interpreter
     {
         private List<Directive> m_directives;

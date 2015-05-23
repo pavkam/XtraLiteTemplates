@@ -39,6 +39,11 @@ namespace XtraLiteTemplates.Parsing
     using System.IO;
     using System.Globalization;
 
+    /// <summary>
+    /// The lexical analyzer class. Requires an instance of <see cref="XtraLiteTemplates.Parsing.ITokenizer"/> to obtain all the tokens from. Based
+    /// on said tokens, the <see cref="XtraLiteTemplates.Parsing.Lexer"/> identifies the correct lexical structures and generates <see cref="XtraLiteTemplates.Parsing.Lex"/> objects
+    /// for the <see cref="XtraLiteTemplates.Evaluation.Interpreter"/>.
+    /// </summary>
     public sealed class Lexer
     {
         private ExpressionFlowSymbols m_expressionFlowSymbols;
@@ -50,103 +55,6 @@ namespace XtraLiteTemplates.Parsing
 
         private Token m_currentToken;
         private Boolean m_isEndOfStream;
-
-        public ITokenizer Tokenizer { get; private set; }
-
-        public IEqualityComparer<String> Comparer { get; private set; }
-
-        public IReadOnlyCollection<Tag> Tags
-        {
-            get 
-            {
-                return m_tags;
-            }
-        }
-
-        public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<String> comparer)
-        {
-            Expect.NotNull("tokenizer", tokenizer);
-            Expect.NotNull("comparer", comparer);
-            Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
-
-            Tokenizer = tokenizer;
-            Comparer = comparer;
-
-            m_tags = new List<Tag>();
-            m_expressionOperators = new List<Operator>();
-            m_unaryExpressionOperators = new HashSet<String>(comparer);
-            m_binaryExpressionOperators = new HashSet<String>(comparer);
-            m_specials = new Dictionary<String, Object>();
-
-            m_expressionFlowSymbols = expressionFlowSymbols;
-
-            /* Register the flow symbols in */
-            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.Separator);
-            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.MemberAccess);
-            m_unaryExpressionOperators.Add(m_expressionFlowSymbols.GroupOpen);
-            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.GroupClose);
-        }
-
-        public Lexer RegisterTag(Tag tag)
-        {
-            Expect.NotNull("tag", tag);
-            if (tag.ComponentCount == 0)
-                ExceptionHelper.CannotRegisterTagWithNoComponents();
-
-            /* Check for an equivalent tag in the list */
-            foreach (var ot in m_tags)
-            {
-                if (ot.Equals(tag, Comparer))
-                    return this;
-            }
-
-            m_tags.Add(tag);
-            return this;
-        }
-
-        public Lexer RegisterOperator(Operator @operator)
-        {
-            Expect.NotNull("operator", @operator);
-
-            var unaryOperator = @operator as UnaryOperator;
-            if (unaryOperator != null)
-            {
-                if (m_unaryExpressionOperators.Contains(unaryOperator.Symbol) || 
-                    m_specials.ContainsKey(unaryOperator.Symbol))
-                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
-                else
-                    m_unaryExpressionOperators.Add(unaryOperator.Symbol);
-            }
-
-            var binaryOperator = @operator as BinaryOperator;
-            if (binaryOperator != null)
-            {
-                if (m_binaryExpressionOperators.Contains(binaryOperator.Symbol) ||
-                    m_specials.ContainsKey(binaryOperator.Symbol))
-                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
-                else
-                    m_binaryExpressionOperators.Add(binaryOperator.Symbol);
-            }
-
-            m_expressionOperators.Add(@operator);
-
-            return this;
-        }
-
-        public Lexer RegisterSpecial(String keyword, Object value)
-        {
-            Expect.Identifier("keyword", keyword);
-            
-            if (m_unaryExpressionOperators.Contains(keyword) ||
-                m_binaryExpressionOperators.Contains(keyword))
-            {
-                ExceptionHelper.SpecialCannotBeRegistered(keyword);
-            }
-
-            m_specials[keyword] = value;
-            return this;
-        }
-
 
         private Boolean NextToken()
         {
@@ -222,6 +130,155 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
+        /// <summary>
+        /// <value>The <see cref="XtraLiteTemplates.Parsing.ITokenizer"/> object used to read the tokens from the input template.</value>
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        public ITokenizer Tokenizer { get; private set; }
+
+        /// <summary>
+        /// <value>The <see cref="System.Collections.Generic.IEqualityComparer{String}"/> object used to match keywords and identifiers.</value>
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        public IEqualityComparer<String> Comparer { get; private set; }
+
+        /// <summary>
+        /// <value>A collection of <see cref="XtraLiteTemplates.Parsing.Tag"/> objects registered using <see cref="RegisterTag"/> method.</value>
+        /// <remarks>The caller is responsible with loading up the known tag objects into the lexer before attempting to reading the first lex object.</remarks>
+        /// </summary>
+        public IReadOnlyCollection<Tag> Tags
+        {
+            get 
+            {
+                return m_tags;
+            }
+        }
+
+        /// <summary>
+        /// Creates an instance of <see cref="XtraLiteTemplates.Parsing.Lexer"/> class.
+        /// </summary>
+        /// <param name="tokenizer">The <see cref="XtraLiteTemplates.Parsing.ITokenizer"/> object used to read the tokens from the input template.</param>
+        /// <param name="expressionFlowSymbols">The <see cref="XtraLiteTemplates.Expressions.ExpressionFlowSymbols"/> object containing the standard expression flow control symbols.</param>
+        /// <param name="comparer">The <see cref="System.Collections.Generic.IEqualityComparer{String}"/> object used to match keywords and identifiers.</param>
+        /// <exception cref="System.ArgumentNullException">Either <paramref name="tokenizer"/>, <paramref name="expressionFlowSymbols"/> or <paramref name="expressionFlowSymbols"/> are <c>null</c>.</exception>
+        public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<String> comparer)
+        {
+            Expect.NotNull("tokenizer", tokenizer);
+            Expect.NotNull("comparer", comparer);
+            Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
+
+            Tokenizer = tokenizer;
+            Comparer = comparer;
+
+            m_tags = new List<Tag>();
+            m_expressionOperators = new List<Operator>();
+            m_unaryExpressionOperators = new HashSet<String>(comparer);
+            m_binaryExpressionOperators = new HashSet<String>(comparer);
+            m_specials = new Dictionary<String, Object>();
+
+            m_expressionFlowSymbols = expressionFlowSymbols;
+
+            /* Register the flow symbols in */
+            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.Separator);
+            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.MemberAccess);
+            m_unaryExpressionOperators.Add(m_expressionFlowSymbols.GroupOpen);
+            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.GroupClose);
+        }
+
+        /// <summary>
+        /// Registers a know tag with this lexer instance. All registered tags will take part in the matching process during the analysis of the
+        /// incoming tokens.
+        /// </summary>
+        /// <param name="tag">A <see cref="XtraLiteTemplates.Parsing.Tag"/> object to register.</param>
+        /// <returns>This lexer instance.</returns>
+        /// <exception cref="System.ArgumentNullException"><paramref name="tag"/> is <c>null</c>.</exception>
+        public Lexer RegisterTag(Tag tag)
+        {
+            Expect.NotNull("tag", tag);
+            if (tag.ComponentCount == 0)
+                ExceptionHelper.CannotRegisterTagWithNoComponents();
+
+            /* Check for an equivalent tag in the list */
+            foreach (var ot in m_tags)
+            {
+                if (ot.Equals(tag, Comparer))
+                    return this;
+            }
+
+            m_tags.Add(tag);
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a know operator with this lexer instance. All registered operators will take part in the matching process 
+        /// during the expression analysis of the incoming tokens.
+        /// </summary>
+        /// <param name="@operator">A <see cref="XtraLiteTemplates.Expressions.Operators.Operator"/> object to register.</param>
+        /// <returns>This lexer instance.</returns>
+        /// <exception cref="System.ArgumentNullException"><paramref name="@operator"/> is <c>null</c>.</exception>
+        public Lexer RegisterOperator(Operator @operator)
+        {
+            Expect.NotNull("operator", @operator);
+
+            var unaryOperator = @operator as UnaryOperator;
+            if (unaryOperator != null)
+            {
+                if (m_unaryExpressionOperators.Contains(unaryOperator.Symbol) || 
+                    m_specials.ContainsKey(unaryOperator.Symbol))
+                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
+                else
+                    m_unaryExpressionOperators.Add(unaryOperator.Symbol);
+            }
+
+            var binaryOperator = @operator as BinaryOperator;
+            if (binaryOperator != null)
+            {
+                if (m_binaryExpressionOperators.Contains(binaryOperator.Symbol) ||
+                    m_specials.ContainsKey(binaryOperator.Symbol))
+                    ExceptionHelper.OperatorAlreadyRegistered(@operator);
+                else
+                    m_binaryExpressionOperators.Add(binaryOperator.Symbol);
+            }
+
+            m_expressionOperators.Add(@operator);
+
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a know special constant. Special constants can be looked at as keywords such as <c>true</c> or <c>Infinity</c>. These identifiers will
+        /// be replaced by their literal value during the analysis process and will not be identified as anything else.
+        /// <remarks>
+        /// <para>Calling this method multiple times for the same <paramref name="keyword"/> will result in the last value being used.</para>
+        /// </remarks>
+        /// </summary>
+        /// <param name="keyword">The name of the constant.</param>
+        /// <param name="value">The value of the constant.</param>
+        /// <returns>This lexer instance.</returns>
+        /// <exception cref="System.ArgumentNullException"><paramref name="keyword"/> is <c>null</c>.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="keyword"/> is not a valid identifier.</exception>
+        /// <exception cref="System.InvalidOperationException"><paramref name="keyword"/> is already in use by an operator.</exception>
+        public Lexer RegisterSpecial(String keyword, Object value)
+        {
+            Expect.Identifier("keyword", keyword);
+            
+            if (m_unaryExpressionOperators.Contains(keyword) ||
+                m_binaryExpressionOperators.Contains(keyword))
+            {
+                ExceptionHelper.SpecialCannotBeRegistered(keyword);
+            }
+
+            m_specials[keyword] = value;
+            return this;
+        }
+
+        /// <summary>
+        /// Analizes a batch of tokens and generates a lex object. If the tokenizer reached the end of the stream, this method will
+        /// return a <c>null</c> value. All subsequent calls to this method will also return <c>null</c>.
+        /// </summary>
+        /// <returns>An analyzed <see cref="XtraLiteTemplates.Parsing.Lex"/> object.</returns>
+        /// <exception cref="XtraLiteTemplates.Parsing.ParseException">A parsing error encountered.</exception>
+        /// <exception cref="XtraLiteTemplates.Expressions.ExpressionException">An expression contruction error encountered.</exception>
         public Lex ReadNext()
         {
             if (this.m_currentToken == null && !this.m_isEndOfStream)

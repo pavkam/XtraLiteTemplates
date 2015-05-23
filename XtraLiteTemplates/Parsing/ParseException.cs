@@ -32,19 +32,27 @@ namespace XtraLiteTemplates.Parsing
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The generic exception for all identified parsing errors. Instances of this class can only be created internally.
+    /// </summary>
     public class ParseException : FormatException
     {
+        /// <summary>
+        /// <value>The index of the character where the parsing error occured.</value>
+        /// </summary>
         public Int32 CharacterIndex { get; private set; }
 
-        internal ParseException(Int32 characterIndex, 
-                                String format, 
-                                params Object[] args)
-            : base(String.Format(format, args))
+        /// <summary>
+        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.ParseException"/> class.
+        /// </summary>
+        /// <param name="characterIndex">The index of the character where the parsing error occured.</param>
+        /// <param name="format">A format string.</param>
+        /// <param name="args">Format arguments.</param>
+        internal ParseException(Exception innerException, Int32 characterIndex, String format, params Object[] args)
+            : base(String.Format(format, args), innerException)
         {
             Debug.Assert(characterIndex >= 0);
-
             this.CharacterIndex = characterIndex;
         }
-
     }
 }

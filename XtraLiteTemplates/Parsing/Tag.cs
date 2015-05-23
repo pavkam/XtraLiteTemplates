@@ -34,16 +34,16 @@ namespace XtraLiteTemplates.Parsing
     using System.Diagnostics;
     using System.Text;
 
+    /// <summary>
+    /// The basic building block of <see cref="XtraLiteTemplates.Evaluation.Directive"/> classes. The tag defines a set of keywords, indentifier and expression
+    /// match rules that need to be satisfied during the lexical analysis.
+    /// </summary>
     public sealed class Tag
     {
         private const String MarkupExpressionWord = "$";
-
         private const String MarkupAnyIdentifierWord = "?";
-
         private const Char MarkupIdentifierGroupStartCharacter = '(';
-
         private const Char MarkupIdentifierGroupEndCharacter = ')';
-
         public static String AsIdentifier(String candidate)
         {
             if (candidate != null)
@@ -57,7 +57,6 @@ namespace XtraLiteTemplates.Parsing
             return isValid ? candidate : null;
         }
 
-
         private readonly IList<Object> m_components;
 
         private Boolean LastComponentIsExpression
@@ -68,11 +67,64 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
+        internal Boolean MatchesKeyword(Int32 index, IEqualityComparer<String> comparer, String keyword)
+        {
+            Debug.Assert(comparer != null);
+            Debug.Assert(!String.IsNullOrEmpty(keyword));
+
+            if (index < 0 || index >= m_components.Count || m_components[index] == null)
+                return false;
+
+            String stringComponent = m_components[index] as String;
+            return comparer.Equals(stringComponent, keyword);
+        }
+
+        internal Boolean MatchesIdentifier(Int32 index, IEqualityComparer<String> comparer, String identifier)
+        {
+            Debug.Assert(comparer != null);
+            Debug.Assert(!String.IsNullOrEmpty(identifier));
+
+            if (index < 0 || index >= m_components.Count || m_components[index] == null)
+                return false;
+
+            var stringComponent = m_components[index] as String;
+            if (stringComponent != null)
+                return stringComponent == String.Empty;
+
+            String[] _identifiers = m_components[index] as String[];
+            return _identifiers.Any(i => comparer.Equals(i, identifier));
+        }
+
+        internal Boolean MatchesAnyIdentifier(Int32 index)
+        {
+            if (index < 0 || index >= m_components.Count || m_components[index] == null)
+                return false;
+
+            var stringComponent = m_components[index] as String;
+            return stringComponent == String.Empty;
+        }
+
+        internal Boolean MatchesExpression(Int32 index)
+        {
+            return index >= 0 && index < m_components.Count && m_components[index] == null;
+        }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.Tag"/> class.
+        /// <remarks>The caller is expected to use the public methods to prepare the tag for use.</remarks>
+        /// </summary>
         public Tag()
         {
             m_components = new List<Object>();
         }
 
+        /// <summary>
+        /// Appends a keyword requirement component to the tag's matching pattern.
+        /// </summary>
+        /// <param name="keyword">The keyword to match.</param>
+        /// <returns>This tag instance.</returns>
+        /// <exception cref="System.ArgumentNullException"><paramref name="keyword"/> is <c>null</c>.</exception>
+        /// <exception cref="System.ArgumentException"><paramref name="keyword"/> is not a valid identifier.</exception>
         public Tag Keyword(String keyword)
         {
             Expect.Identifier("keyword", keyword);
@@ -81,6 +133,11 @@ namespace XtraLiteTemplates.Parsing
             return this;
         }
 
+        /// <summary>
+        /// Appends any identifier requirement component to the tag's matching pattern. Any valid identifier will match this component.
+        /// </summary>
+        /// <returns>This tag instance.</returns>
+        /// <exception cref="System.InvalidOperationException">If the previous requirement component was an expression.</exception>
         public Tag Identifier()
         {
             if (m_components.Count > 0 && m_components[m_components.Count - 1] == null)
@@ -90,6 +147,12 @@ namespace XtraLiteTemplates.Parsing
             return this;
         }
 
+        /// <summary>
+        /// Appends identifier set requirement component to the tag's matching pattern. Any identifier contained in the provided set of options will match this component.
+        /// </summary>
+        /// <returns>This tag instance.</returns>
+        /// <exception cref="System.ArgumentNullException"><param name="candidates"> or any of its elements are <c>null</c>.</exception>
+        /// <exception cref="System.ArgumentException"><param name="candidates"> is <c>empty</c> or any of its elements is not a valid identifier.</exception>
         public Tag Identifier(params String[] candidates)
         {
             Expect.NotEmpty("candidates", candidates);
@@ -101,6 +164,11 @@ namespace XtraLiteTemplates.Parsing
             return this;
         }
 
+        /// <summary>
+        /// Appends an expression requirement component to the tag's matching pattern.
+        /// </summary>
+        /// <returns>This tag instance.</returns>
+        /// <exception cref="System.InvalidOperationException">If the previous requirement component was another expression.</exception>
         public Tag Expression()
         {
             if (m_components.Count > 0 && m_components[m_components.Count - 1] == null)
@@ -111,6 +179,10 @@ namespace XtraLiteTemplates.Parsing
             return this;
         }
 
+        /// <summary>
+        /// A human-readable representation of the tag's structure. The representation uses the same markup language used to create the tag.
+        /// </summary>
+        /// <returns>A <see cref="System.String"/> value.</returns>
         public override String ToString()
         {
             if (m_components.Count == 0)
@@ -140,6 +212,12 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
+        /// <summary>
+        /// Tries to parse a given tag markup string. This is an easy way to defined tags without needing to resort to calling individual component methods.
+        /// </summary>
+        /// <param name="markup">The markup string.</param>
+        /// <param name="result">The built tag object, if the parsing succeeded.</param>
+        /// <returns><c>true</c> if the parsing was successful; or <c>false</c> otherwise.</returns>
         public static Boolean TryParse(String markup, out Tag result)
         {
             result = null;
@@ -262,6 +340,12 @@ namespace XtraLiteTemplates.Parsing
             return result != null;
         }
 
+        /// <summary>
+        /// Parses a given tag markup string. This method uses <see cref="TryParse"/>, but will throw an excetion if the parsing fails.
+        /// </summary>
+        /// <param name="markup">The markup string.</param>
+        /// <returns>The built tag object.</returns>
+        /// <exception cref="System.FormatException">If <paramref name="markup"/> cannot be parsed.</exception>
         public static Tag Parse(String markup)
         {
             Tag result;
@@ -271,7 +355,14 @@ namespace XtraLiteTemplates.Parsing
             return result;
         }
 
-
+        /// <summary>
+        /// Checks whether this tag object is semantically equal with another tag object using a given <paramref name="comparer"/> for keyword and identifier
+        /// comparisons.
+        /// </summary>
+        /// <param name="obj">The object to compare with.</param>
+        /// <param name="comparer">An instance of <see cref="System.Collections.Generic.IEqualityComparer{String}"/> used for comparison.</param>
+        /// <returns><c>true</c> if the tags are equal; <c>false</c> otherwise.</returns>
+        /// <exception cref="System.ArgumentNullException"><paramref name="comparer"/> is <c>null</c>.</exception>
         public Boolean Equals(Object obj, IEqualityComparer<String> comparer)
         {
             Expect.NotNull("comparer", comparer);
@@ -326,11 +417,22 @@ namespace XtraLiteTemplates.Parsing
             return true;
         }
 
+        /// <summary>
+        /// Checks whether this tag object is semantically equal with another tag object using the current culture comparison rules.
+        /// </summary>
+        /// <param name="obj">The object to compare with.</param>
+        /// <returns><c>true</c> if the tags are equal; <c>false</c> otherwise.</returns>
         public override Boolean Equals(Object obj)
         {
             return Equals(obj, StringComparer.CurrentCulture);
         }
 
+        /// <summary>
+        /// Calculates the hash code for this tag object using a given <paramref name="comparer"/> object.
+        /// </summary>
+        /// <param name="comparer">An instance of <see cref="System.Collections.Generic.IEqualityComparer{String}"/> used for hash code generation.</param>
+        /// <returns>A <see cref="System.Int32"/> value representing the hash code.</returns>
+        /// <exception cref="System.ArgumentNullException"><paramref name="comparer"/> is <c>null</c>.</exception>
         public Int32 GetHashCode(IEqualityComparer<String> comparer)
         {
             Expect.NotNull("comparer", comparer);
@@ -365,60 +467,24 @@ namespace XtraLiteTemplates.Parsing
             return hash;
         }
 
+        /// <summary>
+        /// Calculates the hash code for this tag object using the current culture string comparison rules.
+        /// </summary>
+        /// <returns>A <see cref="System.Int32"/> value representing the hash code.</returns>
         public override Int32 GetHashCode()
         {
             return GetHashCode(StringComparer.CurrentCulture);
         }
 
+        /// <summary>
+        /// <value>Returns the number of components this tag has defined.</value>
+        /// </summary>
         public Int32 ComponentCount
         {
             get
             {
                 return m_components.Count;
             }
-        }
-
-
-        internal Boolean MatchesKeyword(Int32 index, IEqualityComparer<String> comparer, String keyword)
-        {
-            Debug.Assert(comparer != null);
-            Debug.Assert(!String.IsNullOrEmpty(keyword));
-
-            if (index < 0 || index >= m_components.Count || m_components[index] == null)
-                return false;
-
-            String stringComponent = m_components[index] as String;
-            return comparer.Equals(stringComponent, keyword);
-        }
-
-        internal Boolean MatchesIdentifier(Int32 index, IEqualityComparer<String> comparer, String identifier)
-        {
-            Debug.Assert(comparer != null);
-            Debug.Assert(!String.IsNullOrEmpty(identifier));
-
-            if (index < 0 || index >= m_components.Count || m_components[index] == null)
-                return false;
-
-            var stringComponent = m_components[index] as String;
-            if (stringComponent != null)
-                return stringComponent == String.Empty;
-
-            String[] _identifiers = m_components[index] as String[];
-            return _identifiers.Any(i => comparer.Equals(i, identifier));
-        }
-
-        internal Boolean MatchesAnyIdentifier(Int32 index)
-        {
-            if (index < 0 || index >= m_components.Count || m_components[index] == null)
-                return false;
-
-            var stringComponent = m_components[index] as String;
-            return stringComponent == String.Empty;
-        }
-
-        internal Boolean MatchesExpression(Int32 index)
-        {
-            return index >= 0 && index < m_components.Count && m_components[index] == null;
         }
     }
 }

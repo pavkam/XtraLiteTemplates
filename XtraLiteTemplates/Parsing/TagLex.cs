@@ -31,6 +31,9 @@ namespace XtraLiteTemplates.Parsing
     using System;
     using System.Text;
 
+    /// <summary>
+    /// Represents a lex object that identifies a valid tag. 
+    /// </summary>
     public sealed class TagLex : Lex
     {
         public Tag Tag { get; private set; }
