@@ -146,7 +146,7 @@ namespace XtraLiteTemplates.Expressions
         private void OpenNewGroup()
         {
             if (!m_current.Continuity.HasFlag(PermittedContinuations.NewGroup))
-                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupOpen);
+                ExceptionHelper.InvalidExpressionTerm(FlowSymbols.GroupOpen);
 
             if (m_current is OperatorNode)
             {
@@ -176,10 +176,10 @@ namespace XtraLiteTemplates.Expressions
         {
             /* Special case just here! */
             if (m_root.Parent == null)
-                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupClose);
+                ExceptionHelper.InvalidExpressionTerm(FlowSymbols.GroupClose);
 
             if (!m_current.Continuity.HasFlag(PermittedContinuations.CloseGroup))
-                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupClose);
+                ExceptionHelper.InvalidExpressionTerm(FlowSymbols.GroupClose);
 
             m_root.Close();
             m_current = m_root;
@@ -194,12 +194,8 @@ namespace XtraLiteTemplates.Expressions
 
         private void ContinueExistingGroup()
         {
-            /* Special case just here! */
-            if (m_current == m_root)
-                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.Separator);
-
             if (!m_current.Continuity.HasFlag(PermittedContinuations.ContinueGroup))
-                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.Separator);
+                ExceptionHelper.InvalidExpressionTerm(FlowSymbols.Separator);
 
             m_current = m_root;
         }
@@ -207,7 +203,7 @@ namespace XtraLiteTemplates.Expressions
         private void StartUnary(UnaryOperator unaryOperator)
         {
             if (!m_current.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
-                ExceptionHelper.UnexpectedExpressionTerm(unaryOperator.Symbol);
+                ExceptionHelper.UnexpectedOperator(unaryOperator.Symbol);
 
             if (m_current is OperatorNode)
             {
@@ -220,8 +216,7 @@ namespace XtraLiteTemplates.Expressions
             else if (m_current is RootNode)
             {
                 var _current = m_current as RootNode;
-                if (_current.Closed)
-                    ExceptionHelper.UnexpectedExpressionTerm(unaryOperator.Symbol);
+                Debug.Assert(!_current.Closed);
 
                 var newNode = new UnaryOperatorNode(_current, unaryOperator);
                 _current.AddChild(newNode);
@@ -232,7 +227,7 @@ namespace XtraLiteTemplates.Expressions
         private void StartBinary(BinaryOperator binaryOperator)
         {
             if (!m_current.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
-                ExceptionHelper.UnexpectedExpressionTerm(binaryOperator.Symbol);
+                ExceptionHelper.UnexpectedOperator(binaryOperator.Symbol);
 
             var leftNode = m_current;
             var comparand = binaryOperator.Associativity == Associativity.LeftToRight ? 0 : -1;
@@ -265,7 +260,7 @@ namespace XtraLiteTemplates.Expressions
         private void CompleteWithSymbol(String symbol)
         {
             if (!m_current.Continuity.HasFlag(PermittedContinuations.Identifier))
-                ExceptionHelper.UnexpectedExpressionTerm(symbol);
+                ExceptionHelper.InvalidExpressionTerm(symbol);
 
             var newNode = new ReferenceNode(m_current, symbol);
 
@@ -280,8 +275,7 @@ namespace XtraLiteTemplates.Expressions
             else if (m_current is RootNode)
             {
                 var _current = m_current as RootNode;
-                if (_current.Closed)
-                    ExceptionHelper.UnexpectedExpressionTerm(symbol);
+                Debug.Assert(!_current.Closed);
 
                 _current.AddChild(newNode);
                 m_current = newNode;
@@ -298,7 +292,12 @@ namespace XtraLiteTemplates.Expressions
         private void CompleteWithLiteral(Object literal)
         {
             if (!m_current.Continuity.HasFlag(PermittedContinuations.Literal))
-                ExceptionHelper.UnexpectedExpressionTerm(literal);
+            {
+                if (m_current is DisembowelerNode && ((DisembowelerNode)m_current).MemberName == null)
+                    ExceptionHelper.UnexpectedLiteralRequiresIdentifier(FlowSymbols.MemberAccess, literal);
+                else
+                    ExceptionHelper.UnexpectedLiteralRequiresOperator(literal);
+            }
 
             var newNode = new LiteralNode(m_current, literal);
 
@@ -314,8 +313,7 @@ namespace XtraLiteTemplates.Expressions
             else if (m_current is RootNode)
             {
                 var _current = m_current as RootNode;
-                if (_current.Closed)
-                    ExceptionHelper.UnexpectedExpressionTerm(literal);
+                Debug.Assert(!_current.Closed);
 
                 _current.AddChild(newNode);
                 m_current = newNode;
@@ -325,7 +323,7 @@ namespace XtraLiteTemplates.Expressions
         private void ContinueWithMemberAccess()
         {
             if (!m_current.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
-                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.MemberAccess);
+                ExceptionHelper.UnexpectedOperator(FlowSymbols.MemberAccess);
 
             /* Left side now becomes the "object" of disembowlement and the right side will be the member name */
             var newNode = new DisembowelerNode(m_current.Parent, m_current);
@@ -394,7 +392,7 @@ namespace XtraLiteTemplates.Expressions
                     }
 
                     if (unaryOperator != null || binaryOperator != null)
-                        ExceptionHelper.UnexpectedExpressionTerm(symbol);
+                        ExceptionHelper.UnexpectedOperator(symbol);
                     else
                         CompleteWithSymbol(symbol);
                 }

@@ -536,6 +536,55 @@ using System.Diagnostics;
             Assert.Fail();
         }
 
+        protected static void ExpectUnexpectedLiteralRequiresOperatorException(Object literal, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ExpressionException), e);
+                Assert.AreEqual(String.Format("Unexpected expression literal value: '{0}'. Expected operator.", literal), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectUnexpectedExpressionOperatorException(String @operator, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ExpressionException), e);
+                Assert.AreEqual(String.Format("Unexpected expression operator: '{0}'.", @operator), e.Message);
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected static void ExpectUnexpectedLiteralRequiresIdentifierException(String @operator, Object literal, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ExpressionException), e);
+                Assert.AreEqual(String.Format("Operator '{0}' cannot be applied to literal value: '{1}'. Expected identifier.", @operator, literal), e.Message);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
         protected static void ExpectCannotConstructExpressionInvalidStateException(Action action)
         {
             try

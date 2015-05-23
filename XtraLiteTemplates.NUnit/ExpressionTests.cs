@@ -288,27 +288,27 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseFeedingErrors1()
         {
             var expression = CreateBloatedExpression();
-            ExpectUnexpectedExpressionTermException("*", () => expression.FeedSymbol("*"));
-            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectUnexpectedExpressionOperatorException("*", () => expression.FeedSymbol("*"));
+            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
 
             expression.FeedLiteral("Hello");
-            ExpectUnexpectedExpressionTermException("!", () => expression.FeedSymbol("!"));
-            ExpectUnexpectedExpressionTermException("(", () => expression.FeedSymbol("("));
-            ExpectUnexpectedExpressionTermException("World", () => expression.FeedLiteral("World"));
+            ExpectUnexpectedExpressionOperatorException("!", () => expression.FeedSymbol("!"));
+            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectUnexpectedLiteralRequiresOperatorException("World", () => expression.FeedLiteral("World"));
             ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
 
             expression.FeedSymbol("+");
-            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
             expression.FeedSymbol("(");
-            ExpectUnexpectedExpressionTermException("/", () => expression.FeedSymbol("/"));
+            ExpectUnexpectedExpressionOperatorException("/", () => expression.FeedSymbol("/"));
             expression.FeedLiteral(100);
-            ExpectUnexpectedExpressionTermException(200, () => expression.FeedLiteral(200));
+            ExpectUnexpectedLiteralRequiresOperatorException(200, () => expression.FeedLiteral(200));
             ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
             expression.FeedSymbol(")");
-            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
-            ExpectUnexpectedExpressionTermException("!", () => expression.FeedSymbol("!"));
-            ExpectUnexpectedExpressionTermException("reference", () => expression.FeedSymbol("reference"));
-            ExpectUnexpectedExpressionTermException(true, () => expression.FeedLiteral(true));
+            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectUnexpectedExpressionOperatorException("!", () => expression.FeedSymbol("!"));
+            ExpectInvalidExpressionTermException("reference", () => expression.FeedSymbol("reference"));
+            ExpectUnexpectedLiteralRequiresOperatorException(true, () => expression.FeedLiteral(true));
         }
 
         [Test]
@@ -317,16 +317,16 @@ namespace XtraLiteTemplates.NUnit
             var expression = CreateBloatedExpression();
 
             expression.FeedSymbol("(");
-            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
-            ExpectUnexpectedExpressionTermException(",", () => expression.FeedSymbol(","));
+            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectInvalidExpressionTermException(",", () => expression.FeedSymbol(","));
             expression.FeedSymbol("a");
-            ExpectUnexpectedExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
             expression.FeedSymbol(",");
-            ExpectUnexpectedExpressionTermException(",", () => expression.FeedSymbol(","));
-            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectInvalidExpressionTermException(",", () => expression.FeedSymbol(","));
+            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
             expression.FeedSymbol("b");
             expression.FeedSymbol(")");
-            ExpectUnexpectedExpressionTermException(")", () => expression.FeedSymbol(")"));
+            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
 
             Assert.AreEqual("(){@a , @b}", expression.ToString(ExpressionFormatStyle.Canonical));
         }
@@ -538,32 +538,32 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseMemberAccess4()
+        public void TestCaseMemberAccess()
         {
             var expression = CreateBloatedExpression();
 
             expression.FeedSymbol("!");
             expression.FeedSymbol("variable");
             expression.FeedSymbol(".");
-
-            ExpectUnexpectedExpressionTermException("+", () => expression.FeedSymbol("+"));
-            ExpectUnexpectedExpressionTermException("(", () => expression.FeedSymbol("("));
-            ExpectUnexpectedExpressionTermException("length", () => expression.FeedLiteral("length"));
-            ExpectUnexpectedExpressionTermException(1, () => expression.FeedLiteral(1));
-            ExpectUnexpectedExpressionTermException(1.00, () => expression.FeedLiteral(1.00));
-            ExpectUnexpectedExpressionTermException(false, () => expression.FeedLiteral(false));
-            ExpectUnexpectedExpressionTermException(null, () => expression.FeedLiteral(null));
+            ExpectUnexpectedExpressionOperatorException(".", () => expression.FeedSymbol("."));
+            ExpectUnexpectedExpressionOperatorException("+", () => expression.FeedSymbol("+"));
+            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", "literal", () => expression.FeedLiteral("literal"));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1, () => expression.FeedLiteral(1));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1.00, () => expression.FeedLiteral(1.00));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", false, () => expression.FeedLiteral(false));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", null, () => expression.FeedLiteral(null));
 
             expression.FeedSymbol("length");
             expression.FeedSymbol(".");
 
-            ExpectUnexpectedExpressionTermException("+", () => expression.FeedSymbol("+"));
-            ExpectUnexpectedExpressionTermException("(", () => expression.FeedSymbol("("));
-            ExpectUnexpectedExpressionTermException("some_else", () => expression.FeedLiteral("some_else"));
-            ExpectUnexpectedExpressionTermException(1, () => expression.FeedLiteral(1));
-            ExpectUnexpectedExpressionTermException(1.00, () => expression.FeedLiteral(1.00));
-            ExpectUnexpectedExpressionTermException(false, () => expression.FeedLiteral(false));
-            ExpectUnexpectedExpressionTermException(null, () => expression.FeedLiteral(null));
+            ExpectUnexpectedExpressionOperatorException("+", () => expression.FeedSymbol("+"));
+            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", "some_else", () => expression.FeedLiteral("some_else"));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1, () => expression.FeedLiteral(1));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1.00, () => expression.FeedLiteral(1.00));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", false, () => expression.FeedLiteral(false));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", null, () => expression.FeedLiteral(null));
 
             expression.FeedSymbol("some_else");
             expression.FeedSymbol("*");

@@ -174,7 +174,22 @@ namespace XtraLiteTemplates
             throw new ExpressionException("Unexpected expression term: '{0}'.", term);
         }
 
+        internal static void UnexpectedLiteralRequiresOperator(Object term)
+        {
+            throw new ExpressionException("Unexpected expression literal value: '{0}'. Expected operator.", term);
+        }
 
+        internal static void UnexpectedOperator(String @operator)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(@operator));
+            throw new ExpressionException("Unexpected expression operator: '{0}'.", @operator);
+        }
+
+        internal static void UnexpectedLiteralRequiresIdentifier(String @operator, Object literal)
+        {
+            Debug.Assert(!String.IsNullOrEmpty(@operator));
+            throw new ExpressionException("Operator '{0}' cannot be applied to literal value: '{1}'. Expected identifier.", @operator, literal);
+        }
 
         internal static void OperatorAlreadyRegistered(Operator @operator)
         {
