@@ -39,6 +39,12 @@ namespace XtraLiteTemplates
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Parsing;
 
+    /// <summary>
+    /// Facade class that uses all components exposed by the XtraLiteTemplates library. XLTemplate class uses an instance of <see cref="XtraLiteTemplates.Dialects.IDialect"/> interface
+    /// to peform the parsing, lexing and interpretation of the template.
+    /// 
+    /// A private implementation of <see cref="XtraLiteTemplates.Evaluation.IEvaluationContext"/> interface is used to perform the actual evaluation of the compiled template.
+    /// </summary>
     public sealed class XLTemplate
     {
         private sealed class EvaluationContext : IEvaluationContext
@@ -172,17 +178,14 @@ namespace XtraLiteTemplates
             }
         }
 
-        public IDialect Dialect { get; private set; }
-        public String Template { get; private set; }
-
         private IEvaluable m_evaluable;
 
         private IEvaluable Compile()
         {
             using (var reader = new StringReader(Template))
             {
-                var tokenizer = new Tokenizer(reader, Dialect.StartTagCharacter, Dialect.EndTagCharacter, 
-                    Dialect.StartStringLiteralCharacter, Dialect.EndStringLiteralCharacter, Dialect.StringLiteralEscapeCharacter, 
+                var tokenizer = new Tokenizer(reader, Dialect.StartTagCharacter, Dialect.EndTagCharacter,
+                    Dialect.StartStringLiteralCharacter, Dialect.EndStringLiteralCharacter, Dialect.StringLiteralEscapeCharacter,
                     Dialect.NumberDecimalSeparatorCharacter);
 
                 var interpreter = new Interpreter(tokenizer, Dialect.FlowSymbols, Dialect.IdentifierComparer);
@@ -202,6 +205,40 @@ namespace XtraLiteTemplates
             }
         }
 
+        /// <summary>
+        /// <value>
+        /// Specifies the domain-specific dialect used to compile the template.
+        /// </value>
+        /// <remarks>
+        /// This property is provided by the caller at construction time.
+        /// </remarks>
+        /// </summary>
+        public IDialect Dialect { get; private set; }
+
+        /// <summary>
+        /// <value>
+        /// Specifies the original template <see cref="System.String"/> that was compiled.
+        /// </value>
+        /// <remarks>
+        /// This property is provided by the caller at construction time.
+        /// </remarks>
+        /// </summary>
+        public String Template { get; private set; }
+
+
+        /// <summary>
+        /// Creates a new instance if <see cref="XtraLiteTemplates.XLTemplate"/> class.
+        /// <remarks>
+        /// The value supplied in the <paramref name="template"/> parameter will be parsed, lexed and interpreted in the constructor. There are a number of exceptions
+        /// that can be trown at this stage.
+        /// </remarks>
+        /// </summary>
+        /// <param name="dialect">An instance <see cref="XtraLiteTemplates.Dialects.IDialect"/> used to define the domain-specific language properties.</param>
+        /// <param name="template">A <see cref="System.String"/> value that is compiled and used for evaluation.</param>
+        /// <exception cref="System.ArgumentNullException">Either <paramref name="dialect"/> or <paramref name="template"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="XtraLiteTemplates.Parsing.ParseException">Parsing error during template compilation.</exception>
+        /// <exception cref="XtraLiteTemplates.Expressions.ExpressionException">Expression parsing error during template compilation.</exception>
+        /// <exception cref="XtraLiteTemplates.Evaluation.InterpreterException">Lexical error during template compilation.</exception>
         public XLTemplate(IDialect dialect, String template)
         {
             Expect.NotNull("dialect", dialect);
@@ -214,6 +251,14 @@ namespace XtraLiteTemplates
             m_evaluable = Compile();
         }
 
+        /// <summary>
+        /// Evaluates the result of the compiled template. The resulting text is written to <paramref name="writer"/>. All key-value-pairs
+        /// contained in <paramref name="variables"/> are exposed to the compiled template as variables.
+        /// </summary>
+        /// <param name="writer">A <see cref="System.IO.TextWriter"/> instance which will be written to.</param>
+        /// <param name="variables">A <see cref="System.Collections.Generic.IReadOnlyDictionary{String}{Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <exception cref="System.ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any unrecoverable evaluation error.</exception>
         public void Evaluate(TextWriter writer, IReadOnlyDictionary<String, Object> variables)
         {
             Expect.NotNull("writer", writer);
@@ -232,6 +277,13 @@ namespace XtraLiteTemplates
             context.CloseEvaluationFrame();
         }
 
+        /// <summary>
+        /// Evaluates the result of the compiled template. All key-value-pairs contained in <paramref name="variables"/> are exposed to the compiled template as variables.
+        /// </summary>
+        /// <param name="variables">A <see cref="System.Collections.Generic.IReadOnlyDictionary{String}{Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <returns>The result of evaluating the template.</returns>
+        /// <exception cref="System.ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any unrecoverable evaluation error.</exception>
         public String Evaluate(IReadOnlyDictionary<String, Object> variables)
         {
             /* Call the original version with a created writer. */
@@ -242,15 +294,34 @@ namespace XtraLiteTemplates
             }
         }
 
+        /// <summary>
+        /// Returns a human-readable <see cref="System.String"/> representation of the compiled template.
+        /// </summary>
+        /// <returns>The <see cref="System.String"/> value.</returns>
         public override String ToString()
         {
-            if (m_evaluable != null)
-                return m_evaluable.ToString();
-            else
-                return null;
+            Debug.Assert(m_evaluable != null);
+            return m_evaluable.ToString();
         }
 
-
+        /// <summary>
+        /// An easy-to-use facade method that compiles a template and immediately evaluates it.
+        /// <remarks>
+        /// An optional set of <paramref name="arguments"/> can be provided to the template. These objects will be exposed to the compiled template at evaluation time as follows:
+        /// <para>
+        /// The first object in <paramref name="arguments"/> can be refereced as <c>_0</c> inside the template. The second object can be referenced as <c>_1</c> and so on. In a sense,
+        /// it tries to mimic the behaviour of <see cref="System.String.Format"/> method.</para>
+        /// </remarks>
+        /// </summary>
+        /// <param name="dialect">An instance <see cref="XtraLiteTemplates.Dialects.IDialect"/> used to define the domain-specific language properties.</param>
+        /// <param name="template">A <see cref="System.String"/> value that is compiled and used for evaluation.</param>
+        /// <param name="variables">A <see cref="System.Collections.Generic.IReadOnlyDictionary{String}{Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <returns>The result of evaluating the template.</returns>
+        /// <exception cref="System.ArgumentNullException">Either <paramref name="dialect"/>, <paramref name="template"/> or <paramref name="arguments"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="XtraLiteTemplates.Parsing.ParseException">Parsing error during template compilation.</exception>
+        /// <exception cref="XtraLiteTemplates.Expressions.ExpressionException">Expression parsing error during template compilation.</exception>
+        /// <exception cref="XtraLiteTemplates.Evaluation.InterpreterException">Lexical error during template compilation.</exception>
+        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any unrecoverable evaluation error.</exception>
         public static String Evaluate(IDialect dialect, String template, params Object[] arguments)
         {
             Expect.NotNull("dialect", dialect);

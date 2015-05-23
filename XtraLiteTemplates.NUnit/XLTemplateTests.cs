@@ -68,7 +68,7 @@ namespace XtraLiteTemplates.NUnit
             var variables = new Dictionary<String, Object>()
             {
             };
-
+  
             ExpectArgumentNullException("variables", () => template.Evaluate(null));
             ExpectArgumentNullException("writer", () => template.Evaluate(null, variables));
         }
