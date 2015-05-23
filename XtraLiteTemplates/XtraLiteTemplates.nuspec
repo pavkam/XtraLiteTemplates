@@ -2,7 +2,7 @@
 <package xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>XtraLiteTemplates</id>
-    <version>@build.number@</version>
+    <version>$version$</version>
     <authors>Alexandru Ciobanu (alex@ciobanu.org)</authors>
     <owners>Alexandru Ciobanu (alex@ciobanu.org)</owners>
     <licenseUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/LICENSE</licenseUrl>
