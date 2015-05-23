@@ -1,14 +1,1 @@
-# XtraLiteTemplates
-
-= Test
-
-  class Player
-    def play_turn(warrior)
-      # your code goes here
-    end
-  end
-
-
-*bold*
-
-    git clone https://github.com/scikit-learn/scikit-learn.git
+# XtraLiteTemplates - Leightweigth templating engine for Microsoft .NET and Mono Frameworks [![Build status](https://ci.appveyor.com/api/projects/status/gapq9gvrneooy1ob/branch/master?svg=true)](https://ci.appveyor.com/project/pavkam/xtralitetemplates/branch/master)
