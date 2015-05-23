@@ -174,10 +174,12 @@ namespace XtraLiteTemplates.Expressions
 
         private void CloseExistingGroup()
         {
-            if (!m_current.Continuity.HasFlag(PermittedContinuations.CloseGroup))
+            /* Special case just here! */
+            if (m_root.Parent == null)
                 ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupClose);
 
-            Debug.Assert(m_current != m_root && m_root.Parent != null);
+            if (!m_current.Continuity.HasFlag(PermittedContinuations.CloseGroup))
+                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.GroupClose);
 
             m_root.Close();
             m_current = m_root;
@@ -192,10 +194,12 @@ namespace XtraLiteTemplates.Expressions
 
         private void ContinueExistingGroup()
         {
-            if (!m_current.Continuity.HasFlag(PermittedContinuations.ContinueGroup))
+            /* Special case just here! */
+            if (m_current == m_root)
                 ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.Separator);
 
-            Debug.Assert(m_current != m_root);
+            if (!m_current.Continuity.HasFlag(PermittedContinuations.ContinueGroup))
+                ExceptionHelper.UnexpectedExpressionTerm(FlowSymbols.Separator);
 
             m_current = m_root;
         }

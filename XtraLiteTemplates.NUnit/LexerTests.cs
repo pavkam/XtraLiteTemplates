@@ -266,7 +266,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterOperator(new ArithmeticSubtractOperator(TypeConverter))
                 .RegisterOperator(new ArithmeticNegateOperator(TypeConverter));
 
-            AssertTagLex(lexer.ReadNext(), 0, 29, tag, "100 << -100 << 0.1 - ----0.1 << -1");
+            AssertTagLex(lexer.ReadNext(), 0, 29, tag, "100 << -100 << " + (0.1).ToString(CultureInfo.CurrentCulture) + " - ----" + (0.1).ToString(CultureInfo.CurrentCulture) + " << -1");
             Assert.IsNull(lexer.ReadNext());
         }
 
@@ -294,7 +294,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterTag(ifTag)
                 .RegisterSpecial("TRUE", 100.5);
 
-            AssertTagLex(lexer.ReadNext(), 0, 9, ifTag, "IF|100.5");
+            AssertTagLex(lexer.ReadNext(), 0, 9, ifTag, "IF|" + (100.5).ToString(CultureInfo.CurrentCulture));
             Assert.IsNull(lexer.ReadNext());
         }
 
@@ -716,7 +716,7 @@ namespace XtraLiteTemplates.NUnit
             var lexer = new Lexer(new Tokenizer(new StringReader(two_numbers), '{', '}', '"', '"', '\\', '['),
                 ExpressionFlowSymbols.Default, StringComparer.Ordinal).RegisterTag(exprTag);
 
-            AssertTagLex(lexer.ReadNext(), 0, two_numbers.Length, exprTag, "11.22");
+            AssertTagLex(lexer.ReadNext(), 0, two_numbers.Length, exprTag, (11.22).ToString(CultureInfo.CurrentCulture));
         }
     }
 }

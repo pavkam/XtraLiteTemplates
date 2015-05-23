@@ -82,7 +82,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             get
             {
-                if (Closed && Parent != null)
+                if (Closed)
                 {
                     return
                         PermittedContinuations.BinaryOperator |

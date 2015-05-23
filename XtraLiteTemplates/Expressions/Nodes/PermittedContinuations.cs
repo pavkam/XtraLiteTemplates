@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     [Flags]
     internal enum PermittedContinuations
     {
+        None = 0x00,
         Literal = 0x01,
         Identifier = 0x02,        
         UnaryOperator = 0x04,
