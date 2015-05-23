@@ -10,3 +10,5 @@
 
 
 *bold*
+
+    git clone https://github.com/scikit-learn/scikit-learn.git
