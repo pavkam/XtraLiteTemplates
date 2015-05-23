@@ -23,6 +23,25 @@ The easiest way to evaluate a template is by using the built-in facade class ```
 ```
 Will display `"Hello, John McMann. You are 31 years old and you love: Apples,Bikes,Everything Nice,"`
 
+```
+{preformatted}
+Hello {Customer.FirstName},
+
+You have made a purchase on {Order.SourceWebsite.Host} on {Order.DateTime:'g'} in amount of {Order.Currency} {Order.Total:'N'}.
+
+Your items include:
+{for each purchased_item in Order.Items}  * {purchased_item.Name} with a value of {Order.Currency} {purchased_item.Amount:'N'}{end}
+
+{if Order.DeliveryType == Postal}Your items will be delivered by post on {Order.DeliveryDate:'D'}{end}
+
+{'* This order is a gift' IF Order.IsGift}
+
+With respect,
+Somebody responsible.
+{end}
+```
+The above code block exemplifies a possible email template that uses the `Standard` dialect. One is in no way forced to use it; the library allows creation of custom dialects with custom constructs, custom special characters, etc. Nothing is "reserved" by the engine. There are a few small restrictions resulting from the tokenization process but those will be covered in a later area.
+
 ### Core Concepts & Building Blocks
 Put in the simplest of terms, the process of evaluation of a template follows the following pattern:
 * Tokenization, in which a string is split into tokens. The `tokenizer` requires a set of control characters that drive the process (such as the *directive open & close* characters or *string literal escape* characters).
