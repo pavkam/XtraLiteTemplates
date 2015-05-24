@@ -46,13 +46,15 @@ namespace XtraLiteTemplates.Dialects.Standard
     /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviours that concrete
     /// dialect implementations can use out-of-the box.
     /// </summary>
-    public abstract class StandardDialectBase : IDialect
+    public abstract class StandardDialectBase : IDialect, IObjectFormatter
     {
         private IPrimitiveTypeConverter m_typeConverter;
         private DialectCasing m_casing;
-        private IReadOnlyList<Operator> m_operators;
-        private IReadOnlyList<Directive> m_directives;
-        private IReadOnlyDictionary<String, Object> m_specials;
+        private List<Operator> m_operators;
+        private List<Directive> m_directives;
+        private Dictionary<String, Object> m_specials;
+        private Dictionary<Object, String> m_specialsIdentifiers;
+        private String m_undefinedSpecialIdentifier;
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported operators.
@@ -124,8 +126,9 @@ namespace XtraLiteTemplates.Dialects.Standard
             /* Build culture-aware values.*/
             Name = name;
             Culture = culture;
-            m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture);
+            m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture, this);
             m_casing = casing;
+            m_undefinedSpecialIdentifier = AdjustCasing("Undefined");
 
             var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
 
@@ -231,11 +234,17 @@ namespace XtraLiteTemplates.Dialects.Standard
             {
                 if (m_specials == null)
                 {
-                    var specials = new Dictionary<String, Object>(IdentifierComparer);
-                    foreach (var kvp in CreateSpecials())
-                        specials.Add(kvp.Key, kvp.Value);
+                    m_specials = new Dictionary<String, Object>(IdentifierComparer);
+                    m_specialsIdentifiers = new Dictionary<Object, String>();
 
-                    m_specials = specials;
+                    foreach (var kvp in CreateSpecials())
+                    {
+                        m_specials.Add(kvp.Key, kvp.Value);
+                        if (kvp.Value == null)
+                            m_undefinedSpecialIdentifier = kvp.Key;
+                        else
+                            m_specialsIdentifiers[kvp.Value] = kvp.Key;
+                    }
                 }
 
                 return m_specials;
@@ -393,6 +402,44 @@ namespace XtraLiteTemplates.Dialects.Standard
                 Name.GetHashCode() ^
                 m_casing.GetHashCode() ^
                 Culture.GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets the string representation of an <see cref="Object" /> using the given <paramref name="formatProvider"/>.
+        /// </summary>
+        /// <param name="obj">The object to obtain the string representation for.</param>
+        /// <param name="formatProvider">The format provider.</param>
+        /// <returns>
+        /// The string representation.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
+        String IObjectFormatter.ToString(Object obj, IFormatProvider formatProvider)
+        {
+            String result;
+
+            if (obj == null)
+                return m_undefinedSpecialIdentifier;
+            else if (!m_specialsIdentifiers.TryGetValue(obj, out result))
+            {
+                if (obj is String)
+                    result = (String)obj;
+                else if (obj is IFormattable)
+                    result = (obj as IFormattable).ToString(null, formatProvider);
+                else
+                    result = obj.ToString();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the string representation of an <see cref="Object"/>.
+        /// </summary>
+        /// <param name="obj">The object to obtain the string representation for.</param>
+        /// <returns>The string representation.</returns>
+        String IObjectFormatter.ToString(Object obj)
+        {
+            return ((IObjectFormatter)this).ToString(obj, Culture);
         }
     }
 }

@@ -38,6 +38,7 @@
     <Compile Include="Dialects\Standard\Directives\PreFormattedUnparsedTextDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
+    <Compile Include="Dialects\Standard\IObjectFormatter.cs" />
     <Compile Include="Dialects\Standard\Operators\ValueFormatOperator.cs" />
     <Compile Include="Expressions\Nodes\PermittedContinuations.cs" />
     <Compile Include="Expressions\Nodes\LiteralNode.cs" />

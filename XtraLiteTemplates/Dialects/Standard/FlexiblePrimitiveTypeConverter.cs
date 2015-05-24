@@ -97,15 +97,23 @@ namespace XtraLiteTemplates.Dialects.Standard
         public IFormatProvider FormatProvider { get; private set; }
 
         /// <summary>
+        /// <value>Specifies the object formatter used to transform objects to their string representations.</value>
+        /// <remarks>The value of the property is set by the caller during class construction.</remarks>
+        /// </summary>
+        public IObjectFormatter ObjectFormatter { get; private set; }
+
+        /// <summary>
         /// Creates a new instance of <see cref="FlexiblePrimitiveTypeConverter"/> class.
         /// </summary>
         /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="Double"/> values.</param>
-        /// <exception cref="ArgumentNullException"><paramref name="formatProvider"/> is <c>null</c>.</exception>
-        public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider)
+        /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> or <paramref name="objectFormatter"/> is <c>null</c>.</exception>
+        public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider, IObjectFormatter objectFormatter)
         {
             Expect.NotNull("formatProvider", formatProvider);
+            Expect.NotNull("objectFormatter", objectFormatter);
 
             FormatProvider = formatProvider;
+            ObjectFormatter = objectFormatter;
         }
 
         /// <summary>
@@ -167,21 +175,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public virtual String ConvertToString(Object obj)
         {
             obj = ReduceObject(obj);
-
-            String result;
-
-            if (obj is String)
-                result = (String)obj;
-            else if (obj is Double)
-                result = ((Double)obj).ToString(FormatProvider);
-            else if (obj is Boolean)
-                result = ((Boolean)obj).ToString(FormatProvider);
-            else if (obj == null)
-                result = "undefined";
-            else
-                result = obj.ToString();
-
-            return result;
+            return ObjectFormatter.ToString(obj, FormatProvider);
         }
 
         /// <summary>

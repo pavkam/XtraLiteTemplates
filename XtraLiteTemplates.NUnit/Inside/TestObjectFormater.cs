@@ -26,39 +26,42 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.Parsing
+namespace XtraLiteTemplates.NUnit.Inside
 {
     using System;
+    using System.Diagnostics;
+    using System.Globalization;
+using XtraLiteTemplates.Dialects.Standard;
 
-    /// <summary>
-    /// A <see cref="Lex"/> object representing an uparsed text block.
-    /// </summary>
-    public sealed class UnparsedLex : Lex
+    public sealed class TestObjectFormatter : IObjectFormatter
     {
-        /// <summary>
-        /// Specifies the unparsed text (as read from the input template).
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        /// <value>
-        /// The unparsed text.
-        /// </value>
-        public String UnparsedText { get; private set; }
+        private CultureInfo m_culture;
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="UnparsedLex"/> class.
-        /// </summary>
-        /// <param name="unparsedText">The unparsed text.</param>
-        /// <param name="firstCharacterIndex">Index of the first character in the input template.</param>
-        /// <param name="originalLength">Original length of the unparsed text.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="unparsedText"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="unparsedText"/> is empty.</exception>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        public UnparsedLex(String unparsedText, Int32 firstCharacterIndex, Int32 originalLength)
-            : base(firstCharacterIndex, originalLength)
+        public TestObjectFormatter(CultureInfo culture)
         {
-            Expect.NotEmpty("unparsedText", unparsedText);
+            Debug.Assert(culture != null);
+            m_culture = culture;
+        }
 
-            this.UnparsedText = unparsedText;
+        public String ToString(Object obj, IFormatProvider formatProvider)
+        {
+            String result;
+
+            if (obj == null)
+                return "!undefined!";
+            else if (obj is String)
+                result = (String)obj;
+            else if (obj is IFormattable)
+                result = (obj as IFormattable).ToString(null, formatProvider);
+            else
+                result = obj.ToString();
+
+            return result;
+        }
+
+        public String ToString(Object obj)
+        {
+            return ((IObjectFormatter)this).ToString(obj, m_culture);
         }
     }
 }

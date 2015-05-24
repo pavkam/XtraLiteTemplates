@@ -153,11 +153,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             return new KeyValuePair<String, Object>[]
             {
-                new KeyValuePair<String, Object>( AdjustCasing("TRUE"), true ),
-                new KeyValuePair<String, Object>( AdjustCasing("FALSE"), false ),
-                new KeyValuePair<String, Object>( AdjustCasing("UNDEFINED"), null ),
-                new KeyValuePair<String, Object>( AdjustCasing("NAN"), Double.NaN ),
-                new KeyValuePair<String, Object>( AdjustCasing("INFINITY"), Double.PositiveInfinity ),
+                new KeyValuePair<String, Object>(AdjustCasing("True"), true),
+                new KeyValuePair<String, Object>(AdjustCasing("False"), false),
+                new KeyValuePair<String, Object>(AdjustCasing("Undefined"), null),
+                new KeyValuePair<String, Object>(AdjustCasing("NaN"), Double.NaN),
+                new KeyValuePair<String, Object>(AdjustCasing("Infinity"), Double.PositiveInfinity),
             };
         }
 

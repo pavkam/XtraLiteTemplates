@@ -274,7 +274,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
         }
 
         [Test]
-        public void TestCaseSpecialKeywordsCaseSensitiveLowed()
+        public void TestCaseSpecialKeywordsCaseInsensitive()
         {
             var dialect = new CodeMonkeyDialect(DialectCasing.IgnoreCase);
 

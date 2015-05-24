@@ -113,7 +113,7 @@ namespace XtraLiteTemplates.NUnit
                 { "variable", 2 }
             };
 
-            Assert.AreEqual("V =undefined", template.Evaluate(variables1));
+            Assert.AreEqual("V =UNDEFINED", template.Evaluate(variables1));
             Assert.AreEqual("V =1", template.Evaluate(variables2));
             Assert.AreEqual("V =2", template.Evaluate(variables3));
         }
@@ -124,7 +124,7 @@ namespace XtraLiteTemplates.NUnit
             var text = "{if true then}eat a cookie!{else}{variable}{end}";
             var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
 
-            Assert.AreEqual("(({if @true then}eat a cookie!{else}({@variable}){end}))", template.ToString());
+            Assert.AreEqual("(({if True then}eat a cookie!{else}({@variable}){end}))", template.ToString());
         }
 
         [Test]

@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.NUnit
     using System.Linq;
     using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.NUnit.Inside;
 
     [TestFixture]
     public class FlexiblePrimitiveTypeConverterTests : TestBase
@@ -43,16 +44,20 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConstruction()
         {
-            ExpectArgumentNullException("formatProvider", () => new FlexiblePrimitiveTypeConverter(null));
+            var objectFormatter = new TestObjectFormatter(CultureInfo.CurrentCulture);
 
-            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+            ExpectArgumentNullException("formatProvider", () => new FlexiblePrimitiveTypeConverter(null, objectFormatter));
+            ExpectArgumentNullException("objectFormatter", () => new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, null));
+
+            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, objectFormatter);
             Assert.AreEqual(CultureInfo.InvariantCulture, converter.FormatProvider);
+            Assert.AreEqual(objectFormatter, converter.ObjectFormatter);
         }
 
         [Test]
         public void TestCaseTypeOf()
         {
-            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
             Assert.AreEqual(PrimitiveType.Number, converter.TypeOf(default(Byte)));
             Assert.AreEqual(PrimitiveType.Number, converter.TypeOf(default(SByte)));
@@ -74,7 +79,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConvertToBoolean()
         {
-            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
             Assert.AreEqual(false, converter.ConvertToBoolean(default(Byte)));
             Assert.AreEqual(true, converter.ConvertToBoolean((Byte)10));
@@ -109,7 +114,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConvertToString()
         {
-            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
             Assert.AreEqual("10", converter.ConvertToString((Byte)10));
             Assert.AreEqual("10", converter.ConvertToString((SByte)10));
@@ -126,14 +131,14 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("True", converter.ConvertToString(true));
             Assert.AreEqual(String.Empty, converter.ConvertToString(String.Empty));
             Assert.AreEqual("anything", converter.ConvertToString("anything"));
-            Assert.AreEqual("undefined", converter.ConvertToString(null));
+            Assert.AreEqual("!undefined!", converter.ConvertToString(null));
             Assert.AreEqual(this.ToString(), converter.ConvertToString(this));
         }
 
         [Test]
         public void TestCaseConvertToNumber()
         {
-            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
             Assert.AreEqual(10, converter.ConvertToNumber((Byte)10));
             Assert.AreEqual(-10, converter.ConvertToNumber((SByte)(-10)));
@@ -158,7 +163,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConvertToInteger()
         {
-            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
             Assert.AreEqual(1, converter.ConvertToInteger((Byte)1));
             Assert.AreEqual(-1, converter.ConvertToInteger((SByte)(-1)));
@@ -183,7 +188,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConvertToSequence()
         {
-            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
             /* Undefined */
             Assert.IsNull(converter.ConvertToSequence(null));
@@ -216,7 +221,9 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseCultureSpecific()
         {
-            var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.GetCultureInfo("ro-RO"));
+            var culture = CultureInfo.GetCultureInfo("ro-RO");
+            var objectFormatter = new TestObjectFormatter(culture);
+            var converter = new FlexiblePrimitiveTypeConverter(culture, objectFormatter);
 
             Assert.AreEqual(-1234.5, converter.ConvertToNumber("-1.234,5"));
             Assert.AreEqual(-1234, converter.ConvertToInteger("-1.234,5"));

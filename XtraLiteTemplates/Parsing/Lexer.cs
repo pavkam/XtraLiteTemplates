@@ -174,7 +174,7 @@ namespace XtraLiteTemplates.Parsing
             m_expressionOperators = new List<Operator>();
             m_unaryExpressionOperators = new HashSet<String>(comparer);
             m_binaryExpressionOperators = new HashSet<String>(comparer);
-            m_specials = new Dictionary<String, Object>();
+            m_specials = new Dictionary<String, Object>(comparer);
 
             m_expressionFlowSymbols = expressionFlowSymbols;
 

@@ -32,14 +32,39 @@ namespace XtraLiteTemplates.Parsing
     using System.Text;
 
     /// <summary>
-    /// Represents a lex object that identifies a valid tag. 
+    /// A <see cref="Lex"/> object representing a matched <see cref="Tag"/>.
     /// </summary>
     public sealed class TagLex : Lex
     {
+        /// <summary>
+        /// Specifies the tag that is matched by this lex.
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The tag object
+        /// </value>
         public Tag Tag { get; private set; }
 
+        /// <summary>
+        /// Lists all the components of the matched tag. The number of items in this property matches the <see cref="XtraLiteTemplates.Parsing.Tag.ComponentCount"/> property.
+        /// Each item can either be a <see cref="String"/> or an <see cref="XtraLiteTemplates.Expressions.Expression"/>, depending on which of the tag's component was matched.
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The matched tag's components.
+        /// </value>
         public Object[] Components { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TagLex"/> class.
+        /// </summary>
+        /// <param name="tag">The matched tag.</param>
+        /// <param name="components">The matched tag's components.</param>
+        /// <param name="firstCharacterIndex">Index of the first character in the input template.</param>
+        /// <param name="originalLength">Original length of all the tags combined that make up this lex.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="tag"/> or <paramref name="components"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="components"/> is empty.</exception>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
         public TagLex(Tag tag, Object[] components, Int32 firstCharacterIndex, Int32 originalLength)
             : base(firstCharacterIndex, originalLength)
         {
@@ -50,6 +75,12 @@ namespace XtraLiteTemplates.Parsing
             Tag = tag;
         }
 
+        /// <summary>
+        /// Returns a human-readable representation of this lex object.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the current lex object.
+        /// </returns>
         public override String ToString()
         {
             return String.Join(" ", Components);

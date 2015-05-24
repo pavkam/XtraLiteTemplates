@@ -48,6 +48,7 @@
     <Compile Include="Directives\StandardForEachDirectiveTests.cs" />
     <Compile Include="Directives\StandardConditionalInterpolationDirectiveTests.cs" />
     <Compile Include="ExpressionFlowSymbolsTests.cs" />
+    <Compile Include="Inside\TestObjectFormater.cs" />
     <Compile Include="Operators\ArithmeticNeutralOperatorTests.cs" />
     <Compile Include="Operators\ArithmeticNegateOperatorTests.cs" />
     <Compile Include="Operators\ArithmeticMultiplyOperatorTests.cs" />

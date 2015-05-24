@@ -29,14 +29,16 @@
 namespace XtraLiteTemplates.Parsing
 {
     /// <summary>
-    /// Defines the commont traits of a tokenizer.
+    /// Defines the common traits of a tokenizer. A tokenizer is responsible for transforming a text document into a sequence of tokens
+    /// easily interpretable by the other parts of this library.
     /// </summary>
     public interface ITokenizer
     {
         /// <summary>
-        /// Reads the next <see cref="XtraLiteTemplates.Parsing.Token"/> object from the input template.
+        /// Reads the next <see cref="Token"/> object from the input template.
         /// </summary>
-        /// <returns>The next read token, or <c>null</c> if the end of template was reached.</returns>
+        /// <returns>The next read token; or <c>null</c> if the end of template was reached.</returns>
+        /// <exception cref="ParseException">Any parsing error encountered.</exception>
         Token ReadNext();
     }
 }

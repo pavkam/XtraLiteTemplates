@@ -31,28 +31,34 @@ namespace XtraLiteTemplates.Parsing
     using System;
 
     /// <summary>
-    /// Base class for the two types of lex objects returned during the lexical analysis process.
+    /// Abstract base class for all lex objects created and passed along during the lexical analysis process.
     /// </summary>
     public abstract class Lex
     {
         /// <summary>
-        /// <value>The index in the input template of the first character of the first token that makes up this lex object.</value>
+        /// The index in the input template of the first character of the first token that makes up this lex object.
         /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
         /// </summary>
+        /// <value>
+        /// The index of the first character.
+        /// </value>
         public Int32 FirstCharacterIndex { get; private set; }
 
         /// <summary>
-        /// <value>The original length of all the combined tokens that make up this lex object.</value>
+        /// The original length of all tokens combined that make up this lex object.
         /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
         /// </summary>
+        /// <value>
+        /// The total length of all tokens that make up this lex.
+        /// </value>
         public Int32 OriginalLength { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.Lex"/> class.
+        /// Initializes a new instance of the <see cref="Lex"/> class.
         /// </summary>
-        /// <param name="firstCharacterIndex">The index in the input template of the first character of the first token that makes up this lex object.</param>
-        /// <param name="originalLength">The original length of all the combined tokens that make up this lex object.</param>
-        /// <exception cref="System.ArgumentOutOfRangeException"><paramref name="firstCharacterIndex"/> is less than zero; or <paramref name="originalLength"/> is less or equal to zero.</exception>
+        /// <param name="firstCharacterIndex">The index of the first character in the input template</param>
+        /// <param name="originalLength">The combined length of all tokens that make up this lex object.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
         protected Lex(Int32 firstCharacterIndex, Int32 originalLength)
         {
             Expect.GreaterThanOrEqual("firstCharacterIndex", firstCharacterIndex, 0);

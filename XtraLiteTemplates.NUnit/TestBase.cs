@@ -40,12 +40,13 @@ namespace XtraLiteTemplates.NUnit
     using System.Collections.Generic;
     using XtraLiteTemplates.NUnit.Inside;
     using System.IO;
-using System.Diagnostics;
+    using System.Diagnostics;
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
     public class TestBase
     {
-        protected IPrimitiveTypeConverter TypeConverter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture);
+        protected static IObjectFormatter ObjectFormatter = new TestObjectFormatter(CultureInfo.InvariantCulture);
+        protected static IPrimitiveTypeConverter TypeConverter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
 
         protected String Evaluate(IEvaluable evaluable, StringComparer comparer, params KeyValuePair<String, Object>[] values)
