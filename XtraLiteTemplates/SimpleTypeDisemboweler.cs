@@ -48,7 +48,7 @@ namespace XtraLiteTemplates
         }
 
         /// <summary>
-        /// Defines a set of options that guides the <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/>.
+        /// Defines a set of options that guides the <see cref="SimpleTypeDisemboweler"/>.
         /// </summary>
         [Flags]
         public enum EvaluationOptions
@@ -58,12 +58,12 @@ namespace XtraLiteTemplates
             /// </summary>
             None = 0,
             /// <summary>
-            /// Instructs the <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/> to treat parameterless, methods to be treated as properties.
+            /// Instructs the <see cref="SimpleTypeDisemboweler"/> to treat parameterless, methods to be treated as properties.
             /// The <c>void</c> return type will be treated as <c>null</c>.
             /// </summary>
             TreatParameterlessFunctionsAsProperties = 1,
             /// <summary>
-            /// Instructs the <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/> to silently return <c>null</c> for any property that raised an exception
+            /// Instructs the <see cref="SimpleTypeDisemboweler"/> to silently return <c>null</c> for any property that raised an exception
             /// during evaluation.
             /// </summary>
             TreatAllErrorsAsNull = 2,
@@ -76,26 +76,26 @@ namespace XtraLiteTemplates
         public Type Type { get; private set; }
 
         /// <summary>
-        /// <value>An instance of <see cref="System.Collections.Generic.IEqualityComparer{String}"/> used by <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/> to compare the 
-        /// names of properies. This property is primarily used to decide the case-sensitivity of this <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/> instance.</value>
+        /// <value>An instance of <see cref="IEqualityComparer{String}"/> used by <see cref="SimpleTypeDisemboweler"/> to compare the 
+        /// names of properies. This property is primarily used to decide the case-sensitivity of this <see cref="SimpleTypeDisemboweler"/> instance.</value>
         /// <remarks>Value provided by the caller during construction.</remarks>
         /// </summary>
         public IEqualityComparer<String> Comparer { get; private set; }
 
         /// <summary>
-        /// <value>A set of <see cref="XtraLiteTemplates.SimpleTypeDisemboweler.EvaluationOptions"/> options that modifies the bahaviour of this 
-        /// <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/> instance.</value>
+        /// <value>A set of <see cref="EvaluationOptions"/> options that modifies the bahaviour of this 
+        /// <see cref="SimpleTypeDisemboweler"/> instance.</value>
         /// <remarks>Value provided by the caller during construction.</remarks>
         /// </summary>
         public EvaluationOptions Options { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/> class.
+        /// Creates a new instance of <see cref="SimpleTypeDisemboweler"/> class.
         /// </summary>
         /// <param name="type">The <see cref="System.Type"/> to inspect.</param>
-        /// <param name="options">A set of <see cref="XtraLiteTemplates.SimpleTypeDisemboweler.EvaluationOptions"/> options.</param>
-        /// <param name="memberComparer">An instance of <see cref="System.Collections.Generic.IEqualityComparer{String}"/> used when looking up properties in the inspected type.</param>
-        /// <exception cref="System.ArgumentNullException">Either <paramref name="type"/> or <paramref name="memberComparer"/> parameters are <c>null</c>.</exception>
+        /// <param name="options">A set of <see cref="EvaluationOptions"/> options.</param>
+        /// <param name="memberComparer">An instance of <see cref="IEqualityComparer{String}"/> used when looking up properties in the inspected type.</param>
+        /// <exception cref="ArgumentNullException">Either <paramref name="type"/> or <paramref name="memberComparer"/> parameters are <c>null</c>.</exception>
         public SimpleTypeDisemboweler(Type type, EvaluationOptions options, IEqualityComparer<String> memberComparer)
         {
             Expect.NotNull("type", type);
@@ -109,15 +109,15 @@ namespace XtraLiteTemplates
         }
 
         /// <summary>
-        /// Reads the <paramref name="property"/> of <paramref name="instance"/>.
+        /// Reads the <paramref name="property" /> of <paramref name="instance" />.
         /// </summary>
         /// <param name="property">The property name.</param>
         /// <param name="instance">The object whose property is being read.</param>
-        /// <exception cref="System.ArgumentNullException"><paramref name="property"/> is <c>null</c>. The <paramref name="instance"/> is <c>null</c> and this instance of <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/>
+        /// <returns></returns>
+        /// <exception cref="ArgumentNullException"><paramref name="property" /> is <c>null</c>. The <paramref name="instance" /> is <c>null</c> and this instance of <see cref="SimpleTypeDisemboweler" />
         /// is not instructed to ignore evaluation errors.</exception>
-        /// <exception cref="System.ArgumentException"><paramref name="property"/> is not a valid identifier.</exception>
-        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Read error while reading the property value; and this instance of <see cref="XtraLiteTemplates.SimpleTypeDisemboweler"/>
-        /// is not instructed to ignore evaluation errors.</exception>
+        /// <exception cref="ArgumentException"><paramref name="property" /> is not a valid identifier.</exception>
+        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any error while reading the property value</exception>
         public Object Read(String property, Object instance)
         {
             Expect.Identifier("property", property);

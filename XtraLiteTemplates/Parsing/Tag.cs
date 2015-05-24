@@ -150,9 +150,12 @@ namespace XtraLiteTemplates.Parsing
         /// <summary>
         /// Appends identifier set requirement component to the tag's matching pattern. Any identifier contained in the provided set of options will match this component.
         /// </summary>
-        /// <returns>This tag instance.</returns>
-        /// <exception cref="System.ArgumentNullException"><param name="candidates"> or any of its elements are <c>null</c>.</exception>
-        /// <exception cref="System.ArgumentException"><param name="candidates"> is <c>empty</c> or any of its elements is not a valid identifier.</exception>
+        /// <param name="candidates">The candidate identifier set.</param>
+        /// <returns>
+        /// This tag instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="candidates" /> or any of its elements are <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="candidates" /> is <c>empty</c> or any of its elements is not a valid identifier.</exception>
         public Tag Identifier(params String[] candidates)
         {
             Expect.NotEmpty("candidates", candidates);
@@ -167,7 +170,9 @@ namespace XtraLiteTemplates.Parsing
         /// <summary>
         /// Appends an expression requirement component to the tag's matching pattern.
         /// </summary>
-        /// <returns>This tag instance.</returns>
+        /// <returns>
+        /// This tag instance.
+        /// </returns>
         /// <exception cref="System.InvalidOperationException">If the previous requirement component was another expression.</exception>
         public Tag Expression()
         {
@@ -182,7 +187,9 @@ namespace XtraLiteTemplates.Parsing
         /// <summary>
         /// A human-readable representation of the tag's structure. The representation uses the same markup language used to create the tag.
         /// </summary>
-        /// <returns>A <see cref="System.String"/> value.</returns>
+        /// <returns>
+        /// A string that represents the current object.
+        /// </returns>
         public override String ToString()
         {
             if (m_components.Count == 0)

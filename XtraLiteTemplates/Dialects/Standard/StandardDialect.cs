@@ -42,19 +42,54 @@ namespace XtraLiteTemplates.Dialects.Standard
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
+    /// <summary>
+    /// The standard dialect. Contains the full set of supported expression operators, directives and special constants.
+    /// This is the default, medium-verbosity dialect exposed by this library.
+    /// See <seealso cref="CodeMonkeyDialect" /> for a less verbose, programmer-oriented dialect.
+    /// </summary>
     public class StandardDialect : StandardDialectBase
     {
+        /// <summary>
+        /// Gets a culture-invariant, case-insensitive instance of <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <value>
+        /// The culture-invariant, case-insensitive instance of <see cref="StandardDialect"/> class.
+        /// </value>
         public static IDialect DefaultIgnoreCase { get; private set; }
+
+        /// <summary>
+        /// Gets a culture-invariant, case-sensitive (upper cased) instance of <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <value>
+        /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
+        /// </value>
         public static IDialect Default { get; private set; }
 
+        /// <summary>
+        /// Initializes the <see cref="StandardDialect"/> class.
+        /// </summary>
         static StandardDialect()
         {
             DefaultIgnoreCase = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
             Default = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
         }
 
+        /// <summary>
+        /// Specifies the state object that can be used by directive to disable the unhandled text tirimming behaviour.
+        /// </summary>
+        /// <value>
+        /// The preformatted state object.
+        /// </value>
         protected Object PreformattedStateObject { get; private set; }
 
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported operators.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implentation used for type conversions.</param>
+        /// <returns>
+        /// An array of all supported operators.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         protected override Operator[] CreateOperators(IPrimitiveTypeConverter typeConverter)
         {
             return new Operator[]
@@ -86,6 +121,14 @@ namespace XtraLiteTemplates.Dialects.Standard
             };
         }
 
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported directives.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implentation used for type conversions.</param>
+        /// <returns>
+        /// An array of all supported directives.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         protected override Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter)
         {
             return new Directive[]
@@ -100,6 +143,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             };
         }
 
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported special constants.
+        /// </summary>
+        /// <returns>
+        /// An array of all supported special constants.
+        /// </returns>
         protected override KeyValuePair<String, Object>[] CreateSpecials()
         {
             return new KeyValuePair<String, Object>[]
@@ -112,24 +161,50 @@ namespace XtraLiteTemplates.Dialects.Standard
             };
         }
 
-
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <param name="name">A human-readable name for the dialect.</param>
+        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behaviour of the dialect.</param>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behaviour.</param>
+        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
         protected StandardDialect(String name, CultureInfo culture, DialectCasing casing)
             : base(name, culture, casing)
         {
             PreformattedStateObject = new Object();
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behaviour of the dialect.</param>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behaviour.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="culture" /> is <c>null</c>.</exception>
         public StandardDialect(CultureInfo culture, DialectCasing casing)
             : this("Standard", culture, casing)
         {
         }
 
+        /// <summary>
+        /// Initializes a new culture-invariant, case-insensitive instance of the <see cref="StandardDialect" /> class.
+        /// </summary>
         public StandardDialect()
             : this(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase)
         {
         }
 
-
+        /// <summary>
+        /// Processes all unparsed text blocks read from the original template. The method current implementation
+        /// trims all white-spaces and new line characters and replaces them with a single white-space character (emulates how HTML trimming works).
+        /// A preformatted directive is available to allow disabling this default behaviour and preserving all original formatting.
+        /// </summary>
+        /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
+        /// <param name="unparsedText">The text block being processed.</param>
+        /// <returns>
+        /// The processed text value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override String DecorateUnparsedText(IExpressionEvaluationContext context, String unparsedText)
         {
             Expect.NotNull("context", context);
@@ -140,6 +215,12 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return base.DecorateUnparsedText(context, unparsedText);
         }
 
+        /// <summary>
+        /// Specifies the tag start character (used by the tokenization process).
+        /// </summary>
+        /// <value>
+        /// The tag start character.
+        /// </value>
         public override Char StartTagCharacter
         {
             get
@@ -148,6 +229,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
+        /// <summary>
+        /// Specifies the tag end character (used by the tokenization process).
+        /// </summary>
+        /// <value>
+        /// The tag end character.
+        /// </value>
         public override Char EndTagCharacter
         {
             get 
@@ -156,6 +243,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
+        /// <summary>
+        /// Specifies the string literal start character (used by the tokenization process).
+        /// </summary>
+        /// <value>
+        /// The string literal start character.
+        /// </value>
         public override Char StartStringLiteralCharacter
         {
             get
@@ -164,6 +257,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
+        /// <summary>
+        /// Specifies the string literal end character (used by the tokenization process).
+        /// </summary>
+        /// <value>
+        /// The string literal end character.
+        /// </value>
         public override Char EndStringLiteralCharacter
         {
             get
@@ -172,6 +271,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
+        /// <summary>
+        /// Specifies the string literal escape character (used by the tokenization process).
+        /// </summary>
+        /// <value>
+        /// The string literal escape character.
+        /// </value>
         public override Char StringLiteralEscapeCharacter
         {
             get
@@ -180,6 +285,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
+        /// <summary>
+        /// Specifies the number literal decimal separator character (used by the tokenization process).
+        /// </summary>
+        /// <value>
+        /// The number literal decimal separator character.
+        /// </value>
         public override Char NumberDecimalSeparatorCharacter
         {
             get
@@ -191,11 +302,24 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="Object" /> is equal to the current <see cref="StandardDialect" />.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current dialect class instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
+        /// </returns>
         public override Boolean Equals(Object obj)
         {
             return base.Equals(obj as StandardDialect);
         }
 
+        /// <summary>
+        /// Calculates the hash for this dialect class instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current <see cref="StandardDialect" />.
+        /// </returns>
         public override Int32 GetHashCode()
         {
             return base.GetHashCode() ^ GetType().GetHashCode();

@@ -42,17 +42,45 @@ namespace XtraLiteTemplates.Dialects.Standard
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
+    /// <summary>
+    /// A minimalistic, programmer-oriented standard dialect. Contains the full set of supported expression operators, directives and special constants.
+    /// See <seealso cref="StandardDialect" /> for a medium verbose dialect.
+    /// </summary>
     public class CodeMonkeyDialect : StandardDialect
     {
+        /// <summary>
+        /// Gets a culture-invariant, case-insensitive instance of <see cref="CodeMonkeyDialect"/> class.
+        /// </summary>
+        /// <value>
+        /// The culture-invariant, case-insensitive instance of <see cref="CodeMonkeyDialect"/> class.
+        /// </value>
         public static new IDialect DefaultIgnoreCase { get; private set; }
+
+        /// <summary>
+        /// Gets a culture-invariant, case-sensitive (upper cased) instance of <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <value>
+        /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
+        /// </value>
         public static new IDialect Default { get; private set; }
 
+        /// <summary>
+        /// Initializes the <see cref="CodeMonkeyDialect"/> class.
+        /// </summary>
         static CodeMonkeyDialect()
         {
             DefaultIgnoreCase = new CodeMonkeyDialect(DialectCasing.IgnoreCase);
             Default = new CodeMonkeyDialect(DialectCasing.UpperCase);
         }
 
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported directives.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implentation used for type conversions.</param>
+        /// <returns>
+        /// An array of all supported directives.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         protected override Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter)
         {
             return new Directive[]
@@ -67,17 +95,30 @@ namespace XtraLiteTemplates.Dialects.Standard
             };
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CodeMonkeyDialect"/> class.
+        /// </summary>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behaviour.</param>
         public CodeMonkeyDialect(DialectCasing casing)
             : base("Code Monkey", CultureInfo.InvariantCulture, casing)
         {
         }
 
+        /// <summary>
+        /// Initializes a new case-insensitive instance of the <see cref="CodeMonkeyDialect" /> class.
+        /// </summary>
         public CodeMonkeyDialect()
             : this(DialectCasing.IgnoreCase)
         {
         }
 
 
+        /// <summary>
+        /// Specifies the string literal start character (used by the tokenization process).
+        /// </summary>
+        /// <value>
+        /// The string literal start character.
+        /// </value>
         public override Char StartStringLiteralCharacter
         {
             get
@@ -86,6 +127,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
+        /// <summary>
+        /// Specifies the string literal end character (used by the tokenization process).
+        /// </summary>
+        /// <value>
+        /// The string literal end character.
+        /// </value>
         public override Char EndStringLiteralCharacter
         {
             get
@@ -95,11 +142,24 @@ namespace XtraLiteTemplates.Dialects.Standard
         }
 
 
+        /// <summary>
+        /// Determines whether the specified <see cref="Object" /> is equal to the current <see cref="CodeMonkeyDialect" />.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current dialect class instance.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
+        /// </returns>
         public override Boolean Equals(Object obj)
         {
             return base.Equals(obj as CodeMonkeyDialect);
         }
 
+        /// <summary>
+        /// Calculates the hash for this dialect class instance.
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current <see cref="CodeMonkeyDialect" />.
+        /// </returns>
         public override Int32 GetHashCode()
         {
             return base.GetHashCode() ^ GetType().GetHashCode();

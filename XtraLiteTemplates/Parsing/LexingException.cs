@@ -43,8 +43,9 @@ namespace XtraLiteTemplates.Parsing
         public Token Token { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.LexingException"/> class.
+        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.LexingException" /> class.
         /// </summary>
+        /// <param name="innerException">The inner exception.</param>
         /// <param name="token">The token that resulted in the error being thrown.</param>
         /// <param name="format">A format string.</param>
         /// <param name="args">Format arguments.</param>

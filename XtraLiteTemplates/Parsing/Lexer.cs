@@ -213,9 +213,9 @@ namespace XtraLiteTemplates.Parsing
         /// Registers a know operator with this lexer instance. All registered operators will take part in the matching process 
         /// during the expression analysis of the incoming tokens.
         /// </summary>
-        /// <param name="@operator">A <see cref="XtraLiteTemplates.Expressions.Operators.Operator"/> object to register.</param>
+        /// <param name="operator">A <see cref="XtraLiteTemplates.Expressions.Operators.Operator"/> object to register.</param>
         /// <returns>This lexer instance.</returns>
-        /// <exception cref="System.ArgumentNullException"><paramref name="@operator"/> is <c>null</c>.</exception>
+        /// <exception cref="System.ArgumentNullException">Argument <paramref name="operator"/> is <c>null</c>.</exception>
         public Lexer RegisterOperator(Operator @operator)
         {
             Expect.NotNull("operator", @operator);

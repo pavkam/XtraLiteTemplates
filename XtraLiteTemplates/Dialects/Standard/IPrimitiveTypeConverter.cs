@@ -17,7 +17,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// method to detect the data types involved in the operation and decide on the appropriate evaluation techniques.
         /// </summary>
         /// <param name="obj">The object to check the type for.</param>
-        /// <returns>A <see cref="XtraLiteTemplates.Dialects.Standard.PrimitiveType"/> value.</returns>
+        /// <returns>
+        /// A <see cref="PrimitiveType" /> value.
+        /// </returns>
         PrimitiveType TypeOf(Object obj);
 
         /// <summary>
@@ -27,7 +29,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </remarks>
         /// </summary>
         /// <param name="obj">The object to convert.</param>
-        /// <returns>A <see cref="System.Int32"/> value.</returns>
+        /// <returns>
+        /// A <see cref="Int32" /> value.
+        /// </returns>
         Int32 ConvertToInteger(Object obj);
 
         /// <summary>
@@ -37,7 +41,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </remarks>
         /// </summary>
         /// <param name="obj">The object to convert.</param>
-        /// <returns>A <see cref="System.Double"/> value.</returns>
+        /// <returns>
+        /// A <see cref="Double" /> value.
+        /// </returns>
         Double ConvertToNumber(Object obj);
 
         /// <summary>
@@ -47,7 +53,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </remarks>
         /// </summary>
         /// <param name="obj">The object to convert.</param>
-        /// <returns>A <see cref="System.String"/> value.</returns>
+        /// <returns>
+        /// A <see cref="String" /> value.
+        /// </returns>
         String ConvertToString(Object obj);
 
         /// <summary>
@@ -57,7 +65,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </remarks>
         /// </summary>
         /// <param name="obj">The object to convert.</param>
-        /// <returns>A <see cref="System.Boolean"/> value.</returns>
+        /// <returns>
+        /// A <see cref="Boolean" /> value.
+        /// </returns>
         Boolean ConvertToBoolean(Object obj);
 
         /// <summary>
@@ -67,7 +77,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </remarks>
         /// </summary>
         /// <param name="obj">The object to convert.</param>
-        /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Object}"/> value.</returns>
+        /// <returns>
+        /// A <see cref="IEnumerable{Object}" /> value.
+        /// </returns>
         IEnumerable<Object> ConvertToSequence(Object obj);
     }
 }

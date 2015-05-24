@@ -43,8 +43,9 @@ namespace XtraLiteTemplates.Parsing
         public Int32 CharacterIndex { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.ParseException"/> class.
+        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.ParseException" /> class.
         /// </summary>
+        /// <param name="innerException">The inner exception.</param>
         /// <param name="characterIndex">The index of the character where the parsing error occured.</param>
         /// <param name="format">A format string.</param>
         /// <param name="args">Format arguments.</param>
