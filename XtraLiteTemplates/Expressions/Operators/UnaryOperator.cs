@@ -30,13 +30,29 @@ namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
 
+    /// <summary>
+    /// The abstract base class for all unary expression operators.
+    /// </summary>
     public abstract class UnaryOperator : Operator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="UnaryOperator"/> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
         protected UnaryOperator(String symbol)
             : base(symbol, 1) 
         {
         }
 
+        /// <summary>
+        /// Evaluates the current operator for a given <paramref name="arg"/> operand.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="arg">The operand.</param>
+        /// <returns>The evaluated object.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
         public abstract Object Evaluate(IExpressionEvaluationContext context, Object arg);
     }
 }

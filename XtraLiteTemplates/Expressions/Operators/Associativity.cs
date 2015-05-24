@@ -28,9 +28,18 @@
 
 namespace XtraLiteTemplates.Expressions.Operators
 {
+    /// <summary>
+    /// Determines the associativity of an operator (the relation of an operator in relation with other operats of the same precedence).
+    /// </summary>
     public enum Associativity
     {
+        /// <summary>
+        /// The left to right associativity.
+        /// </summary>
         LeftToRight,
+        /// <summary>
+        /// The right to left associativity.
+        /// </summary>
         RightToLeft,
     }
 }

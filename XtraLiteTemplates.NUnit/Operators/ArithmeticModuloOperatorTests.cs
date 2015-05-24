@@ -79,9 +79,11 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new ArithmeticModuloOperator(TypeConverter);
 
-            AssertEvaluation<Double, Int32>(@operator, 1.8, 2, 1);
-            AssertEvaluation<Double, Int32>(@operator, -5.5, 3, -2);
-            AssertEvaluation<Double, Int32>(@operator, Int32.MaxValue, Int32.MaxValue, 0);
+            AssertEvaluation<Double, Double>(@operator, 1.8, 2, 1.8);
+            AssertEvaluation<Double, Double>(@operator, -5.5, 3, -2.5);
+            AssertEvaluation<Double, Double>(@operator, 10, 3.5, 3);
+            AssertEvaluation<Double, Double>(@operator, -100, -32.5, -2.5);
+            AssertEvaluation<Double, Double>(@operator, Int32.MaxValue, Int32.MaxValue, 0);
         }
     }
 }

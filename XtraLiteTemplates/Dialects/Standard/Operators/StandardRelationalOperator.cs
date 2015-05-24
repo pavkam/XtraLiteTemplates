@@ -33,10 +33,30 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The abstract base class for all standard binary relational expression operators.
+    /// </summary>
     public abstract class StandardRelationalOperator : StandardBinaryOperator
     {
+        /// <summary>
+        /// Specifies a <see cref="IComparer{String}"/> object used to compare string literals.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The string literal comparer.
+        /// </value>
         public IComparer<String> StringComparer { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardRelationalOperator" /> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="precedence">The operator's precedence.</param>
+        /// <param name="stringComparer">The string literal comparer.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Arguments <paramref name="symbol" />, <paramref name="typeConverter" /> or <paramref name="stringComparer" /> are <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
         public StandardRelationalOperator(String symbol, Int32 precedence, 
             IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, typeConverter)
@@ -45,6 +65,17 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             StringComparer = stringComparer;
         }
 
+        /// <summary>
+        /// Evaluates the current operator for a given <paramref name="left" /> and <paramref name="right" /> operands. This method calls <see cref="Evaluate(Int32,Object,Object)"/>, which
+        /// is expected to be implemented in descendant classes.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>
+        /// A <seealso cref="Boolean"/> value indicating the result of the comparison.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
         public sealed override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
             Expect.NotNull("context", context);
@@ -58,6 +89,15 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             return Evaluate(relation, left, right);
         }
 
+        /// <summary>
+        /// Validates that the specified <paramref name="relation"/> is valid for the specified operator.
+        /// </summary>
+        /// <param name="relation">The evaluated relation between the two operands.</param>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>
+        /// A <seealso cref="Boolean"/> value indicating the result of the validation.
+        /// </returns>
         public abstract Boolean Evaluate(Int32 relation, Object left, Object right);
     }
 }

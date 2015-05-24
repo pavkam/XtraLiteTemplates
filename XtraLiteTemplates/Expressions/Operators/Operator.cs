@@ -33,12 +33,37 @@ namespace XtraLiteTemplates.Expressions.Operators
     using System.Collections.Generic;
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
+    /// <summary>
+    /// The abstract base class for all expression operators.
+    /// </summary>
     public abstract class Operator
     {
+        /// <summary>
+        /// Specifies the operator's symbol, used in the expression building process.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The operator's symbol.
+        /// </value>
         public String Symbol { get; private set; }
 
+        /// <summary>
+        /// Specifies the operator's precedence, used in the expression building process.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The operator's precedence.
+        /// </value>
         public Int32 Precedence { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Operator"/> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="precedence">The operator's precedence.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
         protected Operator(String symbol, Int32 precedence)
         {
             Expect.NotEmpty("symbol", symbol);
@@ -48,21 +73,15 @@ namespace XtraLiteTemplates.Expressions.Operators
             Precedence = precedence;
         }
 
+        /// <summary>
+        /// Returns a human-redable representation of the operator. This implementation returns the value of <see cref="Symbol"/> property.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the current operator object.
+        /// </returns>
         public override String ToString()
         {
             return Symbol;
-        }
-
-        public override Boolean Equals(Object obj)
-        {
-            var objc = obj as Operator;
-            return 
-                objc != null && objc.Symbol == Symbol;
-        }
-
-        public override Int32 GetHashCode()
-        {
-            return Symbol.GetHashCode();
         }
     }
 }

@@ -31,10 +31,28 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using XtraLiteTemplates.Expressions.Operators;
 
+    /// <summary>
+    /// The abstract base class for all standard unary expression operators.
+    /// </summary>
     public abstract class StandardUnaryOperator : UnaryOperator
     {
+        /// <summary>
+        /// Specifies the type converter used to convert to primitive types.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The type converter.
+        /// </value>
         protected IPrimitiveTypeConverter TypeConverter { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardUnaryOperator" /> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         protected StandardUnaryOperator(String symbol, IPrimitiveTypeConverter typeConverter)
             : base(symbol)
         {

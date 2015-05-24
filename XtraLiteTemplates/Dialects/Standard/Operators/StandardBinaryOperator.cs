@@ -31,10 +31,29 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using XtraLiteTemplates.Expressions.Operators;
 
+    /// <summary>
+    /// The abstract base class for all standard binary expression operators.
+    /// </summary>
     public abstract class StandardBinaryOperator : BinaryOperator
     {
+        /// <summary>
+        /// Specifies the type converter used to convert to primitive types.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The type converter.
+        /// </value>
         protected IPrimitiveTypeConverter TypeConverter { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardBinaryOperator" /> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="precedence">The operator's precedence.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         protected StandardBinaryOperator(String symbol, Int32 precedence, IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, Associativity.LeftToRight)
         {
