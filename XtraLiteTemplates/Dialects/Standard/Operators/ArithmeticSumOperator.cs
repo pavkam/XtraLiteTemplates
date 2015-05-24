@@ -42,7 +42,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// </summary>
         /// <param name="symbol">The operator's symbol.</param>
         /// <param name="typeConverter">The type converter.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter"> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         public ArithmeticSumOperator(String symbol, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 4, typeConverter)

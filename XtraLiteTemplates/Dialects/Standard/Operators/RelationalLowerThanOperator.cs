@@ -33,23 +33,54 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Implements the standard relational less than ('&lt;') operation.
+    /// </summary>
     public sealed class RelationalLowerThanOperator : StandardRelationalOperator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelationalGreaterThanOperator" /> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="stringComparer">The string literal comparer.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> or <paramref name="stringComparer" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         public RelationalLowerThanOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 6, stringComparer, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelationalGreaterThanOperator" /> class using the standard '&lt;' symbol.
+        /// </summary>
+        /// <param name="stringComparer">The string literal comparer.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> or <paramref name="stringComparer" /> is <c>null</c>.</exception>
         public RelationalLowerThanOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
             : this("<", stringComparer, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RelationalGreaterThanOperator" /> class using the standard '&lt;' symbol and current culture string comparer.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         public RelationalLowerThanOperator(IPrimitiveTypeConverter typeConverter)
             : this(System.StringComparer.CurrentCulture, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Validates that the specified <paramref name="relation" /> is less than zero.
+        /// </summary>
+        /// <param name="relation">The evaluated relation between the two operands.</param>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>
+        /// <c>true</c> if <paramref name="relation"/> is less than zero; <c>false</c> otherwise.
+        /// </returns>
         public override Boolean Evaluate(Int32 relation, Object left, Object right)
         {
             return relation < 0;

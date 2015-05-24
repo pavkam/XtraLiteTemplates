@@ -32,10 +32,28 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Implements the standard object formatting (':') operation.
+    /// </summary>
     public sealed class ValueFormatOperator : StandardBinaryOperator
     {
+        /// <summary>
+        /// Specifies culture-specific format options used by this operation.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The culture-specific formatting options.
+        /// </value>
         public IFormatProvider FormatProvider { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValueFormatOperator" /> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="formatProvider">The culture-specific formatting provider.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> or <paramref name="formatProvider" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         public ValueFormatOperator(String symbol, IFormatProvider formatProvider, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 2, typeConverter)
         {
@@ -44,11 +62,28 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             FormatProvider = formatProvider;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ValueFormatOperator" /> class using the standard ':' symbol.
+        /// </summary>
+        /// <param name="formatProvider">The culture-specific formatting provider.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> or <paramref name="formatProvider" /> is <c>null</c>.</exception>
         public ValueFormatOperator(IFormatProvider formatProvider, IPrimitiveTypeConverter typeConverter)
             : this(":", formatProvider, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Evaluates the result of formatting operation for <paramref name="left" /> and <paramref name="right" /> operands.
+        /// The <paramref name="right" /> operand is expected to be the format string.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>
+        /// The evaluated object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
             Expect.NotNull("context", context);

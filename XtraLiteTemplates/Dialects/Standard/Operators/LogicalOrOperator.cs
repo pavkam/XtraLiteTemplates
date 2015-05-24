@@ -32,18 +32,43 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Implements the standard logical or ('||') operation.
+    /// </summary>
     public sealed class LogicalOrOperator : StandardBinaryOperator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogicalOrOperator" /> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         public LogicalOrOperator(String symbol, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 12, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogicalOrOperator" /> class using the standard '||' symbol.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         public LogicalOrOperator(IPrimitiveTypeConverter typeConverter)
             : this("||", typeConverter)
         {
         }
 
+        /// <summary>
+        /// Evaluates the result of logical or operation for <paramref name="left" /> and <paramref name="right" /> operands.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>
+        /// The evaluated object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
             Expect.NotNull("context", context);
@@ -51,6 +76,16 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             return TypeConverter.ConvertToBoolean(left) || TypeConverter.ConvertToBoolean(right);
         }
 
+        /// <summary>
+        /// Tries to evaluate the result only using the left-hand-side operand.
+        /// <remarks>This method is used by operators that support left-hand-side short-circuit logic. The current implementation always return <c>false</c>.</remarks>
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="left">The left operand.</param>
+        /// <param name="result">The result of the evaluation if the return value is <c>true</c>.</param>
+        /// <returns>
+        ///   <c>true</c> if the operation is supported; <c>false</c> otherwise.
+        /// </returns>
         public override Boolean EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
         {
             Expect.NotNull("context", context);

@@ -32,18 +32,42 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Implements the standard logical not ('!') operation.
+    /// </summary>
     public sealed class LogicalNotOperator : StandardUnaryOperator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogicalNotOperator" /> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         public LogicalNotOperator(String symbol, IPrimitiveTypeConverter typeConverter)
             : base(symbol, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="LogicalNotOperator" /> class using the standard '!' symbol.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         public LogicalNotOperator(IPrimitiveTypeConverter typeConverter)
             : base("!", typeConverter)
         {
         }
 
+        /// <summary>
+        /// Evaluates the result of logical not operation for operand <paramref name="arg" />.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="arg">The operand.</param>
+        /// <returns>
+        /// The evaluated object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override Object Evaluate(IExpressionEvaluationContext context, Object arg)
         {
             Expect.NotNull("context", context);

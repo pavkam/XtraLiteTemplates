@@ -96,7 +96,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>
-        /// A <seealso cref="Boolean"/> value indicating the result of the validation.
+        /// A <see cref="Boolean"/> value indicating the result of the validation.
         /// </returns>
         public abstract Boolean Evaluate(Int32 relation, Object left, Object right);
     }
