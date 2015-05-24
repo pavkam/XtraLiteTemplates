@@ -60,7 +60,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         }
 
         /// <summary>
-        /// Evaluate the result of the operation for <paramref name="left" /> and <paramref name="right" /> operands.
+        /// Evaluates the result of modulo operation for <paramref name="left" /> and <paramref name="right" /> operands.
         /// </summary>
         /// <param name="context">The evaluation context.</param>
         /// <param name="left">The left operand.</param>

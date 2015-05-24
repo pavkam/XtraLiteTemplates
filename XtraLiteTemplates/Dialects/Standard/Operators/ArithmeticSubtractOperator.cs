@@ -32,18 +32,43 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Implements the standard floating point subtraction ('*') operation.
+    /// </summary>
     public sealed class ArithmeticSubtractOperator : StandardBinaryOperator
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArithmeticSubtractOperator" /> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter"> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         public ArithmeticSubtractOperator(String symbol, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 4, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ArithmeticSubtractOperator" /> class using the standard '-' symbol.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         public ArithmeticSubtractOperator(IPrimitiveTypeConverter typeConverter)
             : this("-", typeConverter)
         {
         }
 
+        /// <summary>
+        /// Evaluates the result of subtraction operation for <paramref name="left" /> and <paramref name="right" /> operands.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="left">The left operand.</param>
+        /// <param name="right">The right operand.</param>
+        /// <returns>
+        /// The evaluated object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
         {
             Expect.NotNull("context", context);
