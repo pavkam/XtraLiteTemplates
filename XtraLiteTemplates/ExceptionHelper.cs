@@ -124,11 +124,12 @@ namespace XtraLiteTemplates
             throw new ParseException(null, characterIndex, "Invalid escape character '{0}' at position {1}.", character, characterIndex);
         }
 
+
         internal static void UnexpectedToken(Token token)
         {
             Debug.Assert(token != null);
 
-            throw new ParseException(null, token.CharacterIndex,
+            throw new LexingException(null, token,
                 "Unexpected token '{0}' (type: {1}) found at position {2}.", token.Value, token.Type, token.CharacterIndex);
         }
 
@@ -139,13 +140,13 @@ namespace XtraLiteTemplates
 
             if (components.Count > 0)
             {
-                throw new ParseException(null, token.CharacterIndex,
+                throw new LexingException(null, token,
                     "No matching tags composed of {{{3}}} found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
                         token.Value, token.Type, token.CharacterIndex, String.Join(" ", components));
             }
             else
             {
-                throw new ParseException(null, token.CharacterIndex,
+                throw new LexingException(null, token,
                     "No matching tags found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
                         token.Value, token.Type, token.CharacterIndex);
             }
@@ -156,10 +157,11 @@ namespace XtraLiteTemplates
             Debug.Assert(token != null);
             Debug.Assert(innerException != null);
 
-            throw new ParseException(innerException, token.CharacterIndex,
+            throw new LexingException(innerException, token,
                 "Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: {3}",
                 token.Value, token.Type, token.CharacterIndex, innerException.Message);
         }
+
 
         internal static void UnexpectedTag(TagLex tagLex)
         {
@@ -169,13 +171,15 @@ namespace XtraLiteTemplates
                 "Unexpected tag {{{0}}} encountered at position {1}.", tagLex.ToString(), tagLex.FirstCharacterIndex);
         }
 
-        internal static void UnexpectedEndOfStreamAfterToken(Token token)
+        internal static void UnmatchedDirectiveTag(Directive[] candidateDirectives, Int32 firstCharaterIndex)
         {
-            Debug.Assert(token != null);
+            Debug.Assert(candidateDirectives != null);
 
-            throw new ParseException(null, token.CharacterIndex,
-                "Unexpected end of stream after token '{0}' (type: {1}) at position {2}.", token.Value, token.Type, token.CharacterIndex);
+            throw new InterpreterException(candidateDirectives, firstCharaterIndex,
+                "Directive(s) {0} encountered at position {1}, could not be finalized by matching all component tags.",
+                String.Join(" or ", candidateDirectives.AsEnumerable()), firstCharaterIndex);
         }
+
 
         internal static void CannotEvaluateOperator(Operator @operator, Object constant)
         {
@@ -265,14 +269,6 @@ namespace XtraLiteTemplates
         }
 
 
-        internal static void UnmatchedDirectiveTag(Directive[] candidateDirectives, Int32 firstCharaterIndex)
-        {
-            Debug.Assert(candidateDirectives != null);
-
-            throw new InterpreterException(candidateDirectives, firstCharaterIndex,
-                "Directive(s) {0} encountered at position {1}, could not be finalized by matching all component tags.",
-                String.Join(" or ", candidateDirectives.AsEnumerable()), firstCharaterIndex);
-        }
 
         internal static void DirectiveEvaluationError(Directive directive, Exception exception)
         {

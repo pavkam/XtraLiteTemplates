@@ -1,15 +1,16 @@
 ﻿using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 
 // Information about this assembly is defined by the following attributes.
 // Change them to the values specific to your project.
 
 [assembly: AssemblyTitle ("XtraLiteTemplates")]
-[assembly: AssemblyDescription ("")]
+[assembly: AssemblyDescription("Lightweight Templating Engine for .NET")]
 [assembly: AssemblyConfiguration ("")]
-[assembly: AssemblyCompany ("")]
-[assembly: AssemblyProduct ("")]
-[assembly: AssemblyCopyright ("aciobanu")]
+[assembly: AssemblyCompany("Alexandru Ciobanu (alex@ciobanu.org)")]
+[assembly: AssemblyProduct("XtraLiteTemplates")]
+[assembly: AssemblyCopyright("Alexandru Ciobanu (alex@ciobanu.org) 2015")]
 [assembly: AssemblyTrademark ("")]
 [assembly: AssemblyCulture ("")]
 
@@ -25,3 +26,4 @@ using System.Runtime.CompilerServices;
 //[assembly: AssemblyDelaySign(false)]
 //[assembly: AssemblyKeyFile("")]
 
+[assembly: GuidAttribute("111F6683-8ADE-47B3-955C-476E26ACD021")]

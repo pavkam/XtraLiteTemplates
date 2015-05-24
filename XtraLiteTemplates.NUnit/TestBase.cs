@@ -301,7 +301,8 @@ using System.Diagnostics;
         }
 
 
-        protected static void ExpectUnexpectedTokenException(Int32 index, String token, Token.TokenType type, Action action)
+
+        protected static void ExpectUnexpectedTokenException(Int32 index, Int32 originalLength, String token, Token.TokenType type, Action action)
         {
             try
             {
@@ -309,9 +310,13 @@ using System.Diagnostics;
             }
             catch (Exception e)
             {
-                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.IsInstanceOf(typeof(LexingException), e);
                 Assert.AreEqual(String.Format("Unexpected token '{0}' (type: {1}) found at position {2}.", token, type, index), e.Message);
-                Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+
+                Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
+                Assert.AreEqual(originalLength, (e as LexingException).Token.OriginalLength);
+                Assert.AreEqual(token, (e as LexingException).Token.Value);
+                Assert.AreEqual(type, (e as LexingException).Token.Type);
 
                 return;
             }
@@ -319,7 +324,7 @@ using System.Diagnostics;
             Assert.Fail();
         }
 
-        protected static void ExpectNoMatchingTagsLeftException(Object[] components, Int32 index, String token, Token.TokenType type, Action action)
+        protected static void ExpectNoMatchingTagsLeftException(Object[] components, Int32 index, Int32 originalLength, String token, Token.TokenType type, Action action)
         {
             try
             {
@@ -327,7 +332,7 @@ using System.Diagnostics;
             }
             catch (Exception e)
             {
-                Assert.IsInstanceOf(typeof(ParseException), e);
+                Assert.IsInstanceOf(typeof(LexingException), e);
 
                 if (components != null && components.Length > 0)
                 {
@@ -340,12 +345,40 @@ using System.Diagnostics;
                         token, type, index), e.Message);
                 }
 
-                Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+                Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
+                Assert.AreEqual(originalLength, (e as LexingException).Token.OriginalLength);
+                Assert.AreEqual(token, (e as LexingException).Token.Value);
+                Assert.AreEqual(type, (e as LexingException).Token.Type);
+
                 return;
             }
 
             Assert.Fail();
         }
+
+        protected static void ExpectUnexpectedOrInvalidExpressionTokenException(Int32 index, Int32 originalLength, String token, Token.TokenType type, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(LexingException), e);
+                Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Invalid expression term: '{0}'.",
+                    token, type, index), e.Message);
+
+                Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
+                Assert.AreEqual(originalLength, (e as LexingException).Token.OriginalLength);
+                Assert.AreEqual(token, (e as LexingException).Token.Value);
+                Assert.AreEqual(type, (e as LexingException).Token.Type);
+
+                return;
+            }
+
+            Assert.Fail();
+        }
+
 
         protected static void ExpectCannotRegisterTagWithNoComponentsException(Action action)
         {
@@ -408,24 +441,6 @@ using System.Diagnostics;
             {
                 Assert.IsInstanceOf(typeof(ParseException), e);
                 Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Unbalanced expressions cannot be finalized.",
-                    token, type, index), e.Message);
-
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        protected static void ExpectUnexpectedOrInvalidExpressionTokenException(Int32 index, String token, Token.TokenType type, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ParseException), e);
-                Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Invalid expression term: '{0}'.",
                     token, type, index), e.Message);
 
                 return;

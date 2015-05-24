@@ -317,7 +317,7 @@ namespace XtraLiteTemplates.Parsing
                 tokenIndex++;
                 var _previousToken = this.m_currentToken;
                 if (!this.NextToken())
-                    ExceptionHelper.UnexpectedEndOfStreamAfterToken(_previousToken);
+                    ExceptionHelper.NoMatchingTagsLeft(_components, _previousToken);
 
                 _allTokens.Add(this.m_currentToken);
 
