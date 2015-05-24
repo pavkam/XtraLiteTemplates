@@ -32,8 +32,18 @@ namespace XtraLiteTemplates.Evaluation
     using System.IO;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Defines an entry-point method which evaluates the a compiled template. An <see cref="IEvaluable"/> interface is
+    /// returned as a result of compiling a template.
+    /// </summary>
     public interface IEvaluable
     {
+        /// <summary>
+        /// Evaluates the specified template using a given evaluation context.
+        /// </summary>
+        /// <param name="writer">The text writer which will serve as the destination of the evaluated text.</param>
+        /// <param name="context">The evaluation context providing all required state and variables.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="writer"/> or <paramref name="context"/> is <c>null</c>.</exception>
         void Evaluate(TextWriter writer, IEvaluationContext context);
     }
 }

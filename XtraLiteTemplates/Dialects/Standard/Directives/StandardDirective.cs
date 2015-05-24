@@ -37,10 +37,28 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
 
+    /// <summary>
+    /// Abstract base class for all standard directives.
+    /// </summary>
     public abstract class StandardDirective : Directive
     {
+        /// <summary>
+        /// Specifies the type converter used to convert to primitive types.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The type converter.
+        /// </value>
         public IPrimitiveTypeConverter TypeConverter { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardDirective"/> class.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <param name="tags">The tags that make up this directive.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="tags"/> or <paramref name="typeConverter"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="tags"/> is empty.</exception>
+        /// <exception cref="InvalidOperationException">One or more tags have no defined components.</exception>
         public StandardDirective(IPrimitiveTypeConverter typeConverter, params Tag[] tags)
             : base(tags)
         {

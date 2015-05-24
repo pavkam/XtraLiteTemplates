@@ -32,8 +32,17 @@ namespace XtraLiteTemplates.Evaluation
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The exception type thrown for any errors encountered dutin the evaluation of a template.
+    /// </summary>
     public class EvaluationException : InvalidOperationException
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="EvaluationException"/> class.
+        /// </summary>
+        /// <param name="innerException">The inner exception.</param>
+        /// <param name="format">The format string.</param>
+        /// <param name="args">The format arguments.</param>
         internal EvaluationException(Exception innerException, String format, params Object[] args)
             : base(String.Format(format, args), innerException)
         {

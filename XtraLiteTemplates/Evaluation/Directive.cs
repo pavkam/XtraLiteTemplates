@@ -36,13 +36,31 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Abstract base class for all supported directives.
+    /// </summary>
     public abstract class Directive
     {
+        /// <summary>
+        /// Defines the directive execution flow.
+        /// </summary>
         protected internal enum FlowDecision
         {
+            /// <summary>
+            /// Terminate execution of diretive immediately after.
+            /// </summary>
             Terminate,
+            /// <summary>
+            /// Restart the execution of the directive immediately by jumping to the first tag.
+            /// </summary>
             Restart,
+            /// <summary>
+            /// Evaluate the all child directives and uparsed text blocks between the current tag and the following one.
+            /// </summary>
             Evaluate,
+            /// <summary>
+            /// Skip directly to the next following tag in the directive.
+            /// </summary>
             Skip,
         }
 
@@ -56,6 +74,14 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Directive"/> class.
+        /// </summary>
+        /// <param name="tags">The tags that make up the directive.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="tags"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="tags"/> is empty.</exception>
+        /// <exception cref="InvalidOperationException">One or more tags have no defined components.</exception>
         public Directive(params Tag[] tags)
         {
             Expect.NotEmpty("tags", tags);
@@ -71,6 +97,12 @@ namespace XtraLiteTemplates.Evaluation
             m_tags = new List<Tag>(tags);
         }
 
+        /// <summary>
+        /// Returns a human-readable representation of the current directive object.
+        /// </summary>
+        /// <returns>
+        /// A string that represents the current directive.
+        /// </returns>
         public override String ToString()
         {
             StringBuilder sb = new StringBuilder();
@@ -85,7 +117,17 @@ namespace XtraLiteTemplates.Evaluation
             return sb.ToString();
         }
 
-
+        /// <summary>
+        /// Determines whether the specified <see cref="Object" /> is equal to the current directive object using the provided comparer.
+        /// <remarks>
+        /// Two directives are equal is all their corresponding tags are equal and in the same order.
+        /// </remarks>
+        /// </summary>
+        /// <param name="obj">The object to compare with the current directive object.</param>
+        /// <param name="comparer">The keyword and identifier comparer.</param>
+        /// <returns>
+        ///   <c>true</c> if the specified object is equal to the current directive; otherwise, <c>false</c>.
+        /// </returns>
         public Boolean Equals(Object obj, IEqualityComparer<String> comparer)
         {
             Expect.NotNull("comparer", comparer);
@@ -105,11 +147,28 @@ namespace XtraLiteTemplates.Evaluation
             return true;
         }
 
+        /// <summary>
+        /// Determines whether the specified <see cref="Object" /> is equal to the current directive object using current culture comparing rules.
+        /// <remarks>
+        /// Two directives are equal is all their corresponding tags are equal and in the same order.
+        /// </remarks>
+        /// </summary>
+        /// <param name="obj">The object to compare with the current directive object.</param>
+        /// <returns>
+        /// <c>true</c> if the specified object is equal to the current directive; otherwise, <c>false</c>.
+        /// </returns>
         public override Boolean Equals(Object obj)
         {
             return Equals(obj, StringComparer.CurrentCulture);
         }
 
+        /// <summary>
+        /// Calculates the hash of the current directive using the provided comparer.
+        /// </summary>
+        /// <param name="comparer">The keyword and identifier comparer.</param>
+        /// <returns>
+        /// A hash code for the current directive object.
+        /// </returns>
         public Int32 GetHashCode(IEqualityComparer<String> comparer)
         {
             Expect.NotNull("comparer", comparer);
@@ -124,12 +183,27 @@ namespace XtraLiteTemplates.Evaluation
             return hash;
         }
 
+        /// <summary>
+        /// Calculates the hash of the current directive using the current culture comparing rules.
+        /// </summary>
+        /// <returns>
+        /// A hash code for the current directive object.
+        /// </returns>
         public override Int32 GetHashCode()
         {
             return GetHashCode(StringComparer.CurrentCulture);
         }
 
-
+        /// <summary>
+        /// Executes the current directive. This method can be invoken multiple times by the evaluation environment depending on
+        /// the particular directive implementation.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag that triggered the execution.</param>
+        /// <param name="components">The tag components as provided by the lexical analyzer.</param>
+        /// <param name="state">A general-purpose state object. Initially set to <c>null</c>.</param>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="text">An optional text generated by the directive.</param>
+        /// <returns>A value indicating the next step for the evaluation environment.</returns>
         protected internal abstract FlowDecision Execute(Int32 tagIndex, Object[] components, 
             ref Object state, IExpressionEvaluationContext context, out String text);
     }

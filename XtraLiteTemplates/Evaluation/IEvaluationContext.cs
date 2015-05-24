@@ -34,12 +34,45 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Defines all the traits and properties required for template evaluation.
+    /// Implementers of <see cref="IEvaluationContext" /> need to provide basic variable and state management.
+    /// </summary>
     public interface IEvaluationContext : IExpressionEvaluationContext
     {
+        /// <summary>
+        /// Specifies whether evaluation exceptions are silently ignored (or result in <c>null</c> values) during template evaluation.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if evaluation exceptions are ignored; otherwise, <c>false</c>.
+        /// </value>
         Boolean IgnoreEvaluationExceptions { get; }
+
+        /// <summary>
+        /// Processeses the unparsed text blocks.
+        /// <remarks>
+        /// <see cref="ProcessUnparsedText"/> is invoked during the evaluation process for each unparsed text block before it is commited to the result.
+        /// </remarks>
+        /// </summary>
+        /// <param name="value">The unparsed text block to process.</param>
+        /// <returns>The processed text.</returns>
         String ProcessUnparsedText(String value);
 
+        /// <summary>
+        /// Opens an evaluation frame. An evaluation frame can be considered as a rudimentary stack frame.
+        /// <para>
+        /// Each variable or state object lives in its own frame. The evaluation environment opens up a frame for each directive it encounters.
+        /// </para>
+        /// </summary>
         void OpenEvaluationFrame();
+
+        /// <summary>
+        /// Closes an evaluation frame.
+        /// <para>
+        /// The evaluation environment closes up frames after each directive finished its execution. It is expected that any
+        /// state objects and variables belonging to the frame are cleared in the process.
+        /// </para>
+        /// </summary>
         void CloseEvaluationFrame();
     }
 }
