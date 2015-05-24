@@ -42,17 +42,17 @@ namespace XtraLiteTemplates.Dialects.Standard
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
+    /// <summary>
+    /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviours that concrete
+    /// dialect implementations can use out-of-the box.
+    /// </summary>
     public abstract class StandardDialectBase : IDialect
     {
         private IPrimitiveTypeConverter m_typeConverter;
         private DialectCasing m_casing;
-
-        private Object m_preformattedStateObject;
-
         private IReadOnlyList<Operator> m_operators;
         private IReadOnlyList<Directive> m_directives;
         private IReadOnlyDictionary<String, Object> m_specials;
-
 
         protected abstract Operator[] CreateOperators(IPrimitiveTypeConverter typeConverter);
         protected abstract Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter);
@@ -71,6 +71,22 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return markup;
         }
 
+        protected StandardDialectBase(String name, CultureInfo culture, DialectCasing casing)
+        {
+            Expect.NotEmpty("name", name);
+            Expect.NotNull("culture", culture);
+
+            /* Build culture-aware values.*/
+            Name = name;
+            Culture = culture;
+            m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture);
+            m_casing = casing;
+
+            var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
+
+            IdentifierComparer = comparer;
+            StringLiteralComparer = comparer;
+        }
 
         public CultureInfo Culture { get; private set;  }
         public IEqualityComparer<String> IdentifierComparer { get; private set; }
@@ -125,24 +141,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         }
 
 
-        protected StandardDialectBase(String name, CultureInfo culture, DialectCasing casing)
-        {
-            Expect.NotEmpty("name", name);
-            Expect.NotNull("culture", culture);
-
-            /* Build culture-aware values.*/
-            Name = name;
-            Culture = culture;
-            m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture);
-            m_casing = casing;
-
-            var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
-
-            IdentifierComparer = comparer;
-            StringLiteralComparer = comparer;
-        }
-
-
         public virtual String DecorateUnparsedText(IExpressionEvaluationContext context, String unparsedText)
         {
             Expect.NotNull("context", context);
@@ -189,7 +187,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         public abstract Char StringLiteralEscapeCharacter { get; }
 
         public abstract Char NumberDecimalSeparatorCharacter { get; }
-
 
         public override String ToString()
         {

@@ -38,15 +38,15 @@
   <ItemGroup>
     <Compile Include="Dialects\CodeMonkeyDialectTests.cs" />
     <Compile Include="Dialects\StandardDialectTests.cs" />
-    <Compile Include="Directives\StandardForDirectiveTests.cs" />
-    <Compile Include="Directives\StandardSeparatedForEachDirectiveTests.cs" />
-    <Compile Include="Directives\StandardPreformattedDirectiveTests.cs" />
-    <Compile Include="Directives\StandardRepeatDirectiveTests.cs" />
-    <Compile Include="Directives\StandardInterpolationDirectiveTests.cs" />
-    <Compile Include="Directives\StandardIfElseDirectiveTests.cs" />
-    <Compile Include="Directives\StandardIfDirectiveTests.cs" />
-    <Compile Include="Directives\StandardForEachDirectiveTests.cs" />
-    <Compile Include="Directives\StandardConditionalInterpolationDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardForDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardSeparatedForEachDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardPreformattedDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardRepeatDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardInterpolationDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardIfElseDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardIfDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardForEachDirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\StandardConditionalInterpolationDirectiveTests.cs" />
     <Compile Include="ExpressionFlowSymbolsTests.cs" />
     <Compile Include="Operators\ArithmeticNeutralOperatorTests.cs" />
     <Compile Include="Operators\ArithmeticNegateOperatorTests.cs" />
@@ -81,7 +81,7 @@
     <Compile Include="Inside\TestEvaluationContext.cs" />
     <Compile Include="EvaluationTests.cs" />
     <Compile Include="InterpreterTests.cs" />
-    <Compile Include="Directives\DirectiveTests.cs" />
+    <Compile Include="Dialects\Directives\DirectiveTests.cs" />
     <Compile Include="TagTests.cs" />
     <Compile Include="LexerTests.cs" />
     <Compile Include="TokenizerTests.cs" />

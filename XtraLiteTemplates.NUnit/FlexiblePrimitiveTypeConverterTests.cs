@@ -214,7 +214,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseCultureSpecicic()
+        public void TestCaseCultureSpecific()
         {
             var converter = new FlexiblePrimitiveTypeConverter(CultureInfo.GetCultureInfo("ro-RO"));
 

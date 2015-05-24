@@ -238,6 +238,60 @@ namespace XtraLiteTemplates.NUnit.Dialects
         }
 
         [Test]
+        public void TestCaseSpecialKeywordsCaseSensitiveUpper()
+        {
+            var dialect = new CodeMonkeyDialect(DialectCasing.UpperCase);
+
+            var _undefined = XLTemplate.Evaluate(dialect, "{UNDEFINED}");
+            var _true = XLTemplate.Evaluate(dialect, "{TRUE}");
+            var _false = XLTemplate.Evaluate(dialect, "{FALSE}");
+            var _nan = XLTemplate.Evaluate(dialect, "{NAN}");
+            var _infinity = XLTemplate.Evaluate(dialect, "{INFINITY}");
+
+            Assert.AreEqual("UNDEFINED", _undefined);
+            Assert.AreEqual("TRUE", _true);
+            Assert.AreEqual("FALSE", _false);
+            Assert.AreEqual("NAN", _nan);
+            Assert.AreEqual("INFINITY", _infinity);
+        }
+
+        [Test]
+        public void TestCaseSpecialKeywordsCaseSensitiveLower()
+        {
+            var dialect = new CodeMonkeyDialect(DialectCasing.LowerCase);
+
+            var _undefined = XLTemplate.Evaluate(dialect, "{undefined}");
+            var _true = XLTemplate.Evaluate(dialect, "{true}");
+            var _false = XLTemplate.Evaluate(dialect, "{false}");
+            var _nan = XLTemplate.Evaluate(dialect, "{nan}");
+            var _infinity = XLTemplate.Evaluate(dialect, "{infinity}");
+
+            Assert.AreEqual("undefined", _undefined);
+            Assert.AreEqual("true", _true);
+            Assert.AreEqual("false", _false);
+            Assert.AreEqual("nan", _nan);
+            Assert.AreEqual("infinity", _infinity);
+        }
+
+        [Test]
+        public void TestCaseSpecialKeywordsCaseSensitiveLowed()
+        {
+            var dialect = new CodeMonkeyDialect(DialectCasing.IgnoreCase);
+
+            var _undefined = XLTemplate.Evaluate(dialect, "{undeFIned}");
+            var _true = XLTemplate.Evaluate(dialect, "{tRUe}");
+            var _false = XLTemplate.Evaluate(dialect, "{faLSe}");
+            var _nan = XLTemplate.Evaluate(dialect, "{nAn}");
+            var _infinity = XLTemplate.Evaluate(dialect, "{infinitY}");
+
+            Assert.AreEqual("Undefined", _undefined);
+            Assert.AreEqual("True", _true);
+            Assert.AreEqual("False", _false);
+            Assert.AreEqual("NaN", _nan);
+            Assert.AreEqual("Infinity", _infinity);
+        }
+
+        [Test]
         public void TestCaseShowcase1()
         {
             var customer = new

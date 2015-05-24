@@ -36,17 +36,13 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.IO;
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
+    /// <summary>
+    /// An implementation of <see cref="XtraLiteTemplates.Dialects.Standard.IPrimitiveTypeConverter"/> interface. This class offers
+    /// a flexible approach to type conversion. It will select the most appropriate way to convert one type to another primitive type guiding
+    /// as much as possible by how JavaScript conversion rules operate.
+    /// </summary>
     public class FlexiblePrimitiveTypeConverter : IPrimitiveTypeConverter
     {
-        public IFormatProvider FormatProvider { get; private set; }
-
-        public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider)
-        {
-            Expect.NotNull("formatProvider", formatProvider);
-
-            FormatProvider = formatProvider;
-        }
-
         private IEnumerable<Object> UpgradeEnumerable(IEnumerable enumerable)
         {
             Debug.Assert(enumerable != null);
@@ -94,6 +90,30 @@ namespace XtraLiteTemplates.Dialects.Standard
             return reduced;
         }
 
+        /// <summary>
+        /// <value>Specifies the formatting options used to parse string values. Primarily used when parsing <see cref="System.Double"/> values.</value>
+        /// <remarks>The value of the property is set by the caller during class construction.</remarks>
+        /// </summary>
+        public IFormatProvider FormatProvider { get; private set; }
+
+        /// <summary>
+        /// Creates a new instance of <see cref="XtraLiteTemplates.Dialects.Standard.FlexiblePrimitiveTypeConverter"/> class.
+        /// </summary>
+        /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="System.Double"/> values.</param>
+        /// <exception cref="System.ArgumentNullException"><paramref name="formatProvider"/> is <c>null</c>.</exception>
+        public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider)
+        {
+            Expect.NotNull("formatProvider", formatProvider);
+
+            FormatProvider = formatProvider;
+        }
+
+        /// <summary>
+        /// Tries to convert the value of <paramref name="obj"/> argument to a 32-bit integer.
+        /// <remarks>A value of <c>0</c> is returned if <paramref name="obj"/> is not directly convertible to an <c>int</c>.</remarks>
+        /// </summary>
+        /// <param name="obj">The value object to convert.</param>
+        /// <returns>A <see cref="System.Int32"/> value.</returns>
         public virtual Int32 ConvertToInteger(Object obj)
         {
             var number = ConvertToNumber(obj);
@@ -103,6 +123,12 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return (Int32)number;
         }
 
+        /// <summary>
+        /// Tries to convert the value of <paramref name="obj"/> argument to a double-precision floating point number.
+        /// <remarks>A value of <see cref="System.Double.NaN"/> is returned if <paramref name="obj"/> is not directly convertible to a <c>double</c>.</remarks>
+        /// </summary>
+        /// <param name="obj">The value object to convert.</param>
+        /// <returns>A <see cref="System.Double"/> value.</returns>
         public virtual Double ConvertToNumber(Object obj)
         {
             obj = ReduceObject(obj);
@@ -132,6 +158,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             return result;
         }
 
+        /// <summary>
+        /// Tries to convert the value of <paramref name="obj"/> argument to a string.
+        /// <remarks>A value of <c>null</c> is returned if <paramref name="obj"/> is null; otherwise the object is formatted accordingly.</remarks>
+        /// </summary>
+        /// <param name="obj">The value object to convert.</param>
+        /// <returns>A <see cref="System.String"/> value.</returns>
         public virtual String ConvertToString(Object obj)
         {
             obj = ReduceObject(obj);
@@ -152,6 +184,12 @@ namespace XtraLiteTemplates.Dialects.Standard
             return result;
         }
 
+        /// <summary>
+        /// Tries to convert the value of <paramref name="obj"/> argument to a boolean.
+        /// <remarks>A value of <c>false</c> is returned if <paramref name="obj"/> is not directly convertible to a <c>bool</c>.</remarks>
+        /// </summary>
+        /// <param name="obj">The value object to convert.</param>
+        /// <returns>A <see cref="System.Boolean"/> value.</returns>
         public virtual Boolean ConvertToBoolean(Object obj)
         {
             obj = ReduceObject(obj);
@@ -171,6 +209,13 @@ namespace XtraLiteTemplates.Dialects.Standard
             return result;
         }
 
+        /// <summary>
+        /// Tries to convert the value of <paramref name="obj"/> argument to a sequence of objects.
+        /// <remarks>A value of <c>null</c> is returned if <paramref name="obj"/> is null. If <paramref name="obj"/> is not an enumerable object,
+        /// a new enumerable, containing <paramref name="obj"/> is returned.</remarks>
+        /// </summary>
+        /// <param name="obj">The value object to convert.</param>
+        /// <returns>A <see cref="System.Collections.Generic.IEnumerable{Object}"/> value.</returns>
         public virtual IEnumerable<Object> ConvertToSequence(Object obj)
         {
             if (obj == null)
@@ -183,6 +228,11 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return ObjectToSequence(obj);
         }
 
+        /// <summary>
+        /// Detects the primitive type of the supplied object.
+        /// </summary>
+        /// <param name="obj">The object to check the type for.</param>
+        /// <returns>A <see cref="XtraLiteTemplates.Dialects.Standard.PrimitiveType"/> value.</returns>
         public PrimitiveType TypeOf(Object obj)
         {
             if (obj == null)

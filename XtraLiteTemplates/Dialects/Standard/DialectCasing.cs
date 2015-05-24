@@ -28,10 +28,25 @@
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
+    /// <summary>
+    /// Defines the the casing of a standard dialect. This type controls how the keywords, variables and properties are matched.
+    /// </summary>
     public enum DialectCasing
     {
+        /// <summary>
+        /// The dialect is case-insensitive. All keywords, variables and properties will be considered equals regardless of
+        /// their case.
+        /// </summary>
         IgnoreCase,
+        /// <summary>
+        /// The dialect is upper-cased. All keywords are required to be upper case to match. The variables and properties are
+        /// case-sensitive.
+        /// </summary>
         UpperCase,
+        /// <summary>
+        /// The dialect is upper-cased. All keywords are required to be lower case to match. The variables and properties are
+        /// case-sensitive.
+        /// </summary>
         LowerCase,
     }
 }
