@@ -66,7 +66,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public static IDialect Default { get; private set; }
 
         /// <summary>
-        /// Initializes the <see cref="StandardDialect"/> class.
+        /// Initializes static member of the <see cref="StandardDialect"/> class.
         /// </summary>
         static StandardDialect()
         {
@@ -157,7 +157,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new KeyValuePair<String, Object>(AdjustCasing("False"), false),
                 new KeyValuePair<String, Object>(AdjustCasing("Undefined"), null),
                 new KeyValuePair<String, Object>(AdjustCasing("NaN"), Double.NaN),
-                new KeyValuePair<String, Object>(AdjustCasing("Infinity"), Double.PositiveInfinity),
+                new KeyValuePair<String, Object>(AdjustCasing("Infinity"), double.PositiveInfinity),
             };
         }
 
@@ -221,7 +221,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The tag start character.
         /// </value>
-        public override Char StartTagCharacter
+        public override char StartTagCharacter
         {
             get
             {
@@ -235,7 +235,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The tag end character.
         /// </value>
-        public override Char EndTagCharacter
+        public override char EndTagCharacter
         {
             get 
             {
@@ -249,7 +249,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal start character.
         /// </value>
-        public override Char StartStringLiteralCharacter
+        public override char StartStringLiteralCharacter
         {
             get
             {
@@ -263,7 +263,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal end character.
         /// </value>
-        public override Char EndStringLiteralCharacter
+        public override char EndStringLiteralCharacter
         {
             get
             {
@@ -277,7 +277,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal escape character.
         /// </value>
-        public override Char StringLiteralEscapeCharacter
+        public override char StringLiteralEscapeCharacter
         {
             get
             {
@@ -291,7 +291,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The number literal decimal separator character.
         /// </value>
-        public override Char NumberDecimalSeparatorCharacter
+        public override char NumberDecimalSeparatorCharacter
         {
             get
             {
@@ -309,7 +309,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         ///   <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
         /// </returns>
-        public override Boolean Equals(Object obj)
+        public override bool Equals(Object obj)
         {
             return base.Equals(obj as StandardDialect);
         }

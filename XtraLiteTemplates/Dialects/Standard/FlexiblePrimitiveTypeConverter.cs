@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
@@ -43,7 +41,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     /// </summary>
     public class FlexiblePrimitiveTypeConverter : IPrimitiveTypeConverter
     {
-        private IEnumerable<Object> UpgradeEnumerable(IEnumerable enumerable)
+        private IEnumerable<object> UpgradeEnumerable(IEnumerable enumerable)
         {
             Debug.Assert(enumerable != null);
             foreach (var o in enumerable)
@@ -52,38 +50,38 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
-        private IEnumerable<Object> ObjectToSequence(Object obj)
+        private IEnumerable<object> ObjectToSequence(object obj)
         {
             yield return obj;
         }
 
-        private Object ReduceObject(Object obj)
+        private Object ReduceObject(object obj)
         {
             Object reduced;
 
             /* Identify standard types */
-            if (obj is Double || obj is Boolean || obj is String)
+            if (obj is double || obj is bool || obj is string)
                 reduced = obj;
-            else if (obj is Byte)
-                reduced = (Double)(Byte)obj;
-            else if (obj is SByte)
-                reduced = (Double)(SByte)obj;
-            else if (obj is Int16)
-                reduced = (Double)(Int16)obj;
-            else if (obj is UInt16)
-                reduced = (Double)(UInt16)obj;
-            else if (obj is Int32)
-                reduced = (Double)(Int32)obj;
-            else if (obj is UInt32)
-                reduced = (Double)(UInt32)obj;
-            else if (obj is Int64)
-                reduced = (Double)(Int64)obj;
-            else if (obj is UInt64)
-                reduced = (Double)(UInt64)obj;
-            else if (obj is Single)
-                reduced = (Double)(Single)obj;
-            else if (obj is Decimal)
-                reduced = (Double)(Decimal)obj;
+            else if (obj is byte)
+                reduced = (double)(byte)obj;
+            else if (obj is sbyte)
+                reduced = (double)(sbyte)obj;
+            else if (obj is short)
+                reduced = (double)(short)obj;
+            else if (obj is ushort)
+                reduced = (double)(ushort)obj;
+            else if (obj is int)
+                reduced = (double)(int)obj;
+            else if (obj is uint)
+                reduced = (double)(uint)obj;
+            else if (obj is long)
+                reduced = (double)(long)obj;
+            else if (obj is ulong)
+                reduced = (double)(ulong)obj;
+            else if (obj is float)
+                reduced = (double)(float)obj;
+            else if (obj is decimal)
+                reduced = (double)(decimal)obj;
             else
                 reduced = obj;
 
@@ -103,10 +101,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         public IObjectFormatter ObjectFormatter { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="FlexiblePrimitiveTypeConverter"/> class.
+        /// Creates a new instance of <see cref="FlexiblePrimitiveTypeConverter" /> class.
         /// </summary>
-        /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="Double"/> values.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> or <paramref name="objectFormatter"/> is <c>null</c>.</exception>
+        /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="Double" /> values.</param>
+        /// <param name="objectFormatter">The object formatter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider" /> or <paramref name="objectFormatter" /> is <c>null</c>.</exception>
         public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider, IObjectFormatter objectFormatter)
         {
             Expect.NotNull("formatProvider", formatProvider);
@@ -122,13 +121,13 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="Int32"/> value.</returns>
-        public virtual Int32 ConvertToInteger(Object obj)
+        public virtual int ConvertToInteger(object obj)
         {
-            var number = ConvertToNumber(obj);
-            if (Double.IsNaN(number) || Double.IsInfinity(number))
+            var number = this.ConvertToNumber(obj);
+            if (double.IsNaN(number) || double.IsInfinity(number))
                 return 0;
             else
-                return (Int32)number;
+                return (int)number;
         }
 
         /// <summary>
@@ -137,30 +136,30 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="Double"/> value.</returns>
-        public virtual Double ConvertToNumber(Object obj)
+        public virtual double ConvertToNumber(object obj)
         {
             obj = ReduceObject(obj);
 
-            Double result;
+            double result;
 
             if (obj == null)
-                result = Double.NaN;
-            else if (obj is Double)
-                result = (Double)obj;
-            else if (obj is Boolean)
-                result = (Boolean)obj ? 1 : 0;
+                result = double.NaN;
+            else if (obj is double)
+                result = (double)obj;
+            else if (obj is bool)
+                result = (bool)obj ? 1 : 0;
             else
             {
-                var str = obj as String;
+                var str = obj as string;
                 if (str != null)
                 {
                     if (str.Length == 0)
                         result = 0;
-                    else if (!Double.TryParse(str, System.Globalization.NumberStyles.Number, FormatProvider, out result))
-                        result = Double.NaN;
+                    else if (!double.TryParse(str, System.Globalization.NumberStyles.Number, FormatProvider, out result))
+                        result = double.NaN;
                 }
                 else
-                    result = Double.NaN;
+                    result = double.NaN;
             }
 
             return result;
@@ -172,10 +171,10 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="String"/> value.</returns>
-        public virtual String ConvertToString(Object obj)
+        public virtual string ConvertToString(object obj)
         {
             obj = ReduceObject(obj);
-            return ObjectFormatter.ToString(obj, FormatProvider);
+            return ObjectFormatter.ToString(obj, this.FormatProvider);
         }
 
         /// <summary>
@@ -184,19 +183,19 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="Boolean"/> value.</returns>
-        public virtual Boolean ConvertToBoolean(Object obj)
+        public virtual bool ConvertToBoolean(object obj)
         {
             obj = ReduceObject(obj);
 
-            Boolean result;
+            bool result;
             if (obj == null)
                 result = false;
-            else if (obj is Boolean)
-                result = (Boolean)obj;
-            else if (obj is Double)
-                result = (Double)obj != 0;
-            else if (obj is String)
-                result = ((String)obj).Length > 0;
+            else if (obj is bool)
+                result = (bool)obj;
+            else if (obj is double)
+                result = (double)obj != 0;
+            else if (obj is string)
+                result = ((string)obj).Length > 0;
             else
                 result = true;
 
@@ -210,7 +209,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="IEnumerable{Object}"/> value.</returns>
-        public virtual IEnumerable<Object> ConvertToSequence(Object obj)
+        public virtual IEnumerable<object> ConvertToSequence(object obj)
         {
             if (obj == null)
                 return null;
@@ -227,18 +226,18 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The object to check the type for.</param>
         /// <returns>A <see cref="PrimitiveType"/> value.</returns>
-        public PrimitiveType TypeOf(Object obj)
+        public PrimitiveType TypeOf(object obj)
         {
             if (obj == null)
                 return PrimitiveType.Undefined;
 
             obj = ReduceObject(obj);
 
-            if (obj is Double)
+            if (obj is double)
                 return PrimitiveType.Number;
-            else if (obj is Boolean)
+            else if (obj is bool)
                 return PrimitiveType.Boolean;
-            else if (obj is String)
+            else if (obj is string)
                 return PrimitiveType.String;
             else
                 return PrimitiveType.Object;

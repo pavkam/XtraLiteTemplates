@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
@@ -39,7 +37,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class RepeatDirective : StandardDirective
     {
-        private Int32 m_expressionIndex;
+        private int m_expressionIndex;
 
         public RepeatDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
@@ -61,8 +59,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
         }
 
-        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
-            IExpressionEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(
+            int tagIndex, 
+            Object[] components, 
+            ref Object state,
+            IExpressionEvaluationContext context, 
+            out String text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);
@@ -70,7 +72,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Debug.Assert(context != null);
 
             text = null;
-            Int32 remainingIterations;
+            int remainingIterations;
             if (state == null)
             {
                 /* Starting up. */
@@ -79,8 +81,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
             else if (tagIndex == 0)
             {
-                Debug.Assert(state is Int32);
-                remainingIterations = (Int32)state;
+                Debug.Assert(state is int);
+                remainingIterations = (int)state;
             }
             else
                 return FlowDecision.Restart;

@@ -30,14 +30,40 @@ namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
+    using System.Runtime.Serialization;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// Exception type thrown for any encountered intrepretation error.
+    /// </summary>
     public class InterpreterException : FormatException
     {
+        /// <summary>
+        /// Lists all candidate directives for which the exception applies.
+        /// </summary>
+        /// <value>
+        /// The candidate directives.
+        /// </value>
         public Directive[] CandidateDirectives { get; private set; }
+
+        /// <summary>
+        /// Gets the index of the first character in the input template that matches the candidate directives.
+        /// </summary>
+        /// <value>
+        /// The index of the first character.
+        /// </value>
         public Int32 FirstCharacterIndex { get; private set; }
 
-        internal InterpreterException(Exception innerException, Directive[] candidateDirectives, Int32 firstCharacterIndex, String format, params Object[] args)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InterpreterException"/> class.
+        /// </summary>
+        /// <param name="innerException">The inner exception.</param>
+        /// <param name="candidateDirectives">The candidate directives.</param>
+        /// <param name="firstCharacterIndex">Index of the first character.</param>
+        /// <param name="format">The format string.</param>
+        /// <param name="args">Format arguments.</param>
+        internal InterpreterException(Exception innerException, Directive[] candidateDirectives, 
+            Int32 firstCharacterIndex, String format, params Object[] args)
             : base(String.Format(format, args), innerException)
         {
             Debug.Assert(firstCharacterIndex >= 0);
@@ -46,6 +72,13 @@ namespace XtraLiteTemplates.Evaluation
             this.CandidateDirectives = candidateDirectives;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InterpreterException"/> class.
+        /// </summary>
+        /// <param name="candidateDirectives">The candidate directives.</param>
+        /// <param name="firstCharacterIndex">Index of the first character.</param>
+        /// <param name="format">The format string.</param>
+        /// <param name="args">Format arguments.</param>
         internal InterpreterException(Directive[] candidateDirectives, Int32 firstCharacterIndex, String format, params Object[] args)
             : this(null, candidateDirectives, firstCharacterIndex, format, args)
         {

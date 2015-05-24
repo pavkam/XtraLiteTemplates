@@ -32,8 +32,17 @@ namespace XtraLiteTemplates.Expressions
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
+    /// <summary>
+    /// Exception type throws for any errors encountered during exception construction.
+    /// </summary>
+    [Serializable]
     public class ExpressionException : InvalidOperationException
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionException"/> class.
+        /// </summary>
+        /// <param name="format">The format string.</param>
+        /// <param name="args">Format arguments.</param>
         internal ExpressionException(String format, params Object[] args)
             : base(String.Format(format, args))
         {

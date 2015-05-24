@@ -80,7 +80,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <returns>
         /// <c>true</c> if <paramref name="relation"/> is greater than or equal to zero; <c>false</c> otherwise.
         /// </returns>
-        public override Boolean Evaluate(Int32 relation, Object left, Object right)
+        public override bool Evaluate(Int32 relation, Object left, Object right)
         {
             return relation >= 0;
         }

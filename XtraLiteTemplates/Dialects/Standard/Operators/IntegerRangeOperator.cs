@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
@@ -61,7 +59,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         }
 
         /// <summary>
-        /// Evaluates the result of interger sequence operation for <paramref name="left" /> and <paramref name="right" /> operands.
+        /// Evaluates the result of integer sequence operation for <paramref name="left" /> and <paramref name="right" /> operands.
         /// </summary>
         /// <param name="context">The evaluation context.</param>
         /// <param name="left">The left operand.</param>

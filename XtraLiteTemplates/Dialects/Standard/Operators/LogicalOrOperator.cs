@@ -86,12 +86,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <returns>
         ///   <c>true</c> if the operation is supported; <c>false</c> otherwise.
         /// </returns>
-        public override Boolean EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
+        public override bool EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
         {
             Expect.NotNull("context", context);
 
             result = true;
-            return (TypeConverter.TypeOf(left) == PrimitiveType.Boolean && TypeConverter.ConvertToBoolean(left) == true);
+            return TypeConverter.TypeOf(left) == PrimitiveType.Boolean && TypeConverter.ConvertToBoolean(left) == true;
         }
     }
 }

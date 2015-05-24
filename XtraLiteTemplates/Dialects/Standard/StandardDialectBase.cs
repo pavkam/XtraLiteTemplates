@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
     /// <summary>
-    /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviours that concrete
+    /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviors that concrete
     /// dialect implementations can use out-of-the box.
     /// </summary>
     public abstract class StandardDialectBase : IDialect, IObjectFormatter
@@ -69,7 +69,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <summary>
         /// Override in descendant classes to supply all dialect supported directives.
         /// </summary>
-        /// <param name="typeConverter">The concrete <see cref="T:XtraLiteTemplates.Dialects.Standard.IPrimitiveTypeConverter" /> implentation used for type conversions.</param>
+        /// <param name="typeConverter">The concrete <see cref="T:XtraLiteTemplates.Dialects.Standard.IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
         /// <returns>
         /// An array of all supported directives.
         /// </returns>
@@ -99,10 +99,10 @@ namespace XtraLiteTemplates.Dialects.Standard
             if (String.IsNullOrEmpty(markup))
                 return markup;
 
-            if (m_casing == DialectCasing.LowerCase)
-                return markup.ToLower(Culture);
-            else if (m_casing == DialectCasing.UpperCase)
-                return markup.ToUpper(Culture);
+            if (this.m_casing == DialectCasing.LowerCase)
+                return markup.ToLower(this.Culture);
+            else if (this.m_casing == DialectCasing.UpperCase)
+                return markup.ToUpper(this.Culture);
             else
                 return markup;
         }
@@ -124,16 +124,16 @@ namespace XtraLiteTemplates.Dialects.Standard
             Expect.NotNull("culture", culture);
 
             /* Build culture-aware values.*/
-            Name = name;
-            Culture = culture;
-            m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture, this);
-            m_casing = casing;
-            m_undefinedSpecialIdentifier = AdjustCasing("Undefined");
+            this.Name = name;
+            this.Culture = culture;
+            this.m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture, this);
+            this.m_casing = casing;
+            this.m_undefinedSpecialIdentifier = this.AdjustCasing("Undefined");
 
             var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
 
-            IdentifierComparer = comparer;
-            StringLiteralComparer = comparer;
+            this.IdentifierComparer = comparer;
+            this.StringLiteralComparer = comparer;
         }
 
         /// <summary>
@@ -272,10 +272,10 @@ namespace XtraLiteTemplates.Dialects.Standard
             {
                 /* Trim all 1+ white spaces to one space character. */
                 StringBuilder result = new StringBuilder();
-                Boolean putSpace = false;
+                bool putSpace = false;
                 foreach (var c in unparsedText)
                 {
-                    if (Char.IsWhiteSpace(c))
+                    if (char.IsWhiteSpace(c))
                     {
                         if (putSpace)
                         {
@@ -290,7 +290,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                     }
                 }
 
-                if (result.Length > 0 && Char.IsWhiteSpace(result[result.Length - 1]))
+                if (result.Length > 0 && char.IsWhiteSpace(result[result.Length - 1]))
                     result.Length -= 1;
 
                 return result.ToString();
@@ -303,7 +303,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The tag start character.
         /// </value>
-        public abstract Char StartTagCharacter { get; }
+        public abstract char StartTagCharacter { get; }
 
         /// <summary>
         /// Override in descendant classes to specify the tag end character (used by the tokenization process).
@@ -311,7 +311,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The tag end character.
         /// </value>
-        public abstract Char EndTagCharacter { get; }
+        public abstract char EndTagCharacter { get; }
 
         /// <summary>
         /// Override in descendant classes to specify the string literal start character (used by the tokenization process).
@@ -319,7 +319,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal start character.
         /// </value>
-        public abstract Char StartStringLiteralCharacter { get; }
+        public abstract char StartStringLiteralCharacter { get; }
 
         /// <summary>
         /// Override in descendant classes to specify the string literal end character (used by the tokenization process).
@@ -327,7 +327,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal end character.
         /// </value>
-        public abstract Char EndStringLiteralCharacter { get; }
+        public abstract char EndStringLiteralCharacter { get; }
 
         /// <summary>
         /// Override in descendant classes to specify the string literal escape character (used by the tokenization process).
@@ -335,7 +335,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal escape character.
         /// </value>
-        public abstract Char StringLiteralEscapeCharacter { get; }
+        public abstract char StringLiteralEscapeCharacter { get; }
 
         /// <summary>
         /// Override in descendant classes to specify the number literal decimal separator character (used by the tokenization process).
@@ -343,7 +343,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The number literal decimal separator character.
         /// </value>
-        public abstract Char NumberDecimalSeparatorCharacter { get; }
+        public abstract char NumberDecimalSeparatorCharacter { get; }
 
         /// <summary>
         /// Returns a human-readable representation of the dialect instance.
@@ -380,7 +380,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
         /// </returns>
-        public override Boolean Equals(Object obj)
+        public override bool Equals(Object obj)
         {
             var other = obj as StandardDialect;
             return

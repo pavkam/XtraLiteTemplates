@@ -39,7 +39,7 @@ namespace XtraLiteTemplates.Dialects
     using XtraLiteTemplates.Expressions.Operators;
 
     /// <summary>
-    /// Defines all the common properties and behaviours specific to a templating language dialect.
+    /// Defines all the common properties and behaviours specific to a template language dialect.
     /// A dialect exposes any number of expression operators and directives; specifies all control characters and how
     /// text is parsed.
     /// <para>Check out the <seealso cref="XtraLiteTemplates.Dialects.Standard.StandardDialect"/> and <seealso cref="XtraLiteTemplates.Dialects.Standard.CodeMonkeyDialect"/> for specific implementations of this interface.</para>
@@ -60,7 +60,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The identifier comparer.
         /// </value>
-        IEqualityComparer<String> IdentifierComparer { get; }
+        IEqualityComparer<string> IdentifierComparer { get; }
 
         /// <summary>
         /// Specifies the expression flow symbols used by expressions of this dialect.
@@ -92,7 +92,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The special keywords.
         /// </value>
-        IReadOnlyDictionary<String, Object> SpecialKeywords { get; }
+        IReadOnlyDictionary<string, object> SpecialKeywords { get; }
 
         /// <summary>
         /// Processes all unparsed text blocks read from the original template.
@@ -103,7 +103,7 @@ namespace XtraLiteTemplates.Dialects
         /// The processed text value.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        String DecorateUnparsedText(IExpressionEvaluationContext context, String unparsedText);
+        string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText);
 
         /// <summary>
         /// Specifies the tag start character (used by the tokenization process).
@@ -111,7 +111,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The tag start character.
         /// </value>
-        Char StartTagCharacter { get; }
+        char StartTagCharacter { get; }
 
         /// <summary>
         /// Specifies the tag end character (used by the tokenization process).
@@ -119,7 +119,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The tag end character.
         /// </value>
-        Char EndTagCharacter { get; }
+        char EndTagCharacter { get; }
 
         /// <summary>
         /// Specifies the string literal start character (used by the tokenization process).
@@ -127,7 +127,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The string literal start character.
         /// </value>
-        Char StartStringLiteralCharacter { get; }
+        char StartStringLiteralCharacter { get; }
 
         /// <summary>
         /// Specifies the string literal end character (used by the tokenization process).
@@ -135,7 +135,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The string literal end character.
         /// </value>
-        Char EndStringLiteralCharacter { get; }
+        char EndStringLiteralCharacter { get; }
 
         /// <summary>
         /// Specifies the string literal escape character (used by the tokenization process).
@@ -143,7 +143,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The string literal escape character.
         /// </value>
-        Char StringLiteralEscapeCharacter { get; }
+        char StringLiteralEscapeCharacter { get; }
 
         /// <summary>
         /// Specifies the number literal decimal separator character (used by the tokenization process).
@@ -151,6 +151,6 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The number literal decimal separator character.
         /// </value>
-        Char NumberDecimalSeparatorCharacter { get; }
+        char NumberDecimalSeparatorCharacter { get; }
     }
 }

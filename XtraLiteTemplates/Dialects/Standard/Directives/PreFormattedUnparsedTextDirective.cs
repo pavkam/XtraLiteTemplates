@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
@@ -40,9 +38,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class PreFormattedUnparsedTextDirective : StandardDirective    
     {
-        private Object m_stateObject;
+        private object m_stateObject;
 
-        public PreFormattedUnparsedTextDirective(String startTagMarkup, String endTagMarkup, Object stateObject, IPrimitiveTypeConverter typeConverter)
+        public PreFormattedUnparsedTextDirective(string startTagMarkup, string endTagMarkup, object stateObject, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2);
@@ -52,13 +50,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             m_stateObject = stateObject;
         }
 
-        public PreFormattedUnparsedTextDirective(Object stateObject, IPrimitiveTypeConverter typeConverter)
+        public PreFormattedUnparsedTextDirective(object stateObject, IPrimitiveTypeConverter typeConverter)
             : this("PREFORMATTED", "END", stateObject, typeConverter)
         {
         }
 
-        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
-            IExpressionEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
+            IExpressionEvaluationContext context, out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);            
             Debug.Assert(components != null);

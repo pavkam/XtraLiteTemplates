@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
@@ -81,7 +79,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <returns>
         /// <c>true</c> if <paramref name="relation"/> is less than or equal to zero; <c>false</c> otherwise.
         /// </returns>
-        public override Boolean Evaluate(Int32 relation, Object left, Object right)
+        public override bool Evaluate(Int32 relation, Object left, Object right)
         {
             return relation <= 0;
         }

@@ -40,7 +40,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class ForDirective : StandardDirective
     {
-        private Int32 m_expressionIndex;
+        private int m_expressionIndex;
 
         public ForDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))

@@ -72,7 +72,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull("context", context);
 
-            return - TypeConverter.ConvertToNumber(arg);
+            return -TypeConverter.ConvertToNumber(arg);
         }
     }
 }

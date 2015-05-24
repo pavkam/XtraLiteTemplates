@@ -42,14 +42,14 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     {
         private class State
         {
-            public IEnumerator<Object> Enumerator;
-            public Boolean IsLast;
+            public IEnumerator<object> Enumerator;
+            public bool IsLast;
         }
 
-        private Int32 m_expressionIndex;
-        private Int32 m_identifierIndex;
+        private int m_expressionIndex;
+        private int m_identifierIndex;
 
-        public SeparatedForEachDirective(String startTagMarkup, String separatorTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+        public SeparatedForEachDirective(string startTagMarkup, string separatorTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(separatorTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 3);
@@ -73,8 +73,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
         }
 
-        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
-            IExpressionEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
+            IExpressionEvaluationContext context, out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
             Debug.Assert(components != null);
@@ -111,7 +111,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                     Debug.Assert(sstate.Enumerator != null);
                     Debug.Assert(!sstate.IsLast);
 
-                    context.SetVariable(components[m_identifierIndex] as String, sstate.Enumerator.Current);
+                    context.SetVariable(components[m_identifierIndex] as string, sstate.Enumerator.Current);
                     sstate.IsLast = !sstate.Enumerator.MoveNext();
 
                     return FlowDecision.Evaluate;

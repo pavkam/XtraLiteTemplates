@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
@@ -62,7 +60,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
         }
 
-        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state, IExpressionEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(int tagIndex, Object[] components, ref Object state, IExpressionEvaluationContext context, out String text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
             Debug.Assert(components != null);
@@ -79,8 +77,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
             else if (tagIndex == 1)
             {
-                Debug.Assert(state is Boolean);
-                var conditionWasTrue = (Boolean)state;
+                Debug.Assert(state is bool);
+                var conditionWasTrue = (bool)state;
 
                 if (!conditionWasTrue)
                     return FlowDecision.Evaluate;

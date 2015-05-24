@@ -40,10 +40,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class ConditionalInterpolationDirective : StandardDirective
     {
-        private Int32 m_interpolatedExpressionIndex;
-        private Int32 m_conditionalExpressionIndex;
+        private int m_interpolatedExpressionIndex;
+        private int m_conditionalExpressionIndex;
 
-        public ConditionalInterpolationDirective(String markup, Boolean invertExpressionOrder, IPrimitiveTypeConverter typeConverter)
+        public ConditionalInterpolationDirective(String markup, bool invertExpressionOrder, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(markup))
         {
             Debug.Assert(Tags.Count == 1);
@@ -72,8 +72,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
         }
 
-        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components,
-            ref Object state, IExpressionEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(
+            int tagIndex, 
+            Object[] components,
+            ref Object state, 
+            IExpressionEvaluationContext context, 
+            out String text)
         {
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);

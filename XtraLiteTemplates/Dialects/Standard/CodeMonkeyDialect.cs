@@ -119,7 +119,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal start character.
         /// </value>
-        public override Char StartStringLiteralCharacter
+        public override char StartStringLiteralCharacter
         {
             get
             {
@@ -133,7 +133,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal end character.
         /// </value>
-        public override Char EndStringLiteralCharacter
+        public override char EndStringLiteralCharacter
         {
             get
             {
@@ -149,7 +149,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         ///   <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
         /// </returns>
-        public override Boolean Equals(Object obj)
+        public override bool Equals(Object obj)
         {
             return base.Equals(obj as CodeMonkeyDialect);
         }
@@ -160,7 +160,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A hash code for the current <see cref="CodeMonkeyDialect" />.
         /// </returns>
-        public override Int32 GetHashCode()
+        public override int GetHashCode()
         {
             return base.GetHashCode() ^ GetType().GetHashCode();
         }
