@@ -31,12 +31,27 @@ namespace XtraLiteTemplates.Parsing
     using System;
 
     /// <summary>
-    /// Abstract base class for all lex objects created and passed along during the lexical analysis process.
+    /// Abstract base class for all <c>lex</c> objects created and passed along during the lexical analysis process.
     /// </summary>
     public abstract class Lex
     {
         /// <summary>
-        /// Gets index in the input template of the first character of the first token that makes up this lex object.
+        /// Initializes a new instance of the <see cref="Lex"/> class.
+        /// </summary>
+        /// <param name="firstCharacterIndex">The index of the first character in the input template</param>
+        /// <param name="originalLength">The combined length of all tokens that make up this <c>lex</c> object.</param>
+        /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
+        protected Lex(int firstCharacterIndex, int originalLength)
+        {
+            Expect.GreaterThanOrEqual("firstCharacterIndex", firstCharacterIndex, 0);
+            Expect.GreaterThan("originalLength", originalLength, 0);
+
+            this.FirstCharacterIndex = firstCharacterIndex;
+            this.OriginalLength = originalLength;
+        }
+
+        /// <summary>
+        /// Gets index in the input template of the first character of the first token that makes up this <c>lex</c> object.
         /// </summary>
         /// <value>
         /// The index of the first character.
@@ -47,29 +62,14 @@ namespace XtraLiteTemplates.Parsing
         public int FirstCharacterIndex { get; private set; }
 
         /// <summary>
-        /// Gets original length of all tokens combined that make up this lex object.
+        /// Gets original length of all tokens combined that make up this <c>lex</c> object.
         /// </summary>
         /// <value>
-        /// The total length of all tokens that make up this lex.
+        /// The total length of all tokens that make up this <c>lex</c>.
         /// </value>
         /// <remarks>
         /// The value of this property is provided by the caller during the construction process.
         /// </remarks>
         public int OriginalLength { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Lex"/> class.
-        /// </summary>
-        /// <param name="firstCharacterIndex">The index of the first character in the input template</param>
-        /// <param name="originalLength">The combined length of all tokens that make up this lex object.</param>
-        /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        protected Lex(int firstCharacterIndex, int originalLength)
-        {
-            Expect.GreaterThanOrEqual("firstCharacterIndex", firstCharacterIndex, 0);
-            Expect.GreaterThan("originalLength", originalLength, 0);
-
-            this.FirstCharacterIndex = firstCharacterIndex;
-            this.OriginalLength = originalLength;
-        }
     }
 }

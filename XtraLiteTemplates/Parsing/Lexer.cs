@@ -25,18 +25,20 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Parsing
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
     using System.Text;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
-    using System.IO;
-    using System.Globalization;
 
     /// <summary>
     /// The lexical analyzer class. Requires an instance of <see cref="XtraLiteTemplates.Parsing.ITokenizer"/> to obtain all the tokens from. Based
@@ -45,121 +47,30 @@ namespace XtraLiteTemplates.Parsing
     /// </summary>
     public sealed class Lexer
     {
-        private ExpressionFlowSymbols m_expressionFlowSymbols;
-        private List<Operator> m_expressionOperators;
-        private HashSet<string> m_unaryExpressionOperators;
-        private HashSet<string> m_binaryExpressionOperators;
-        private Dictionary<string, Object> m_specials;
-        private List<Tag> m_tags;
-
-        private Token m_currentToken;
-        private bool m_isEndOfStream;
-
-        private bool NextToken()
-        {
-            if (this.m_isEndOfStream)
-                return false;
-
-            this.m_currentToken = this.Tokenizer.ReadNext();
-            if (this.m_currentToken == null)
-                this.m_isEndOfStream = true;
-
-            return !this.m_isEndOfStream;
-        }
-
-        private Expression CreateExpression()
-        {
-            var expression = new Expression(this.m_expressionFlowSymbols, this.Comparer);
-
-            foreach (var @operator in this.m_expressionOperators)
-                expression.RegisterOperator(@operator);
-
-            return expression;
-        }
-
-        private bool KnownSymbol(string symbol)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(symbol));
-
-            if (Comparer.Equals(symbol, this.m_expressionFlowSymbols.GroupClose) ||
-                Comparer.Equals(symbol, this.m_expressionFlowSymbols.GroupOpen) ||
-                Comparer.Equals(symbol, this.m_expressionFlowSymbols.Separator) ||
-                Comparer.Equals(symbol, this.m_expressionFlowSymbols.MemberAccess))
-                return true;
-
-            foreach (var @operator in this.m_expressionOperators)
-            {
-                if (Comparer.Equals(@operator.Symbol, symbol))
-                    return true;
-            }
-
-            return false;
-        }
-
-        private void InterpretSymbolChainToken(Expression expression, Token token)
-        {
-            var _symbols = token.Value;
-
-            while (_symbols.Length > 0)
-            {
-                var found = false;
-
-                for (var i = _symbols.Length; i > 0; i--)
-                {
-                    var potentialOperator = _symbols.Substring(0, i);
-                    if (this.KnownSymbol(potentialOperator))
-                    {
-                        try
-                        {
-                            expression.FeedSymbol(potentialOperator);
-                        }
-                        catch (ExpressionException feedException)
-                        {
-                            ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, token);
-                        }
-
-                        found = true;
-                        _symbols = _symbols.Substring(i);
-                        break;
-                    }
-                }
-
-                if (!found)
-                    ExceptionHelper.UnexpectedToken(token);
-            }
-        }
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private ExpressionFlowSymbols expressionFlowSymbols;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private List<Operator> expressionOperators;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private HashSet<string> unaryExpressionOperators;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private HashSet<string> binaryExpressionOperators;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Dictionary<string, object> specialConstants;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private List<Tag> registeredTags;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Token currentToken;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private bool endOfStream;
 
         /// <summary>
-        /// <value>The <see cref="XtraLiteTemplates.Parsing.ITokenizer"/> object used to read the tokens from the input template.</value>
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// Initializes a new instance of the <see cref="Lexer"/> class.
         /// </summary>
-        public ITokenizer Tokenizer { get; private set; }
-
-        /// <summary>
-        /// <value>The <see cref="IEqualityComparer{String}"/> object used to match keywords and identifiers.</value>
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        public IEqualityComparer<string> Comparer { get; private set; }
-
-        /// <summary>
-        /// <value>A collection of <see cref="XtraLiteTemplates.Parsing.Tag"/> objects registered using <see cref="RegisterTag"/> method.</value>
-        /// <remarks>The caller is responsible with loading up the known tag objects into the lexer before attempting to reading the first lex object.</remarks>
-        /// </summary>
-        public IReadOnlyCollection<Tag> Tags
-        {
-            get 
-            {
-                return m_tags;
-            }
-        }
-
-        /// <summary>
-        /// Creates an instance of <see cref="XtraLiteTemplates.Parsing.Lexer"/> class.
-        /// </summary>
-        /// <param name="tokenizer">The <see cref="XtraLiteTemplates.Parsing.ITokenizer"/> object used to read the tokens from the input template.</param>
-        /// <param name="expressionFlowSymbols">The <see cref="XtraLiteTemplates.Expressions.ExpressionFlowSymbols"/> object containing the standard expression flow control symbols.</param>
-        /// <param name="comparer">The <see cref="System.Collections.Generic.IEqualityComparer{String}"/> object used to match keywords and identifiers.</param>
-        /// <exception cref="System.ArgumentNullException">Either <paramref name="tokenizer"/>, <paramref name="expressionFlowSymbols"/> or <paramref name="expressionFlowSymbols"/> are <c>null</c>.</exception>
+        /// <param name="tokenizer">The <see cref="XtraLiteTemplates.Parsing.ITokenizer" /> object used to read the tokens from the input template.</param>
+        /// <param name="expressionFlowSymbols">The <see cref="XtraLiteTemplates.Expressions.ExpressionFlowSymbols" /> object containing the standard expression flow control symbols.</param>
+        /// <param name="comparer">The <see cref="System.Collections.Generic.IEqualityComparer{String}" /> object used to match keywords and identifiers.</param>
+        /// <exception cref="System.ArgumentNullException">Either <paramref name="tokenizer" />, <paramref name="expressionFlowSymbols" /> or <paramref name="expressionFlowSymbols" /> are <c>null</c>.</exception>
         public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<string> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
@@ -169,19 +80,58 @@ namespace XtraLiteTemplates.Parsing
             this.Tokenizer = tokenizer;
             this.Comparer = comparer;
 
-            this.m_tags = new List<Tag>();
-            this.m_expressionOperators = new List<Operator>();
-            this.m_unaryExpressionOperators = new HashSet<string>(comparer);
-            this.m_binaryExpressionOperators = new HashSet<string>(comparer);
-            this.m_specials = new Dictionary<string, Object>(comparer);
+            this.registeredTags = new List<Tag>();
+            this.expressionOperators = new List<Operator>();
+            this.unaryExpressionOperators = new HashSet<string>(comparer);
+            this.binaryExpressionOperators = new HashSet<string>(comparer);
+            this.specialConstants = new Dictionary<string, object>(comparer);
 
-            this.m_expressionFlowSymbols = expressionFlowSymbols;
+            this.expressionFlowSymbols = expressionFlowSymbols;
 
             /* Register the flow symbols in */
-            this.m_binaryExpressionOperators.Add(m_expressionFlowSymbols.Separator);
-            this.m_binaryExpressionOperators.Add(m_expressionFlowSymbols.MemberAccess);
-            this.m_unaryExpressionOperators.Add(m_expressionFlowSymbols.GroupOpen);
-            this.m_binaryExpressionOperators.Add(m_expressionFlowSymbols.GroupClose);
+            this.binaryExpressionOperators.Add(expressionFlowSymbols.Separator);
+            this.binaryExpressionOperators.Add(expressionFlowSymbols.MemberAccess);
+            this.unaryExpressionOperators.Add(expressionFlowSymbols.GroupOpen);
+            this.binaryExpressionOperators.Add(expressionFlowSymbols.GroupClose);
+        }
+
+        /// <summary>
+        /// Gets the <see cref="XtraLiteTemplates.Parsing.ITokenizer" /> object used to read the tokens from the input template.
+        /// </summary>
+        /// <value>
+        /// The input template <c>tokenizer</c>.
+        /// </value>
+        /// <remarks>
+        /// The value of this property is provided by the caller during the construction process.
+        /// </remarks>
+        public ITokenizer Tokenizer { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IEqualityComparer{String}" /> object used to match keywords and identifiers.
+        /// </summary>
+        /// <value>
+        /// The identifier comparer.
+        /// </value>
+        /// <remarks>
+        /// The value of this property is provided by the caller during the construction process.
+        /// </remarks>
+        public IEqualityComparer<string> Comparer { get; private set; }
+
+        /// <summary>
+        /// Gets all the registered <see cref="XtraLiteTemplates.Parsing.Tag" /> objects.
+        /// </summary>
+        /// <value>
+        /// The registered tags.
+        /// </value>
+        /// <remarks>
+        /// The caller is responsible with loading up the known tag objects into the lexer before attempting to reading the first <c>lex</c> object.
+        /// </remarks>
+        public IReadOnlyCollection<Tag> Tags
+        {
+            get
+            {
+                return this.registeredTags;
+            }
         }
 
         /// <summary>
@@ -195,16 +145,20 @@ namespace XtraLiteTemplates.Parsing
         {
             Expect.NotNull("tag", tag);
             if (tag.ComponentCount == 0)
-                ExceptionHelper.CannotRegisterTagWithNoComponents();
-
-            /* Check for an equivalent tag in the list */
-            foreach (var ot in this.m_tags)
             {
-                if (ot.Equals(tag, Comparer))
-                    return this;
+                ExceptionHelper.CannotRegisterTagWithNoComponents();
             }
 
-            this.m_tags.Add(tag);
+            /* Check for an equivalent tag in the list */
+            foreach (var ot in this.registeredTags)
+            {
+                if (ot.Equals(tag, this.Comparer))
+                {
+                    return this;
+                }
+            }
+
+            this.registeredTags.Add(tag);
             return this;
         }
 
@@ -222,24 +176,32 @@ namespace XtraLiteTemplates.Parsing
             var unaryOperator = @operator as UnaryOperator;
             if (unaryOperator != null)
             {
-                if (this.m_unaryExpressionOperators.Contains(unaryOperator.Symbol) ||
-                    this.m_specials.ContainsKey(unaryOperator.Symbol))
+                if (this.unaryExpressionOperators.Contains(unaryOperator.Symbol) ||
+                    this.specialConstants.ContainsKey(unaryOperator.Symbol))
+                {
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
+                }
                 else
-                    this.m_unaryExpressionOperators.Add(unaryOperator.Symbol);
+                {
+                    this.unaryExpressionOperators.Add(unaryOperator.Symbol);
+                }
             }
 
             var binaryOperator = @operator as BinaryOperator;
             if (binaryOperator != null)
             {
-                if (this.m_binaryExpressionOperators.Contains(binaryOperator.Symbol) ||
-                    this.m_specials.ContainsKey(binaryOperator.Symbol))
+                if (this.binaryExpressionOperators.Contains(binaryOperator.Symbol) ||
+                    this.specialConstants.ContainsKey(binaryOperator.Symbol))
+                {
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
+                }
                 else
-                    this.m_binaryExpressionOperators.Add(binaryOperator.Symbol);
+                {
+                    this.binaryExpressionOperators.Add(binaryOperator.Symbol);
+                }
             }
 
-            this.m_expressionOperators.Add(@operator);
+            this.expressionOperators.Add(@operator);
 
             return this;
         }
@@ -257,22 +219,22 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="System.ArgumentNullException"><paramref name="keyword"/> is <c>null</c>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="keyword"/> is not a valid identifier.</exception>
         /// <exception cref="System.InvalidOperationException"><paramref name="keyword"/> is already in use by an operator.</exception>
-        public Lexer RegisterSpecial(string keyword, Object value)
+        public Lexer RegisterSpecial(string keyword, object value)
         {
             Expect.Identifier("keyword", keyword);
 
-            if (this.m_unaryExpressionOperators.Contains(keyword) ||
-                this.m_binaryExpressionOperators.Contains(keyword))
+            if (this.unaryExpressionOperators.Contains(keyword) ||
+                this.binaryExpressionOperators.Contains(keyword))
             {
                 ExceptionHelper.SpecialCannotBeRegistered(keyword);
             }
 
-            this.m_specials[keyword] = value;
+            this.specialConstants[keyword] = value;
             return this;
         }
 
         /// <summary>
-        /// Analizes a batch of tokens and generates a lex object. If the tokenizer reached the end of the stream, this method will
+        /// Analyzes a batch of tokens and generates a <c>lex</c> object. If the <c>tokenizer</c> reached the end of the stream, this method will
         /// return a <c>null</c> value. All subsequent calls to this method will also return <c>null</c>.
         /// </summary>
         /// <returns>An analyzed <see cref="XtraLiteTemplates.Parsing.Lex"/> object.</returns>
@@ -280,162 +242,182 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="XtraLiteTemplates.Expressions.ExpressionException">An expression contruction error encountered.</exception>
         public Lex ReadNext()
         {
-            if (this.m_currentToken == null && !this.m_isEndOfStream)
+            if (this.currentToken == null && !this.endOfStream)
+            {
                 this.NextToken();
+            }
 
-            if (this.m_isEndOfStream)
+            if (this.endOfStream)
+            {
                 return null;
+            }
 
             /* Load all unparsed tokens and merge them into a big component. */
-            if (this.m_currentToken.Type == Token.TokenType.Unparsed)
+            if (this.currentToken.Type == Token.TokenType.Unparsed)
             {
-                var _unparsedTokens = new List<Token>();
-                while (!this.m_isEndOfStream && this.m_currentToken.Type == Token.TokenType.Unparsed)
+                var allUnparsedTokens = new List<Token>();
+                while (!this.endOfStream && this.currentToken.Type == Token.TokenType.Unparsed)
                 {
-                    _unparsedTokens.Add(this.m_currentToken);
+                    allUnparsedTokens.Add(this.currentToken);
                     this.NextToken();
                 }
 
-                return new UnparsedLex(String.Join(String.Empty, _unparsedTokens.Select(s => s.Value)), 
-                    _unparsedTokens[0].CharacterIndex, _unparsedTokens.Sum(s => s.OriginalLength));
+                return new UnparsedLex(
+                    string.Join(string.Empty, allUnparsedTokens.Select(s => s.Value)), 
+                    allUnparsedTokens[0].CharacterIndex, 
+                    allUnparsedTokens.Sum(s => s.OriginalLength));
             }
 
             /* This is where a tag is parsed. */
-            if (this.m_currentToken.Type != Token.TokenType.StartTag)
-                ExceptionHelper.UnexpectedToken(this.m_currentToken);
+            if (this.currentToken.Type != Token.TokenType.StartTag)
+            {
+                ExceptionHelper.UnexpectedToken(this.currentToken);
+            }
 
-            Int32 tokenIndex = -1;
-
-            var matchingTags = new HashSet<Tag>(this.m_tags);
-            List<Token> _allTokens = new List<Token>() { this.m_currentToken }; 
-            List<Object> _components = new List<Object>();
+            var matchingTags = new HashSet<Tag>(this.registeredTags);
+            List<Token> allTagTokens = new List<Token>() { this.currentToken };
+            List<object> currentComponents = new List<object>();
 
             Expression currentExpression = null;
             while (true)
             {
-                tokenIndex++;
-                var _previousToken = this.m_currentToken;
+                var previousReadToken = this.currentToken;
                 if (!this.NextToken())
-                    ExceptionHelper.NoMatchingTagsLeft(_components, _previousToken);
-
-                _allTokens.Add(this.m_currentToken);
-
-                if (this.m_currentToken.Type == Token.TokenType.EndTag)
                 {
-                    var matchingTag = matchingTags.Where(p => p.ComponentCount == _components.Count).FirstOrDefault();
+                    ExceptionHelper.NoMatchingTagsLeft(currentComponents, previousReadToken);
+                }
+
+                allTagTokens.Add(this.currentToken);
+
+                if (this.currentToken.Type == Token.TokenType.EndTag)
+                {
+                    var matchingTag = matchingTags.Where(p => p.ComponentCount == currentComponents.Count).FirstOrDefault();
 
                     if (matchingTag == null)
-                        ExceptionHelper.NoMatchingTagsLeft(_components, this.m_currentToken);
+                    {
+                        ExceptionHelper.NoMatchingTagsLeft(currentComponents, this.currentToken);
+                    }
                     else
                     {
-                        if (matchingTag.MatchesExpression(_components.Count - 1))
+                        if (matchingTag.MatchesExpression(currentComponents.Count - 1))
                         {
-                            Debug.Assert(currentExpression != null);
+                            Debug.Assert(currentExpression != null, "currentExpression cannot be null.");
                             try
                             {
                                 currentExpression.Construct();
                             }
                             catch (ExpressionException constructException)
                             {
-                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, m_currentToken);
+                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, this.currentToken);
                             }
                         }
 
-                        object[] actualComponents = new object[_components.Count];
-                        for (var i = 0; i < _components.Count; i++)
+                        object[] actualComponents = new object[currentComponents.Count];
+                        for (var i = 0; i < currentComponents.Count; i++)
                         {
-                            var component = _components[i];
+                            var component = currentComponents[i];
 
                             var tuple = component as Tuple<string, Expression>;
                             if (tuple != null)
                             {
                                 if (matchingTag.MatchesExpression(i))
                                 {
-                                    Debug.Assert(tuple.Item2.Constructed);
+                                    Debug.Assert(tuple.Item2.Constructed, "expression variant expected to be fully constructed.");
                                     actualComponents[i] = tuple.Item2;
                                 }
                                 else
+                                {
                                     actualComponents[i] = tuple.Item1;
+                                }
                             }
                             else
                             {
-                                Debug.Assert(component is String || (component is Expression && ((Expression)component).Constructed));
+                                Debug.Assert(
+                                    component is string || (component is Expression && ((Expression)component).Constructed),
+                                    "expression component expected to be fully constructed.");
+
                                 actualComponents[i] = component;
                             }
                         }
 
-                        NextToken();
-                        return new TagLex(matchingTag, actualComponents, _allTokens[0].CharacterIndex, _allTokens.Sum(s => s.OriginalLength));
+                        this.NextToken();
+                        return new TagLex(matchingTag, actualComponents, allTagTokens[0].CharacterIndex, allTagTokens.Sum(s => s.OriginalLength));
                     }
                 }
 
-                if (m_currentToken.Type == Token.TokenType.Word && 
-                    !m_specials.ContainsKey(m_currentToken.Value))
+                if (this.currentToken.Type == Token.TokenType.Word &&
+                    !this.specialConstants.ContainsKey(this.currentToken.Value))
                 {
-                    if (_previousToken.Type != Token.TokenType.StartTag &&
-                        _previousToken.Type != Token.TokenType.Symbol && 
-                        _previousToken.Type != Token.TokenType.Whitespace)
-                        ExceptionHelper.UnexpectedToken(m_currentToken);
+                    if (previousReadToken.Type != Token.TokenType.StartTag &&
+                        previousReadToken.Type != Token.TokenType.Symbol &&
+                        previousReadToken.Type != Token.TokenType.Whitespace)
+                    {
+                        ExceptionHelper.UnexpectedToken(this.currentToken);
+                    }
 
                     /* This is either a keyword or part of an expression. Reflect that. */
-                    var matchesByKeyword = matchingTags.Where(p => p.MatchesKeyword(_components.Count, Comparer, this.m_currentToken.Value)).ToArray();
+                    var matchesByKeyword = matchingTags.Where(p => p.MatchesKeyword(currentComponents.Count, this.Comparer, this.currentToken.Value)).ToArray();
                     if (matchesByKeyword.Length > 0)
                     {
                         /* Keyword match. All the rest is now history. */
                         if (matchesByKeyword.Length > 0)
+                        {
                             matchingTags = new HashSet<Tag>(matchesByKeyword);
+                        }
 
-                        var previousComponentWasExpression = matchingTags.Any(p => p.MatchesExpression(_components.Count - 1));
+                        var previousComponentWasExpression = matchingTags.Any(p => p.MatchesExpression(currentComponents.Count - 1));
                         if (previousComponentWasExpression)
                         {
-                            Debug.Assert(currentExpression != null);
+                            Debug.Assert(currentExpression != null, "currentExpression cannot be null.");
                             try
                             {
                                 currentExpression.Construct();
                             }
                             catch (ExpressionException constructException)
                             {
-                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, m_currentToken);
+                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, this.currentToken);
                             }
                         }
 
                         currentExpression = null;
-                        _components.Add(this.m_currentToken.Value);
+                        currentComponents.Add(this.currentToken.Value);
                         continue;
                     }
                     else
                     {
-                        var matchesByIdentifier = matchingTags.Where(p => p.MatchesIdentifier(_components.Count, Comparer, this.m_currentToken.Value)).ToArray();
+                        var matchesByIdentifier = matchingTags.Where(p => p.MatchesIdentifier(currentComponents.Count, this.Comparer, this.currentToken.Value)).ToArray();
                         if (matchesByIdentifier.Length > 0)
                         {
                             if (currentExpression == null)
                             {
-                                var matchesByExpression = matchingTags.Where(p => p.MatchesExpression(_components.Count)).ToArray();
+                                var matchesByExpression = matchingTags.Where(p => p.MatchesExpression(currentComponents.Count)).ToArray();
                                 if (matchesByExpression.Length > 0)
                                 {
-                                    currentExpression = CreateExpression();
+                                    currentExpression = this.CreateExpression();
                                     try
                                     {
-                                        currentExpression.FeedSymbol(this.m_currentToken.Value);
+                                        currentExpression.FeedSymbol(this.currentToken.Value);
                                     }
                                     catch (ExpressionException feedException)
                                     {
-                                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, this.m_currentToken);
+                                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, this.currentToken);
                                     }
 
-                                    _components.Add(Tuple.Create(this.m_currentToken.Value, currentExpression));
+                                    currentComponents.Add(Tuple.Create(this.currentToken.Value, currentExpression));
                                 }
                                 else
-                                    _components.Add(this.m_currentToken.Value);
+                                {
+                                    currentComponents.Add(this.currentToken.Value);
+                                }
 
                                 matchingTags = new HashSet<Tag>(matchesByIdentifier.Concat(matchesByExpression));
                             }
                             else
                             {
-                                var previousComponentWasExpression = matchesByIdentifier.Any(p => p.MatchesExpression(_components.Count - 1));
+                                var previousComponentWasExpression = matchesByIdentifier.Any(p => p.MatchesExpression(currentComponents.Count - 1));
                                 if (previousComponentWasExpression)
                                 {
-                                    Debug.Assert(currentExpression != null);
+                                    Debug.Assert(currentExpression != null, "currentExpression cannot be null.");
                                     try
                                     {
                                         currentExpression.Construct();
@@ -443,11 +425,11 @@ namespace XtraLiteTemplates.Parsing
                                     }
                                     catch (ExpressionException constructException)
                                     {
-                                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, m_currentToken);
+                                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, this.currentToken);
                                     }
                                 }
 
-                                _components.Add(this.m_currentToken.Value);
+                                currentComponents.Add(this.currentToken.Value);
                             }
 
                             continue;
@@ -455,72 +437,175 @@ namespace XtraLiteTemplates.Parsing
                     }
                 }
 
-                if (m_currentToken.Type == Token.TokenType.Word ||
-                    m_currentToken.Type == Token.TokenType.Number ||
-                    m_currentToken.Type == Token.TokenType.String)
+                if (this.currentToken.Type == Token.TokenType.Word ||
+                    this.currentToken.Type == Token.TokenType.Number ||
+                    this.currentToken.Type == Token.TokenType.String)
                 {
-                    if (_previousToken.Type != Token.TokenType.StartTag &&
-                        _previousToken.Type != Token.TokenType.Symbol && 
-                        _previousToken.Type != Token.TokenType.Whitespace)
-                        ExceptionHelper.UnexpectedToken(m_currentToken);
+                    if (previousReadToken.Type != Token.TokenType.StartTag &&
+                        previousReadToken.Type != Token.TokenType.Symbol &&
+                        previousReadToken.Type != Token.TokenType.Whitespace)
+                    {
+                        ExceptionHelper.UnexpectedToken(this.currentToken);
+                    }
 
                     if (currentExpression == null)
                     {
                         /* Starting an expression. */
-                        matchingTags.RemoveWhere(p => !p.MatchesExpression(_components.Count));
+                        matchingTags.RemoveWhere(p => !p.MatchesExpression(currentComponents.Count));
                         if (matchingTags.Count == 0)
-                            ExceptionHelper.NoMatchingTagsLeft(_components, this.m_currentToken);
+                        {
+                            ExceptionHelper.NoMatchingTagsLeft(currentComponents, this.currentToken);
+                        }
 
-                        currentExpression = CreateExpression();
-                        _components.Add(currentExpression);
+                        currentExpression = this.CreateExpression();
+                        currentComponents.Add(currentExpression);
                     }
 
                     try
                     {
-                        if (this.m_currentToken.Type == Token.TokenType.Number)
+                        if (this.currentToken.Type == Token.TokenType.Number)
                         {
-                            double _float;
-                            if (double.TryParse(this.m_currentToken.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out _float))
-                                currentExpression.FeedLiteral(_float);
+                            double parsedDouble;
+                            if (double.TryParse(this.currentToken.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out parsedDouble))
+                            {
+                                currentExpression.FeedLiteral(parsedDouble);
+                            }
                             else
-                                ExceptionHelper.UnexpectedToken(this.m_currentToken);
+                            {
+                                ExceptionHelper.UnexpectedToken(this.currentToken);
+                            }
                         }
-                        else if (this.m_currentToken.Type == Token.TokenType.String)
+                        else if (this.currentToken.Type == Token.TokenType.String)
                         {
-                            currentExpression.FeedLiteral(this.m_currentToken.Value);
+                            currentExpression.FeedLiteral(this.currentToken.Value);
                         }
                         else
                         {
                             object keywordedLiteral;
-                            if (m_specials.TryGetValue(this.m_currentToken.Value, out keywordedLiteral))
+                            if (this.specialConstants.TryGetValue(this.currentToken.Value, out keywordedLiteral))
+                            {
                                 currentExpression.FeedLiteral(keywordedLiteral);
+                            }
                             else
-                                currentExpression.FeedSymbol(this.m_currentToken.Value);
+                            {
+                                currentExpression.FeedSymbol(this.currentToken.Value);
+                            }
                         }
                     }
                     catch (ExpressionException feedException)
                     {
-                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, this.m_currentToken);
+                        ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, this.currentToken);
                     }
                 }
-                else if (this.m_currentToken.Type == Token.TokenType.Symbol)
+                else if (this.currentToken.Type == Token.TokenType.Symbol)
                 {
                     /* This must be part of an expression. */
                     if (currentExpression == null)
                     {
                         /* Starting an expression. */
-                        matchingTags.RemoveWhere(p => !p.MatchesExpression(_components.Count));
+                        matchingTags.RemoveWhere(p => !p.MatchesExpression(currentComponents.Count));
                         if (matchingTags.Count == 0)
-                            ExceptionHelper.NoMatchingTagsLeft(_components, this.m_currentToken);
+                        {
+                            ExceptionHelper.NoMatchingTagsLeft(currentComponents, this.currentToken);
+                        }
 
-                        currentExpression = CreateExpression();
-                        _components.Add(currentExpression);
+                        currentExpression = this.CreateExpression();
+                        currentComponents.Add(currentExpression);
                     }
 
-                    InterpretSymbolChainToken(currentExpression, this.m_currentToken);
+                    this.InterpretSymbolChainToken(currentExpression, this.currentToken);
+                }
+            }
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private bool NextToken()
+        {
+            if (this.endOfStream)
+            {
+                return false;
+            }
+
+            this.currentToken = this.Tokenizer.ReadNext();
+            if (this.currentToken == null)
+            {
+                this.endOfStream = true;
+            }
+
+            return !this.endOfStream;
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Expression CreateExpression()
+        {
+            var expression = new Expression(this.expressionFlowSymbols, this.Comparer);
+
+            foreach (var @operator in this.expressionOperators)
+            {
+                expression.RegisterOperator(@operator);
+            }
+
+            return expression;
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private bool KnownSymbol(string symbol)
+        {
+            Debug.Assert(!string.IsNullOrEmpty(symbol), "symbol cannot be empty.");
+
+            if (this.Comparer.Equals(symbol, this.expressionFlowSymbols.GroupClose) ||
+                this.Comparer.Equals(symbol, this.expressionFlowSymbols.GroupOpen) ||
+                this.Comparer.Equals(symbol, this.expressionFlowSymbols.Separator) ||
+                this.Comparer.Equals(symbol, this.expressionFlowSymbols.MemberAccess))
+            {
+                return true;
+            }
+
+            foreach (var @operator in this.expressionOperators)
+            {
+                if (this.Comparer.Equals(@operator.Symbol, symbol))
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private void InterpretSymbolChainToken(Expression expression, Token token)
+        {
+            var remainingSymbols = token.Value;
+
+            while (remainingSymbols.Length > 0)
+            {
+                var found = false;
+
+                for (var i = remainingSymbols.Length; i > 0; i--)
+                {
+                    var potentialOperator = remainingSymbols.Substring(0, i);
+                    if (this.KnownSymbol(potentialOperator))
+                    {
+                        try
+                        {
+                            expression.FeedSymbol(potentialOperator);
+                        }
+                        catch (ExpressionException feedException)
+                        {
+                            ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, token);
+                        }
+
+                        found = true;
+                        remainingSymbols = remainingSymbols.Substring(i);
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    ExceptionHelper.UnexpectedToken(token);
                 }
             }
         }
     }
 }
-

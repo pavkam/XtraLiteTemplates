@@ -42,7 +42,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="tag">The matched tag.</param>
         /// <param name="components">The matched tag's components.</param>
         /// <param name="firstCharacterIndex">Index of the first character in the input template.</param>
-        /// <param name="originalLength">Original length of all the tags combined that make up this lex.</param>
+        /// <param name="originalLength">Original length of all the tags combined that make up this <c>lex</c> object.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="tag"/> or <paramref name="components"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="components"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
@@ -57,7 +57,7 @@ namespace XtraLiteTemplates.Parsing
         }
 
         /// <summary>
-        /// Gets the tag that is matched by this lex.
+        /// Gets the tag that is matched by this <c>lex</c> object.
         /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
         /// </summary>
         /// <value>
@@ -76,10 +76,10 @@ namespace XtraLiteTemplates.Parsing
         public object[] Components { get; private set; }
 
         /// <summary>
-        /// Returns a human-readable representation of this lex object.
+        /// Returns a human-readable representation of this <c>lex</c> object.
         /// </summary>
         /// <returns>
-        /// A string that represents the current lex object.
+        /// A string that represents the current <c>lex</c> object.
         /// </returns>
         public override string ToString()
         {

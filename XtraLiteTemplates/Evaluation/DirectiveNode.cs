@@ -92,7 +92,7 @@ namespace XtraLiteTemplates.Evaluation
 
                     if (!context.IgnoreEvaluationExceptions)
                     {
-                        ExceptionHelper.DirectiveEvaluationError(this.m_directives[0], exception);
+                        ExceptionHelper.DirectiveEvaluationError(exception, this.m_directives[0]);
                     }
                 }
 

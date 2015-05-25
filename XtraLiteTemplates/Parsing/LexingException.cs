@@ -33,7 +33,7 @@ namespace XtraLiteTemplates.Parsing
     using XtraLiteTemplates.Expressions;
 
     /// <summary>
-    /// The exception type thrown during unexpected lexing errors.
+    /// The exception type thrown for errors encountered during the lexical analysis.
     /// </summary>
     public class LexingException : ParseException
     {

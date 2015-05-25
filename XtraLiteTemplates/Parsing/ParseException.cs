@@ -38,22 +38,22 @@ namespace XtraLiteTemplates.Parsing
     public class ParseException : FormatException
     {
         /// <summary>
-        /// <value>Gets the index of the character where the parsing error occured.</value>
-        /// </summary>
-        public int CharacterIndex { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="ParseException"/> class.
         /// </summary>
         /// <param name="innerException">The inner exception.</param>
-        /// <param name="characterIndex">The index of the character where the parsing error occured.</param>
+        /// <param name="characterIndex">The index of the character where the parsing error occurred.</param>
         /// <param name="format">A format string.</param>
         /// <param name="args">Format arguments.</param>
         internal ParseException(Exception innerException, int characterIndex, string format, params object[] args)
             : base(string.Format(format, args), innerException)
         {
-            Debug.Assert(characterIndex >= 0);
+            Debug.Assert(characterIndex >= 0, "characterIndex cannot be less than zero.");
             this.CharacterIndex = characterIndex;
         }
+
+        /// <summary>
+        /// <value>Gets the index of the character where the parsing error occurred.</value>
+        /// </summary>
+        public int CharacterIndex { get; private set; }
     }
 }

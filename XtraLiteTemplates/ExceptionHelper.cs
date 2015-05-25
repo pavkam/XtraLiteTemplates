@@ -43,70 +43,70 @@ namespace XtraLiteTemplates
     {
         internal static void ArgumentIsNull(string argumentName)
         {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName));
+            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
             throw new ArgumentNullException(argumentName, string.Format("Argument \"{0}\" cannot be null.", argumentName));
         }
 
         internal static void ArgumentIsEmpty(string argumentName)
         {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName));
+            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
             throw new ArgumentException(string.Format("Argument \"{0}\" cannot be empty.", argumentName), argumentName);
         }
 
         internal static void ArgumentIsNotValidIdentifier(string argumentName)
         {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName));
+            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
             throw new ArgumentException(string.Format("Argument \"{0}\" does not represent a valid identifer.", argumentName), argumentName);
         }
 
         internal static void ArgumentsAreEqual(string argumentName1, string argumentName2)
         {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName1));
-            Debug.Assert(!string.IsNullOrEmpty(argumentName2));
+            Debug.Assert(!string.IsNullOrEmpty(argumentName1), "argumentName1 cannot be empty.");
+            Debug.Assert(!string.IsNullOrEmpty(argumentName2), "argumentName2 cannot be empty.");
 
             throw new ArgumentException(string.Format("Arguments \"{0}\" and \"{1}\" cannot be equal.", argumentName1, argumentName2), argumentName1);
         }
 
         internal static void ArgumentNotGreaterThan(string argumentName, string comparand)
         {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName));
-            Debug.Assert(!string.IsNullOrEmpty(comparand));
+            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
+            Debug.Assert(!string.IsNullOrEmpty(comparand), "comparand cannot be empty.");
 
             throw new ArgumentOutOfRangeException(argumentName, string.Format("Argument \"{0}\" is expected to be greater than {1}.", argumentName, comparand));
         }
 
         internal static void ArgumentNotGreaterThanOrEqual(string argumentName, string comparand)
         {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName));
-            Debug.Assert(!string.IsNullOrEmpty(comparand));
+            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
+            Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
 
             throw new ArgumentOutOfRangeException(argumentName, string.Format("Argument \"{0}\" is expected to be greater than or equal to {1}.", argumentName, comparand));
         }
 
         internal static void ArgumentNotLessThan(string argumentName, string comparand)
         {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName));
-            Debug.Assert(!string.IsNullOrEmpty(comparand));
+            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
+            Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
 
             throw new ArgumentOutOfRangeException(argumentName, string.Format("Argument \"{0}\" is expected to be less than {1}.", argumentName, comparand));
         }
 
         internal static void ArgumentNotLessThanOrEqual(string argumentName, string comparand)
         {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName));
-            Debug.Assert(!string.IsNullOrEmpty(comparand));
+            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
+            Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
 
             throw new ArgumentOutOfRangeException(argumentName, string.Format("Argument \"{0}\" is expected to be less than or equal to {1}.", argumentName, comparand));
         }
 
         internal static void ConditionFailed(string conditionName)
         {
-            Debug.Assert(!string.IsNullOrEmpty(conditionName));
+            Debug.Assert(!string.IsNullOrEmpty(conditionName), "conditionName cannot be empty.");
 
-            throw new ArgumentException(String.Format("Argument condition \"{0}\" failed to be validated as true.", conditionName), conditionName);
+            throw new ArgumentException(string.Format("Argument condition \"{0}\" failed to be validated as true.", conditionName), conditionName);
         }
 
         internal static void UnexpectedCharacter(int characterIndex, char character)
@@ -126,7 +126,7 @@ namespace XtraLiteTemplates
 
         internal static void UnexpectedToken(Token token)
         {
-            Debug.Assert(token != null);
+            Debug.Assert(token != null, "token cannot be null.");
 
             throw new LexingException(
                 null, 
@@ -139,18 +139,19 @@ namespace XtraLiteTemplates
 
         internal static void NoMatchingTagsLeft(IReadOnlyList<object> components, Token token)
         {
-            Debug.Assert(token != null);
-            Debug.Assert(components != null);
+            Debug.Assert(token != null, "token cannot be null.");
+            Debug.Assert(components != null, "components cannot be null.");
 
             if (components.Count > 0)
             {
-                throw new LexingException(null, 
+                throw new LexingException(
+                    null, 
                     token,
                     "No matching tags composed of {{{3}}} found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
                     token.Value, 
                     token.Type, 
-                    token.CharacterIndex, 
-                    String.Join(" ", components));
+                    token.CharacterIndex,
+                    string.Join(" ", components));
             }
             else
             {
@@ -166,8 +167,8 @@ namespace XtraLiteTemplates
 
         internal static void UnexpectedOrInvalidExpressionToken(ExpressionException innerException, Token token)
         {
-            Debug.Assert(token != null);
-            Debug.Assert(innerException != null);
+            Debug.Assert(token != null, "token cannot be null.");
+            Debug.Assert(innerException != null, "innerException cannot be null.");
 
             throw new LexingException(
                 innerException, 
@@ -181,7 +182,7 @@ namespace XtraLiteTemplates
 
         internal static void UnexpectedTag(TagLex tagLex)
         {
-            Debug.Assert(tagLex != null);
+            Debug.Assert(tagLex != null, "tagLex cannot be null.");
 
             throw new InterpreterException(
                 new Directive[0], 
@@ -193,19 +194,19 @@ namespace XtraLiteTemplates
 
         internal static void UnmatchedDirectiveTag(Directive[] candidateDirectives, int firstCharaterIndex)
         {
-            Debug.Assert(candidateDirectives != null);
+            Debug.Assert(candidateDirectives != null, "candidateDirectives cannot be null.");
 
             throw new InterpreterException(
                 candidateDirectives, 
                 firstCharaterIndex,
                 "Directive(s) {0} encountered at position {1}, could not be finalized by matching all component tags.",
-                String.Join(" or ", candidateDirectives.AsEnumerable()), 
+                string.Join(" or ", candidateDirectives.AsEnumerable()), 
                 firstCharaterIndex);
         }
 
         internal static void CannotEvaluateOperator(Operator @operator, object constant)
         {
-            Debug.Assert(@operator != null);
+            Debug.Assert(@operator != null, "operator cannot be null.");
             throw new ExpressionException("Operator {0} could not be applied to value '{1}'.", @operator, constant);
         }
 
@@ -226,25 +227,28 @@ namespace XtraLiteTemplates
 
         internal static void UnexpectedOperator(string @operator)
         {
-            Debug.Assert(!string.IsNullOrEmpty(@operator));
+            Debug.Assert(!string.IsNullOrEmpty(@operator), "operator cannot be null.");
+
             throw new ExpressionException("Unexpected expression operator: '{0}'.", @operator);
         }
 
         internal static void UnexpectedLiteralRequiresIdentifier(string @operator, object literal)
         {
-            Debug.Assert(!string.IsNullOrEmpty(@operator));
+            Debug.Assert(!string.IsNullOrEmpty(@operator), "operator cannot be null.");
+
             throw new ExpressionException("Operator '{0}' cannot be applied to literal value: '{1}'. Expected identifier.", @operator, literal);
         }
 
         internal static void OperatorAlreadyRegistered(Operator @operator)
         {
-            Debug.Assert(@operator != null);
+            Debug.Assert(@operator != null, "operator cannot be null.");
+
             throw new InvalidOperationException(string.Format("Operator '{0}' (or one of its identifying symbols) already registered.", @operator));
         }
 
         internal static void SpecialCannotBeRegistered(string keyword)
         {
-            Debug.Assert(!string.IsNullOrEmpty(keyword));
+            Debug.Assert(!string.IsNullOrEmpty(keyword), "keyword cannot be empty.");
 
             throw new InvalidOperationException(string.Format("Special keyword '{0}' cannot be registered as it is currently in use by an operator.", keyword));
         }
@@ -289,25 +293,27 @@ namespace XtraLiteTemplates
             throw new FormatException(string.Format("Invalid tag markup: '{0}'", markup));
         }
 
-        internal static void DirectiveEvaluationError(Directive directive, Exception exception)
+        internal static void DirectiveEvaluationError(Exception innerException, Directive directive)
         {
-            Debug.Assert(directive != null);
-            Debug.Assert(exception != null);
+            Debug.Assert(directive != null, "directive cannot be null.");
+            Debug.Assert(innerException != null, "exception cannot be null.");
 
-            throw new EvaluationException(exception, "Evaluation of directive {0} resulted in an error: {1}", directive, exception.Message);
+            throw new EvaluationException(innerException, "Evaluation of directive {0} resulted in an error: {1}", directive, innerException.Message);
         }
 
         internal static void InvalidObjectMemberName(string name)
         {
-            Debug.Assert(!string.IsNullOrEmpty(name));
+            Debug.Assert(!string.IsNullOrEmpty(name), "name cannot be empty.");
+
             throw new EvaluationException(null, "Property or method '{0}' could not be located in the provided object.", name);
         }
 
-        internal static void ObjectMemberEvaluationError(Exception inner, string name)
+        internal static void ObjectMemberEvaluationError(Exception innerException, string name)
         {
-            Debug.Assert(inner != null);
-            Debug.Assert(!string.IsNullOrEmpty(name));
-            throw new EvaluationException(inner, "Evaluation of property or method '{0}' failed. An exception was raised: {1}", name, inner.Message);
+            Debug.Assert(innerException != null, "innerException cannot be null.");
+            Debug.Assert(!string.IsNullOrEmpty(name), "name cannot be empty.");
+
+            throw new EvaluationException(innerException, "Evaluation of property or method '{0}' failed. An exception was raised: {1}", name, innerException.Message);
         }
     }
 }

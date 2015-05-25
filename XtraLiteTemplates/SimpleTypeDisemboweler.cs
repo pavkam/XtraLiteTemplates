@@ -31,6 +31,7 @@ namespace XtraLiteTemplates
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Text;
     using System.Threading.Tasks;
@@ -41,6 +42,9 @@ namespace XtraLiteTemplates
     /// </summary>
     public sealed class SimpleTypeDisemboweler
     {
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private IReadOnlyDictionary<string, Func<object, object>> propertyNameMap;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleTypeDisemboweler"/> class.
         /// </summary>
@@ -53,11 +57,11 @@ namespace XtraLiteTemplates
             Expect.NotNull("type", type);
             Expect.NotNull("memberComparer", memberComparer);
 
-            Type = type;
-            Comparer = memberComparer;
-            Options = options;
+            this.Type = type;
+            this.Comparer = memberComparer;
+            this.Options = options;
 
-            m_mapping = BuildMapping();
+            this.propertyNameMap = this.BuildMapping();
         }
 
         /// <summary>
@@ -70,11 +74,14 @@ namespace XtraLiteTemplates
             /// No special options.
             /// </summary>
             None = 0,
+
             /// <summary>
             /// Instructs the <see cref="SimpleTypeDisemboweler"/> to treat parameterless, methods to be treated as properties.
             /// The <c>void</c> return type will be treated as <c>null</c>.
             /// </summary>
+            [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Not an issue.")]
             TreatParameterlessFunctionsAsProperties = 1,
+
             /// <summary>
             /// Instructs the <see cref="SimpleTypeDisemboweler"/> to silently return <c>null</c> for any property that raised an exception
             /// during evaluation.
@@ -95,7 +102,7 @@ namespace XtraLiteTemplates
 
         /// <summary>
         /// Gets the <see cref="IEqualityComparer{String}" /> used by <see cref="SimpleTypeDisemboweler" /> to compare the
-        /// names of properies. This property is primarily used to decide the case-sensitivity of this <see cref="SimpleTypeDisemboweler" /> instance.
+        /// names of properties. This property is primarily used to decide the case-sensitivity of this <see cref="SimpleTypeDisemboweler" /> instance.
         /// <remarks>Value provided by the caller during construction.</remarks>
         /// </summary>
         /// <value>
@@ -104,7 +111,7 @@ namespace XtraLiteTemplates
         public IEqualityComparer<string> Comparer { get; private set; }
 
         /// <summary>
-        /// Gets the set of <see cref="EvaluationOptions" /> options that modifies the bahaviour of this
+        /// Gets the set of <see cref="EvaluationOptions" /> options that modifies the behavior of this
         /// <see cref="SimpleTypeDisemboweler" /> instance.&gt;
         /// </summary>
         /// <value>
@@ -129,15 +136,17 @@ namespace XtraLiteTemplates
         {
             Expect.Identifier("property", property);
 
-            var ignoreErrors = Options.HasFlag(EvaluationOptions.TreatAllErrorsAsNull);
+            var ignoreErrors = this.Options.HasFlag(EvaluationOptions.TreatAllErrorsAsNull);
 
             if (!ignoreErrors)
+            {
                 Expect.NotNull("instance", instance);
+            }
             
             if (instance != null)
             {
-                Func<Object, Object> reader;
-                if (m_mapping.TryGetValue(property, out reader))
+                Func<object, object> reader;
+                if (this.propertyNameMap.TryGetValue(property, out reader))
                 {
                     try
                     {
@@ -146,47 +155,56 @@ namespace XtraLiteTemplates
                     catch (Exception e)
                     {
                         if (!ignoreErrors)
+                        {
                             ExceptionHelper.ObjectMemberEvaluationError(e, property);
+                        }
                     }
                 }
                 else
                 {
                     if (!ignoreErrors)
+                    {
                         ExceptionHelper.InvalidObjectMemberName(property);
+                    }
                 }
             }
 
             return null;
         }
 
-        private IReadOnlyDictionary<String, Func<object, object>> m_mapping;
-
-        private IReadOnlyDictionary<String, Func<object, object>> BuildMapping()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private IReadOnlyDictionary<string, Func<object, object>> BuildMapping()
         {
-            var mapping = new Dictionary<String, Func<Object, Object>>(Comparer);
+            var mapping = new Dictionary<string, Func<object, object>>(this.Comparer);
 
             /* Load properties in. */
             foreach (var property in Type.GetProperties())
             {
                 if (!property.CanRead || property.GetIndexParameters().Length > 0)
+                {
                     continue;
+                }
 
                 mapping[property.Name] = property.GetValue;
             }
 
-            if (Options.HasFlag(EvaluationOptions.TreatParameterlessFunctionsAsProperties))
+            if (this.Options.HasFlag(EvaluationOptions.TreatParameterlessFunctionsAsProperties))
             {
-                var zeroParams = new Object[0];
+                var zeroParams = new object[0];
 
                 /* Load methods in. */
                 foreach (var method in Type.GetMethods())
                 {
                     if (method.GetParameters().Length > 0 || method.IsAbstract || method.IsConstructor ||
                         method.IsPrivate)
+                    {
                         continue;
+                    }
 
                     if (!mapping.ContainsKey(method.Name))
+                    {
                         mapping[method.Name] = instance => method.Invoke(instance, zeroParams);
+                    }
                 }
             }
 

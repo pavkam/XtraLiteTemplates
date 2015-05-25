@@ -31,19 +31,10 @@ namespace XtraLiteTemplates.Parsing
     using System;
 
     /// <summary>
-    /// A <see cref="Lex"/> object representing an uparsed text block.
+    /// A <see cref="Lex"/> object representing an unparsed text block.
     /// </summary>
     public sealed class UnparsedLex : Lex
     {
-        /// <summary>
-        /// Gets the unparsed text (as read from the input template).
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        /// <value>
-        /// The unparsed text.
-        /// </value>
-        public string UnparsedText { get; private set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="UnparsedLex"/> class.
         /// </summary>
@@ -60,5 +51,14 @@ namespace XtraLiteTemplates.Parsing
 
             this.UnparsedText = unparsedText;
         }
+
+        /// <summary>
+        /// Gets the unparsed text (as read from the input template).
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The unparsed text.
+        /// </value>
+        public string UnparsedText { get; private set; }
     }
 }
