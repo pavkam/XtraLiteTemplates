@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
@@ -38,15 +39,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     public abstract class StandardRelationalOperator : StandardBinaryOperator
     {
         /// <summary>
-        /// Gets the <see cref="IComparer{String}"/> object used to compare string literals.
-        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
-        /// </summary>
-        /// <value>
-        /// The string literal comparer.
-        /// </value>
-        public IComparer<string> StringComparer { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="StandardRelationalOperator" /> class.
         /// </summary>
         /// <param name="symbol">The operator's symbol.</param>
@@ -56,13 +48,26 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Arguments <paramref name="symbol" />, <paramref name="typeConverter" /> or <paramref name="stringComparer" /> are <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
-        public StandardRelationalOperator(string symbol, int precedence, 
-            IComparer<string> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public StandardRelationalOperator(
+            string symbol, 
+            int precedence, 
+            IComparer<string> stringComparer, 
+            IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, typeConverter)
         {
             Expect.NotNull("stringComparer", stringComparer);
             StringComparer = stringComparer;
         }
+
+        /// <summary>
+        /// Gets the <see cref="IComparer{String}"/> object used to compare string literals.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The string literal comparer.
+        /// </value>
+        public IComparer<string> StringComparer { get; private set; }
+
 
         /// <summary>
         /// Evaluates the current operator for a given <paramref name="left" /> and <paramref name="right" /> operands. This method calls <see cref="Evaluate(Int32,Object,Object)"/>, which
@@ -79,14 +84,14 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull("context", context);
 
-            Int32 relation;
-            if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)
+            int relation;
+            if (this.TypeConverter.TypeOf(left) == PrimitiveType.String || this.TypeConverter.TypeOf(right) == PrimitiveType.String)
             {
-                relation = StringComparer.Compare(TypeConverter.ConvertToString(left), TypeConverter.ConvertToString(right));
+                relation = this.StringComparer.Compare(this.TypeConverter.ConvertToString(left), this.TypeConverter.ConvertToString(right));
             }
             else
             {
-                relation = TypeConverter.ConvertToNumber(left).CompareTo(TypeConverter.ConvertToNumber(right));
+                relation = this.TypeConverter.ConvertToNumber(left).CompareTo(this.TypeConverter.ConvertToNumber(right));
             }
 
             return Evaluate(relation, left, right);

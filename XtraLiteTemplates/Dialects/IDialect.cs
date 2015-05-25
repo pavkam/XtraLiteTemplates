@@ -95,17 +95,6 @@ namespace XtraLiteTemplates.Dialects
         IReadOnlyDictionary<string, object> SpecialKeywords { get; }
 
         /// <summary>
-        /// Processes all unparsed text blocks read from the original template.
-        /// </summary>
-        /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
-        /// <param name="unparsedText">The text block being processed.</param>
-        /// <returns>
-        /// The processed text value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText);
-
-        /// <summary>
         /// Gets the tag start character (used by the tokenization process).
         /// </summary>
         /// <value>
@@ -152,5 +141,16 @@ namespace XtraLiteTemplates.Dialects
         /// The number literal decimal separator character.
         /// </value>
         char NumberDecimalSeparatorCharacter { get; }
+
+        /// <summary>
+        /// Processes all unparsed text blocks read from the original template.
+        /// </summary>
+        /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
+        /// <param name="unparsedText">The text block being processed.</param>
+        /// <returns>
+        /// The processed text value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
+        string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText);
     }
 }

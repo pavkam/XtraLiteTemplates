@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
@@ -35,11 +36,12 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
+    
 
     /// <summary>
     /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviors that concrete
@@ -282,9 +284,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A string that represents the current object.
         /// </returns>
-        public override String ToString()
+        public override string ToString()
         {
-            String caseDescr = null;
+            string caseDescr = null;
             switch (m_casing)
             {
                 case DialectCasing.IgnoreCase:
@@ -298,13 +300,13 @@ namespace XtraLiteTemplates.Dialects.Standard
                     break;
             }
 
-            if (String.IsNullOrEmpty(Culture.Name))
+            if (string.IsNullOrEmpty(Culture.Name))
             {
-                return String.Format("{0} ({1})", Name, caseDescr);
+                return string.Format("{0} ({1})", Name, caseDescr);
             }
             else
             {
-                return String.Format("{0} ({1}, {2})", Name, Culture.Name, caseDescr);
+                return string.Format("{0} ({1}, {2})", Name, Culture.Name, caseDescr);
             }
         }
 
@@ -331,7 +333,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A hash code for the current <see cref="StandardDialectBase" />.
         /// </returns>
-        public override Int32 GetHashCode()
+        public override int GetHashCode()
         {
             return
                 Name.GetHashCode() ^
@@ -384,7 +386,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             return ((IObjectFormatter)this).ToString(obj, Culture);
         }
-
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported operators.
@@ -473,6 +474,5 @@ namespace XtraLiteTemplates.Dialects.Standard
             this.IdentifierComparer = comparer;
             this.StringLiteralComparer = comparer;
         }
-
     }
 }

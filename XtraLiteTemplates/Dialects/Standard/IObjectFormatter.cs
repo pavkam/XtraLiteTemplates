@@ -44,7 +44,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <returns>The string representation.</returns>
-        String ToString(object obj);
+        string ToString(object obj);
 
         /// <summary>
         /// Gets the string representation of an <see cref="Object" /> using the given <paramref name="formatProvider"/>.

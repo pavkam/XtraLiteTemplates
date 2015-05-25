@@ -25,44 +25,46 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class ReduceExpressionEvaluationContext : IExpressionEvaluationContext
     {
         public static readonly IExpressionEvaluationContext Instance = new ReduceExpressionEvaluationContext();
 
-        public void SetVariable(String identifier, Object value)
+        public void SetVariable(string identifier, object value)
         {
             Debug.Fail("Invalid operation.");
         }
 
-        public Object GetVariable(String identifier)
+        public object GetVariable(string identifier)
         {
             Debug.Fail("Invalid operation.");
             return null;
         }
 
-        public void AddStateObject(Object state)
+        public void AddStateObject(object state)
         {
             Debug.Fail("Invalid operation.");
         }
 
-        public void RemoveStateObject(Object state)
+        public void RemoveStateObject(object state)
         {
             Debug.Fail("Invalid operation.");
         }
 
-        public bool ContainsStateObject(Object state)
+        public bool ContainsStateObject(object state)
         {
             Debug.Fail("Invalid operation.");
             return false;
         }
 
-        public Object GetProperty(Object variable, String memberName)
+        public object GetProperty(object variable, string memberName)
         {
             Debug.Fail("Invalid operation.");
             return false;

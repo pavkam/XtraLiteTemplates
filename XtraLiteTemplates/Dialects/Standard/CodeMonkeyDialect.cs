@@ -36,11 +36,12 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    
 
     /// <summary>
     /// A minimalistic, programmer-oriented standard dialect. Contains the full set of supported expression operators, directives and special constants.
@@ -48,22 +49,6 @@ namespace XtraLiteTemplates.Dialects.Standard
     /// </summary>
     public class CodeMonkeyDialect : StandardDialect
     {
-        /// <summary>
-        /// Gets a culture-invariant, case-insensitive instance of <see cref="CodeMonkeyDialect"/> class.
-        /// </summary>
-        /// <value>
-        /// The culture-invariant, case-insensitive instance of <see cref="CodeMonkeyDialect"/> class.
-        /// </value>
-        public static new IDialect DefaultIgnoreCase { get; private set; }
-
-        /// <summary>
-        /// Gets a culture-invariant, case-sensitive (upper cased) instance of <see cref="StandardDialect"/> class.
-        /// </summary>
-        /// <value>
-        /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
-        /// </value>
-        public static new IDialect Default { get; private set; }
-
         /// <summary>
         /// Initializes static members of the <see cref="CodeMonkeyDialect"/> class.
         /// </summary>
@@ -89,6 +74,22 @@ namespace XtraLiteTemplates.Dialects.Standard
             : this(DialectCasing.IgnoreCase)
         {
         }
+
+        /// <summary>
+        /// Gets a culture-invariant, case-insensitive instance of <see cref="CodeMonkeyDialect"/> class.
+        /// </summary>
+        /// <value>
+        /// The culture-invariant, case-insensitive instance of <see cref="CodeMonkeyDialect"/> class.
+        /// </value>
+        public static new IDialect DefaultIgnoreCase { get; private set; }
+
+        /// <summary>
+        /// Gets a culture-invariant, case-sensitive (upper cased) instance of <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <value>
+        /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
+        /// </value>
+        public static new IDialect Default { get; private set; }
 
         /// <summary>
         /// Specifies the string literal start character (used by the tokenization process).
@@ -162,6 +163,5 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new PreFormattedUnparsedTextDirective(AdjustCasing("PRE"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
             };
         }
-
     }
 }

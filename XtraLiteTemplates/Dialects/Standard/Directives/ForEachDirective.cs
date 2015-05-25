@@ -61,7 +61,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public ForEachDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(Tags.Count == 2);
+            Debug.Assert(this.Tags.Count == 2);
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -73,8 +73,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
             Expect.IsTrue("one identifier component", identifierComponents.Length == 1);
 
-            m_expressionIndex = expressionComponents[0];
-            m_identifierIndex = identifierComponents[0];
+            this.m_expressionIndex = expressionComponents[0];
+            this.m_identifierIndex = identifierComponents[0];
         }
 
         /// <summary>
@@ -110,7 +110,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);
-            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
             text = null;
@@ -121,7 +121,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 /* Starting up. */
                 Debug.Assert(tagIndex == 0);
 
-                var sequence = TypeConverter.ConvertToSequence(components[m_expressionIndex]);
+                var sequence = this.TypeConverter.ConvertToSequence(components[this.m_expressionIndex]);
                 if (sequence == null)
                 {
                     return FlowDecision.Terminate;
@@ -146,7 +146,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
             else
             {
-                var variableName = components[m_identifierIndex] as string;
+                var variableName = components[this.m_identifierIndex] as string;
                 Debug.Assert(variableName != null);
                 context.SetVariable(variableName, enumerator.Current);
                 return FlowDecision.Evaluate;

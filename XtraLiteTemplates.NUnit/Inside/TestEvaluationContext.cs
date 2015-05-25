@@ -48,7 +48,6 @@ namespace XtraLiteTemplates.NUnit.Inside
         private Stack<Frame> m_frames;
         private Dictionary<Type, SimpleTypeDisemboweler> m_disembowelers;
         private IEqualityComparer<String> m_identifierComparer;
-        private Boolean m_ignoreEvaluationExceptions;
 
         public TestEvaluationContext(IEqualityComparer<String> identifierComparer)
         {

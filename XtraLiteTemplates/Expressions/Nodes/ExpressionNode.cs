@@ -25,14 +25,16 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using XtraLiteTemplates.Expressions.Operators;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class ExpressionNode
     {
         public ExpressionNode Parent { get; set; }
@@ -43,7 +45,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public abstract PermittedContinuations Continuity { get; }
 
-        public Boolean Reduce(IExpressionEvaluationContext reduceContext)
+        public bool Reduce(IExpressionEvaluationContext reduceContext)
         {
             Debug.Assert(reduceContext != null);
 

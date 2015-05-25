@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Parsing
 {
     using System;
@@ -34,25 +36,6 @@ namespace XtraLiteTemplates.Parsing
     /// </summary>
     public sealed class TagLex : Lex
     {
-        /// <summary>
-        /// Specifies the tag that is matched by this lex.
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        /// <value>
-        /// The tag object
-        /// </value>
-        public Tag Tag { get; private set; }
-
-        /// <summary>
-        /// Lists all the components of the matched tag. The number of items in this property matches the <see cref="XtraLiteTemplates.Parsing.Tag.ComponentCount"/> property.
-        /// Each item can either be a <see cref="String"/> or an <see cref="XtraLiteTemplates.Expressions.Expression"/>, depending on which of the tag's component was matched.
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        /// <value>
-        /// The matched tag's components.
-        /// </value>
-        public object[] Components { get; private set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="TagLex"/> class.
         /// </summary>
@@ -74,6 +57,25 @@ namespace XtraLiteTemplates.Parsing
         }
 
         /// <summary>
+        /// Gets the tag that is matched by this lex.
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The tag object
+        /// </value>
+        public Tag Tag { get; private set; }
+
+        /// <summary>
+        /// Gets all the components of the matched tag. The number of items in this property matches the <see cref="XtraLiteTemplates.Parsing.Tag.ComponentCount"/> property.
+        /// Each item can either be a <see cref="String"/> or an <see cref="XtraLiteTemplates.Expressions.Expression"/>, depending on which of the tag's component was matched.
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The matched tag's components.
+        /// </value>
+        public object[] Components { get; private set; }
+
+        /// <summary>
         /// Returns a human-readable representation of this lex object.
         /// </summary>
         /// <returns>
@@ -81,7 +83,7 @@ namespace XtraLiteTemplates.Parsing
         /// </returns>
         public override string ToString()
         {
-            return string.Join(" ", Components);
+            return string.Join(" ", this.Components);
         }
     }
 }

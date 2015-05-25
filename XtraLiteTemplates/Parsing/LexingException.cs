@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Parsing
 {
     using System;
@@ -37,11 +38,6 @@ namespace XtraLiteTemplates.Parsing
     public class LexingException : ParseException
     {
         /// <summary>
-        /// <value>Gets the token that resulted in the exception being thrown.</value>
-        /// </summary>
-        public Token Token { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="LexingException"/> class.
         /// </summary>
         /// <param name="innerException">The inner exception.</param>
@@ -53,5 +49,10 @@ namespace XtraLiteTemplates.Parsing
         {
             this.Token = token;
         }
+
+        /// <summary>
+        /// <value>Gets the token that resulted in the exception being thrown.</value>
+        /// </summary>
+        public Token Token { get; private set; }
     }
 }

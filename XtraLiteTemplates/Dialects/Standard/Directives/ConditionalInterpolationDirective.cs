@@ -33,10 +33,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Text;
-    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The conditional interpolation directive implementation.
@@ -72,13 +72,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             if (invertExpressionOrder)
             {
-                m_interpolatedExpressionIndex = expressionComponents[1];
-                m_conditionalExpressionIndex = expressionComponents[0];
+                this.m_interpolatedExpressionIndex = expressionComponents[1];
+                this.m_conditionalExpressionIndex = expressionComponents[0];
             }
             else
             {
-                m_interpolatedExpressionIndex = expressionComponents[0];
-                m_conditionalExpressionIndex = expressionComponents[1];
+                this.m_interpolatedExpressionIndex = expressionComponents[0];
+                this.m_conditionalExpressionIndex = expressionComponents[1];
             }
         }
 
@@ -113,12 +113,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);
             Debug.Assert(components != null);
-            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
             if (TypeConverter.ConvertToBoolean(components[m_conditionalExpressionIndex]))
             {
-                text = TypeConverter.ConvertToString(components[m_interpolatedExpressionIndex]);
+                text = this.TypeConverter.ConvertToString(components[m_interpolatedExpressionIndex]);
             }
             else
             {

@@ -43,75 +43,19 @@ namespace XtraLiteTemplates.Dialects.Standard
     /// </summary>
     public class FlexiblePrimitiveTypeConverter : IPrimitiveTypeConverter
     {
-        private IEnumerable<object> UpgradeEnumerable(IEnumerable enumerable)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="FlexiblePrimitiveTypeConverter" /> class.
+        /// </summary>
+        /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="Double" /> values.</param>
+        /// <param name="objectFormatter">The object formatter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider" /> or <paramref name="objectFormatter" /> is <c>null</c>.</exception>
+        public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider, IObjectFormatter objectFormatter)
         {
-            Debug.Assert(enumerable != null);
-            foreach (var o in enumerable)
-            {
-                yield return o;
-            }
-        }
+            Expect.NotNull("formatProvider", formatProvider);
+            Expect.NotNull("objectFormatter", objectFormatter);
 
-        private IEnumerable<object> ObjectToSequence(object obj)
-        {
-            yield return obj;
-        }
-
-        private object ReduceObject(object obj)
-        {
-            object reduced;
-
-            /* Identify standard types */
-            if (obj is double || obj is bool || obj is string)
-            {
-                reduced = obj;
-            }
-            else if (obj is byte)
-            {
-                reduced = (double)(byte)obj;
-            }
-            else if (obj is sbyte)
-            {
-                reduced = (double)(sbyte)obj;
-            }
-            else if (obj is short)
-            {
-                reduced = (double)(short)obj;
-            }
-            else if (obj is ushort)
-            {
-                reduced = (double)(ushort)obj;
-            }
-            else if (obj is int)
-            {
-                reduced = (double)(int)obj;
-            }
-            else if (obj is uint)
-            {
-                reduced = (double)(uint)obj;
-            }
-            else if (obj is long)
-            {
-                reduced = (double)(long)obj;
-            }
-            else if (obj is ulong)
-            {
-                reduced = (double)(ulong)obj;
-            }
-            else if (obj is float)
-            {
-                reduced = (double)(float)obj;
-            }
-            else if (obj is decimal)
-            {
-                reduced = (double)(decimal)obj;
-            }
-            else
-            {
-                reduced = obj;
-            }
-
-            return reduced;
+            FormatProvider = formatProvider;
+            ObjectFormatter = objectFormatter;
         }
 
         /// <summary>
@@ -131,21 +75,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The object formatter.
         /// </value>
         public IObjectFormatter ObjectFormatter { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="FlexiblePrimitiveTypeConverter" /> class.
-        /// </summary>
-        /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="Double" /> values.</param>
-        /// <param name="objectFormatter">The object formatter.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider" /> or <paramref name="objectFormatter" /> is <c>null</c>.</exception>
-        public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider, IObjectFormatter objectFormatter)
-        {
-            Expect.NotNull("formatProvider", formatProvider);
-            Expect.NotNull("objectFormatter", objectFormatter);
-
-            FormatProvider = formatProvider;
-            ObjectFormatter = objectFormatter;
-        }
 
         /// <summary>
         /// Tries to convert the value of <paramref name="obj"/> argument to a 32-bit integer.
@@ -317,6 +246,77 @@ namespace XtraLiteTemplates.Dialects.Standard
             {
                 return PrimitiveType.Object;
             }
+        }
+
+        private IEnumerable<object> UpgradeEnumerable(IEnumerable enumerable)
+        {
+            Debug.Assert(enumerable != null);
+            foreach (var o in enumerable)
+            {
+                yield return o;
+            }
+        }
+
+        private IEnumerable<object> ObjectToSequence(object obj)
+        {
+            yield return obj;
+        }
+
+        private object ReduceObject(object obj)
+        {
+            object reduced;
+
+            /* Identify standard types */
+            if (obj is double || obj is bool || obj is string)
+            {
+                reduced = obj;
+            }
+            else if (obj is byte)
+            {
+                reduced = (double)(byte)obj;
+            }
+            else if (obj is sbyte)
+            {
+                reduced = (double)(sbyte)obj;
+            }
+            else if (obj is short)
+            {
+                reduced = (double)(short)obj;
+            }
+            else if (obj is ushort)
+            {
+                reduced = (double)(ushort)obj;
+            }
+            else if (obj is int)
+            {
+                reduced = (double)(int)obj;
+            }
+            else if (obj is uint)
+            {
+                reduced = (double)(uint)obj;
+            }
+            else if (obj is long)
+            {
+                reduced = (double)(long)obj;
+            }
+            else if (obj is ulong)
+            {
+                reduced = (double)(ulong)obj;
+            }
+            else if (obj is float)
+            {
+                reduced = (double)(float)obj;
+            }
+            else if (obj is decimal)
+            {
+                reduced = (double)(decimal)obj;
+            }
+            else
+            {
+                reduced = obj;
+            }
+
+            return reduced;
         }
     }
 }

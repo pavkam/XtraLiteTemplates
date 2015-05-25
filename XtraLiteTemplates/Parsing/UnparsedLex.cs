@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Parsing
 {
     using System;
@@ -34,7 +36,7 @@ namespace XtraLiteTemplates.Parsing
     public sealed class UnparsedLex : Lex
     {
         /// <summary>
-        /// Specifies the unparsed text (as read from the input template).
+        /// Gets the unparsed text (as read from the input template).
         /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
         /// </summary>
         /// <value>

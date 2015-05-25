@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions
 {
     using System;
@@ -44,6 +45,307 @@ namespace XtraLiteTemplates.Expressions
         private Func<IExpressionEvaluationContext, object> m_function;
         private Dictionary<string, UnaryOperator> m_unaryOperatorSymbols;
         private Dictionary<string, BinaryOperator> m_binaryOperatorSymbols;
+
+        /// <summary>
+        /// Gets a value indicating whether this <see cref="Expression"/> is constructed.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if constructed; otherwise, <c>false</c>.
+        /// </value>
+        public bool Constructed
+        {
+            get
+            {
+                return this.m_function != null;
+            }
+        }
+
+        /// <summary>
+        /// Gets a value indicating whether the construction of this <see cref="Expression"/> has started.
+        /// </summary>
+        /// <value>
+        ///   <c>true</c> if started; otherwise, <c>false</c>.
+        /// </value>
+        public bool Started
+        {
+            get
+            {
+                return this.m_current != null;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified <paramref name="symbol" /> is a supported operator.
+        /// </summary>
+        /// <param name="symbol">The symbol to verify.</param>
+        /// <returns>
+        ///   <c>true</c> if the symbol is supported; otherwise, <c>false</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
+        public bool IsSupportedOperator(string symbol)
+        {
+            Expect.NotEmpty("symbol", symbol);
+
+            return
+                this.m_unaryOperatorSymbols.ContainsKey(symbol) || this.m_binaryOperatorSymbols.ContainsKey(symbol);
+        }
+
+        /// <summary>
+        /// Gets all supported operators.
+        /// </summary>
+        /// <value>
+        /// The supported operators.
+        /// </value>
+        public IReadOnlyList<Operator> SupportedOperators
+        {
+            get
+            {
+                return this.m_supportedOperators;
+            }
+        }
+
+        /// <summary>
+        /// Gets the flow symbols.
+        /// </summary>
+        /// <value>
+        /// The flow symbols.
+        /// </value>
+        public ExpressionFlowSymbols FlowSymbols { get; private set; }
+
+        /// <summary>
+        /// Gets the comparer used to compare symbols and identifiers.
+        /// </summary>
+        /// <value>
+        /// The symbol and identifier comparer.
+        /// </value>
+        public IEqualityComparer<string> Comparer { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Expression"/> class.
+        /// </summary>
+        /// <param name="flowSymbols">The flow symbols.</param>
+        /// <param name="comparer">The symbol and identifier comparer.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="flowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
+        public Expression(ExpressionFlowSymbols flowSymbols, IEqualityComparer<string> comparer)
+        {
+            Expect.NotNull("comparer", comparer);
+            Expect.NotNull("flowSymbols", flowSymbols);
+
+            this.FlowSymbols = flowSymbols;
+            this.m_unaryOperatorSymbols = new Dictionary<String, UnaryOperator>(comparer);
+            this.m_binaryOperatorSymbols = new Dictionary<String, BinaryOperator>(comparer);
+            this.m_supportedOperators = new List<Operator>();
+            this.Comparer = comparer;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Expression"/> class using the default flow symbols and a culture-invariant, case-insensitive comparer.
+        /// </summary>
+        public Expression()
+            : this(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
+        {
+        }
+
+        /// <summary>
+        /// Registers an operator with this expression.
+        /// </summary>
+        /// <param name="operator">The operator to register.</param>
+        /// <returns>This expression instance.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="operator"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException">Expression under constrcution or the symbol of <paramref name="operator"/> already registered.</exception>
+        public Expression RegisterOperator(Operator @operator)
+        {
+            Expect.NotNull("operator", @operator);
+
+            if (Started)
+            {
+                ExceptionHelper.CannotRegisterOperatorsForStartedExpression();
+            }
+
+            Debug.Assert(!Constructed);
+
+            /* Standards. */
+            if (@operator.Symbol == this.FlowSymbols.Separator ||
+                @operator.Symbol == this.FlowSymbols.GroupClose ||
+                @operator.Symbol == this.FlowSymbols.GroupOpen ||
+                @operator.Symbol == this.FlowSymbols.MemberAccess)
+            {
+                ExceptionHelper.OperatorAlreadyRegistered(@operator);
+            }
+
+            if (@operator is UnaryOperator)
+            {
+                var unaryOperator = (UnaryOperator)@operator;
+                if (this.m_unaryOperatorSymbols.ContainsKey(unaryOperator.Symbol))
+                {
+                    ExceptionHelper.OperatorAlreadyRegistered(unaryOperator);
+                }
+
+                this.m_unaryOperatorSymbols.Add(@operator.Symbol, unaryOperator);
+            }
+            else if (@operator is BinaryOperator)
+            {
+                var binaryOperator = (BinaryOperator)@operator;
+                if (this.m_binaryOperatorSymbols.ContainsKey(binaryOperator.Symbol))
+                {
+                    ExceptionHelper.OperatorAlreadyRegistered(binaryOperator);
+                }
+
+                this.m_binaryOperatorSymbols.Add(@operator.Symbol, binaryOperator);
+            }
+            else
+            {
+                Debug.Fail("Unsupported operator type.");
+            }
+
+            this.m_supportedOperators.Add(@operator);
+            return this;
+        }
+
+        /// <summary>
+        /// Feeds a literal value into the expression.
+        /// </summary>
+        /// <param name="literal">The literal value.</param>
+        /// <returns>
+        /// This expression instance.
+        /// </returns>
+        /// <exception cref="ExpressionException">An expression construction error detected.</exception>
+        /// <exception cref="InvalidOperationException">Expression construction finalized.</exception>
+        public Expression FeedLiteral(object literal)
+        {
+            if (this.Constructed)
+            {
+                ExceptionHelper.CannotModifyAConstructedExpression();
+            }
+
+            FeedTerm(literal, true);
+            return this;
+        }
+
+        /// <summary>
+        /// Feeds a symbol into the expression.
+        /// </summary>
+        /// <param name="symbol">The symbol value.</param>
+        /// <returns>
+        /// This expression instance.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
+        /// <exception cref="ExpressionException">An expression construction error detected.</exception>
+        /// <exception cref="InvalidOperationException">Expression construction finalized.</exception>
+        public Expression FeedSymbol(string symbol)
+        {
+            Expect.NotEmpty("symbol", symbol);
+
+            if (this.Constructed)
+            {
+                ExceptionHelper.CannotModifyAConstructedExpression();
+            }
+
+            FeedTerm(symbol, false);
+            return this;
+        }
+
+        /// <summary>
+        /// Finalize the construction of the expression.
+        /// </summary>
+        /// <exception cref="InvalidOperationException">Expression construction not started.</exception>
+        /// <exception cref="ExpressionException">Expression in unbalanced state.</exception>
+        public void Construct()
+        {
+            if (!this.Started)
+            {
+                ExceptionHelper.CannotConstructExpressionInvalidState();
+            }
+
+            if (!this.Constructed)
+            {
+                bool fail = false;
+                if (this.m_root.Parent != null)
+                {
+                    fail = true;
+                }
+                else
+                {
+                    var currentRootNode = this.m_current as RootNode;
+                    if (currentRootNode != null)
+                    {
+                        fail = !currentRootNode.Closed;
+                    }
+                    else
+                    {
+                        var currentDisembowelerNode = this.m_current as DisembowelerNode;
+                        if (currentDisembowelerNode != null)
+                        {
+                            fail = currentDisembowelerNode.MemberName == null;
+                        }
+                        else
+                        {
+                            fail = !(this.m_current is LeafNode);
+                        }
+                    }
+                }
+
+                if (fail)
+                {
+                    ExceptionHelper.CannotConstructExpressionInvalidState();
+                }
+
+                /* Reduce the expression if so was desired. */
+                this.m_root.Reduce(ReduceExpressionEvaluationContext.Instance);
+                this.m_function = this.m_root.GetEvaluationFunction();
+            }
+        }
+
+        /// <summary>
+        /// Evaluates this expression using an evaluation context.
+        /// </summary>
+        /// <param name="context">The evaluation context.</param>
+        /// <returns>The result of expression evaluation.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException">Expression not constructed.</exception>
+        public object Evaluate(IExpressionEvaluationContext context)
+        {
+            Expect.NotNull("context", context);
+
+            if (!Constructed)
+            {
+                ExceptionHelper.CannotEvaluateUnconstructedExpression();
+            }
+
+            return this.m_function(context);
+        }
+
+        /// <summary>
+        /// Returns a human-readable representation this expression instance using the <see cref="ExpressionFormatStyle.Arithmetic"/> formatting.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public override string ToString()
+        {
+            return ToString(ExpressionFormatStyle.Arithmetic);
+        }
+
+        /// <summary>
+        /// Returns a human-readable representation this expression instance using the specified formatting.
+        /// </summary>
+        /// <param name="style">The formatting style to use.</param>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents this instance.
+        /// </returns>
+        public string ToString(ExpressionFormatStyle style)
+        {
+            if (this.m_root == null)
+            {
+                return "??";
+            }
+            else
+            {
+                return this.m_root.ToString(style);
+            }
+        }
 
         private void OpenNewGroup()
         {
@@ -341,301 +643,6 @@ namespace XtraLiteTemplates.Expressions
             else
             {
                 this.CompleteWithLiteral(term);
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether this <see cref="Expression"/> is constructed.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if constructed; otherwise, <c>false</c>.
-        /// </value>
-        public bool Constructed
-        {
-            get
-            {
-                return this.m_function != null;
-            }
-        }
-
-        /// <summary>
-        /// Gets a value indicating whether the construction of this <see cref="Expression"/> has started.
-        /// </summary>
-        /// <value>
-        ///   <c>true</c> if started; otherwise, <c>false</c>.
-        /// </value>
-        public bool Started
-        {
-            get
-            {
-                return this.m_current != null;
-            }
-        }
-
-        /// <summary>
-        /// Determines whether the specified <paramref name="symbol" /> is a supported operator.
-        /// </summary>
-        /// <param name="symbol">The symbol to verify.</param>
-        /// <returns>
-        ///   <c>true</c> if the symbol is supported; otherwise, <c>false</c>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
-        public bool IsSupportedOperator(string symbol)
-        {
-            Expect.NotEmpty("symbol", symbol);
-
-            return
-                this.m_unaryOperatorSymbols.ContainsKey(symbol) || this.m_binaryOperatorSymbols.ContainsKey(symbol);
-        }
-
-        /// <summary>
-        /// Gets all supported operators.
-        /// </summary>
-        /// <value>
-        /// The supported operators.
-        /// </value>
-        public IReadOnlyList<Operator> SupportedOperators
-        {
-            get
-            {
-                return this.m_supportedOperators;
-            }
-        }
-
-        /// <summary>
-        /// Gets the flow symbols.
-        /// </summary>
-        /// <value>
-        /// The flow symbols.
-        /// </value>
-        public ExpressionFlowSymbols FlowSymbols { get; private set; }
-
-        /// <summary>
-        /// Gets the comparer used to compare symbols and identifiers.
-        /// </summary>
-        /// <value>
-        /// The symbol and identifier comparer.
-        /// </value>
-        public IEqualityComparer<string> Comparer { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Expression"/> class.
-        /// </summary>
-        /// <param name="flowSymbols">The flow symbols.</param>
-        /// <param name="comparer">The symbol and identifier comparer.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="flowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
-        public Expression(ExpressionFlowSymbols flowSymbols, IEqualityComparer<string> comparer)
-        {
-            Expect.NotNull("comparer", comparer);
-            Expect.NotNull("flowSymbols", flowSymbols);
-
-            this.FlowSymbols = flowSymbols;
-            this.m_unaryOperatorSymbols = new Dictionary<String, UnaryOperator>(comparer);
-            this.m_binaryOperatorSymbols = new Dictionary<String, BinaryOperator>(comparer);
-            this.m_supportedOperators = new List<Operator>();
-            this.Comparer = comparer;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Expression"/> class using the default flow symbols and a culture-invariant, case-insensitive comparer.
-        /// </summary>
-        public Expression()
-            : this(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
-        {
-        }
-
-        /// <summary>
-        /// Registers an operator with this expression.
-        /// </summary>
-        /// <param name="operator">The operator to register.</param>
-        /// <returns>This expression instance.</returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="operator"/> is <c>null</c>.</exception>
-        /// <exception cref="InvalidOperationException">Expression under constrcution or the symbol of <paramref name="operator"/> already registered.</exception>
-        public Expression RegisterOperator(Operator @operator)
-        {
-            Expect.NotNull("operator", @operator);
-
-            if (Started)
-            {
-                ExceptionHelper.CannotRegisterOperatorsForStartedExpression();
-            }
-
-            Debug.Assert(!Constructed);
-
-            /* Standards. */
-            if (@operator.Symbol == this.FlowSymbols.Separator ||
-                @operator.Symbol == this.FlowSymbols.GroupClose ||
-                @operator.Symbol == this.FlowSymbols.GroupOpen ||
-                @operator.Symbol == this.FlowSymbols.MemberAccess)
-                ExceptionHelper.OperatorAlreadyRegistered(@operator);
-
-            if (@operator is UnaryOperator)
-            {
-                var unaryOperator = (UnaryOperator)@operator;
-                if (this.m_unaryOperatorSymbols.ContainsKey(unaryOperator.Symbol))
-                {
-                    ExceptionHelper.OperatorAlreadyRegistered(unaryOperator);
-                }
-
-                this.m_unaryOperatorSymbols.Add(@operator.Symbol, unaryOperator);
-            }
-            else if (@operator is BinaryOperator)
-            {
-                var binaryOperator = (BinaryOperator)@operator;
-                if (this.m_binaryOperatorSymbols.ContainsKey(binaryOperator.Symbol))
-                {
-                    ExceptionHelper.OperatorAlreadyRegistered(binaryOperator);
-                }
-
-                this.m_binaryOperatorSymbols.Add(@operator.Symbol, binaryOperator);
-            }
-            else
-            {
-                Debug.Fail("Unsupported operator type.");
-            }
-
-            this.m_supportedOperators.Add(@operator);
-            return this;
-        }
-
-        /// <summary>
-        /// Feeds a literal value into the expression.
-        /// </summary>
-        /// <param name="literal">The literal value.</param>
-        /// <returns>
-        /// This expression instance.
-        /// </returns>
-        /// <exception cref="ExpressionException">An expression construction error detected.</exception>
-        /// <exception cref="InvalidOperationException">Expression construction finalized.</exception>
-        public Expression FeedLiteral(object literal)
-        {
-            if (this.Constructed)
-            {
-                ExceptionHelper.CannotModifyAConstructedExpression();
-            }
-
-            FeedTerm(literal, true);
-            return this;
-        }
-
-        /// <summary>
-        /// Feeds a symbol into the expression.
-        /// </summary>
-        /// <param name="symbol">The symbol value.</param>
-        /// <returns>
-        /// This expression instance.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
-        /// <exception cref="ExpressionException">An expression construction error detected.</exception>
-        /// <exception cref="InvalidOperationException">Expression construction finalized.</exception>
-        public Expression FeedSymbol(string symbol)
-        {
-            Expect.NotEmpty("symbol", symbol);
-
-            if (this.Constructed)
-            {
-                ExceptionHelper.CannotModifyAConstructedExpression();
-            }
-
-            FeedTerm(symbol, false);
-            return this;
-        }
-
-        /// <summary>
-        /// Finalize the construction of the expression.
-        /// </summary>
-        /// <exception cref="InvalidOperationException">Expression construction not started.</exception>
-        /// <exception cref="ExpressionException">Expression in unbalanced state.</exception>
-        public void Construct()
-        {
-            if (!this.Started)
-                ExceptionHelper.CannotConstructExpressionInvalidState();
-
-            if (!this.Constructed)
-            {
-                bool fail = false;
-                if (this.m_root.Parent != null)
-                    fail = true;
-                else
-                {
-                    var currentRootNode = this.m_current as RootNode;
-                    if (currentRootNode != null)
-                    {
-                        fail = !currentRootNode.Closed;
-                    }
-                    else
-                    {
-                        var currentDisembowelerNode = this.m_current as DisembowelerNode;
-                        if (currentDisembowelerNode != null)
-                        {
-                            fail = currentDisembowelerNode.MemberName == null;
-                        }
-                        else
-                        {
-                            fail = !(this.m_current is LeafNode);
-                        }
-                    }
-                }
-
-                if (fail)
-                {
-                    ExceptionHelper.CannotConstructExpressionInvalidState();
-                }
-
-                /* Reduce the expression if so was desired. */
-                this.m_root.Reduce(ReduceExpressionEvaluationContext.Instance);
-                this.m_function = this.m_root.GetEvaluationFunction();
-            }
-        }
-
-        /// <summary>
-        /// Evaluates this expression using an evaluation context.
-        /// </summary>
-        /// <param name="context">The evaluation context.</param>
-        /// <returns>The result of expression evaluation.</returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        /// <exception cref="InvalidOperationException">Expression not constructed.</exception>
-        public object Evaluate(IExpressionEvaluationContext context)
-        {
-            Expect.NotNull("context", context);
-
-            if (!Constructed)
-            {
-                ExceptionHelper.CannotEvaluateUnconstructedExpression();
-            }
-
-            return this.m_function(context);
-        }
-
-        /// <summary>
-        /// Returns a human-readable representation this expression instance using the <see cref="ExpressionFormatStyle.Arithmetic"/> formatting.
-        /// </summary>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
-        public override string ToString()
-        {
-            return ToString(ExpressionFormatStyle.Arithmetic);
-        }
-
-        /// <summary>
-        /// Returns a human-readable representation this expression instance using the specified formatting.
-        /// </summary>
-        /// <param name="style">The formatting style to use.</param>
-        /// <returns>
-        /// A <see cref="System.String" /> that represents this instance.
-        /// </returns>
-        public string ToString(ExpressionFormatStyle style)
-        {
-            if (this.m_root == null)
-            {
-                return "??";
-            }
-            else
-            {
-                return this.m_root.ToString(style);
             }
         }
     }

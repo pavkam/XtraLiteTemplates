@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
@@ -35,15 +36,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     /// </summary>
     public abstract class StandardBinaryOperator : BinaryOperator
     {
-        /// <summary>
-        /// Gets the type converter used to convert to primitive types.
-        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
-        /// </summary>
-        /// <value>
-        /// The type converter.
-        /// </value>
-        protected IPrimitiveTypeConverter TypeConverter { get; private set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="StandardBinaryOperator" /> class.
         /// </summary>
@@ -58,7 +50,17 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull("typeConverter", typeConverter);
 
-            TypeConverter = typeConverter;
+            this.TypeConverter = typeConverter;
         }
+
+        /// <summary>
+        /// Gets the type converter used to convert to primitive types.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The type converter.
+        /// </value>
+        protected IPrimitiveTypeConverter TypeConverter { get; private set; }
+
     }
 }

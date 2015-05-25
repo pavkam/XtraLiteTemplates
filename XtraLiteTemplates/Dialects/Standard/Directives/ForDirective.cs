@@ -31,8 +31,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System;
     using System.Collections;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Diagnostics;
+    using System.Linq;
     using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
@@ -95,8 +95,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// If the expression is evaluated to <c>null</c>, the directive does not evaluate. It evaluates once for non-sequences and once for each element if the
         /// expression is a sequence.
         /// </remarks>
-        protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
-            IExpressionEvaluationContext context, out string text)
+        protected internal override FlowDecision Execute(
+            int tagIndex, 
+            object[] components, 
+            ref object state,
+            IExpressionEvaluationContext context, 
+            out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);

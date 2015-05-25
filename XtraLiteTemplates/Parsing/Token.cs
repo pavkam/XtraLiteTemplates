@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Parsing
 {
     using System;
@@ -33,82 +35,6 @@ namespace XtraLiteTemplates.Parsing
     /// </summary>
     public sealed class Token
     {
-        /// <summary>
-        /// Defines the type of the token.
-        /// </summary>
-        public enum TokenType
-        {
-            /// <summary>
-            /// An unparsed text block.
-            /// </summary>
-            Unparsed,
-            /// <summary>
-            /// Tag start symbol encountered.
-            /// </summary>
-            StartTag,
-            /// <summary>
-            /// Tag end symbol encountered.
-            /// </summary>
-            EndTag,
-            /// <summary>
-            /// A word in an open tag.
-            /// </summary>
-            Word,
-            /// <summary>
-            /// A number literal in an open tag.
-            /// </summary>
-            Number,
-            /// <summary>
-            /// A string literal in an open tag.
-            /// </summary>
-            String,
-            /// <summary>
-            /// A sequence of characters that match by type and are not words.
-            /// </summary>
-            Symbol,
-            /// <summary>
-            /// Whitespace in an open tag.
-            /// </summary>
-            Whitespace,
-        }
-
-        /// <summary>
-        /// Specifies the type of the token.
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        /// <value>
-        /// The type of the token.
-        /// </value>
-        public TokenType Type { get; private set; }
-
-        /// <summary>
-        /// Specifies the value of the token.
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        /// <value>
-        /// The value of the token.
-        /// </value>
-        public string Value { get; private set; }
-
-        /// <summary>
-        /// Specifies the index of the token's first character 
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        /// <value>
-        /// The index the first character.
-        /// </value>
-        public int CharacterIndex { get; private set; }
-
-        /// <summary>
-        /// Specifies the original length of the token (as seen in the input template).
-        /// The <see cref="OriginalLength"/> might differ from the length of the <see cref="Value"/> property for some tag types.
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
-        /// </summary>
-        /// <value>
-        /// The original length of the token.
-        /// </value>
-        public int OriginalLength { get; private set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Token"/> class.
         /// </summary>
@@ -123,12 +49,97 @@ namespace XtraLiteTemplates.Parsing
             Expect.GreaterThan("originalLength", originalLength, 0);
 
             if (type != TokenType.String)
+            {
                 Expect.NotEmpty("value", value);
+            }
 
             this.Type = type;
             this.Value = value ?? string.Empty;
             this.CharacterIndex = characterIndex;
             this.OriginalLength = originalLength;
         }
+
+        /// <summary>
+        /// Defines the type of the token.
+        /// </summary>
+        public enum TokenType
+        {
+            /// <summary>
+            /// An unparsed text block.
+            /// </summary>
+            Unparsed,
+
+            /// <summary>
+            /// Tag start symbol encountered.
+            /// </summary>
+            StartTag,
+
+            /// <summary>
+            /// Tag end symbol encountered.
+            /// </summary>
+            EndTag,
+
+            /// <summary>
+            /// A word in an open tag.
+            /// </summary>
+            Word,
+
+            /// <summary>
+            /// A number literal in an open tag.
+            /// </summary>
+            Number,
+
+            /// <summary>
+            /// A string literal in an open tag.
+            /// </summary>
+            String,
+
+            /// <summary>
+            /// A sequence of characters that match by type and are not words.
+            /// </summary>
+            Symbol,
+
+            /// <summary>
+            /// Whitespace in an open tag.
+            /// </summary>
+            Whitespace,
+        }
+
+        /// <summary>
+        /// Gets the type of the token.
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The type of the token.
+        /// </value>
+        public TokenType Type { get; private set; }
+
+        /// <summary>
+        /// Gets the value of the token.
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The value of the token.
+        /// </value>
+        public string Value { get; private set; }
+
+        /// <summary>
+        /// Gets the index of the token's first character 
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The index the first character.
+        /// </value>
+        public int CharacterIndex { get; private set; }
+
+        /// <summary>
+        /// Gets the original length of the token (as seen in the input template).
+        /// The <see cref="OriginalLength"/> might differ from the length of the <see cref="Value"/> property for some tag types.
+        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// </summary>
+        /// <value>
+        /// The original length of the token.
+        /// </value>
+        public int OriginalLength { get; private set; }
     }
 }

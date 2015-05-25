@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
@@ -58,7 +59,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull("formatProvider", formatProvider);
 
-            FormatProvider = formatProvider;
+            this.FormatProvider = formatProvider;
         }
 
         /// <summary>
@@ -92,7 +93,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             {
                 try
                 {
-                    return formattable.ToString(TypeConverter.ConvertToString(right), FormatProvider);
+                    return formattable.ToString(this.TypeConverter.ConvertToString(right), this.FormatProvider);
                 }
                 catch
                 {

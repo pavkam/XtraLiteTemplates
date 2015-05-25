@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
@@ -61,8 +62,12 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="firstCharacterIndex">Index of the first character.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal InterpreterException(Exception innerException, Directive[] candidateDirectives, 
-            int firstCharacterIndex, string format, params object[] args)
+        internal InterpreterException(
+            Exception innerException, 
+            Directive[] candidateDirectives, 
+            int firstCharacterIndex, 
+            string format, 
+            params object[] args)
             : base(string.Format(format, args), innerException)
         {
             Debug.Assert(firstCharacterIndex >= 0);
@@ -78,7 +83,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="firstCharacterIndex">Index of the first character.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal InterpreterException(Directive[] candidateDirectives, int firstCharacterIndex, string format, params Object[] args)
+        internal InterpreterException(Directive[] candidateDirectives, int firstCharacterIndex, string format, params object[] args)
             : this(null, candidateDirectives, firstCharacterIndex, format, args)
         {
         }

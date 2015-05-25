@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
@@ -33,27 +34,28 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.IO;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
+    using System.Diagnostics.CodeAnalysis;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class DisembowelerNode : ExpressionNode
     {
-        public ExpressionNode ObjectNode { get; private set; }
-
-        public string MemberName { get; internal set; }
-
         internal DisembowelerNode(ExpressionNode parent, ExpressionNode objectNode)
             : base(parent)
         {
             Debug.Assert(objectNode != null);
 
-            ObjectNode = objectNode;
+            this.ObjectNode = objectNode;
         }
+
+        public ExpressionNode ObjectNode { get; private set; }
+
+        public string MemberName { get; internal set; }
 
         public override PermittedContinuations Continuity
         {
             get
             {
-                if (MemberName == null)
+                if (this.MemberName == null)
                 {
                     return PermittedContinuations.Identifier;
                 } 
@@ -68,19 +70,19 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public override String ToString(ExpressionFormatStyle style)
         {
-            var memberName = MemberName ?? "??";
+            var memberName = this.MemberName ?? "??";
 
             if (style == ExpressionFormatStyle.Arithmetic)
             {
-                return string.Format("{0} . {1}", ObjectNode.ToString(style), memberName);
+                return string.Format("{0} . {1}", this.ObjectNode.ToString(style), memberName);
             }
             else if (style == ExpressionFormatStyle.Canonical)
             {
-                return string.Format(".{{{0},{1}}}", ObjectNode.ToString(style), memberName);
+                return string.Format(".{{{0},{1}}}", this.ObjectNode.ToString(style), memberName);
             }
             else if (style == ExpressionFormatStyle.Polish)
             {
-                return string.Format(". {0} {1}", ObjectNode.ToString(style), memberName);
+                return string.Format(". {0} {1}", this.ObjectNode.ToString(style), memberName);
             }
 
             Debug.Fail("Unreachable code.");
@@ -91,19 +93,19 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(reduceContext != null);
 
-            ObjectNode.Reduce(reduceContext);
+            this.ObjectNode.Reduce(reduceContext);
 
             value = null;
             return false;
         }
 
-        protected override Func<IExpressionEvaluationContext, Object> Build()
+        protected override Func<IExpressionEvaluationContext, object> Build()
         {
-            var objectFunc = ObjectNode.GetEvaluationFunction();
+            var objectFunc = this.ObjectNode.GetEvaluationFunction();
             return context =>
             {
                 var variable = objectFunc(context);
-                return variable == null ? null : context.GetProperty(variable, MemberName);
+                return variable == null ? null : context.GetProperty(variable, this.MemberName);
             };
         }
     }

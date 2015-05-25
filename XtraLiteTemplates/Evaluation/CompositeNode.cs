@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
@@ -39,18 +40,18 @@ namespace XtraLiteTemplates.Evaluation
     {
         private readonly List<TemplateNode> m_children;
 
+        protected CompositeNode(TemplateNode parent)
+            : base(parent)
+        {
+            this.m_children = new List<TemplateNode>();
+        }
+
         public IReadOnlyList<TemplateNode> Children
         {
             get
             {
-                return m_children;
+                return this.m_children;
             }
-        }
-
-        protected CompositeNode(TemplateNode parent)
-            : base(parent)
-        {
-            m_children = new List<TemplateNode>();
         }
 
         public void AddChild(TemplateNode child)
@@ -58,9 +59,9 @@ namespace XtraLiteTemplates.Evaluation
             Debug.Assert(child != null);
             Debug.Assert(child.Parent == this);
 
-            if (!m_children.Contains(child))
+            if (!this.m_children.Contains(child))
             {
-                m_children.Add(child);
+                this.m_children.Add(child);
             }
         }
 
@@ -69,7 +70,7 @@ namespace XtraLiteTemplates.Evaluation
             Expect.NotNull("writer", writer);
             Expect.NotNull("context", context);
 
-            foreach (var child in Children)
+            foreach (var child in this.Children)
             {
                 var evaluable = child as IEvaluable;
                 if (evaluable != null)
@@ -79,10 +80,10 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var child in Children)
+            foreach (var child in this.Children)
             {
                 sb.Append(child.ToString());
             }

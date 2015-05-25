@@ -47,12 +47,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        protected override Func<IExpressionEvaluationContext, object> Build()
-        {
-            var childFunc = RightNode.GetEvaluationFunction();
-            return (context) => Operator.Evaluate(context, childFunc(context));
-        }
-
         public override PermittedContinuations Continuity
         {
             get
@@ -65,13 +59,34 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
+        public override String ToString(ExpressionFormatStyle style)
+        {
+            var childAsString = this.RightNode != null ? this.RightNode.ToString(style) : "??";
+
+            string result = null;
+
+            if (style == ExpressionFormatStyle.Canonical)
+                result = string.Format("{0}{{{1}}}", this.Operator, childAsString);
+            else
+                result = string.Format("{0}{1}", this.Operator, childAsString);
+
+            Debug.Assert(result != null);
+            return result;
+        }
+
+        protected override Func<IExpressionEvaluationContext, object> Build()
+        {
+            var childFunc = this.RightNode.GetEvaluationFunction();
+            return (context) => this.Operator.Evaluate(context, childFunc(context));
+        }
+
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
             Debug.Assert(reduceContext != null);
 
-            if (RightNode.Reduce(reduceContext))
+            if (this.RightNode.Reduce(reduceContext))
             {
-                value = Operator.Evaluate(reduceContext, RightNode.ReducedValue);
+                value = this.Operator.Evaluate(reduceContext, this.RightNode.ReducedValue);
                 return true;
             }
             else
@@ -79,21 +94,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 value = null;
                 return false;
             }
-        }
-
-        public override String ToString(ExpressionFormatStyle style)
-        {
-            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
-
-            string result = null;
-
-            if (style == ExpressionFormatStyle.Canonical)
-                result = string.Format("{0}{{{1}}}", Operator, childAsString);
-            else
-                result = string.Format("{0}{1}", Operator, childAsString);
-
-            Debug.Assert(result != null);
-            return result;
         }
     }
 }

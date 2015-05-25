@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates
 {
     using System;
@@ -39,38 +41,23 @@ namespace XtraLiteTemplates
     /// </summary>
     public sealed class SimpleTypeDisemboweler
     {
-        private IReadOnlyDictionary<String, Func<object, object>> m_mapping;
-
-        private IReadOnlyDictionary<String, Func<object, object>> BuildMapping()
+        /// <summary>
+        /// Initializes a new instance of the <see cref="SimpleTypeDisemboweler"/> class.
+        /// </summary>
+        /// <param name="type">The <see cref="System.Type" /> to inspect.</param>
+        /// <param name="options">A set of <see cref="EvaluationOptions" /> options.</param>
+        /// <param name="memberComparer">An instance of <see cref="IEqualityComparer{String}" /> used when looking up properties in the inspected type.</param>
+        /// <exception cref="ArgumentNullException">Either <paramref name="type" /> or <paramref name="memberComparer" /> parameters are <c>null</c>.</exception>
+        public SimpleTypeDisemboweler(Type type, EvaluationOptions options, IEqualityComparer<string> memberComparer)
         {
-            var mapping = new Dictionary<String, Func<Object, Object>>(Comparer);
+            Expect.NotNull("type", type);
+            Expect.NotNull("memberComparer", memberComparer);
 
-            /* Load properties in. */
-            foreach (var property in Type.GetProperties())
-            {
-                if (!property.CanRead || property.GetIndexParameters().Length > 0)
-                    continue;
+            Type = type;
+            Comparer = memberComparer;
+            Options = options;
 
-                mapping[property.Name] = property.GetValue;
-            }
-
-            if (Options.HasFlag(EvaluationOptions.TreatParameterlessFunctionsAsProperties))
-            {
-                var zeroParams = new Object[0];
-
-                /* Load methods in. */
-                foreach (var method in Type.GetMethods())
-                {
-                    if (method.GetParameters().Length > 0 || method.IsAbstract || method.IsConstructor ||
-                        method.IsPrivate)
-                        continue;
-
-                    if (!mapping.ContainsKey(method.Name))
-                        mapping[method.Name] = instance => method.Invoke(instance, zeroParams);
-                }
-            }
-
-            return mapping;
+            m_mapping = BuildMapping();
         }
 
         /// <summary>
@@ -96,50 +83,44 @@ namespace XtraLiteTemplates
         }
 
         /// <summary>
-        /// <value>The <see cref="System.Type"/> that represents the type being inspected.</value>
-        /// <remarks>Value provided by the caller during construction.</remarks>
+        ///   <value>Gets the <see cref="System.Type" /> that represents the type being inspected.</value>
         /// </summary>
+        /// <value>
+        /// The inspected type.
+        /// </value>
+        /// <remarks>
+        /// Value provided by the caller during construction.
+        /// </remarks>
         public Type Type { get; private set; }
 
         /// <summary>
-        /// <value>An instance of <see cref="IEqualityComparer{String}"/> used by <see cref="SimpleTypeDisemboweler"/> to compare the 
-        /// names of properies. This property is primarily used to decide the case-sensitivity of this <see cref="SimpleTypeDisemboweler"/> instance.</value>
+        /// Gets the <see cref="IEqualityComparer{String}" /> used by <see cref="SimpleTypeDisemboweler" /> to compare the
+        /// names of properies. This property is primarily used to decide the case-sensitivity of this <see cref="SimpleTypeDisemboweler" /> instance.
         /// <remarks>Value provided by the caller during construction.</remarks>
         /// </summary>
+        /// <value>
+        /// The equality comparer.
+        /// </value>
         public IEqualityComparer<string> Comparer { get; private set; }
 
         /// <summary>
-        /// <value>A set of <see cref="EvaluationOptions"/> options that modifies the bahaviour of this 
-        /// <see cref="SimpleTypeDisemboweler"/> instance.</value>
-        /// <remarks>Value provided by the caller during construction.</remarks>
+        /// Gets the set of <see cref="EvaluationOptions" /> options that modifies the bahaviour of this
+        /// <see cref="SimpleTypeDisemboweler" /> instance.&gt;
         /// </summary>
+        /// <value>
+        /// The options.
+        /// </value>
+        /// <remarks>
+        /// Value provided by the caller during construction.
+        /// </remarks>
         public EvaluationOptions Options { get; private set; }
-
-        /// <summary>
-        /// Creates a new instance of <see cref="SimpleTypeDisemboweler"/> class.
-        /// </summary>
-        /// <param name="type">The <see cref="System.Type"/> to inspect.</param>
-        /// <param name="options">A set of <see cref="EvaluationOptions"/> options.</param>
-        /// <param name="memberComparer">An instance of <see cref="IEqualityComparer{String}"/> used when looking up properties in the inspected type.</param>
-        /// <exception cref="ArgumentNullException">Either <paramref name="type"/> or <paramref name="memberComparer"/> parameters are <c>null</c>.</exception>
-        public SimpleTypeDisemboweler(Type type, EvaluationOptions options, IEqualityComparer<string> memberComparer)
-        {
-            Expect.NotNull("type", type);
-            Expect.NotNull("memberComparer", memberComparer);
-
-            Type = type;
-            Comparer = memberComparer;
-            Options = options;
-
-            m_mapping = BuildMapping();
-        }
 
         /// <summary>
         /// Reads the <paramref name="property" /> of <paramref name="instance" />.
         /// </summary>
         /// <param name="property">The property name.</param>
         /// <param name="instance">The object whose property is being read.</param>
-        /// <returns></returns>
+        /// <returns>The value of the read property.</returns>
         /// <exception cref="ArgumentNullException"><paramref name="property" /> is <c>null</c>. The <paramref name="instance" /> is <c>null</c> and this instance of <see cref="SimpleTypeDisemboweler" />
         /// is not instructed to ignore evaluation errors.</exception>
         /// <exception cref="ArgumentException"><paramref name="property" /> is not a valid identifier.</exception>
@@ -176,6 +157,40 @@ namespace XtraLiteTemplates
             }
 
             return null;
+        }
+
+        private IReadOnlyDictionary<String, Func<object, object>> m_mapping;
+
+        private IReadOnlyDictionary<String, Func<object, object>> BuildMapping()
+        {
+            var mapping = new Dictionary<String, Func<Object, Object>>(Comparer);
+
+            /* Load properties in. */
+            foreach (var property in Type.GetProperties())
+            {
+                if (!property.CanRead || property.GetIndexParameters().Length > 0)
+                    continue;
+
+                mapping[property.Name] = property.GetValue;
+            }
+
+            if (Options.HasFlag(EvaluationOptions.TreatParameterlessFunctionsAsProperties))
+            {
+                var zeroParams = new Object[0];
+
+                /* Load methods in. */
+                foreach (var method in Type.GetMethods())
+                {
+                    if (method.GetParameters().Length > 0 || method.IsAbstract || method.IsConstructor ||
+                        method.IsPrivate)
+                        continue;
+
+                    if (!mapping.ContainsKey(method.Name))
+                        mapping[method.Name] = instance => method.Invoke(instance, zeroParams);
+                }
+            }
+
+            return mapping;
         }
     }
 }

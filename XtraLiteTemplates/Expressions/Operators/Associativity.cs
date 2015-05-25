@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// The left to right associativity.
         /// </summary>
         LeftToRight,
+
         /// <summary>
         /// The right to left associativity.
         /// </summary>

@@ -38,6 +38,23 @@ namespace XtraLiteTemplates.Expressions.Operators
     public abstract class Operator
     {
         /// <summary>
+        /// Initializes a new instance of the <see cref="Operator"/> class.
+        /// </summary>
+        /// <param name="symbol">The operator's symbol.</param>
+        /// <param name="precedence">The operator's precedence.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
+        protected Operator(string symbol, int precedence)
+        {
+            Expect.NotEmpty("symbol", symbol);
+            Expect.GreaterThanOrEqual("precedence", precedence, 0);
+
+            Symbol = symbol;
+            Precedence = precedence;
+        }
+
+        /// <summary>
         /// Gets the operator's symbol, used in the expression building process.
         /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// </summary>
@@ -54,23 +71,6 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// The operator's precedence.
         /// </value>
         public int Precedence { get; private set; }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Operator"/> class.
-        /// </summary>
-        /// <param name="symbol">The operator's symbol.</param>
-        /// <param name="precedence">The operator's precedence.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
-        /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
-        protected Operator(string symbol, int precedence)
-        {
-            Expect.NotEmpty("symbol", symbol);
-            Expect.GreaterThanOrEqual("precedence", precedence, 0);
-
-            Symbol = symbol;
-            Precedence = precedence;
-        }
 
         /// <summary>
         /// Returns a human-readable representation of the operator. This implementation returns the value of <see cref="Symbol"/> property.

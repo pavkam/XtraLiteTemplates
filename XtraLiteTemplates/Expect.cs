@@ -25,12 +25,15 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
 
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal static class Expect
     {
         public static void NotNull(string name, object value)
@@ -56,8 +59,8 @@ namespace XtraLiteTemplates
             NotEmpty(name, value);
 
             var isValid =
-                (Char.IsLetter(value[0]) || value[0] == '_') &&
-                value.All(c => Char.IsLetterOrDigit(c) || c == '_');
+                (char.IsLetter(value[0]) || value[0] == '_') &&
+                value.All(c => char.IsLetterOrDigit(c) || c == '_');
 
             if (!isValid)
             {

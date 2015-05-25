@@ -29,28 +29,19 @@
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using System.Text;
-    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// Abstract base class for all standard directives.
     /// </summary>
     public abstract class StandardDirective : Directive
     {
-        /// <summary>
-        /// Gets the type converter used to convert to primitive types.
-        /// </summary>
-        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
-        /// <value>
-        /// The type converter.
-        /// </value>
-        public IPrimitiveTypeConverter TypeConverter { get; private set; }
-
         /// <summary>
         /// Initializes a new instance of the <see cref="StandardDirective"/> class.
         /// </summary>
@@ -63,7 +54,16 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             : base(tags)
         {
             Expect.NotNull("typeConverter", typeConverter);
-            TypeConverter = typeConverter;
+            this.TypeConverter = typeConverter;
         }
+
+        /// <summary>
+        /// Gets the type converter used to convert to primitive types.
+        /// </summary>
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// <value>
+        /// The type converter.
+        /// </value>
+        public IPrimitiveTypeConverter TypeConverter { get; private set; }
     }
 }

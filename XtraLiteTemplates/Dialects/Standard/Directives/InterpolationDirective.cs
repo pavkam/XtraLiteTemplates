@@ -90,8 +90,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <returns>
         /// In the current implementation always equal to <see cref="Directive.FlowDecision.Terminate" />.
         /// </returns>
-        protected internal override FlowDecision Execute(int tagIndex, object[] components,
-            ref object state, IExpressionEvaluationContext context, out string text)
+        protected internal override FlowDecision Execute(
+            int tagIndex, 
+            object[] components,
+            ref object state, 
+            IExpressionEvaluationContext context, 
+            out string text)
         {
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);
@@ -99,7 +103,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
-            text = TypeConverter.ConvertToString(components[m_expressionIndex]);
+            text = this.TypeConverter.ConvertToString(components[this.m_expressionIndex]);
             return FlowDecision.Terminate;
         }
     }

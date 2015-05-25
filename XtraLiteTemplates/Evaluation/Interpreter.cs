@@ -25,13 +25,14 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.IO;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Diagnostics;
+    using System.Linq;
     using System.Text;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
@@ -45,79 +46,6 @@ namespace XtraLiteTemplates.Evaluation
     {
         private List<Directive> m_directives;
         private Lexer m_lexer;
-
-        private void Interpret(CompositeNode compositeNode)
-        {
-            Debug.Assert(compositeNode != null);
-            var matchIndex = 1;
-
-            while (true)
-            {
-                /* Read the next lex out of the lexer. */
-                var lex = this.m_lexer.ReadNext();
-                if (lex == null)
-                {
-                    break;
-                }
-
-                var unparsedLex = lex as UnparsedLex;
-                if (unparsedLex != null)
-                {
-                    /* This is an unparsed lex. */
-                    compositeNode.AddChild(new UnparsedNode(compositeNode, unparsedLex));
-                }
-                else
-                {
-                    /* This can only be a tag lex. */
-                    var tagLex = lex as TagLex;
-                    Debug.Assert(tagLex != null);
-
-                    var directiveCompositeNode = compositeNode as DirectiveNode;
-                    if (directiveCompositeNode != null &&
-                        directiveCompositeNode.SelectDirective(matchIndex, tagLex.Tag, Comparer))
-                    {
-                        /* OK, this is the N'th part of the current directive. */
-                        matchIndex++;
-                        compositeNode.AddChild(new TagNode(directiveCompositeNode, tagLex));
-
-                        if (directiveCompositeNode.CandidateDirectiveLockedIn)
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-
-                    /* Match any directive that starts with this tag. */
-                    var candidateDirectives = m_directives.Where(p => p.Tags[0].Equals(tagLex.Tag, Comparer)).ToArray();
-                    if (candidateDirectives.Length == 0)
-                    {
-                        /* No directive found that starts with the supplied tag! Nothing we can do but bail at this point. */
-                        ExceptionHelper.UnexpectedTag(tagLex);
-                    }
-
-                    var directiveNode = new DirectiveNode(compositeNode, candidateDirectives);
-                    compositeNode.AddChild(directiveNode);
-                    directiveNode.AddChild(new TagNode(directiveNode, tagLex));
-
-                    /* Select the current directive. */
-                    directiveNode.SelectDirective(0, tagLex.Tag, Comparer);
-
-                    if (!directiveNode.CandidateDirectiveLockedIn)
-                    {
-                        Interpret(directiveNode);
-
-                        if (!directiveNode.CandidateDirectiveLockedIn)
-                        {
-                            /* Expecting all child directives to have locked in. Otherwise they weren't closed! */
-                            ExceptionHelper.UnmatchedDirectiveTag(directiveNode.CandidateDirectives, lex.FirstCharacterIndex);
-                        }
-                    }
-                }
-            }
-        }
 
         /// <summary>
         /// Gets the comparer used for keyword and identifier comparison.
@@ -214,6 +142,79 @@ namespace XtraLiteTemplates.Evaluation
             Interpret(document);
 
             return document;
+        }
+
+        private void Interpret(CompositeNode compositeNode)
+        {
+            Debug.Assert(compositeNode != null);
+            var matchIndex = 1;
+
+            while (true)
+            {
+                /* Read the next lex out of the lexer. */
+                var lex = this.m_lexer.ReadNext();
+                if (lex == null)
+                {
+                    break;
+                }
+
+                var unparsedLex = lex as UnparsedLex;
+                if (unparsedLex != null)
+                {
+                    /* This is an unparsed lex. */
+                    compositeNode.AddChild(new UnparsedNode(compositeNode, unparsedLex));
+                }
+                else
+                {
+                    /* This can only be a tag lex. */
+                    var tagLex = lex as TagLex;
+                    Debug.Assert(tagLex != null);
+
+                    var directiveCompositeNode = compositeNode as DirectiveNode;
+                    if (directiveCompositeNode != null &&
+                        directiveCompositeNode.SelectDirective(matchIndex, tagLex.Tag, Comparer))
+                    {
+                        /* OK, this is the N'th part of the current directive. */
+                        matchIndex++;
+                        compositeNode.AddChild(new TagNode(directiveCompositeNode, tagLex));
+
+                        if (directiveCompositeNode.CandidateDirectiveLockedIn)
+                        {
+                            break;
+                        }
+                        else
+                        {
+                            continue;
+                        }
+                    }
+
+                    /* Match any directive that starts with this tag. */
+                    var candidateDirectives = m_directives.Where(p => p.Tags[0].Equals(tagLex.Tag, Comparer)).ToArray();
+                    if (candidateDirectives.Length == 0)
+                    {
+                        /* No directive found that starts with the supplied tag! Nothing we can do but bail at this point. */
+                        ExceptionHelper.UnexpectedTag(tagLex);
+                    }
+
+                    var directiveNode = new DirectiveNode(compositeNode, candidateDirectives);
+                    compositeNode.AddChild(directiveNode);
+                    directiveNode.AddChild(new TagNode(directiveNode, tagLex));
+
+                    /* Select the current directive. */
+                    directiveNode.SelectDirective(0, tagLex.Tag, Comparer);
+
+                    if (!directiveNode.CandidateDirectiveLockedIn)
+                    {
+                        Interpret(directiveNode);
+
+                        if (!directiveNode.CandidateDirectiveLockedIn)
+                        {
+                            /* Expecting all child directives to have locked in. Otherwise they weren't closed! */
+                            ExceptionHelper.UnmatchedDirectiveTag(directiveNode.CandidateDirectives, lex.FirstCharacterIndex);
+                        }
+                    }
+                }
+            }
         }
     }
 }

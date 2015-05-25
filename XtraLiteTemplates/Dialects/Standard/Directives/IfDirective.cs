@@ -29,14 +29,14 @@
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Linq;
     using System.Text;
-    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The IF directive implementation.
@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public IfDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(Tags.Count == 2);
+            Debug.Assert(this.Tags.Count == 2);
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -68,7 +68,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
 
-            m_expressionIndex = expressionComponents[0];
+            this.m_expressionIndex = expressionComponents[0];
         }
 
         /// <summary>
@@ -94,18 +94,22 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <remarks>
         /// The directive evaluates only if the expression evaluates to <c>true</c>.
         /// </remarks>
-        protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
-            IExpressionEvaluationContext context, out string text)
+        protected internal override FlowDecision Execute(
+            int tagIndex, 
+            object[] components, 
+            ref object state,
+            IExpressionEvaluationContext context, 
+            out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);            
             Debug.Assert(components != null);
-            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
             text = null;
             if (tagIndex == 0)
             {
-                if (TypeConverter.ConvertToBoolean(components[m_expressionIndex]) == true)
+                if (this.TypeConverter.ConvertToBoolean(components[this.m_expressionIndex]) == true)
                 {
                     return FlowDecision.Evaluate;
                 }

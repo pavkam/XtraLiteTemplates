@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
@@ -45,7 +46,7 @@ namespace XtraLiteTemplates.Evaluation
         {
             get
             {
-                return m_directives;
+                return this.m_directives;
             }
         }
 
@@ -56,33 +57,33 @@ namespace XtraLiteTemplates.Evaluation
             Debug.Assert(candidateDirectives != null);
             Debug.Assert(candidateDirectives.Length > 0);
 
-            m_directives = candidateDirectives;
+            this.m_directives = candidateDirectives;
         }
 
         public override void Evaluate(TextWriter writer, IEvaluationContext context)
         {
             Debug.Assert(writer != null);
             Debug.Assert(context != null);
-            Debug.Assert(Children.Count > 0);
-            Debug.Assert(m_directives.Length == 1);
+            Debug.Assert(this.Children.Count > 0);
+            Debug.Assert(this.m_directives.Length == 1);
 
             context.OpenEvaluationFrame();
 
             var directiveComponentIndex = 0;
             var tagIndex = 0;
-            var tagNode = Children[directiveComponentIndex] as TagNode;
+            var tagNode = this.Children[directiveComponentIndex] as TagNode;
             Debug.Assert(tagNode != null);
 
-            Object state = null;
+            object state = null;
             while (tagNode != null)
             {
                 var tagComponents = tagNode.Evaluate(context);
-                String text;
+                string text;
                 Directive.FlowDecision flow;
 
                 try
                 {
-                    flow = m_directives[0].Execute(tagIndex, tagComponents, ref state, context, out text);
+                    flow = this.m_directives[0].Execute(tagIndex, tagComponents, ref state, context, out text);
                 }
                 catch (Exception exception)
                 {
@@ -91,7 +92,7 @@ namespace XtraLiteTemplates.Evaluation
 
                     if (!context.IgnoreEvaluationExceptions)
                     {
-                        ExceptionHelper.DirectiveEvaluationError(m_directives[0], exception);
+                        ExceptionHelper.DirectiveEvaluationError(this.m_directives[0], exception);
                     }
                 }
 
@@ -109,7 +110,7 @@ namespace XtraLiteTemplates.Evaluation
                 {
                     directiveComponentIndex = 0;
                     tagIndex = 0;
-                    tagNode = Children[directiveComponentIndex] as TagNode;
+                    tagNode = this.Children[directiveComponentIndex] as TagNode;
                 }
                 else if (flow == Directive.FlowDecision.Evaluate)
                 {
@@ -117,7 +118,7 @@ namespace XtraLiteTemplates.Evaluation
                     tagNode = null;
                     for (var i = directiveComponentIndex + 1; i < Children.Count; i++)
                     {
-                        tagNode = Children[i] as TagNode;
+                        tagNode = this.Children[i] as TagNode;
                         if (tagNode != null)
                         {
                             directiveComponentIndex = i;
@@ -125,7 +126,7 @@ namespace XtraLiteTemplates.Evaluation
                             break;
                         }
 
-                        var evaluable = Children[i] as IEvaluable;
+                        var evaluable = this.Children[i] as IEvaluable;
                         Debug.Assert(evaluable != null);
 
                         evaluable.Evaluate(writer, context);
@@ -137,7 +138,7 @@ namespace XtraLiteTemplates.Evaluation
                     tagNode = null;
                     for (var i = directiveComponentIndex + 1; i < Children.Count; i++)
                     {
-                        tagNode = Children[i] as TagNode;
+                        tagNode = this.Children[i] as TagNode;
                         if (tagNode != null)
                         {
                             tagIndex++;
@@ -151,32 +152,32 @@ namespace XtraLiteTemplates.Evaluation
             context.CloseEvaluationFrame();
         }
 
-        public Boolean SelectDirective(Int32 presenceIndex, Tag tag, IEqualityComparer<String> comparer)
+        public bool SelectDirective(int presenceIndex, Tag tag, IEqualityComparer<string> comparer)
         {
             Debug.Assert(presenceIndex >= 0);
             Debug.Assert(tag != null);
             Debug.Assert(comparer != null);
-            Debug.Assert(!CandidateDirectiveLockedIn);
+            Debug.Assert(!this.CandidateDirectiveLockedIn);
 
-            var options = m_directives.Where(d => d.Tags.Count > presenceIndex && d.Tags[presenceIndex].Equals(tag, comparer)).ToArray();
+            var options = this.m_directives.Where(d => d.Tags.Count > presenceIndex && d.Tags[presenceIndex].Equals(tag, comparer)).ToArray();
             if (options.Length > 0)
             {
                 var firstFullySelected = options.FirstOrDefault(o => o.Tags.Count == presenceIndex + 1);
 
                 if (firstFullySelected != null)
                 {
-                    m_directives = new Directive[] { firstFullySelected };
-                    CandidateDirectiveLockedIn = true;
+                    this.m_directives = new Directive[] { firstFullySelected };
+                    this.CandidateDirectiveLockedIn = true;
                 }
                 else
                 {
-                    m_directives = options;
+                    this.m_directives = options;
                 }
             }
 
             return options.Length > 0;
         }
 
-        public Boolean CandidateDirectiveLockedIn { get; private set; }
+        public bool CandidateDirectiveLockedIn { get; private set; }
     }
 }

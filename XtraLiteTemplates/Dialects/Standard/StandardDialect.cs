@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
@@ -35,11 +36,11 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
 
     /// <summary>
     /// The standard dialect. Contains the full set of supported expression operators, directives and special constants.
@@ -237,7 +238,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The preformatted state object.
         /// </value>
-        protected Object PreformattedStateObject { get; private set; }
+        protected object PreformattedStateObject { get; private set; }
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported operators.
@@ -310,11 +311,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             return new KeyValuePair<string, object>[]
             {
-                new KeyValuePair<String, object>(AdjustCasing("True"), true),
-                new KeyValuePair<String, object>(AdjustCasing("False"), false),
-                new KeyValuePair<String, object>(AdjustCasing("Undefined"), null),
-                new KeyValuePair<String, object>(AdjustCasing("NaN"), double.NaN),
-                new KeyValuePair<String, object>(AdjustCasing("Infinity"), double.PositiveInfinity),
+                new KeyValuePair<string, object>(AdjustCasing("True"), true),
+                new KeyValuePair<string, object>(AdjustCasing("False"), false),
+                new KeyValuePair<string, object>(AdjustCasing("Undefined"), null),
+                new KeyValuePair<string, object>(AdjustCasing("NaN"), double.NaN),
+                new KeyValuePair<string, object>(AdjustCasing("Infinity"), double.PositiveInfinity),
             };
         }
 
@@ -329,7 +330,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         protected StandardDialect(string name, CultureInfo culture, DialectCasing casing)
             : base(name, culture, casing)
         {
-            PreformattedStateObject = new Object();
+            this.PreformattedStateObject = new object();
         }
     }
 }

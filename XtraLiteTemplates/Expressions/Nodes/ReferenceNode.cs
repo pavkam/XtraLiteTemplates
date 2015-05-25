@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
@@ -33,8 +34,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.IO;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
+    using System.Diagnostics.CodeAnalysis;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class ReferenceNode : LeafNode
     {
         public string Identifier { get; private set; }
@@ -44,12 +46,12 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(!string.IsNullOrEmpty(identifier));
 
-            Identifier = identifier;
+            this.Identifier = identifier;
         }
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            return string.Format("@{0}", Identifier);
+            return string.Format("@{0}", this.Identifier);
         }
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
@@ -62,7 +64,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override Func<IExpressionEvaluationContext, object> Build()
         {
-            return context => context.GetVariable(Identifier);
+            return context => context.GetVariable(this.Identifier);
         }
     }
 }

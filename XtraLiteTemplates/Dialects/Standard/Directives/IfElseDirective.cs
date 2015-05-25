@@ -60,7 +60,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public IfElseDirective(string startTagMarkup, string midTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(midTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(Tags.Count == 3);
+            Debug.Assert(this.Tags.Count == 3);
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -69,7 +69,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
 
-            m_expressionIndex = expressionComponents[0];
+            this.m_expressionIndex = expressionComponents[0];
         }
 
         /// <summary>
@@ -100,13 +100,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
             Debug.Assert(components != null);
-            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
             text = null;
             if (tagIndex == 0)
             {
-                var conditionIsTrue = TypeConverter.ConvertToBoolean(components[m_expressionIndex]) == true;
+                var conditionIsTrue = this.TypeConverter.ConvertToBoolean(components[m_expressionIndex]) == true;
                 state = conditionIsTrue;
 
                 return conditionIsTrue ? FlowDecision.Evaluate : FlowDecision.Skip;

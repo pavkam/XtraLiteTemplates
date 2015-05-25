@@ -29,14 +29,14 @@
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Text;
-    using XtraLiteTemplates.Parsing;
+    using System.Linq;
+    using System.Text;    
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The "keep formatting" directive implementation. This is a special directive that simply
@@ -90,23 +90,27 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <remarks>
         /// The directive always evaluates. Its sole purpose is to register a state object that is later queried by the corresponding evaluation context.
         /// </remarks>
-        protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
-            IExpressionEvaluationContext context, out string text)
+        protected internal override FlowDecision Execute(
+            int tagIndex, 
+            object[] components, 
+            ref object state,
+            IExpressionEvaluationContext context, 
+            out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);            
             Debug.Assert(components != null);
-            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
             Debug.Assert(context != null);
 
             text = null;
             if (tagIndex == 0)
             {
-                context.AddStateObject(m_stateObject);
+                context.AddStateObject(this.m_stateObject);
                 return FlowDecision.Evaluate;
             }
             else
             {
-                context.RemoveStateObject(m_stateObject);
+                context.RemoveStateObject(this.m_stateObject);
                 return FlowDecision.Terminate;
             }
         }

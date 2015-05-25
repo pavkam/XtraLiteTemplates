@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
@@ -33,34 +34,35 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.IO;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
+    using System.Diagnostics.CodeAnalysis;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class LiteralNode : LeafNode
     {
         public object Literal { get; private set; }
 
-        public LiteralNode(ExpressionNode parent, Object literal)
+        public LiteralNode(ExpressionNode parent, object literal)
             : base(parent)
         {
-            Literal = literal;
+            this.Literal = literal;
         }
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            if (Literal is string)
+            if (this.Literal is string)
             {
                 using (var writer = new StringWriter())
                 {
                     using (var provider = CodeDomProvider.CreateProvider("CSharp"))
                     {
-                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Literal), writer, null);
+                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(this.Literal), writer, null);
                         return writer.ToString();
                     }
                 }
             }
             else
             {
-                return Literal.ToString();
+                return this.Literal.ToString();
             }
         }
 
@@ -68,13 +70,13 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(reduceContext != null);
 
-            value = Literal;
+            value = this.Literal;
             return true;
         }
 
         protected override Func<IExpressionEvaluationContext, object> Build()
         {
-            return context => Literal;
+            return context => this.Literal;
         }
     }
 }

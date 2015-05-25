@@ -25,45 +25,47 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Parsing;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class UnparsedNode : TemplateNode, IEvaluable
     {
-        public int FirstCharacterIndex { get; private set; }
-
-        public int OriginalLength { get; private set; }
-
-        public string UnparsedText { get; private set; }
-
         public UnparsedNode(TemplateNode parent, UnparsedLex lex)
             : base(parent)
         {
             Debug.Assert(parent != null);
             Debug.Assert(lex != null);
 
-            FirstCharacterIndex = lex.FirstCharacterIndex;
-            OriginalLength = lex.OriginalLength;
-            UnparsedText = lex.UnparsedText;
+            this.FirstCharacterIndex = lex.FirstCharacterIndex;
+            this.OriginalLength = lex.OriginalLength;
+            this.UnparsedText = lex.UnparsedText;
         }
+
+        public int FirstCharacterIndex { get; private set; }
+
+        public int OriginalLength { get; private set; }
+
+        public string UnparsedText { get; private set; }
 
         public void Evaluate(TextWriter writer, IEvaluationContext context)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("context", context);
 
-            writer.Write(context.ProcessUnparsedText(UnparsedText));
+            writer.Write(context.ProcessUnparsedText(this.UnparsedText));
         }
 
         public override string ToString()
         {
-            return UnparsedText;
+            return this.UnparsedText;
         }
     }
 }

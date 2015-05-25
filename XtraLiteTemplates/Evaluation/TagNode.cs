@@ -25,33 +25,19 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Text;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Parsing;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class TagNode : TemplateNode
     {
-        public new DirectiveNode Parent
-        {
-            get
-            {
-                return (DirectiveNode)base.Parent;
-            }
-        }
-
-        public int FirstCharacterIndex { get; private set; }
-
-        public int OriginalLength { get; private set; }
-
-        public object[] Components { get; private set; }
-
-        public Tag Tag { get; private set; }
-
         public TagNode(DirectiveNode parent, TagLex lex)
             : base(parent)
         {
@@ -64,13 +50,29 @@ namespace XtraLiteTemplates.Evaluation
             Tag = lex.Tag;
         }
 
+        public new DirectiveNode Parent
+        {
+            get
+            {
+                return (DirectiveNode)base.Parent;
+            }
+        }
+
+        public Tag Tag { get; private set; }
+
+        public int FirstCharacterIndex { get; private set; }
+
+        public int OriginalLength { get; private set; }
+
+        public object[] Components { get; private set; }
+
         public object[] Evaluate(IExpressionEvaluationContext context)
         {
             Debug.Assert(context != null);
-            object[] result = new object[Components.Length];
-            for (var i = 0; i < Components.Length; i++)
+            object[] result = new object[this.Components.Length];
+            for (var i = 0; i < this.Components.Length; i++)
             {
-                var expression = Components[i] as Expression;
+                var expression = this.Components[i] as Expression;
                 if (expression != null)
                 {
                     /* Evaluate the expression. */
@@ -88,7 +90,7 @@ namespace XtraLiteTemplates.Evaluation
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var component in Components)
+            foreach (var component in this.Components)
             {
                 if (sb.Length > 0)
                 {

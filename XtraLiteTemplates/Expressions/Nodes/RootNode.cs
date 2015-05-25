@@ -47,16 +47,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             get
             {
-                Debug.Assert(m_children.Count > 0);
-                return m_children[m_children.Count - 1];
+                Debug.Assert(this.m_children.Count > 0);
+                return this.m_children[m_children.Count - 1];
             }
 
             set
             {
-                Debug.Assert(m_children.Count > 0);
+                Debug.Assert(this.m_children.Count > 0);
                 Debug.Assert(value != null);
 
-                m_children[m_children.Count - 1] = value;
+                this.m_children[m_children.Count - 1] = value;
             }
         }
 
@@ -65,25 +65,25 @@ namespace XtraLiteTemplates.Expressions.Nodes
         public RootNode(ExpressionNode parent)
             : base(parent)
         {
-            m_children = new List<ExpressionNode>();
+            this.m_children = new List<ExpressionNode>();
         }
 
         public void AddChild(ExpressionNode child)
         {
-            m_children.Add(child);
+            this.m_children.Add(child);
         }
 
         public void Close()
         {
-            Debug.Assert(!Closed);
-            Closed = true;
+            Debug.Assert(!this.Closed);
+            this.Closed = true;
         }
 
         public override PermittedContinuations Continuity
         {
             get
             {
-                if (Closed)
+                if (this.Closed)
                 {
                     return
                         PermittedContinuations.BinaryOperator |
@@ -102,9 +102,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            var result = string.Join(" , ", m_children.Select(s => s.ToString(style)));
+            var result = string.Join(" , ", this.m_children.Select(s => s.ToString(style)));
 
-            if (Parent != null)
+            if (this.Parent != null)
             {
                 if (style == ExpressionFormatStyle.Canonical)
                 {
