@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
@@ -34,7 +35,7 @@ namespace XtraLiteTemplates.Expressions.Operators
     public abstract class BinaryOperator : Operator
     {
         /// <summary>
-        /// Specifies the associativity.
+        /// Gets the operator's associativity.
         /// </summary>
         /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// <value>
@@ -86,4 +87,3 @@ namespace XtraLiteTemplates.Expressions.Operators
         }
     }
 }
-

@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
@@ -33,6 +34,7 @@ namespace XtraLiteTemplates.Evaluation
     using System.Text;
     using XtraLiteTemplates.Expressions;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class CompositeNode : TemplateNode, IEvaluable
     {
         private readonly List<TemplateNode> m_children;

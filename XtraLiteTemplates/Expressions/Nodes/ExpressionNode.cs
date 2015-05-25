@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
@@ -31,6 +32,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions.Operators;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class ExpressionNode
     {
         public ExpressionNode Parent { get; set; }
@@ -39,25 +41,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
         
         public object ReducedValue { get; private set; }
 
-
-        protected ExpressionNode(ExpressionNode parent)
-        {
-            Parent = parent;
-        }
-
-        protected virtual bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)
-        {
-            Debug.Assert(reduceContext != null);
-
-            reducedValue = null;
-            return false;
-        }
-
-        protected abstract Func<IExpressionEvaluationContext, object> Build();
-
-
         public abstract PermittedContinuations Continuity { get; }
-
 
         public Boolean Reduce(IExpressionEvaluationContext reduceContext)
         {
@@ -79,9 +63,13 @@ namespace XtraLiteTemplates.Expressions.Nodes
         public Func<IExpressionEvaluationContext, object> GetEvaluationFunction()
         {
             if (IsReduced)
+            {
                 return context => ReducedValue;
+            }
             else
+            {
                 return Build();
+            }
         }
 
         public abstract string ToString(ExpressionFormatStyle style);
@@ -90,6 +78,20 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             return ToString(ExpressionFormatStyle.Arithmetic);
         }
+
+        protected ExpressionNode(ExpressionNode parent)
+        {
+            Parent = parent;
+        }
+
+        protected virtual bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)
+        {
+            Debug.Assert(reduceContext != null);
+
+            reducedValue = null;
+            return false;
+        }
+
+        protected abstract Func<IExpressionEvaluationContext, object> Build();
     }
 }
-

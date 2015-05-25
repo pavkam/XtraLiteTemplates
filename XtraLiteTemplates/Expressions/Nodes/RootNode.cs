@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
@@ -35,6 +36,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Linq;
     using System.Text;
 
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class RootNode : ExpressionNode
     {
         private List<ExpressionNode> m_children;
@@ -48,6 +50,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 Debug.Assert(m_children.Count > 0);
                 return m_children[m_children.Count - 1];
             }
+
             set
             {
                 Debug.Assert(m_children.Count > 0);
@@ -104,11 +107,17 @@ namespace XtraLiteTemplates.Expressions.Nodes
             if (Parent != null)
             {
                 if (style == ExpressionFormatStyle.Canonical)
+                {
                     result = string.Format("(){{{0}}}", result);
+                }
                 else if (style == ExpressionFormatStyle.Arithmetic)
+                {
                     result = string.Format("( {0} )", result);
+                }
                 else if (style == ExpressionFormatStyle.Polish)
+                {
                     result = string.Format("({0})", result);
+                }
             }
 
             return result;
@@ -130,7 +139,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
             {
                 var allReduced = true;
                 foreach (var child in m_children)
+                {
                     allReduced &= child.Reduce(reduceContext);
+                }
 
                 if (allReduced)
                 {
@@ -159,7 +170,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 {
                     object[] array = new object[childFuncs.Length];
                     for (var i = 0; i < childFuncs.Length; i++)
+                    {
                         array[i] = childFuncs[i](context);
+                    }
 
                     return array;
                 };
@@ -167,4 +180,3 @@ namespace XtraLiteTemplates.Expressions.Nodes
         }
     }
 }
-

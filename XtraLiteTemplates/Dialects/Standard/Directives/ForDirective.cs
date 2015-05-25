@@ -24,14 +24,16 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Linq;
     using System.Diagnostics;
     using XtraLiteTemplates.Parsing;
-    using System.Collections;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
@@ -111,7 +113,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 
                 var sequence = TypeConverter.ConvertToSequence(components[m_expressionIndex]);
                 if (sequence == null)
+                {
                     return FlowDecision.Terminate;
+                }
 
                 enumerator = sequence.GetEnumerator();
                 state = enumerator;

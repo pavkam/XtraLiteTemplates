@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Expressions
 {
     using System;
@@ -44,7 +45,6 @@ namespace XtraLiteTemplates.Expressions
         private Dictionary<string, UnaryOperator> m_unaryOperatorSymbols;
         private Dictionary<string, BinaryOperator> m_binaryOperatorSymbols;
 
-
         private void OpenNewGroup()
         {
             if (!this.m_current.Continuity.HasFlag(PermittedContinuations.NewGroup))
@@ -54,24 +54,24 @@ namespace XtraLiteTemplates.Expressions
 
             if (m_current is OperatorNode)
             {
-                var _current = (OperatorNode)this.m_current;
-                Debug.Assert(_current.RightNode == null);
+                var currentOperatorNode = (OperatorNode)this.m_current;
+                Debug.Assert(currentOperatorNode.RightNode == null);
 
                 /* Flip to the new root */
-                this.m_root = new RootNode(_current);
-                _current.RightNode = this.m_root;
+                this.m_root = new RootNode(currentOperatorNode);
+                currentOperatorNode.RightNode = this.m_root;
                 this.m_current = this.m_root;
             }
             else if (this.m_current is RootNode)
             {
-                var _current = (RootNode)this.m_current;
+                var currentRootNode = (RootNode)this.m_current;
 
-                Debug.Assert(_current == this.m_root);
-                Debug.Assert(!_current.Closed);
+                Debug.Assert(currentRootNode == this.m_root);
+                Debug.Assert(!currentRootNode.Closed);
 
                 /* Flip to the new root */
-                this.m_root = new RootNode(_current);
-                _current.AddChild(m_root);
+                this.m_root = new RootNode(currentRootNode);
+                currentRootNode.AddChild(m_root);
                 this.m_current = m_root;
             }
         }
@@ -93,13 +93,13 @@ namespace XtraLiteTemplates.Expressions
             this.m_current = m_root;
 
             /* Find the actual root now. */
-            var _root = this.m_root.Parent;
-            while (!(_root is RootNode))
+            var rootNode = this.m_root.Parent;
+            while (!(rootNode is RootNode))
             {
-                _root = _root.Parent;
+                rootNode = rootNode.Parent;
             }
 
-            this.m_root = (RootNode)_root;
+            this.m_root = (RootNode)rootNode;
         }
 
         private void ContinueExistingGroup()
@@ -121,19 +121,19 @@ namespace XtraLiteTemplates.Expressions
 
             if (this.m_current is OperatorNode)
             {
-                var _current = this.m_current as OperatorNode;
-                Debug.Assert(_current.RightNode == null);
+                var currentOperatorNode = this.m_current as OperatorNode;
+                Debug.Assert(currentOperatorNode.RightNode == null);
 
-                _current.RightNode = new UnaryOperatorNode(_current, unaryOperator);
-                this.m_current = _current.RightNode;
+                currentOperatorNode.RightNode = new UnaryOperatorNode(currentOperatorNode, unaryOperator);
+                this.m_current = currentOperatorNode.RightNode;
             }
             else if (m_current is RootNode)
             {
-                var _current = this.m_current as RootNode;
-                Debug.Assert(!_current.Closed);
+                var currentRootNode = this.m_current as RootNode;
+                Debug.Assert(!currentRootNode.Closed);
 
-                var newNode = new UnaryOperatorNode(_current, unaryOperator);
-                _current.AddChild(newNode);
+                var newNode = new UnaryOperatorNode(currentRootNode, unaryOperator);
+                currentRootNode.AddChild(newNode);
                 this.m_current = newNode;
             }
         }
@@ -141,7 +141,9 @@ namespace XtraLiteTemplates.Expressions
         private void StartBinary(BinaryOperator binaryOperator)
         {
             if (!this.m_current.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
+            {
                 ExceptionHelper.UnexpectedOperator(binaryOperator.Symbol);
+            }
 
             var leftNode = this.m_current;
             var comparand = binaryOperator.Associativity == Associativity.LeftToRight ? 0 : -1;
@@ -178,32 +180,34 @@ namespace XtraLiteTemplates.Expressions
         private void CompleteWithSymbol(string symbol)
         {
             if (!this.m_current.Continuity.HasFlag(PermittedContinuations.Identifier))
+            {
                 ExceptionHelper.InvalidExpressionTerm(symbol);
+            }
 
             var newNode = new ReferenceNode(this.m_current, symbol);
 
             if (this.m_current is OperatorNode)
             {
-                var _current = this.m_current as OperatorNode;
-                Debug.Assert(_current.RightNode == null);
+                var currentOperatorNode = this.m_current as OperatorNode;
+                Debug.Assert(currentOperatorNode.RightNode == null);
 
-                _current.RightNode = newNode;
+                currentOperatorNode.RightNode = newNode;
                 this.m_current = newNode;
             }
             else if (this.m_current is RootNode)
             {
-                var _current = this.m_current as RootNode;
-                Debug.Assert(!_current.Closed);
+                var currentRootNode = this.m_current as RootNode;
+                Debug.Assert(!currentRootNode.Closed);
 
-                _current.AddChild(newNode);
+                currentRootNode.AddChild(newNode);
                 this.m_current = newNode;
             }
             else if (this.m_current is DisembowelerNode && ((DisembowelerNode)this.m_current).MemberName == null)
             {
-                var _current = this.m_current as DisembowelerNode;
-                Debug.Assert(_current.ObjectNode != null);
+                var currentDisembowelerNode = this.m_current as DisembowelerNode;
+                Debug.Assert(currentDisembowelerNode.ObjectNode != null);
 
-                _current.MemberName = symbol;
+                currentDisembowelerNode.MemberName = symbol;
             }
         }
 
@@ -212,28 +216,32 @@ namespace XtraLiteTemplates.Expressions
             if (!this.m_current.Continuity.HasFlag(PermittedContinuations.Literal))
             {
                 if (this.m_current is DisembowelerNode && ((DisembowelerNode)this.m_current).MemberName == null)
+                {
                     ExceptionHelper.UnexpectedLiteralRequiresIdentifier(FlowSymbols.MemberAccess, literal);
+                }
                 else
+                {
                     ExceptionHelper.UnexpectedLiteralRequiresOperator(literal);
+                }
             }
 
             var newNode = new LiteralNode(this.m_current, literal);
 
             if (this.m_current is OperatorNode)
             {
-                var _current = this.m_current as OperatorNode;
+                var currentOperatorNode = this.m_current as OperatorNode;
 
-                Debug.Assert(_current.RightNode == null);
+                Debug.Assert(currentOperatorNode.RightNode == null);
 
-                _current.RightNode = newNode;
+                currentOperatorNode.RightNode = newNode;
                 this.m_current = newNode;
             }
             else if (this.m_current is RootNode)
             {
-                var _current = this.m_current as RootNode;
-                Debug.Assert(!_current.Closed);
+                var currentRootNode = this.m_current as RootNode;
+                Debug.Assert(!currentRootNode.Closed);
 
-                _current.AddChild(newNode);
+                currentRootNode.AddChild(newNode);
                 this.m_current = newNode;
             }
         }
@@ -241,7 +249,9 @@ namespace XtraLiteTemplates.Expressions
         private void ContinueWithMemberAccess()
         {
             if (!m_current.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
+            {
                 ExceptionHelper.UnexpectedOperator(this.FlowSymbols.MemberAccess);
+            }
 
             /* Left side now becomes the "object" of disembowlement and the right side will be the member name */
             var newNode = new DisembowelerNode(this.m_current.Parent, this.m_current);
@@ -329,7 +339,9 @@ namespace XtraLiteTemplates.Expressions
                 }
             }
             else
+            {
                 this.CompleteWithLiteral(term);
+            }
         }
 
         /// <summary>
@@ -426,7 +438,7 @@ namespace XtraLiteTemplates.Expressions
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Expression"/> class usinf the default flow symbols and a culture-invariant, case-insensitive comparer.
+        /// Initializes a new instance of the <see cref="Expression"/> class using the default flow symbols and a culture-invariant, case-insensitive comparer.
         /// </summary>
         public Expression()
             : this(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
@@ -548,17 +560,17 @@ namespace XtraLiteTemplates.Expressions
                     fail = true;
                 else
                 {
-                    var _currentAsRoot = this.m_current as RootNode;
-                    if (_currentAsRoot != null)
+                    var currentRootNode = this.m_current as RootNode;
+                    if (currentRootNode != null)
                     {
-                        fail = !_currentAsRoot.Closed;
+                        fail = !currentRootNode.Closed;
                     }
                     else
                     {
-                        var _currentAsDisem = this.m_current as DisembowelerNode;
-                        if (_currentAsDisem != null)
+                        var currentDisembowelerNode = this.m_current as DisembowelerNode;
+                        if (currentDisembowelerNode != null)
                         {
-                            fail = _currentAsDisem.MemberName == null;
+                            fail = currentDisembowelerNode.MemberName == null;
                         }
                         else
                         {
@@ -582,7 +594,7 @@ namespace XtraLiteTemplates.Expressions
         /// Evaluates this expression using an evaluation context.
         /// </summary>
         /// <param name="context">The evaluation context.</param>
-        /// <returns>The result of expresion evaluation.</returns>
+        /// <returns>The result of expression evaluation.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">Expression not constructed.</exception>
         public object Evaluate(IExpressionEvaluationContext context)

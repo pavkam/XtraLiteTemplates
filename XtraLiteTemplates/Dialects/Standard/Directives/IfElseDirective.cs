@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
@@ -91,7 +93,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// A value indicating the next step for the evaluation environment.
         /// </returns>
         /// <remarks>
-        /// If the expression evaluates to <c>true</c>, the contents between the first and the middle tag are evaluated, other wise the contants between the middle
+        /// If the expression evaluates to <c>true</c>, the contents between the first and the middle tag are evaluated, other wise the constants between the middle
         /// and the end tag are evaluated.
         /// </remarks>
         protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state, IExpressionEvaluationContext context, out string text)
@@ -115,7 +117,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 var conditionWasTrue = (bool)state;
 
                 if (!conditionWasTrue)
+                {
                     return FlowDecision.Evaluate;
+                }
             }
             
             return FlowDecision.Terminate;

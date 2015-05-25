@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Parsing
 {
     using System;
@@ -36,12 +37,12 @@ namespace XtraLiteTemplates.Parsing
     public class ParseException : FormatException
     {
         /// <summary>
-        /// <value>The index of the character where the parsing error occured.</value>
+        /// <value>Gets the index of the character where the parsing error occured.</value>
         /// </summary>
         public int CharacterIndex { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.ParseException" /> class.
+        /// Initializes a new instance of the <see cref="ParseException"/> class.
         /// </summary>
         /// <param name="innerException">The inner exception.</param>
         /// <param name="characterIndex">The index of the character where the parsing error occured.</param>

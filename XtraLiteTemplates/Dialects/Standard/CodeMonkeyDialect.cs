@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
@@ -69,28 +71,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             DefaultIgnoreCase = new CodeMonkeyDialect(DialectCasing.IgnoreCase);
             Default = new CodeMonkeyDialect(DialectCasing.UpperCase);
-        }
-
-        /// <summary>
-        /// Override in descendant classes to supply all dialect supported directives.
-        /// </summary>
-        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
-        /// <returns>
-        /// An array of all supported directives.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter)
-        {
-            return new Directive[]
-            {
-                new ConditionalInterpolationDirective(AdjustCasing("$ IF $"), false, typeConverter),
-                new ForEachDirective(AdjustCasing("FOR ? IN $"), AdjustCasing("END"), typeConverter),
-                new ForDirective(AdjustCasing("FOR $"), AdjustCasing("END"), typeConverter),
-                new IfDirective(AdjustCasing("IF $"), AdjustCasing("END"), typeConverter),
-                new IfElseDirective(AdjustCasing("IF $"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
-                new InterpolationDirective(typeConverter),
-                new PreFormattedUnparsedTextDirective(AdjustCasing("PRE"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
-            };
         }
 
         /// <summary>
@@ -160,5 +140,28 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             return base.GetHashCode() ^ GetType().GetHashCode();
         }
+
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported directives.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
+        /// <returns>
+        /// An array of all supported directives.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        protected override Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter)
+        {
+            return new Directive[]
+            {
+                new ConditionalInterpolationDirective(AdjustCasing("$ IF $"), false, typeConverter),
+                new ForEachDirective(AdjustCasing("FOR ? IN $"), AdjustCasing("END"), typeConverter),
+                new ForDirective(AdjustCasing("FOR $"), AdjustCasing("END"), typeConverter),
+                new IfDirective(AdjustCasing("IF $"), AdjustCasing("END"), typeConverter),
+                new IfElseDirective(AdjustCasing("IF $"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
+                new InterpolationDirective(typeConverter),
+                new PreFormattedUnparsedTextDirective(AdjustCasing("PRE"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
+            };
+        }
+
     }
 }

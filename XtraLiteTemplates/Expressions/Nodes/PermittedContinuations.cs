@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
@@ -31,6 +32,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using XtraLiteTemplates.Expressions.Operators;
 
     [Flags]
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1602:EnumerationItemsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal enum PermittedContinuations
     {
         None = 0x00,
@@ -43,4 +45,3 @@ namespace XtraLiteTemplates.Expressions.Nodes
         ContinueGroup = CloseGroup,
     }
 }
-

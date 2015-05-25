@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
@@ -46,7 +48,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <summary>
         /// Initializes a new instance of the <see cref="InterpolationDirective"/> class.
         /// <remarks>
-        /// The <paramref name="tagMarkup"/> is expected to contain exactly obe expression component - the interpolated expression.
+        /// The <paramref name="tagMarkup"/> is expected to contain exactly one expression component - the interpolated expression.
         /// </remarks>
         /// </summary>
         /// <param name="tagMarkup">The tag markup.</param>

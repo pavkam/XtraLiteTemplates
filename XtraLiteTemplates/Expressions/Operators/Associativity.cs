@@ -24,10 +24,11 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Expressions.Operators
 {
     /// <summary>
-    /// Determines the associativity of an operator (the relation of an operator in relation with other operats of the same precedence).
+    /// Determines the associativity of an operator (the relation of an operator in relation with other operates of the same precedence).
     /// </summary>
     public enum Associativity
     {
@@ -41,4 +42,3 @@ namespace XtraLiteTemplates.Expressions.Operators
         RightToLeft,
     }
 }
-

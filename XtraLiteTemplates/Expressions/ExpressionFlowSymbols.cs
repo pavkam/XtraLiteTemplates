@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Expressions
 {
     using System;
@@ -46,7 +47,7 @@ namespace XtraLiteTemplates.Expressions
         public static ExpressionFlowSymbols Default { get; private set; }
 
         /// <summary>
-        /// Initializes the static members of <see cref="ExpressionFlowSymbols"/> class.
+        /// Initializes static members of the <see cref="ExpressionFlowSymbols"/> class.
         /// </summary>
         static ExpressionFlowSymbols()
         {

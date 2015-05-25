@@ -24,14 +24,16 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Collections;
     using System.Diagnostics;
     using XtraLiteTemplates.Parsing;
-    using System.Collections;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
@@ -88,7 +90,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// Executes the current directive. 
         /// <remarks>
         /// If the expression is evaluated to <c>null</c>, the directive does not evaluate. It evaluates once for non-sequences and once for each element if the 
-        /// expression is a sequence. On each cycle the indentifer is set to the value of teh enumerated object.
+        /// expression is a sequence. On each cycle the identifier is set to the value of the enumerated object.
         /// </remarks>
         /// </summary>
         /// <param name="tagIndex">The index of the tag that triggered the execution.</param>

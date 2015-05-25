@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Parsing
 {
     using System;
@@ -34,21 +35,25 @@ namespace XtraLiteTemplates.Parsing
     public abstract class Lex
     {
         /// <summary>
-        /// The index in the input template of the first character of the first token that makes up this lex object.
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// Gets index in the input template of the first character of the first token that makes up this lex object.
         /// </summary>
         /// <value>
         /// The index of the first character.
         /// </value>
+        /// <remarks>
+        /// The value of this property is provided by the caller during the construction process.
+        /// </remarks>
         public int FirstCharacterIndex { get; private set; }
 
         /// <summary>
-        /// The original length of all tokens combined that make up this lex object.
-        /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
+        /// Gets original length of all tokens combined that make up this lex object.
         /// </summary>
         /// <value>
         /// The total length of all tokens that make up this lex.
         /// </value>
+        /// <remarks>
+        /// The value of this property is provided by the caller during the construction process.
+        /// </remarks>
         public int OriginalLength { get; private set; }
 
         /// <summary>

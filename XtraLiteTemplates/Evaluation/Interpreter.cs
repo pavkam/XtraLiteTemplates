@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
@@ -37,7 +38,7 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Parsing;
 
     /// <summary>
-    /// Provides lex interpretation facilities. Instances of this class are used to interpret
+    /// Provides <c>lex</c> interpretation facilities. Instances of this class are used to interpret
     /// sequences of <see cref="Lex" /> objects and assemble the final <see cref="IEvaluable" /> objects.
     /// </summary>
     public sealed class Interpreter
@@ -118,7 +119,6 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-
         /// <summary>
         /// Gets the comparer used for keyword and identifier comparison.
         /// </summary>
@@ -139,7 +139,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <summary>
         /// Initializes a new instance of the <see cref="Interpreter"/> class.
         /// </summary>
-        /// <param name="tokenizer">The tokenizer.</param>
+        /// <param name="tokenizer">The <c>tokenizer</c> instance.</param>
         /// <param name="expressionFlowSymbols">The expression flow symbols.</param>
         /// <param name="comparer">The keyword and identifier comparer.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="tokenizer"/> or <paramref name="expressionFlowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>

@@ -24,14 +24,16 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Diagnostics;
-    using XtraLiteTemplates.Parsing;
     using System.Collections;
+    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
@@ -41,10 +43,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     /// </summary>
     public sealed class SeparatedForEachDirective : StandardDirective
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private class State
         {
-            public IEnumerator<object> Enumerator;
-            public bool IsLast;
+            public IEnumerator<object> Enumerator { get; set; }
+
+            public bool IsLast { get; set; }
         }
 
         private int m_expressionIndex;
@@ -106,7 +110,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// If the expression is evaluated to <c>null</c>, the directive does not evaluate. It evaluates once for non-sequences and once for each element if the
         /// expression is a sequence. On each cycle the indentifer is set to the value of the enumerated object.
         /// <para>
-        /// The contents between the middle tag and teh end tag are inserted between the evaluated items, simulating the <see cref="String.Join(String,IEnumerable<Object>)" /> method.
+        /// The contents between the middle tag and the end tag are inserted between the evaluated items, simulating the <see cref="String.Join(String,IEnumerable{String})" /> method.
         /// </para>
         /// </remarks>
         protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
@@ -167,7 +171,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 return sstate.IsLast ? FlowDecision.Terminate : FlowDecision.Evaluate;
             }
             else
+            {
                 return FlowDecision.Restart;
+            }
         }
     }
 }

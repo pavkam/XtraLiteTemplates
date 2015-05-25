@@ -24,10 +24,11 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Parsing
 {
     /// <summary>
-    /// Defines the common traits of a tokenizer. A tokenizer is responsible for transforming a text document into a sequence of tokens
+    /// Defines the common traits of a <c>tokenizer</c>. A <c>tokenizer</c> is responsible for transforming a text document into a sequence of tokens
     /// easily interpretable by the other parts of this library.
     /// </summary>
     public interface ITokenizer

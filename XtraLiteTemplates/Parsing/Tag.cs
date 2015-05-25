@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Parsing
 {
     using System;
@@ -109,8 +110,7 @@ namespace XtraLiteTemplates.Parsing
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.Tag"/> class.
-        /// <remarks>The caller is expected to use the public methods to prepare the tag for use.</remarks>
+        /// Initializes a new instance of the <see cref="Tag"/> class.
         /// </summary>
         public Tag()
         {
@@ -483,7 +483,7 @@ namespace XtraLiteTemplates.Parsing
         }
 
         /// <summary>
-        /// <value>Returns the number of components this tag has defined.</value>
+        /// <value>Gets the number of components this tag has defined.</value>
         /// </summary>
         public int ComponentCount
         {
@@ -494,4 +494,3 @@ namespace XtraLiteTemplates.Parsing
         }
     }
 }
-

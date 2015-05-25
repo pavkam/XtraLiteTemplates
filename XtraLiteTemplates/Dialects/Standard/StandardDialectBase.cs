@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
@@ -53,94 +54,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         private Dictionary<string, object> m_specials;
         private Dictionary<object, string> m_specialsIdentifiers;
         private string m_undefinedSpecialIdentifier;
-
-        /// <summary>
-        /// Override in descendant classes to supply all dialect supported operators.
-        /// </summary>
-        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
-        /// <returns>
-        /// An array of all supported operators.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected abstract Operator[] CreateOperators(IPrimitiveTypeConverter typeConverter);
-
-        /// <summary>
-        /// Override in descendant classes to supply all dialect supported directives.
-        /// </summary>
-        /// <param name="typeConverter">The concrete <see cref="T:XtraLiteTemplates.Dialects.Standard.IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
-        /// <returns>
-        /// An array of all supported directives.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected abstract Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter);
-
-        /// <summary>
-        /// Override in descendant classes to supply all dialect supported special constants.
-        /// </summary>
-        /// <returns>
-        /// An array of all supported special constants.
-        /// </returns>
-        protected abstract KeyValuePair<string, object>[] CreateSpecials();
-
-        /// <summary>
-        /// Adjusts the case of a string based on the <see cref="DialectCasing" /> supplied during construction.
-        /// </summary>
-        /// <param name="markup">The string to adjust the case for.</param>
-        /// <returns>
-        /// Case-adjusted string.
-        /// </returns>
-        /// <remarks>
-        /// Descendant classes need to call this method when creating directives and operators to adjust the case accordingly.
-        /// </remarks>
-        protected String AdjustCasing(string markup)
-        {
-            if (string.IsNullOrEmpty(markup))
-            {
-                return markup;
-            }
-
-            if (this.m_casing == DialectCasing.LowerCase)
-            {
-                return markup.ToLower(this.Culture);
-            }
-            else if (this.m_casing == DialectCasing.UpperCase)
-            {
-                return markup.ToUpper(this.Culture);
-            }
-            else
-            {
-                return markup;
-            }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StandardDialectBase" /> class.
-        /// <remarks>
-        /// This constructor is not actually called directly.
-        /// </remarks>
-        /// </summary>
-        /// <param name="name">A human-readable name for the dialect.</param>
-        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
-        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
-        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
-        protected StandardDialectBase(string name, CultureInfo culture, DialectCasing casing)
-        {
-            Expect.NotEmpty("name", name);
-            Expect.NotNull("culture", culture);
-
-            /* Build culture-aware values.*/
-            this.Name = name;
-            this.Culture = culture;
-            this.m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture, this);
-            this.m_casing = casing;
-            this.m_undefinedSpecialIdentifier = this.AdjustCasing("Undefined");
-
-            var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
-
-            this.IdentifierComparer = comparer;
-            this.StringLiteralComparer = comparer;
-        }
 
         /// <summary>
         /// Gets the <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.
@@ -471,5 +384,95 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             return ((IObjectFormatter)this).ToString(obj, Culture);
         }
+
+
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported operators.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
+        /// <returns>
+        /// An array of all supported operators.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        protected abstract Operator[] CreateOperators(IPrimitiveTypeConverter typeConverter);
+
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported directives.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="T:XtraLiteTemplates.Dialects.Standard.IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
+        /// <returns>
+        /// An array of all supported directives.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        protected abstract Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter);
+
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported special constants.
+        /// </summary>
+        /// <returns>
+        /// An array of all supported special constants.
+        /// </returns>
+        protected abstract KeyValuePair<string, object>[] CreateSpecials();
+
+        /// <summary>
+        /// Adjusts the case of a string based on the <see cref="DialectCasing" /> supplied during construction.
+        /// </summary>
+        /// <param name="markup">The string to adjust the case for.</param>
+        /// <returns>
+        /// Case-adjusted string.
+        /// </returns>
+        /// <remarks>
+        /// Descendant classes need to call this method when creating directives and operators to adjust the case accordingly.
+        /// </remarks>
+        protected String AdjustCasing(string markup)
+        {
+            if (string.IsNullOrEmpty(markup))
+            {
+                return markup;
+            }
+
+            if (this.m_casing == DialectCasing.LowerCase)
+            {
+                return markup.ToLower(this.Culture);
+            }
+            else if (this.m_casing == DialectCasing.UpperCase)
+            {
+                return markup.ToUpper(this.Culture);
+            }
+            else
+            {
+                return markup;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardDialectBase" /> class.
+        /// <remarks>
+        /// This constructor is not actually called directly.
+        /// </remarks>
+        /// </summary>
+        /// <param name="name">A human-readable name for the dialect.</param>
+        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
+        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
+        protected StandardDialectBase(string name, CultureInfo culture, DialectCasing casing)
+        {
+            Expect.NotEmpty("name", name);
+            Expect.NotNull("culture", culture);
+
+            /* Build culture-aware values.*/
+            this.Name = name;
+            this.Culture = culture;
+            this.m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture, this);
+            this.m_casing = casing;
+            this.m_undefinedSpecialIdentifier = this.AdjustCasing("Undefined");
+
+            var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
+
+            this.IdentifierComparer = comparer;
+            this.StringLiteralComparer = comparer;
+        }
+
     }
 }

@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
@@ -37,7 +38,7 @@ namespace XtraLiteTemplates.Expressions.Operators
     public abstract class Operator
     {
         /// <summary>
-        /// Specifies the operator's symbol, used in the expression building process.
+        /// Gets the operator's symbol, used in the expression building process.
         /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// </summary>
         /// <value>
@@ -46,7 +47,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         public string Symbol { get; private set; }
 
         /// <summary>
-        /// Specifies the operator's precedence, used in the expression building process.
+        /// Gets the operator's precedence, used in the expression building process.
         /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// </summary>
         /// <value>
@@ -72,7 +73,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         }
 
         /// <summary>
-        /// Returns a human-redable representation of the operator. This implementation returns the value of <see cref="Symbol"/> property.
+        /// Returns a human-readable representation of the operator. This implementation returns the value of <see cref="Symbol"/> property.
         /// </summary>
         /// <returns>
         /// A string that represents the current operator object.
@@ -83,4 +84,3 @@ namespace XtraLiteTemplates.Expressions.Operators
         }
     }
 }
-

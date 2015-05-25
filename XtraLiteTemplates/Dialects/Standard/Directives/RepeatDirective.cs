@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
@@ -118,7 +120,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 remainingIterations = (int)state;
             }
             else
+            {
                 return FlowDecision.Restart;
+            }
 
             remainingIterations--;
             if (remainingIterations >= 0)
@@ -127,7 +131,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 return FlowDecision.Evaluate;
             }
             else
+            {
                 return FlowDecision.Terminate;
+            }
         }
     }
 }

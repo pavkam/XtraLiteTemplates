@@ -24,6 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
@@ -104,7 +106,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             if (tagIndex == 0)
             {
                 if (TypeConverter.ConvertToBoolean(components[m_expressionIndex]) == true)
+                {
                     return FlowDecision.Evaluate;
+                }
             }
             
             return FlowDecision.Terminate;

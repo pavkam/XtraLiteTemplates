@@ -24,6 +24,7 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
+[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
@@ -70,107 +71,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             DefaultIgnoreCase = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
             Default = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
-        }
-
-        /// <summary>
-        /// Gets the state object that can be used by directive to disable the unhandled text trimming behavior.
-        /// </summary>
-        /// <value>
-        /// The preformatted state object.
-        /// </value>
-        protected Object PreformattedStateObject { get; private set; }
-
-        /// <summary>
-        /// Override in descendant classes to supply all dialect supported operators.
-        /// </summary>
-        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
-        /// <returns>
-        /// An array of all supported operators.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override Operator[] CreateOperators(IPrimitiveTypeConverter typeConverter)
-        {
-            return new Operator[]
-            {
-                new RelationalEqualsOperator(StringLiteralComparer, typeConverter),
-                new RelationalNotEqualsOperator(StringLiteralComparer, typeConverter),
-                new RelationalGreaterThanOperator(StringLiteralComparer, typeConverter),
-                new RelationalGreaterThanOrEqualsOperator(StringLiteralComparer, typeConverter),
-                new RelationalLowerThanOperator(StringLiteralComparer, typeConverter),
-                new RelationalLowerThanOrEqualsOperator(StringLiteralComparer, typeConverter),
-                new LogicalAndOperator(typeConverter),
-                new LogicalOrOperator(typeConverter),
-                new LogicalNotOperator(typeConverter),
-                new BitwiseAndOperator(typeConverter),
-                new BitwiseOrOperator(typeConverter),
-                new BitwiseXorOperator(typeConverter),
-                new BitwiseNotOperator(typeConverter),
-                new BitwiseShiftLeftOperator(typeConverter),
-                new BitwiseShiftRightOperator(typeConverter),
-                new ArithmeticDivideOperator(typeConverter),
-                new ArithmeticModuloOperator(typeConverter),
-                new ArithmeticMultiplyOperator(typeConverter),
-                new ArithmeticNegateOperator(typeConverter),
-                new ArithmeticNeutralOperator(typeConverter),
-                new ArithmeticSubtractOperator(typeConverter),
-                new ArithmeticSumOperator(typeConverter),
-                new SequenceOperator(typeConverter),
-                new FormatOperator(Culture, typeConverter),
-            };
-        }
-
-        /// <summary>
-        /// Override in descendant classes to supply all dialect supported directives.
-        /// </summary>
-        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
-        /// <returns>
-        /// An array of all supported directives.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter)
-        {
-            return new Directive[]
-            {
-                new ConditionalInterpolationDirective(AdjustCasing("$ IF $"), false, typeConverter),
-                new ForEachDirective(AdjustCasing("FOR EACH ? IN $"), AdjustCasing("END"), typeConverter),
-                new IfDirective(AdjustCasing("IF $ THEN"), AdjustCasing("END"), typeConverter),
-                new IfElseDirective(AdjustCasing("IF $ THEN"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
-                new InterpolationDirective(typeConverter),
-                new RepeatDirective(AdjustCasing("REPEAT $ TIMES"), AdjustCasing("END"), typeConverter),
-                new PreFormattedUnparsedTextDirective(AdjustCasing("PREFORMATTED"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
-            };
-        }
-
-        /// <summary>
-        /// Override in descendant classes to supply all dialect supported special constants.
-        /// </summary>
-        /// <returns>
-        /// An array of all supported special constants.
-        /// </returns>
-        protected override KeyValuePair<string, object>[] CreateSpecials()
-        {
-            return new KeyValuePair<string, object>[]
-            {
-                new KeyValuePair<String, object>(AdjustCasing("True"), true),
-                new KeyValuePair<String, object>(AdjustCasing("False"), false),
-                new KeyValuePair<String, object>(AdjustCasing("Undefined"), null),
-                new KeyValuePair<String, object>(AdjustCasing("NaN"), double.NaN),
-                new KeyValuePair<String, object>(AdjustCasing("Infinity"), double.PositiveInfinity),
-            };
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StandardDialect"/> class.
-        /// </summary>
-        /// <param name="name">A human-readable name for the dialect.</param>
-        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
-        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
-        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
-        protected StandardDialect(string name, CultureInfo culture, DialectCasing casing)
-            : base(name, culture, casing)
-        {
-            PreformattedStateObject = new Object();
         }
 
         /// <summary>
@@ -329,6 +229,107 @@ namespace XtraLiteTemplates.Dialects.Standard
         public override int GetHashCode()
         {
             return base.GetHashCode() ^ GetType().GetHashCode();
+        }
+
+        /// <summary>
+        /// Gets the state object that can be used by directive to disable the unhandled text trimming behavior.
+        /// </summary>
+        /// <value>
+        /// The preformatted state object.
+        /// </value>
+        protected Object PreformattedStateObject { get; private set; }
+
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported operators.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
+        /// <returns>
+        /// An array of all supported operators.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        protected override Operator[] CreateOperators(IPrimitiveTypeConverter typeConverter)
+        {
+            return new Operator[]
+            {
+                new RelationalEqualsOperator(StringLiteralComparer, typeConverter),
+                new RelationalNotEqualsOperator(StringLiteralComparer, typeConverter),
+                new RelationalGreaterThanOperator(StringLiteralComparer, typeConverter),
+                new RelationalGreaterThanOrEqualsOperator(StringLiteralComparer, typeConverter),
+                new RelationalLowerThanOperator(StringLiteralComparer, typeConverter),
+                new RelationalLowerThanOrEqualsOperator(StringLiteralComparer, typeConverter),
+                new LogicalAndOperator(typeConverter),
+                new LogicalOrOperator(typeConverter),
+                new LogicalNotOperator(typeConverter),
+                new BitwiseAndOperator(typeConverter),
+                new BitwiseOrOperator(typeConverter),
+                new BitwiseXorOperator(typeConverter),
+                new BitwiseNotOperator(typeConverter),
+                new BitwiseShiftLeftOperator(typeConverter),
+                new BitwiseShiftRightOperator(typeConverter),
+                new ArithmeticDivideOperator(typeConverter),
+                new ArithmeticModuloOperator(typeConverter),
+                new ArithmeticMultiplyOperator(typeConverter),
+                new ArithmeticNegateOperator(typeConverter),
+                new ArithmeticNeutralOperator(typeConverter),
+                new ArithmeticSubtractOperator(typeConverter),
+                new ArithmeticSumOperator(typeConverter),
+                new SequenceOperator(typeConverter),
+                new FormatOperator(Culture, typeConverter),
+            };
+        }
+
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported directives.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
+        /// <returns>
+        /// An array of all supported directives.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        protected override Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter)
+        {
+            return new Directive[]
+            {
+                new ConditionalInterpolationDirective(AdjustCasing("$ IF $"), false, typeConverter),
+                new ForEachDirective(AdjustCasing("FOR EACH ? IN $"), AdjustCasing("END"), typeConverter),
+                new IfDirective(AdjustCasing("IF $ THEN"), AdjustCasing("END"), typeConverter),
+                new IfElseDirective(AdjustCasing("IF $ THEN"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
+                new InterpolationDirective(typeConverter),
+                new RepeatDirective(AdjustCasing("REPEAT $ TIMES"), AdjustCasing("END"), typeConverter),
+                new PreFormattedUnparsedTextDirective(AdjustCasing("PREFORMATTED"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
+            };
+        }
+
+        /// <summary>
+        /// Override in descendant classes to supply all dialect supported special constants.
+        /// </summary>
+        /// <returns>
+        /// An array of all supported special constants.
+        /// </returns>
+        protected override KeyValuePair<string, object>[] CreateSpecials()
+        {
+            return new KeyValuePair<string, object>[]
+            {
+                new KeyValuePair<String, object>(AdjustCasing("True"), true),
+                new KeyValuePair<String, object>(AdjustCasing("False"), false),
+                new KeyValuePair<String, object>(AdjustCasing("Undefined"), null),
+                new KeyValuePair<String, object>(AdjustCasing("NaN"), double.NaN),
+                new KeyValuePair<String, object>(AdjustCasing("Infinity"), double.PositiveInfinity),
+            };
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <param name="name">A human-readable name for the dialect.</param>
+        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
+        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
+        protected StandardDialect(string name, CultureInfo culture, DialectCasing casing)
+            : base(name, culture, casing)
+        {
+            PreformattedStateObject = new Object();
         }
     }
 }
