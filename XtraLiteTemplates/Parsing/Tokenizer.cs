@@ -33,7 +33,10 @@ namespace XtraLiteTemplates.Parsing
     using System.IO;
     using System.Collections.Generic;
     using System.Globalization;
-
+    
+    /// <summary>
+    /// Provides the standard tokenization services.
+    /// </summary>
     public sealed class Tokenizer : ITokenizer, IDisposable
     {
         private enum ParserState
@@ -43,76 +46,6 @@ namespace XtraLiteTemplates.Parsing
         }
 
         private ParserState m_parserState;
-
-        public char TagStartCharacter { get; private set; }
-
-        public char TagEndCharacter { get; private set; }
-
-        public char StringLiteralStartCharacter { get; private set; }
-
-        public char StringLiteralEndCharacter { get; private set; }
-
-        public char StringLiteralEscapeCharacter { get; private set; }
-
-        public char NumberLiteralDecimalSeparatorCharacter { get; private set; }
-
-        private void InitializeTokenizer(TextReader reader, char tagStartCharacter, char tagEndCharacter,
-            char stringStartCharacter, char stringEndCharacter, char stringEscapeCharacter, char numberDecimalSeparatorCharacter)
-        {
-            Expect.NotNull("reader", reader);
-            Expect.NotEqual("tagStartCharacter", "tagEndCharacter", tagStartCharacter, tagEndCharacter);
-            Expect.NotEqual("stringStartCharacter", "tagStartCharacter", stringStartCharacter, tagStartCharacter);
-            Expect.NotEqual("stringStartCharacter", "tagEndCharacter", stringStartCharacter, tagEndCharacter);
-            Expect.NotEqual("stringEndCharacter", "tagStartCharacter", stringEndCharacter, tagStartCharacter);
-            Expect.NotEqual("stringEndCharacter", "tagEndCharacter", stringEndCharacter, tagEndCharacter);
-            Expect.NotEqual("stringEscapeCharacter", "stringStartCharacter", stringEscapeCharacter, stringStartCharacter);
-            Expect.NotEqual("stringEscapeCharacter", "stringEndCharacter", stringEscapeCharacter, stringEndCharacter);
-            Expect.NotEqual("tagStartCharacter", "numberDecimalSeparatorCharacter", tagStartCharacter, numberDecimalSeparatorCharacter);
-            Expect.NotEqual("tagEndCharacter", "numberDecimalSeparatorCharacter", tagEndCharacter, numberDecimalSeparatorCharacter);
-            Expect.NotEqual("stringStartCharacter", "numberDecimalSeparatorCharacter", stringStartCharacter, numberDecimalSeparatorCharacter);
-            Expect.NotEqual("stringEndCharacter", "numberDecimalSeparatorCharacter", stringEndCharacter, numberDecimalSeparatorCharacter);
-
-            /* Validate allow character set. */
-            Char[] all = new char[]
-            { 
-                tagStartCharacter, tagEndCharacter, stringStartCharacter,
-                stringEndCharacter, stringEscapeCharacter, numberDecimalSeparatorCharacter
-            };
-
-            var allowedCharacterSet = !all.Any(c => Char.IsWhiteSpace(c) || Char.IsLetterOrDigit(c) || c == '_');
-            Expect.IsTrue("allowed set of characters", allowedCharacterSet);
-
-            this.m_textReader = reader;
-            this.TagStartCharacter = tagStartCharacter;
-            this.TagEndCharacter = tagEndCharacter;
-
-            this.StringLiteralStartCharacter = stringStartCharacter;
-            this.StringLiteralEndCharacter = stringEndCharacter;
-            this.StringLiteralEscapeCharacter = stringEscapeCharacter;
-
-            this.NumberLiteralDecimalSeparatorCharacter = numberDecimalSeparatorCharacter;
-
-            this.m_parserState = ParserState.InText;
-            this.m_currentCharacterIndex = -1;
-        }
-
-        public Tokenizer(TextReader reader, char tagStartCharacter, char tagEndCharacter, char stringStartCharacter,
-            char stringEndCharacter, char stringEscapeCharacter, char numberDecimalSeparatorCharacter)
-        {
-            InitializeTokenizer(reader, tagStartCharacter, tagEndCharacter,
-                stringStartCharacter, stringEndCharacter, stringEscapeCharacter, numberDecimalSeparatorCharacter);
-        }
-
-        public Tokenizer(TextReader reader)            
-        {
-            InitializeTokenizer(reader, '{', '}', '"', '"', '\\', '.');
-        }
-
-        public Tokenizer(String text)
-            : this(new StringReader(text ?? string.Empty))
-        {
-        }
-
         private TextReader m_textReader;
         private int m_currentCharacterIndex;
         private bool m_isEndOfStream;
@@ -136,7 +69,7 @@ namespace XtraLiteTemplates.Parsing
             return '\0';
         }
 
-        private Boolean NextCharacter(Boolean required)
+        private bool NextCharacter(bool required)
         {
             if (this.m_isEndOfStream)
                 ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
@@ -155,15 +88,14 @@ namespace XtraLiteTemplates.Parsing
             return !this.m_isEndOfStream;
         }
 
-
-        private Boolean IsTagSpecialCharacter(char c)
+        private bool IsTagSpecialCharacter(char c)
         {
             return
-                c == TagStartCharacter || c == TagEndCharacter || 
+                c == TagStartCharacter || c == TagEndCharacter ||
                 c == StringLiteralStartCharacter || c == StringLiteralEndCharacter;
         }
 
-        private Boolean IsStandardSymbol(char c)
+        private bool IsStandardSymbol(char c)
         {
             if (IsTagSpecialCharacter(c))
                 return false;
@@ -195,7 +127,7 @@ namespace XtraLiteTemplates.Parsing
                 /* Tag end character. Need to switch to text mode. */
                 this.m_parserState = ParserState.InText;
 
-                var _token = new Token(Token.TokenType.EndTag, 
+                var _token = new Token(Token.TokenType.EndTag,
                                  this.m_currentCharacter.ToString(), this.m_currentCharacterIndex, 1);
 
                 this.NextCharacter(false);
@@ -220,17 +152,17 @@ namespace XtraLiteTemplates.Parsing
                         this.NextCharacter(false);
 
                         return new Token(
-                            Token.TokenType.Unparsed, 
-                            tokenValue.ToString(), 
-                            tokenStartIndex, 
+                            Token.TokenType.Unparsed,
+                            tokenValue.ToString(),
+                            tokenStartIndex,
                             this.m_currentCharacterIndex - tokenStartIndex);
                     }
                     else
                     {
                         this.m_parserState = ParserState.InTag;
                         return new Token(
-                            Token.TokenType.StartTag, 
-                            tokenValue.ToString(), 
+                            Token.TokenType.StartTag,
+                            tokenValue.ToString(),
                             tokenStartIndex,
                             this.m_currentCharacterIndex - tokenStartIndex);
                     }
@@ -239,7 +171,7 @@ namespace XtraLiteTemplates.Parsing
                 {
                     /* Parsing free-form text until the start directive character is found. */
                     this.NextCharacter(false);
-                
+
                     while (!this.m_isEndOfStream && this.m_currentCharacter != this.TagStartCharacter)
                     {
                         tokenValue.Append(this.m_currentCharacter);
@@ -247,9 +179,9 @@ namespace XtraLiteTemplates.Parsing
                     }
 
                     return new Token(
-                        Token.TokenType.Unparsed, 
-                        tokenValue.ToString(), 
-                        tokenStartIndex, 
+                        Token.TokenType.Unparsed,
+                        tokenValue.ToString(),
+                        tokenStartIndex,
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
             }
@@ -331,9 +263,9 @@ namespace XtraLiteTemplates.Parsing
                     }
 
                     return new Token(
-                        Token.TokenType.String, 
-                        tokenValue.ToString(), 
-                        tokenStartIndex, 
+                        Token.TokenType.String,
+                        tokenValue.ToString(),
+                        tokenStartIndex,
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
                 else if (Char.IsLetter(this.m_currentCharacter) || this.m_currentCharacter == '_')
@@ -348,9 +280,9 @@ namespace XtraLiteTemplates.Parsing
 
                     Debug.Assert(tokenValue.Length > 0);
                     return new Token(
-                        Token.TokenType.Word, 
-                        tokenValue.ToString(), 
-                        tokenStartIndex, 
+                        Token.TokenType.Word,
+                        tokenValue.ToString(),
+                        tokenStartIndex,
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
                 else if (char.IsDigit(this.m_currentCharacter))
@@ -377,9 +309,9 @@ namespace XtraLiteTemplates.Parsing
 
                     Debug.Assert(tokenValue.Length > 0);
                     return new Token(
-                        Token.TokenType.Number, 
-                        tokenValue.ToString(), 
-                        tokenStartIndex, 
+                        Token.TokenType.Number,
+                        tokenValue.ToString(),
+                        tokenStartIndex,
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
                 else if (this.m_currentCharacter == this.NumberLiteralDecimalSeparatorCharacter)
@@ -435,9 +367,9 @@ namespace XtraLiteTemplates.Parsing
                     Debug.Assert(tokenValue.Length > 0);
 
                     return new Token(
-                        Token.TokenType.Whitespace, 
-                        tokenValue.ToString(), 
-                        tokenStartIndex, 
+                        Token.TokenType.Whitespace,
+                        tokenValue.ToString(),
+                        tokenStartIndex,
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
                 else if (!this.IsTagSpecialCharacter(this.m_currentCharacter))
@@ -469,9 +401,9 @@ namespace XtraLiteTemplates.Parsing
                     Debug.Assert(tokenValue.Length > 0);
 
                     return new Token(
-                        Token.TokenType.Symbol, 
-                        tokenValue.ToString(), 
-                        tokenStartIndex, 
+                        Token.TokenType.Symbol,
+                        tokenValue.ToString(),
+                        tokenStartIndex,
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
             }
@@ -479,6 +411,147 @@ namespace XtraLiteTemplates.Parsing
             return null;
         }
 
+        /// <summary>
+        /// Gets the tag start character.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The tag start character.
+        /// </value>
+        public char TagStartCharacter { get; private set; }
+
+        /// <summary>
+        /// Gets the tag end character.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The tag end character.
+        /// </value>
+        public char TagEndCharacter { get; private set; }
+
+        /// <summary>
+        /// Gets the string literal start character.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The string literal start character.
+        /// </value>
+        public char StringLiteralStartCharacter { get; private set; }
+
+        /// <summary>
+        /// Gets the string literal end character.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The string literal end character.
+        /// </value>
+        public char StringLiteralEndCharacter { get; private set; }
+
+        /// <summary>
+        /// Gets the string literal escape character.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The string literal escape character.
+        /// </value>
+        public char StringLiteralEscapeCharacter { get; private set; }
+
+        /// <summary>
+        /// Gets the number literal decimal separator character.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The number literal decimal separator character.
+        /// </value>
+        public char NumberLiteralDecimalSeparatorCharacter { get; private set; }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Tokenizer"/> class.
+        /// </summary>
+        /// <param name="reader">The input template reader.</param>
+        /// <param name="tagStartCharacter">The tag start character.</param>
+        /// <param name="tagEndCharacter">The tag end character.</param>
+        /// <param name="stringStartCharacter">The string literal start character.</param>
+        /// <param name="stringEndCharacter">The string literal end character.</param>
+        /// <param name="stringEscapeCharacter">The string literal escape character.</param>
+        /// <param name="numberDecimalSeparatorCharacter">The number literal decimal separator character.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="reader"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException">The supplied character combination is not valid.</exception>
+        /// <exception cref="InvalidOperationException">One or more control characters is not allowed.</exception>
+        public Tokenizer(TextReader reader, char tagStartCharacter, char tagEndCharacter, char stringStartCharacter,
+            char stringEndCharacter, char stringEscapeCharacter, char numberDecimalSeparatorCharacter)
+        {
+            Expect.NotNull("reader", reader);
+            Expect.NotEqual("tagStartCharacter", "tagEndCharacter", tagStartCharacter, tagEndCharacter);
+            Expect.NotEqual("stringStartCharacter", "tagStartCharacter", stringStartCharacter, tagStartCharacter);
+            Expect.NotEqual("stringStartCharacter", "tagEndCharacter", stringStartCharacter, tagEndCharacter);
+            Expect.NotEqual("stringEndCharacter", "tagStartCharacter", stringEndCharacter, tagStartCharacter);
+            Expect.NotEqual("stringEndCharacter", "tagEndCharacter", stringEndCharacter, tagEndCharacter);
+            Expect.NotEqual("stringEscapeCharacter", "stringStartCharacter", stringEscapeCharacter, stringStartCharacter);
+            Expect.NotEqual("stringEscapeCharacter", "stringEndCharacter", stringEscapeCharacter, stringEndCharacter);
+            Expect.NotEqual("tagStartCharacter", "numberDecimalSeparatorCharacter", tagStartCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual("tagEndCharacter", "numberDecimalSeparatorCharacter", tagEndCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual("stringStartCharacter", "numberDecimalSeparatorCharacter", stringStartCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual("stringEndCharacter", "numberDecimalSeparatorCharacter", stringEndCharacter, numberDecimalSeparatorCharacter);
+
+            /* Validate allow character set. */
+            Char[] all = new char[]
+            { 
+                tagStartCharacter, tagEndCharacter, stringStartCharacter,
+                stringEndCharacter, stringEscapeCharacter, numberDecimalSeparatorCharacter
+            };
+
+            var allowedCharacterSet = !all.Any(c => Char.IsWhiteSpace(c) || Char.IsLetterOrDigit(c) || c == '_');
+            Expect.IsTrue("allowed set of characters", allowedCharacterSet);
+
+            this.m_textReader = reader;
+            this.TagStartCharacter = tagStartCharacter;
+            this.TagEndCharacter = tagEndCharacter;
+
+            this.StringLiteralStartCharacter = stringStartCharacter;
+            this.StringLiteralEndCharacter = stringEndCharacter;
+            this.StringLiteralEscapeCharacter = stringEscapeCharacter;
+
+            this.NumberLiteralDecimalSeparatorCharacter = numberDecimalSeparatorCharacter;
+
+            this.m_parserState = ParserState.InText;
+            this.m_currentCharacterIndex = -1;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Tokenizer"/> class.
+        /// <remarks>
+        /// <para>
+        /// Standard character set is used for control characters: '{', '}', '"' and '.'.
+        /// </para>
+        /// </remarks>
+        /// </summary>
+        /// <param name="reader">The input template reader.</param>
+        public Tokenizer(TextReader reader)
+            : this(reader, '{', '}', '"', '"', '\\', '.')         
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Tokenizer"/> class.
+        /// <remarks>
+        /// <para>
+        /// Standard character set is used for control characters: '{', '}', '"' and '.'.
+        /// </para>
+        /// </remarks>
+        /// </summary>
+        /// <param name="text">The input template.</param>
+        public Tokenizer(string text)
+            : this(new StringReader(text ?? string.Empty))
+        {
+        }
+
+        /// <summary>
+        /// Reads the next <see cref="Token" /> object from the input template.
+        /// </summary>
+        /// <returns>
+        /// The next read token; or <c>null</c> if the end of template was reached.
+        /// </returns>
         public Token ReadNext()
         {
             return ReadNextInternal();
@@ -486,22 +559,24 @@ namespace XtraLiteTemplates.Parsing
 
         #region IDisposable implementation
 
+        /// <summary>
+        /// Finalizes this instance of the <see cref="Tokenizer"/> class.
+        /// </summary>
         ~Tokenizer ()
         {
-            this.Dispose(false);
+            this.Dispose();
         }
 
-        public void Dispose(bool disposing)
+        /// <summary>
+        /// Disposes the input template reader.
+        /// </summary>
+        public void Dispose()
         {
-            if (disposing)
+            if (m_textReader != null)
             {
                 this.m_textReader.Dispose();
             }
-        }
 
-        public void Dispose()
-        {
-            this.Dispose(true);
             GC.SuppressFinalize(this);
         }
 

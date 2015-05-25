@@ -114,8 +114,8 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new ArithmeticNeutralOperator(typeConverter),
                 new ArithmeticSubtractOperator(typeConverter),
                 new ArithmeticSumOperator(typeConverter),
-                new IntegerRangeOperator(typeConverter),
-                new ValueFormatOperator(Culture, typeConverter),
+                new SequenceOperator(typeConverter),
+                new FormatOperator(Culture, typeConverter),
             };
         }
 

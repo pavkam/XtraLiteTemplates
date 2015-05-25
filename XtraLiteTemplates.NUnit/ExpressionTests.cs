@@ -70,8 +70,8 @@ namespace XtraLiteTemplates.NUnit
                 new ArithmeticNeutralOperator(TypeConverter),
                 new ArithmeticSubtractOperator(TypeConverter),
                 new ArithmeticSumOperator(TypeConverter),
-                new IntegerRangeOperator(TypeConverter),
-                new ValueFormatOperator(CultureInfo.InvariantCulture, TypeConverter),
+                new SequenceOperator(TypeConverter),
+                new FormatOperator(CultureInfo.InvariantCulture, TypeConverter),
             };
 
             var expression = new Expression(ExpressionFlowSymbols.Default, StringComparer.Ordinal);

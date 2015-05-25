@@ -36,58 +36,14 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
 
+    /// <summary>
+    /// Provides lex interpretation facilities. Instances of this class are used to interpret
+    /// sequences of <see cref="Lex" /> objects and assemble the final <see cref="IEvaluable" /> objects.
+    /// </summary>
     public sealed class Interpreter
     {
         private List<Directive> m_directives;
         private Lexer m_lexer;
-
-        public IEqualityComparer<string> Comparer
-        {
-            get
-            {
-                return m_lexer.Comparer;
-            }
-        }
-
-        public Interpreter(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<string> comparer)
-        {
-            Expect.NotNull("tokenizer", tokenizer);
-            Expect.NotNull("comparer", comparer);
-            Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
-
-            m_lexer = new Lexer(tokenizer, expressionFlowSymbols, comparer);
-            m_directives = new List<Directive>();
-        }
-
-        public Interpreter RegisterDirective(Directive directive)
-        {
-            Expect.NotNull("directive", directive);
-            Debug.Assert(directive.Tags.Any());
-
-            if (!m_directives.Contains(directive))
-            {
-                foreach (var tag in directive.Tags)
-                {
-                    m_lexer.RegisterTag(tag);
-                }
-
-                m_directives.Add(directive);
-            }
-
-            return this;
-        }
-
-        public Interpreter RegisterOperator(Operator @operator)
-        {
-            m_lexer.RegisterOperator(@operator);
-            return this;
-        }
-
-        public Interpreter RegisterSpecial(string keyword, object value)
-        {
-            m_lexer.RegisterSpecial(keyword, value);
-            return this;
-        }
 
         private void Interpret(CompositeNode compositeNode)
         {
@@ -151,7 +107,7 @@ namespace XtraLiteTemplates.Evaluation
                     if (!directiveNode.CandidateDirectiveLockedIn)
                     {
                         Interpret(directiveNode);
-                        
+
                         if (!directiveNode.CandidateDirectiveLockedIn)
                         {
                             /* Expecting all child directives to have locked in. Otherwise they weren't closed! */
@@ -162,6 +118,96 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
+
+        /// <summary>
+        /// Gets the comparer used for keyword and identifier comparison.
+        /// </summary>
+        /// <value>
+        /// The keyword and identifier comparer.
+        /// </value>
+        /// <remarks>
+        /// Value of this property is specified by the caller at construction time.
+        /// </remarks>
+        public IEqualityComparer<string> Comparer
+        {
+            get
+            {
+                return m_lexer.Comparer;
+            }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Interpreter"/> class.
+        /// </summary>
+        /// <param name="tokenizer">The tokenizer.</param>
+        /// <param name="expressionFlowSymbols">The expression flow symbols.</param>
+        /// <param name="comparer">The keyword and identifier comparer.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="tokenizer"/> or <paramref name="expressionFlowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
+        public Interpreter(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<string> comparer)
+        {
+            Expect.NotNull("tokenizer", tokenizer);
+            Expect.NotNull("comparer", comparer);
+            Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
+
+            m_lexer = new Lexer(tokenizer, expressionFlowSymbols, comparer);
+            m_directives = new List<Directive>();
+        }
+
+        /// <summary>
+        /// Registers a directive with this interpreter instance.
+        /// </summary>
+        /// <param name="directive">The directive to register.</param>
+        /// <returns>This interpreter instance.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="directive"/> is <c>null</c>.</exception>
+        public Interpreter RegisterDirective(Directive directive)
+        {
+            Expect.NotNull("directive", directive);
+            Debug.Assert(directive.Tags.Any());
+
+            if (!m_directives.Contains(directive))
+            {
+                foreach (var tag in directive.Tags)
+                {
+                    m_lexer.RegisterTag(tag);
+                }
+
+                m_directives.Add(directive);
+            }
+
+            return this;
+        }
+
+        /// <summary>
+        /// Registers an operator with this interpreter instance.
+        /// </summary>
+        /// <param name="operator">The operator to register.</param>
+        /// <returns>This interpreter instance.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="operator"/> is <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException">The symbol used by <paramref name="operator"/> is already registered with the interpreter.</exception>
+        public Interpreter RegisterOperator(Operator @operator)
+        {
+            m_lexer.RegisterOperator(@operator);
+            return this;
+        }
+
+        /// <summary>
+        /// Registers a special constant with this interpreter.
+        /// </summary>
+        /// <param name="keyword">The constant name.</param>
+        /// <param name="value">The constant value.</param>
+        /// <returns>This interpreter instance.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="keyword"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="keyword"/> is empty.</exception>
+        public Interpreter RegisterSpecial(string keyword, object value)
+        {
+            m_lexer.RegisterSpecial(keyword, value);
+            return this;
+        }
+
+        /// <summary>
+        /// Compiles a template supplied by the <see cref="ITokenizer"/> instance offered at construction time.
+        /// </summary>
+        /// <returns>An evaluable object.</returns>
         public IEvaluable Construct()
         {
             var document = new TemplateDocument();

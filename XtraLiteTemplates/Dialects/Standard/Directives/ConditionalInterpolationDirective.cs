@@ -36,12 +36,27 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The conditional interpolation directive implementation.
+    /// </summary>
     public sealed class ConditionalInterpolationDirective : StandardDirective
     {
         private int m_interpolatedExpressionIndex;
         private int m_conditionalExpressionIndex;
 
-        public ConditionalInterpolationDirective(String markup, bool invertExpressionOrder, IPrimitiveTypeConverter typeConverter)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConditionalInterpolationDirective" /> class.
+        /// </summary>
+        /// <param name="markup">The tag markup.</param>
+        /// <param name="invertExpressionOrder">If set to <c>true</c> the conditional expression is expected to follow before the interpolated expression.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="InvalidOperationException">Argument <paramref name="markup" /> does not correspond to the expressed rules.</exception>
+        /// <exception cref="System.FormatException">Argument <paramref name="markup" /> cannot be parsed.</exception>
+        /// <remarks>
+        /// The <paramref name="markup" /> is expected to contain exactly two expression components; one is the conditional expression, and the second
+        /// one is the interpolated expression.
+        /// </remarks>
+        public ConditionalInterpolationDirective(string markup, bool invertExpressionOrder, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(markup))
         {
             Debug.Assert(Tags.Count == 1);
@@ -65,11 +80,27 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ConditionalInterpolationDirective"/> class using the standard markup {$ IF $}.
+        /// The first expression is the interpolation expression followed by the conditional expression.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
         public ConditionalInterpolationDirective(IPrimitiveTypeConverter typeConverter)
             : this("$ IF $", false, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Executes the current directive.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag that triggered the execution.</param>
+        /// <param name="components">The tag components as provided by the lexical analyzer.</param>
+        /// <param name="state">A general-purpose state object. Initially set to <c>null</c>.</param>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="text">Contains the value of the interpolated expression after execution.</param>
+        /// <returns>
+        /// In the current implementation always equal to <see cref="Directive.FlowDecision.Terminate"/>.
+        /// </returns>
         protected internal override FlowDecision Execute(
             int tagIndex, 
             object[] components,

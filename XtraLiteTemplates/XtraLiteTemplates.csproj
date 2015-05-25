@@ -41,7 +41,7 @@
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
     <Compile Include="Dialects\Standard\IObjectFormatter.cs" />
-    <Compile Include="Dialects\Standard\Operators\ValueFormatOperator.cs" />
+    <Compile Include="Dialects\Standard\Operators\FormatOperator.cs" />
     <Compile Include="Expressions\Nodes\PermittedContinuations.cs" />
     <Compile Include="Expressions\Nodes\LiteralNode.cs" />
     <Compile Include="Expressions\Nodes\ReferenceNode.cs" />
@@ -57,7 +57,7 @@
     <Compile Include="Expressions\IExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\ExpressionFormatStyle.cs" />
     <Compile Include="Expressions\Nodes\OperatorNode.cs" />
-    <Compile Include="Dialects\Standard\Operators\IntegerRangeOperator.cs" />
+    <Compile Include="Dialects\Standard\Operators\SequenceOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\BitwiseAndOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\BitwiseOrOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\BitwiseNotOperator.cs" />

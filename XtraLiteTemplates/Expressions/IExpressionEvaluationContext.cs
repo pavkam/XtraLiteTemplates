@@ -28,18 +28,69 @@ namespace XtraLiteTemplates.Expressions
 {
     using System;
 
+    /// <summary>
+    /// Defines a standard set of behaviors that have to be implemented by an expression evaluation context.
+    /// </summary>
     public interface IExpressionEvaluationContext
     {
+        /// <summary>
+        /// Sets the value of a variable.
+        /// </summary>
+        /// <param name="identifier">The variable name.</param>
+        /// <param name="value">The variable value.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="identifier"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="identifier"/> is not a valid identifier.</exception>
         void SetVariable(string identifier, object value);
 
+        /// <summary>
+        /// Gets the value of a variable.
+        /// </summary>
+        /// <param name="identifier">The variable name.</param>
+        /// <returns>The variable value.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="identifier" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="identifier" /> is not a valid identifier.</exception>
         object GetVariable(string identifier);
 
+        /// <summary>
+        /// Gets the value of an object's property.
+        /// </summary>
+        /// <param name="variable">The variable.</param>
+        /// <param name="memberName">Name of the property to read.</param>
+        /// <returns>The value of the property.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="memberName" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="memberName" /> is not a valid identifier.</exception>
         object GetProperty(object variable, string memberName);
 
+        /// <summary>
+        /// Adds a state object.
+        /// </summary>
+        /// <param name="state">The state object to add.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
+        /// <remarks>
+        /// State objects can represent anything and are a simple way of storing state information for special operators
+        /// or directives.
+        /// </remarks>
         void AddStateObject(object state);
 
+        /// <summary>
+        /// Removes a state object.
+        /// </summary>
+        /// <param name="state">The state object to remove.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
+        /// <remarks>
+        /// State objects can represent anything and are a simple way of storing state information for special operators
+        /// or directives.
+        /// </remarks>
         void RemoveStateObject(object state);
 
+        /// <summary>
+        /// Determines whether a given state object was regustered in this context.
+        /// </summary>
+        /// <param name="state">The state object to check for.</param>
+        /// <returns>
+        ///   <c>true</c> if the state object was added; <c>false</c> otherwise.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
         bool ContainsStateObject(object state);
     }
 }

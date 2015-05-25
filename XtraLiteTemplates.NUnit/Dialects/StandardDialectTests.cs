@@ -147,9 +147,9 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.AreEqual("-", @operator.ToString());
                 else if (@operator is ArithmeticSumOperator)
                     Assert.AreEqual("+", @operator.ToString());
-                else if (@operator is IntegerRangeOperator)
+                else if (@operator is SequenceOperator)
                     Assert.AreEqual("..", @operator.ToString());
-                else if (@operator is ValueFormatOperator)
+                else if (@operator is FormatOperator)
                     Assert.AreEqual(":", @operator.ToString());
                 else
                     Assert.Fail();

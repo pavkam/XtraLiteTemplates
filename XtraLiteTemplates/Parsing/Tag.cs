@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.Parsing
         private const char MarkupIdentifierGroupStartCharacter = '(';
         private const char MarkupIdentifierGroupEndCharacter = ')';
 
-        public static string AsIdentifier(string candidate)
+        private static string AsIdentifier(string candidate)
         {
             if (candidate != null)
                 candidate = candidate.Trim();

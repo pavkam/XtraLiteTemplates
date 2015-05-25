@@ -35,10 +35,24 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The REAPEAT directive implementation.
+    /// </summary>
     public sealed class RepeatDirective : StandardDirective
     {
         private int m_expressionIndex;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RepeatDirective" /> class.
+        /// </summary>
+        /// <param name="startTagMarkup">The start tag markup.</param>
+        /// <param name="endTagMarkup">The end tag markup.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="InvalidOperationException">Argument <paramref name="startTagMarkup" /> does not correspond to the expressed rules.</exception>
+        /// <exception cref="System.FormatException">Argument <paramref name="startTagMarkup" /> or <paramref name="endTagMarkup" /> cannot be parsed.</exception>
+        /// <remarks>
+        /// The <paramref name="startTagMarkup" /> is expected to contain exactly one expression component - the iteration count expression.
+        /// </remarks>
         public RepeatDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
@@ -54,11 +68,30 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             m_expressionIndex = expressionComponents[0];
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="RepeatDirective"/> class using the standard markup {REPEAT $ TIMES}...{END}.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
         public RepeatDirective(IPrimitiveTypeConverter typeConverter) :
             this("REPEAT $ TIMES", "END", typeConverter)
         {
         }
 
+        /// <summary>
+        /// Executes the current directive.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag that triggered the execution.</param>
+        /// <param name="components">The tag components as provided by the lexical analyzer.</param>
+        /// <param name="state">A general-purpose state object. Initially set to <c>null</c>.</param>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="text">Always <c>null</c>.</param>
+        /// <returns>
+        /// A value indicating the next step for the evaluation environment.
+        /// </returns>
+        /// <remarks>
+        /// The directive executes the number times specified by the expression's evaluated value. If the evaluated integer is less than or equal to zero
+        /// then the execution is terminated immediately.
+        /// </remarks>
         protected internal override FlowDecision Execute(
             int tagIndex, 
             object[] components, 

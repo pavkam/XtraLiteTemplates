@@ -26,10 +26,24 @@
 
 namespace XtraLiteTemplates.Expressions
 {
+    /// <summary>
+    /// Defines the types of formatting that can be applied to an expression.
+    /// </summary>
     public enum ExpressionFormatStyle
     {
+        /// <summary>
+        /// Arithmetic formatting. This is the default and is usually the most human-friendly formatting.
+        /// </summary>
         Arithmetic,
+
+        /// <summary>
+        /// Polish notation formatting.
+        /// </summary>
         Polish,
+
+        /// <summary>
+        /// A special formatting mostly used for testing purposes.
+        /// </summary>
         Canonical,
     }
 }

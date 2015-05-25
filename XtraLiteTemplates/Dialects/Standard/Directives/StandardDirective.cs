@@ -42,8 +42,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     {
         /// <summary>
         /// Gets the type converter used to convert to primitive types.
-        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// </summary>
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// <value>
         /// The type converter.
         /// </value>

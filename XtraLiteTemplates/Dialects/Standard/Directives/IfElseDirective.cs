@@ -36,10 +36,25 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The IF - ELSE directive implementation.
+    /// </summary>
     public sealed class IfElseDirective : StandardDirective
     {
         private int m_expressionIndex;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IfElseDirective" /> class.
+        /// </summary>
+        /// <param name="startTagMarkup">The start tag markup.</param>
+        /// <param name="midTagMarkup">The mid tag markup.</param>
+        /// <param name="endTagMarkup">The end tag markup.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="InvalidOperationException">Argument <paramref name="startTagMarkup" /> does not correspond to the expressed rules.</exception>
+        /// <exception cref="System.FormatException">Argument <paramref name="startTagMarkup" /> or <paramref name="midTagMarkup" /> or <paramref name="endTagMarkup" /> cannot be parsed.</exception>
+        /// <remarks>
+        /// The <paramref name="startTagMarkup" /> is expected to contain exactly one expression components - the conditional expression.
+        /// </remarks>
         public IfElseDirective(string startTagMarkup, string midTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(midTagMarkup), Tag.Parse(endTagMarkup))
         {
@@ -55,11 +70,30 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             m_expressionIndex = expressionComponents[0];
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="IfElseDirective" /> class using the standard markup {IF $ THEN}...{ELSE}...{END}.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
         public IfElseDirective(IPrimitiveTypeConverter typeConverter)
             : this("IF $ THEN", "ELSE", "END", typeConverter)
         {
         }
 
+        /// <summary>
+        /// Executes the current directive.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag that triggered the execution.</param>
+        /// <param name="components">The tag components as provided by the lexical analyzer.</param>
+        /// <param name="state">A general-purpose state object. Initially set to <c>null</c>.</param>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="text">Always <c>null</c>.</param>
+        /// <returns>
+        /// A value indicating the next step for the evaluation environment.
+        /// </returns>
+        /// <remarks>
+        /// If the expression evaluates to <c>true</c>, the contents between the first and the middle tag are evaluated, other wise the contants between the middle
+        /// and the end tag are evaluated.
+        /// </remarks>
         protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state, IExpressionEvaluationContext context, out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 2);

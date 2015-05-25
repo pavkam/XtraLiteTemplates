@@ -36,10 +36,23 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The "keep formatting" directive implementation. This is a special directive that simply
+    /// registers a given state object that can be later queried for.
+    /// </summary>
     public sealed class PreFormattedUnparsedTextDirective : StandardDirective    
     {
         private object m_stateObject;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PreFormattedUnparsedTextDirective" /> class.
+        /// </summary>
+        /// <param name="startTagMarkup">The start tag markup.</param>
+        /// <param name="endTagMarkup">The end tag markup.</param>
+        /// <param name="stateObject">The state object to register.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="FormatException">Argument <paramref name="startTagMarkup" /> or <paramref name="endTagMarkup" /> cannot be parsed.</exception>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="stateObject" /> is <c>null</c>.</exception>
         public PreFormattedUnparsedTextDirective(string startTagMarkup, string endTagMarkup, object stateObject, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
@@ -50,11 +63,31 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             m_stateObject = stateObject;
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="PreFormattedUnparsedTextDirective" /> class using the standard markup {PREFORMATTED}...{END}.
+        /// </summary>
+        /// <param name="stateObject">The state object to register.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="stateObject" /> is <c>null</c>.</exception>
         public PreFormattedUnparsedTextDirective(object stateObject, IPrimitiveTypeConverter typeConverter)
             : this("PREFORMATTED", "END", stateObject, typeConverter)
         {
         }
 
+        /// <summary>
+        /// Executes the current directive.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag that triggered the execution.</param>
+        /// <param name="components">The tag components as provided by the lexical analyzer.</param>
+        /// <param name="state">A general-purpose state object. Initially set to <c>null</c>.</param>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="text">Always <c>null</c>.</param>
+        /// <returns>
+        /// A value indicating the next step for the evaluation environment.
+        /// </returns>
+        /// <remarks>
+        /// The directive always evaluates. Its sole purpose is to register a state object that is later queried by the corresponding evaluation context.
+        /// </remarks>
         protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
             IExpressionEvaluationContext context, out string text)
         {

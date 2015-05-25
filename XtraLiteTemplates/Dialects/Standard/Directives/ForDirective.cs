@@ -36,10 +36,24 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The FOR directive implementation.
+    /// </summary>
     public sealed class ForDirective : StandardDirective
     {
         private int m_expressionIndex;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ForDirective" /> class.
+        /// </summary>
+        /// <param name="startTagMarkup">The start tag markup.</param>
+        /// <param name="endTagMarkup">The end tag markup.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="InvalidOperationException">Argument <paramref name="startTagMarkup" /> does not correspond to the expressed rules.</exception>
+        /// <exception cref="System.FormatException">Argument <paramref name="startTagMarkup" /> or <paramref name="endTagMarkup" /> cannot be parsed.</exception>
+        /// <remarks>
+        /// The <paramref name="startTagMarkup" /> is expected to contain exactly one expression components - the conditional expression.
+        /// </remarks>
         public ForDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
@@ -55,11 +69,30 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             m_expressionIndex = expressionComponents[0];
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ForDirective"/> class using the standard markup {FOR $}...{END}.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
         public ForDirective(IPrimitiveTypeConverter typeConverter) :
             this("FOR $", "END", typeConverter)
         {
         }
 
+        /// <summary>
+        /// Executes the current directive.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag that triggered the execution.</param>
+        /// <param name="components">The tag components as provided by the lexical analyzer.</param>
+        /// <param name="state">A general-purpose state object. Initially set to <c>null</c>.</param>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="text">Always <c>null</c>.</param>
+        /// <returns>
+        /// A value indicating the next step for the evaluation environment.
+        /// </returns>
+        /// <remarks>
+        /// If the expression is evaluated to <c>null</c>, the directive does not evaluate. It evaluates once for non-sequences and once for each element if the
+        /// expression is a sequence.
+        /// </remarks>
         protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
             IExpressionEvaluationContext context, out string text)
         {

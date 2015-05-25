@@ -32,23 +32,68 @@ namespace XtraLiteTemplates.Expressions
     using XtraLiteTemplates.Expressions.Nodes;
     using XtraLiteTemplates.Expressions.Operators;
 
+    /// <summary>
+    /// Supplies a set of standard flow symbols used during the expression building process.
+    /// </summary>
     public sealed class ExpressionFlowSymbols
     {
+        /// <summary>
+        /// Gets the default set of expression flow symbols.
+        /// </summary>
+        /// <value>
+        /// The default set of symbols.
+        /// </value>
         public static ExpressionFlowSymbols Default { get; private set; }
 
+        /// <summary>
+        /// Initializes the static members of <see cref="ExpressionFlowSymbols"/> class.
+        /// </summary>
         static ExpressionFlowSymbols()
         {
             Default = new ExpressionFlowSymbols(",", ".", "(", ")");
         }
 
+        /// <summary>
+        /// Gets the group separator symbol.
+        /// </summary>
+        /// <value>
+        /// The group separator symbol.
+        /// </value>
         public string Separator { get; private set; }
 
+        /// <summary>
+        /// Gets the member access symbol.
+        /// </summary>
+        /// <value>
+        /// The member access symbol.
+        /// </value>
         public string MemberAccess { get; private set; }
 
+        /// <summary>
+        /// Gets the group open symbol.
+        /// </summary>
+        /// <value>
+        /// The group open symbol.
+        /// </value>
         public string GroupOpen { get; private set; }
 
+        /// <summary>
+        /// Gets the group close symbol.
+        /// </summary>
+        /// <value>
+        /// The group close symbol.
+        /// </value>
         public string GroupClose { get; private set; }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionFlowSymbols"/> class.
+        /// </summary>
+        /// <param name="separatorSymbol">The group separator symbol.</param>
+        /// <param name="memberAccessSymbol">The member access symbol.</param>
+        /// <param name="groupOpenSymbol">The group open symbol.</param>
+        /// <param name="groupCloseSymbol">The group close symbol.</param>
+        /// <exception cref="ArgumentNullException">One or more symbols are <c>null</c>.</exception>
+        /// <exception cref="InvalidOperationException">Some symbols are equal.</exception>
         public ExpressionFlowSymbols(
             string separatorSymbol,
             string memberAccessSymbol,

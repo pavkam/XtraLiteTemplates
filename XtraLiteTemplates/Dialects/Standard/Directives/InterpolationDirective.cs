@@ -36,10 +36,23 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
+    /// <summary>
+    /// The simple interpolation directive implementation.
+    /// </summary>
     public sealed class InterpolationDirective : StandardDirective
     {
         private int m_expressionIndex;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InterpolationDirective"/> class.
+        /// <remarks>
+        /// The <paramref name="tagMarkup"/> is expected to contain exactly obe expression component - the interpolated expression.
+        /// </remarks>
+        /// </summary>
+        /// <param name="tagMarkup">The tag markup.</param>
+        /// <param name="typeConverter">The type converter.</param>
+        /// <exception cref="InvalidOperationException">Argument <paramref name="tagMarkup"/> does not correspond to the expressed rules.</exception>
+        /// <exception cref="System.FormatException">Argument <paramref name="tagMarkup"/> cannot be parsed.</exception>
         public InterpolationDirective(string tagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(tagMarkup))
         {
@@ -55,11 +68,26 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             m_expressionIndex = expressionComponents[0];
         }
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="InterpolationDirective"/> class using the standard markup {$}.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
         public InterpolationDirective(IPrimitiveTypeConverter typeConverter)
             : this("$", typeConverter)
         {
         }
 
+        /// <summary>
+        /// Executes the current directive.
+        /// </summary>
+        /// <param name="tagIndex">The index of the tag that triggered the execution.</param>
+        /// <param name="components">The tag components as provided by the lexical analyzer.</param>
+        /// <param name="state">A general-purpose state object. Initially set to <c>null</c>.</param>
+        /// <param name="context">The evaluation context.</param>
+        /// <param name="text">Contains the value of the interpolated expression after execution.</param>
+        /// <returns>
+        /// In the current implementation always equal to <see cref="Directive.FlowDecision.Terminate" />.
+        /// </returns>
         protected internal override FlowDecision Execute(int tagIndex, object[] components,
             ref object state, IExpressionEvaluationContext context, out string text)
         {

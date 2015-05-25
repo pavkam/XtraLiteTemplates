@@ -182,7 +182,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .RegisterDirective(new ForEachDirective(TypeConverter))
-                .RegisterOperator(new IntegerRangeOperator(TypeConverter))
+                .RegisterOperator(new SequenceOperator(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Construct();
 
