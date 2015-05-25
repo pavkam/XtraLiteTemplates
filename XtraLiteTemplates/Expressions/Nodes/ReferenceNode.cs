@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
@@ -37,22 +35,22 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
     internal class ReferenceNode : LeafNode
     {
-        public String Identifier { get; private set; }
+        public string Identifier { get; private set; }
 
-        public ReferenceNode(ExpressionNode parent, String identifier)
+        public ReferenceNode(ExpressionNode parent, string identifier)
             : base(parent)
         {
-            Debug.Assert(!String.IsNullOrEmpty(identifier));
+            Debug.Assert(!string.IsNullOrEmpty(identifier));
 
             Identifier = identifier;
         }
 
-        public override String ToString(ExpressionFormatStyle style)
+        public override string ToString(ExpressionFormatStyle style)
         {
-            return String.Format("@{0}", Identifier);
+            return string.Format("@{0}", Identifier);
         }
 
-        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
+        protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
             Debug.Assert(reduceContext != null);
 
@@ -60,7 +58,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        protected override Func<IExpressionEvaluationContext, Object> Build()
+        protected override Func<IExpressionEvaluationContext, object> Build()
         {
             return context => context.GetVariable(Identifier);
         }

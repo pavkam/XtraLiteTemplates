@@ -39,7 +39,7 @@ namespace XtraLiteTemplates.Dialects
     using XtraLiteTemplates.Expressions.Operators;
 
     /// <summary>
-    /// Defines all the common properties and behaviours specific to a template language dialect.
+    /// Defines all the common properties and behaviors specific to a template language dialect.
     /// A dialect exposes any number of expression operators and directives; specifies all control characters and how
     /// text is parsed.
     /// <para>Check out the <seealso cref="XtraLiteTemplates.Dialects.Standard.StandardDialect"/> and <seealso cref="XtraLiteTemplates.Dialects.Standard.CodeMonkeyDialect"/> for specific implementations of this interface.</para>
@@ -47,7 +47,7 @@ namespace XtraLiteTemplates.Dialects
     public interface IDialect
     {
         /// <summary>
-        /// Specifies the <see cref="CultureInfo" /> object that drives the formatting and collation behaviour of the dialect.
+        /// Gets the <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.
         /// </summary>
         /// <value>
         /// The culture-specific properties.
@@ -55,7 +55,7 @@ namespace XtraLiteTemplates.Dialects
         CultureInfo Culture { get; }
 
         /// <summary>
-        /// Specifies the <see cref="IEqualityComparer{String}" /> object used to compare keywords and identifiers.
+        /// Gets the <see cref="IEqualityComparer{String}" /> object used to compare keywords and identifiers.
         /// </summary>
         /// <value>
         /// The identifier comparer.
@@ -63,7 +63,7 @@ namespace XtraLiteTemplates.Dialects
         IEqualityComparer<string> IdentifierComparer { get; }
 
         /// <summary>
-        /// Specifies the expression flow symbols used by expressions of this dialect.
+        /// Gets the expression flow symbols used by expressions of this dialect.
         /// </summary>
         /// <value>
         /// The flow symbols.
@@ -71,7 +71,7 @@ namespace XtraLiteTemplates.Dialects
         ExpressionFlowSymbols FlowSymbols { get; }
 
         /// <summary>
-        /// Lists all dialect supported expression operators.
+        /// Gets all dialect supported expression operators.
         /// </summary>
         /// <value>
         /// The operators.
@@ -79,7 +79,7 @@ namespace XtraLiteTemplates.Dialects
         IReadOnlyCollection<Operator> Operators { get; }
 
         /// <summary>
-        /// Lists all dialect supported directives.
+        /// Gets all dialect supported directives.
         /// </summary>
         /// <value>
         /// The directives.
@@ -87,7 +87,7 @@ namespace XtraLiteTemplates.Dialects
         IReadOnlyCollection<Directive> Directives { get; }
 
         /// <summary>
-        /// Lists all dialect supported special constants.
+        /// Gets all dialect supported special constants.
         /// </summary>
         /// <value>
         /// The special keywords.
@@ -106,7 +106,7 @@ namespace XtraLiteTemplates.Dialects
         string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText);
 
         /// <summary>
-        /// Specifies the tag start character (used by the tokenization process).
+        /// Gets the tag start character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The tag start character.
@@ -114,7 +114,7 @@ namespace XtraLiteTemplates.Dialects
         char StartTagCharacter { get; }
 
         /// <summary>
-        /// Specifies the tag end character (used by the tokenization process).
+        /// Gets the tag end character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The tag end character.
@@ -122,7 +122,7 @@ namespace XtraLiteTemplates.Dialects
         char EndTagCharacter { get; }
 
         /// <summary>
-        /// Specifies the string literal start character (used by the tokenization process).
+        /// Gets the string literal start character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The string literal start character.
@@ -130,7 +130,7 @@ namespace XtraLiteTemplates.Dialects
         char StartStringLiteralCharacter { get; }
 
         /// <summary>
-        /// Specifies the string literal end character (used by the tokenization process).
+        /// Gets the string literal end character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The string literal end character.
@@ -138,7 +138,7 @@ namespace XtraLiteTemplates.Dialects
         char EndStringLiteralCharacter { get; }
 
         /// <summary>
-        /// Specifies the string literal escape character (used by the tokenization process).
+        /// Gets the string literal escape character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The string literal escape character.
@@ -146,7 +146,7 @@ namespace XtraLiteTemplates.Dialects
         char StringLiteralEscapeCharacter { get; }
 
         /// <summary>
-        /// Specifies the number literal decimal separator character (used by the tokenization process).
+        /// Gets the number literal decimal separator character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The number literal decimal separator character.

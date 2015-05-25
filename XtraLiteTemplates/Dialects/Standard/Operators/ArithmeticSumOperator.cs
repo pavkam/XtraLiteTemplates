@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
@@ -69,7 +67,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// The evaluated object.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
+        public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
             Expect.NotNull("context", context);
 
@@ -77,14 +75,21 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             var rightType = TypeConverter.TypeOf(right);
 
             if (leftType == PrimitiveType.String || rightType == PrimitiveType.String)
+            {
                 return TypeConverter.ConvertToString(left) + TypeConverter.ConvertToString(right);
+            }
             else if (leftType == PrimitiveType.Number || rightType == PrimitiveType.Number)
+            {
                 return TypeConverter.ConvertToNumber(left) + TypeConverter.ConvertToNumber(right);
+            }
             else if (leftType == PrimitiveType.Boolean || rightType == PrimitiveType.Boolean)
+            {
                 return TypeConverter.ConvertToNumber(left) + TypeConverter.ConvertToNumber(right);
+            }
             else
+            {
                 return null;
+            }
         }
     }
 }
-

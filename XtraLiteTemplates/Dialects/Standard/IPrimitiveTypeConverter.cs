@@ -34,7 +34,7 @@ namespace XtraLiteTemplates.Dialects.Standard
 
     /// <summary>
     /// Common interface used by the standard dialects to facilitate type-conversion. Standard operators and directives
-    /// use this intreface to obtain the data type required for their correct operation.
+    /// use this interface to obtain the data type required for their correct operation.
     /// </summary>
     public interface IPrimitiveTypeConverter
     {
@@ -46,7 +46,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A <see cref="PrimitiveType" /> value.
         /// </returns>
-        PrimitiveType TypeOf(Object obj);
+        PrimitiveType TypeOf(object obj);
 
         /// <summary>
         /// Converts an object to a 32-bit integer.
@@ -58,7 +58,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A <see cref="Int32" /> value.
         /// </returns>
-        Int32 ConvertToInteger(Object obj);
+        int ConvertToInteger(object obj);
 
         /// <summary>
         /// Converts an object to a double-precision floating point number.
@@ -70,7 +70,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A <see cref="Double" /> value.
         /// </returns>
-        Double ConvertToNumber(Object obj);
+        double ConvertToNumber(object obj);
 
         /// <summary>
         /// Converts an object to its string representation.
@@ -82,7 +82,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A <see cref="String" /> value.
         /// </returns>
-        String ConvertToString(Object obj);
+        string ConvertToString(object obj);
 
         /// <summary>
         /// Converts an object to a boolean.
@@ -94,7 +94,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A <see cref="Boolean" /> value.
         /// </returns>
-        bool ConvertToBoolean(Object obj);
+        bool ConvertToBoolean(object obj);
 
         /// <summary>
         /// Converts an object to a sequence of objects.
@@ -106,6 +106,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// A <see cref="IEnumerable{Object}" /> value.
         /// </returns>
-        IEnumerable<Object> ConvertToSequence(Object obj);
+        IEnumerable<object> ConvertToSequence(object obj);
     }
 }

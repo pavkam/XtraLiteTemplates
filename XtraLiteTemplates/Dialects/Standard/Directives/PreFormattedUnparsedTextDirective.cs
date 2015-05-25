@@ -77,4 +77,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         }
     }
 }
-

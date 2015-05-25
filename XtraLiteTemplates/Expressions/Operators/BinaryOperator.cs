@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Operators
 {
@@ -53,7 +51,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
-        protected BinaryOperator(String symbol, Int32 precedence, Associativity associativity)
+        protected BinaryOperator(string symbol, int precedence, Associativity associativity)
             : base(symbol, precedence)
         {
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
@@ -68,7 +66,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="right">The right operand.</param>
         /// <returns>The evaluated object.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public abstract Object Evaluate(IExpressionEvaluationContext context, Object left, Object right);
+        public abstract object Evaluate(IExpressionEvaluationContext context, object left, object right);
 
         /// <summary>
         /// Tries to evaluate the current operator for a given <paramref name="left"/> operand.
@@ -79,7 +77,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="result">The result of the evaluation if the return value is <c>true</c>.</param>
         /// <returns><c>true</c> if the operation is supported; <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public virtual Boolean EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
+        public virtual bool EvaluateLhs(IExpressionEvaluationContext context, object left, out object result)
         {
             Expect.NotNull("context", context);
 

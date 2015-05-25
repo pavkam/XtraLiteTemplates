@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions
 {
@@ -32,13 +30,16 @@ namespace XtraLiteTemplates.Expressions
 
     public interface IExpressionEvaluationContext
     {
-        void SetVariable(String identifier, Object value);
-        Object GetVariable(String identifier);
+        void SetVariable(string identifier, object value);
 
-        Object GetProperty(Object variable, String memberName);
+        object GetVariable(string identifier);
 
-        void AddStateObject(Object state);
-        void RemoveStateObject(Object state);
-        Boolean ContainsStateObject(Object state);
+        object GetProperty(object variable, string memberName);
+
+        void AddStateObject(object state);
+
+        void RemoveStateObject(object state);
+
+        bool ContainsStateObject(object state);
     }
 }

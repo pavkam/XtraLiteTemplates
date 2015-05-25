@@ -57,7 +57,9 @@ namespace XtraLiteTemplates.Evaluation
             Debug.Assert(child.Parent == this);
 
             if (!m_children.Contains(child))
+            {
                 m_children.Add(child);
+            }
         }
 
         public virtual void Evaluate(TextWriter writer, IEvaluationContext context)
@@ -69,7 +71,9 @@ namespace XtraLiteTemplates.Evaluation
             {
                 var evaluable = child as IEvaluable;
                 if (evaluable != null)
+                {
                     evaluable.Evaluate(writer, context);
+                }
             }
         }
 
@@ -77,10 +81,11 @@ namespace XtraLiteTemplates.Evaluation
         {
             StringBuilder sb = new StringBuilder();
             foreach (var child in Children)
+            {
                 sb.Append(child.ToString());
+            }
 
-            return String.Format("({0})", sb.ToString());
+            return string.Format("({0})", sb.ToString());
         }
     }
 }
-

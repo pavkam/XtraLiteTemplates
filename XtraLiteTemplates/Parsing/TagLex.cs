@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -53,7 +51,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The matched tag's components.
         /// </value>
-        public Object[] Components { get; private set; }
+        public object[] Components { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="TagLex"/> class.
@@ -65,14 +63,14 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="ArgumentNullException">Argument <paramref name="tag"/> or <paramref name="components"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="components"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        public TagLex(Tag tag, Object[] components, Int32 firstCharacterIndex, Int32 originalLength)
+        public TagLex(Tag tag, object[] components, int firstCharacterIndex, int originalLength)
             : base(firstCharacterIndex, originalLength)
         {
             Expect.NotEmpty("components", components);
             Expect.NotNull("tag", tag);
 
-            Components = components;
-            Tag = tag;
+            this.Components = components;
+            this.Tag = tag;
         }
 
         /// <summary>
@@ -81,9 +79,9 @@ namespace XtraLiteTemplates.Parsing
         /// <returns>
         /// A string that represents the current lex object.
         /// </returns>
-        public override String ToString()
+        public override string ToString()
         {
-            return String.Join(" ", Components);
+            return string.Join(" ", Components);
         }
     }
 }

@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,8 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
-using System.Collections.Generic;
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -34,7 +31,8 @@ namespace XtraLiteTemplates.Parsing
     using System.Linq;
     using System.Diagnostics;
     using System.IO;
-using System.Globalization;
+    using System.Collections.Generic;
+    using System.Globalization;
 
     public sealed class Tokenizer : ITokenizer, IDisposable
     {
@@ -46,20 +44,20 @@ using System.Globalization;
 
         private ParserState m_parserState;
 
-        public Char TagStartCharacter { get; private set; }
+        public char TagStartCharacter { get; private set; }
 
-        public Char TagEndCharacter { get; private set; }
+        public char TagEndCharacter { get; private set; }
 
-        public Char StringLiteralStartCharacter { get; private set; }
+        public char StringLiteralStartCharacter { get; private set; }
 
-        public Char StringLiteralEndCharacter { get; private set; }
+        public char StringLiteralEndCharacter { get; private set; }
 
-        public Char StringLiteralEscapeCharacter { get; private set; }
+        public char StringLiteralEscapeCharacter { get; private set; }
 
-        public Char NumberLiteralDecimalSeparatorCharacter { get; private set; }
+        public char NumberLiteralDecimalSeparatorCharacter { get; private set; }
 
-        private void InitializeTokenizer(TextReader reader, Char tagStartCharacter, Char tagEndCharacter,
-            Char stringStartCharacter, Char stringEndCharacter, Char stringEscapeCharacter, Char numberDecimalSeparatorCharacter)
+        private void InitializeTokenizer(TextReader reader, char tagStartCharacter, char tagEndCharacter,
+            char stringStartCharacter, char stringEndCharacter, char stringEscapeCharacter, char numberDecimalSeparatorCharacter)
         {
             Expect.NotNull("reader", reader);
             Expect.NotEqual("tagStartCharacter", "tagEndCharacter", tagStartCharacter, tagEndCharacter);
@@ -98,8 +96,8 @@ using System.Globalization;
             this.m_currentCharacterIndex = -1;
         }
 
-        public Tokenizer(TextReader reader, Char tagStartCharacter, Char tagEndCharacter, Char stringStartCharacter, 
-            Char stringEndCharacter, Char stringEscapeCharacter, Char numberDecimalSeparatorCharacter)
+        public Tokenizer(TextReader reader, char tagStartCharacter, char tagEndCharacter, char stringStartCharacter,
+            char stringEndCharacter, char stringEscapeCharacter, char numberDecimalSeparatorCharacter)
         {
             InitializeTokenizer(reader, tagStartCharacter, tagEndCharacter,
                 stringStartCharacter, stringEndCharacter, stringEscapeCharacter, numberDecimalSeparatorCharacter);
@@ -111,16 +109,16 @@ using System.Globalization;
         }
 
         public Tokenizer(String text)
-            : this(new StringReader(text ?? String.Empty))
+            : this(new StringReader(text ?? string.Empty))
         {
         }
 
         private TextReader m_textReader;
-        private Int32 m_currentCharacterIndex;
-        private Boolean m_isEndOfStream;
-        private Char m_currentCharacter;
+        private int m_currentCharacterIndex;
+        private bool m_isEndOfStream;
+        private char m_currentCharacter;
 
-        private Char PeekCharacter()
+        private char PeekCharacter()
         {
             if (this.m_isEndOfStream)
                 ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
@@ -132,7 +130,7 @@ using System.Globalization;
                 ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex + 1);
             }
             else
-                return (Char)peekedCharacter;
+                return (char)peekedCharacter;
 
             Debug.Fail("PeekCharacter()");
             return '\0';
@@ -152,26 +150,26 @@ using System.Globalization;
                     ExceptionHelper.UnexpectedEndOfStream(this.m_currentCharacterIndex);
             }
             else
-                this.m_currentCharacter = (Char)readCharacter;
+                this.m_currentCharacter = (char)readCharacter;
 
             return !this.m_isEndOfStream;
         }
 
 
-        private Boolean IsTagSpecialCharacter(Char c)
+        private Boolean IsTagSpecialCharacter(char c)
         {
             return
                 c == TagStartCharacter || c == TagEndCharacter || 
                 c == StringLiteralStartCharacter || c == StringLiteralEndCharacter;
         }
 
-        private Boolean IsStandardSymbol(Char c)
+        private Boolean IsStandardSymbol(char c)
         {
             if (IsTagSpecialCharacter(c))
                 return false;
             else
             {
-                var unicodeCategory = Char.GetUnicodeCategory(c);
+                var unicodeCategory = char.GetUnicodeCategory(c);
                 return
                     (unicodeCategory == UnicodeCategory.OtherPunctuation ||
                      unicodeCategory == UnicodeCategory.CurrencySymbol ||
@@ -190,7 +188,7 @@ using System.Globalization;
                 return null;
 
             var tokenValue = new StringBuilder();
-            Int32 tokenStartIndex = this.m_currentCharacterIndex;
+            var tokenStartIndex = this.m_currentCharacterIndex;
 
             if (this.m_parserState == ParserState.InTag && this.m_currentCharacter == this.TagEndCharacter)
             {
@@ -355,16 +353,16 @@ using System.Globalization;
                         tokenStartIndex, 
                         this.m_currentCharacterIndex - tokenStartIndex);
                 }
-                else if (Char.IsDigit(this.m_currentCharacter))
+                else if (char.IsDigit(this.m_currentCharacter))
                 {
                     /* Number has started. */
-                    while (Char.IsDigit(this.m_currentCharacter))
+                    while (char.IsDigit(this.m_currentCharacter))
                     {
                         tokenValue.Append(this.m_currentCharacter);
                         this.NextCharacter(true);
                     }
 
-                    if (this.m_currentCharacter == this.NumberLiteralDecimalSeparatorCharacter && Char.IsDigit(PeekCharacter()))
+                    if (this.m_currentCharacter == this.NumberLiteralDecimalSeparatorCharacter && char.IsDigit(PeekCharacter()))
                     {
                         /* This is a Decimal point. Read the remaining bits. */
                         tokenValue.Append(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
@@ -425,10 +423,10 @@ using System.Globalization;
                             this.m_currentCharacterIndex - tokenStartIndex);
                     }
                 }
-                else if (Char.IsWhiteSpace(this.m_currentCharacter))
+                else if (char.IsWhiteSpace(this.m_currentCharacter))
                 {
                     /* Whitespace... */
-                    while (Char.IsWhiteSpace(this.m_currentCharacter))
+                    while (char.IsWhiteSpace(this.m_currentCharacter))
                     {
                         tokenValue.Append(this.m_currentCharacter);
                         this.NextCharacter(true);
@@ -459,7 +457,7 @@ using System.Globalization;
                             if (this.m_currentCharacter == NumberLiteralDecimalSeparatorCharacter)
                             {
                                 /* Decimal separator. Special case. Peek the next char to see if its a digit. */
-                                if (Char.IsDigit(PeekCharacter()))
+                                if (char.IsDigit(PeekCharacter()))
                                     break;
                             }
 
@@ -493,7 +491,7 @@ using System.Globalization;
             this.Dispose(false);
         }
 
-        public void Dispose(Boolean disposing)
+        public void Dispose(bool disposing)
         {
             if (disposing)
             {

@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -40,7 +38,7 @@ namespace XtraLiteTemplates.Parsing
         /// <summary>
         /// <value>The index of the character where the parsing error occured.</value>
         /// </summary>
-        public Int32 CharacterIndex { get; private set; }
+        public int CharacterIndex { get; private set; }
 
         /// <summary>
         /// Creates a new instance of <see cref="XtraLiteTemplates.Parsing.ParseException" /> class.
@@ -49,8 +47,8 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="characterIndex">The index of the character where the parsing error occured.</param>
         /// <param name="format">A format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal ParseException(Exception innerException, Int32 characterIndex, String format, params Object[] args)
-            : base(String.Format(format, args), innerException)
+        internal ParseException(Exception innerException, int characterIndex, string format, params object[] args)
+            : base(string.Format(format, args), innerException)
         {
             Debug.Assert(characterIndex >= 0);
             this.CharacterIndex = characterIndex;

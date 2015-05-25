@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Evaluation
 {
@@ -47,17 +45,20 @@ namespace XtraLiteTemplates.Evaluation
         protected internal enum FlowDecision
         {
             /// <summary>
-            /// Terminate execution of diretive immediately after.
+            /// Terminate execution of directive immediately after.
             /// </summary>
             Terminate,
+
             /// <summary>
             /// Restart the execution of the directive immediately by jumping to the first tag.
             /// </summary>
             Restart,
+
             /// <summary>
-            /// Evaluate the all child directives and uparsed text blocks between the current tag and the following one.
+            /// Evaluate the all child directives and unparsed text blocks between the current tag and the following one.
             /// </summary>
             Evaluate,
+
             /// <summary>
             /// Skip directly to the next following tag in the directive.
             /// </summary>
@@ -73,7 +74,6 @@ namespace XtraLiteTemplates.Evaluation
                 return m_tags;
             }
         }
-
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Directive"/> class.
@@ -91,7 +91,9 @@ namespace XtraLiteTemplates.Evaluation
                 Expect.NotNull("tag", tag);
 
                 if (tag.ComponentCount == 0)
+                {
                     ExceptionHelper.CannotRegisterTagWithNoComponents();
+                }
             }
 
             m_tags = new List<Tag>(tags);
@@ -103,13 +105,15 @@ namespace XtraLiteTemplates.Evaluation
         /// <returns>
         /// A string that represents the current directive.
         /// </returns>
-        public override String ToString()
+        public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             foreach (var tag in m_tags)
             {
                 if (sb.Length > 0)
+                {
                     sb.Append("...");
+                }
 
                 sb.AppendFormat("{{{0}}}", tag.ToString());
             }
@@ -128,20 +132,26 @@ namespace XtraLiteTemplates.Evaluation
         /// <returns>
         ///   <c>true</c> if the specified object is equal to the current directive; otherwise, <c>false</c>.
         /// </returns>
-        public Boolean Equals(Object obj, IEqualityComparer<String> comparer)
+        public Boolean Equals(object obj, IEqualityComparer<string> comparer)
         {
             Expect.NotNull("comparer", comparer);
 
             var directiveObj = obj as Directive;
             if (directiveObj == null || directiveObj.m_tags.Count != directiveObj.m_tags.Count)
+            {
                 return false;
+            }
             else if (directiveObj == this)
+            {
                 return true;
+            }
 
             for (var i = 0; i < m_tags.Count; i++)
             {
                 if (!m_tags[i].Equals(directiveObj.m_tags[i], comparer))
+                {
                     return false;
+                }
             }
 
             return true;
@@ -157,7 +167,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <returns>
         /// <c>true</c> if the specified object is equal to the current directive; otherwise, <c>false</c>.
         /// </returns>
-        public override Boolean Equals(Object obj)
+        public override bool Equals(object obj)
         {
             return Equals(obj, StringComparer.CurrentCulture);
         }
@@ -169,7 +179,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <returns>
         /// A hash code for the current directive object.
         /// </returns>
-        public Int32 GetHashCode(IEqualityComparer<String> comparer)
+        public Int32 GetHashCode(IEqualityComparer<string> comparer)
         {
             Expect.NotNull("comparer", comparer);
 
@@ -177,7 +187,9 @@ namespace XtraLiteTemplates.Evaluation
             unchecked
             {
                 foreach (var tag in Tags)
-                    hash = hash * 51 + tag.GetHashCode(comparer);
+                {
+                    hash = (hash * 51) + tag.GetHashCode(comparer);
+                }
             }
 
             return hash;
@@ -189,13 +201,13 @@ namespace XtraLiteTemplates.Evaluation
         /// <returns>
         /// A hash code for the current directive object.
         /// </returns>
-        public override Int32 GetHashCode()
+        public override int GetHashCode()
         {
             return GetHashCode(StringComparer.CurrentCulture);
         }
 
         /// <summary>
-        /// Executes the current directive. This method can be invoken multiple times by the evaluation environment depending on
+        /// Executes the current directive. This method can be invoked multiple times by the evaluation environment depending on
         /// the particular directive implementation.
         /// </summary>
         /// <param name="tagIndex">The index of the tag that triggered the execution.</param>
@@ -204,8 +216,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="context">The evaluation context.</param>
         /// <param name="text">An optional text generated by the directive.</param>
         /// <returns>A value indicating the next step for the evaluation environment.</returns>
-        protected internal abstract FlowDecision Execute(Int32 tagIndex, Object[] components, 
-            ref Object state, IExpressionEvaluationContext context, out String text);
+        protected internal abstract FlowDecision Execute(int tagIndex, object[] components,
+            ref object state, IExpressionEvaluationContext context, out string text);
     }
 }
-

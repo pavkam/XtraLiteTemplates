@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
@@ -59,7 +57,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
-        public Boolean Closed { get; private set; }
+        public bool Closed { get; private set; }
 
         public RootNode(ExpressionNode parent)
             : base(parent)
@@ -99,24 +97,24 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
-        public override String ToString(ExpressionFormatStyle style)
+        public override string ToString(ExpressionFormatStyle style)
         {
-            String result = String.Join(" , ", m_children.Select(s => s.ToString(style)));
+            var result = string.Join(" , ", m_children.Select(s => s.ToString(style)));
 
             if (Parent != null)
             {
                 if (style == ExpressionFormatStyle.Canonical)
-                    result = String.Format("(){{{0}}}", result);
+                    result = string.Format("(){{{0}}}", result);
                 else if (style == ExpressionFormatStyle.Arithmetic)
-                    result = String.Format("( {0} )", result);
+                    result = string.Format("( {0} )", result);
                 else if (style == ExpressionFormatStyle.Polish)
-                    result = String.Format("({0})", result);
+                    result = string.Format("({0})", result);
             }
 
             return result;
         }
 
-        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object reducedValue)
+        protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)
         {
             Debug.Assert(reduceContext != null);
 
@@ -130,7 +128,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
             else
             {
-                Boolean allReduced = true;
+                var allReduced = true;
                 foreach (var child in m_children)
                     allReduced &= child.Reduce(reduceContext);
 
@@ -145,7 +143,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        protected override Func<IExpressionEvaluationContext, Object> Build()
+        protected override Func<IExpressionEvaluationContext, object> Build()
         {
             var childFuncs = m_children.Select(s => s.GetEvaluationFunction()).ToArray();
 
@@ -159,7 +157,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             {
                 return context =>
                 {
-                    Object[] array = new Object[childFuncs.Length];
+                    object[] array = new object[childFuncs.Length];
                     for (var i = 0; i < childFuncs.Length; i++)
                         array[i] = childFuncs[i](context);
 

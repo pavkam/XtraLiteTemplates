@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -40,26 +38,27 @@ namespace XtraLiteTemplates.Parsing
     /// </summary>
     public sealed class Tag
     {
-        private const String MarkupExpressionWord = "$";
-        private const String MarkupAnyIdentifierWord = "?";
-        private const Char MarkupIdentifierGroupStartCharacter = '(';
-        private const Char MarkupIdentifierGroupEndCharacter = ')';
-        public static String AsIdentifier(String candidate)
+        private const string MarkupExpressionWord = "$";
+        private const string MarkupAnyIdentifierWord = "?";
+        private const char MarkupIdentifierGroupStartCharacter = '(';
+        private const char MarkupIdentifierGroupEndCharacter = ')';
+
+        public static string AsIdentifier(string candidate)
         {
             if (candidate != null)
                 candidate = candidate.Trim();
 
             var isValid =
-                !String.IsNullOrEmpty(candidate) &&
-                (Char.IsLetter(candidate[0]) || candidate[0] == '_') &&
-                candidate.All(c => Char.IsLetterOrDigit(c) || c == '_');
+                !string.IsNullOrEmpty(candidate) &&
+                (char.IsLetter(candidate[0]) || candidate[0] == '_') &&
+                candidate.All(c => char.IsLetterOrDigit(c) || c == '_');
 
             return isValid ? candidate : null;
         }
 
-        private readonly IList<Object> m_components;
+        private readonly IList<object> m_components;
 
-        private Boolean LastComponentIsExpression
+        private bool LastComponentIsExpression
         {
             get
             {
@@ -67,44 +66,44 @@ namespace XtraLiteTemplates.Parsing
             }
         }
 
-        internal Boolean MatchesKeyword(Int32 index, IEqualityComparer<String> comparer, String keyword)
+        internal bool MatchesKeyword(int index, IEqualityComparer<string> comparer, string keyword)
         {
             Debug.Assert(comparer != null);
-            Debug.Assert(!String.IsNullOrEmpty(keyword));
+            Debug.Assert(!string.IsNullOrEmpty(keyword));
 
             if (index < 0 || index >= m_components.Count || m_components[index] == null)
                 return false;
 
-            String stringComponent = m_components[index] as String;
+            var stringComponent = m_components[index] as string;
             return comparer.Equals(stringComponent, keyword);
         }
 
-        internal Boolean MatchesIdentifier(Int32 index, IEqualityComparer<String> comparer, String identifier)
+        internal bool MatchesIdentifier(int index, IEqualityComparer<string> comparer, string identifier)
         {
             Debug.Assert(comparer != null);
-            Debug.Assert(!String.IsNullOrEmpty(identifier));
+            Debug.Assert(!string.IsNullOrEmpty(identifier));
 
             if (index < 0 || index >= m_components.Count || m_components[index] == null)
                 return false;
 
-            var stringComponent = m_components[index] as String;
+            var stringComponent = m_components[index] as string;
             if (stringComponent != null)
-                return stringComponent == String.Empty;
+                return stringComponent == string.Empty;
 
-            String[] _identifiers = m_components[index] as String[];
+            var _identifiers = m_components[index] as String[];
             return _identifiers.Any(i => comparer.Equals(i, identifier));
         }
 
-        internal Boolean MatchesAnyIdentifier(Int32 index)
+        internal bool MatchesAnyIdentifier(int index)
         {
             if (index < 0 || index >= m_components.Count || m_components[index] == null)
                 return false;
 
-            var stringComponent = m_components[index] as String;
-            return stringComponent == String.Empty;
+            var stringComponent = m_components[index] as string;
+            return stringComponent == string.Empty;
         }
 
-        internal Boolean MatchesExpression(Int32 index)
+        internal bool MatchesExpression(int index)
         {
             return index >= 0 && index < m_components.Count && m_components[index] == null;
         }
@@ -115,7 +114,7 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         public Tag()
         {
-            m_components = new List<Object>();
+            m_components = new List<object>();
         }
 
         /// <summary>
@@ -125,7 +124,7 @@ namespace XtraLiteTemplates.Parsing
         /// <returns>This tag instance.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="keyword"/> is <c>null</c>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="keyword"/> is not a valid identifier.</exception>
-        public Tag Keyword(String keyword)
+        public Tag Keyword(string keyword)
         {
             Expect.Identifier("keyword", keyword);
 
@@ -143,7 +142,7 @@ namespace XtraLiteTemplates.Parsing
             if (m_components.Count > 0 && m_components[m_components.Count - 1] == null)
                 ExceptionHelper.TagAnyIndentifierCannotFollowExpression();
 
-            m_components.Add(String.Empty);
+            m_components.Add(string.Empty);
             return this;
         }
 
@@ -156,7 +155,7 @@ namespace XtraLiteTemplates.Parsing
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="candidates" /> or any of its elements are <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="candidates" /> is <c>empty</c> or any of its elements is not a valid identifier.</exception>
-        public Tag Identifier(params String[] candidates)
+        public Tag Identifier(params string[] candidates)
         {
             Expect.NotEmpty("candidates", candidates);
 
@@ -190,10 +189,10 @@ namespace XtraLiteTemplates.Parsing
         /// <returns>
         /// A string that represents the current object.
         /// </returns>
-        public override String ToString()
+        public override string ToString()
         {
             if (m_components.Count == 0)
-                return String.Empty;
+                return string.Empty;
             else
             {
                 StringBuilder sb = new StringBuilder();
@@ -204,14 +203,14 @@ namespace XtraLiteTemplates.Parsing
 
                     if (component == null)
                         sb.Append(MarkupExpressionWord);
-                    else if (component == (Object)String.Empty)
+                    else if (component == (object)string.Empty)
                         sb.Append(MarkupAnyIdentifierWord);
-                    else if (component is String)
+                    else if (component is string)
                         sb.Append(component);
                     else
                     {
                         sb.AppendFormat("{0}{1}{2}", MarkupIdentifierGroupStartCharacter,
-                            String.Join(" ", (component as String[])), MarkupIdentifierGroupEndCharacter);
+                            string.Join(" ", (component as string[])), MarkupIdentifierGroupEndCharacter);
                     }
                 }
 
@@ -225,20 +224,20 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="markup">The markup string.</param>
         /// <param name="result">The built tag object, if the parsing succeeded.</param>
         /// <returns><c>true</c> if the parsing was successful; or <c>false</c> otherwise.</returns>
-        public static Boolean TryParse(String markup, out Tag result)
+        public static bool TryParse(string markup, out Tag result)
         {
             result = null;
-            if (String.IsNullOrEmpty(markup))
+            if (string.IsNullOrEmpty(markup))
                 return false;
 
             /* Parse the markup */
-            Tag beingBuilt = new Tag();
-            Boolean identifierGroupBeingParsed = false;
-            StringBuilder currentParsedWord = new StringBuilder();
-            HashSet<String> currentIdentifierGroup = new HashSet<String>();
+            var beingBuilt = new Tag();
+            var identifierGroupBeingParsed = false;
+            var currentParsedWord = new StringBuilder();
+            var currentIdentifierGroup = new HashSet<String>();
             for (var i = 0; i < markup.Length; i++)
             {
-                if (Char.IsWhiteSpace(markup[i]) || markup[i] == MarkupIdentifierGroupStartCharacter || markup[i] == MarkupIdentifierGroupEndCharacter)
+                if (char.IsWhiteSpace(markup[i]) || markup[i] == MarkupIdentifierGroupStartCharacter || markup[i] == MarkupIdentifierGroupEndCharacter)
                 {
                     /* A term has ended (maybe) */
                     if (currentParsedWord.Length > 0)
@@ -301,7 +300,7 @@ namespace XtraLiteTemplates.Parsing
                         identifierGroupBeingParsed = false;
                     }
                 }
-                else if (!Char.IsWhiteSpace(markup[i]))
+                else if (!char.IsWhiteSpace(markup[i]))
                 {
                     /* Just put the character in the box-ah */
                     currentParsedWord.Append(markup[i]);
@@ -353,7 +352,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="markup">The markup string.</param>
         /// <returns>The built tag object.</returns>
         /// <exception cref="System.FormatException">If <paramref name="markup"/> cannot be parsed.</exception>
-        public static Tag Parse(String markup)
+        public static Tag Parse(string markup)
         {
             Tag result;
             if (!TryParse(markup, out result))
@@ -370,7 +369,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="comparer">An instance of <see cref="System.Collections.Generic.IEqualityComparer{String}"/> used for comparison.</param>
         /// <returns><c>true</c> if the tags are equal; <c>false</c> otherwise.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="comparer"/> is <c>null</c>.</exception>
-        public Boolean Equals(Object obj, IEqualityComparer<String> comparer)
+        public bool Equals(Object obj, IEqualityComparer<string> comparer)
         {
             Expect.NotNull("comparer", comparer);
 
@@ -388,8 +387,8 @@ namespace XtraLiteTemplates.Parsing
                         return false;
 
                     /* Compare as keywords or "any identifiers" */
-                    var otherKeyword = tag.m_components[i] as String;
-                    var mineKeyword = m_components[i] as String;
+                    var otherKeyword = tag.m_components[i] as string;
+                    var mineKeyword = m_components[i] as string;
 
                     if (otherKeyword != null && mineKeyword == null)
                         return false;
@@ -414,7 +413,7 @@ namespace XtraLiteTemplates.Parsing
                         Debug.Assert(otherIdents.Length > 0);
                         Debug.Assert(mineIdents.Length > 0);
 
-                        var areEqualSets = new HashSet<String>(otherIdents, comparer).SetEquals(mineIdents);
+                        var areEqualSets = new HashSet<string>(otherIdents, comparer).SetEquals(mineIdents);
                         if (!areEqualSets)
                             return false;
                     }
@@ -429,7 +428,7 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         /// <param name="obj">The object to compare with.</param>
         /// <returns><c>true</c> if the tags are equal; <c>false</c> otherwise.</returns>
-        public override Boolean Equals(Object obj)
+        public override bool Equals(Object obj)
         {
             return Equals(obj, StringComparer.CurrentCulture);
         }
@@ -440,7 +439,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="comparer">An instance of <see cref="System.Collections.Generic.IEqualityComparer{String}"/> used for hash code generation.</param>
         /// <returns>A <see cref="System.Int32"/> value representing the hash code.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="comparer"/> is <c>null</c>.</exception>
-        public Int32 GetHashCode(IEqualityComparer<String> comparer)
+        public int GetHashCode(IEqualityComparer<string> comparer)
         {
             Expect.NotNull("comparer", comparer);
 
@@ -453,12 +452,12 @@ namespace XtraLiteTemplates.Parsing
 
                     if (component != null)
                     {
-                        var stringComponent = component as String;
+                        var stringComponent = component as string;
                         if (stringComponent != null)
                             hash += comparer.GetHashCode(stringComponent);
                         else
                         {
-                            var identArray = component as String[];
+                            var identArray = component as string[];
                             Debug.Assert(identArray != null);
 
                             var identsHash = 0;
@@ -478,7 +477,7 @@ namespace XtraLiteTemplates.Parsing
         /// Calculates the hash code for this tag object using the current culture string comparison rules.
         /// </summary>
         /// <returns>A <see cref="System.Int32"/> value representing the hash code.</returns>
-        public override Int32 GetHashCode()
+        public override int GetHashCode()
         {
             return GetHashCode(StringComparer.CurrentCulture);
         }
@@ -486,7 +485,7 @@ namespace XtraLiteTemplates.Parsing
         /// <summary>
         /// <value>Returns the number of components this tag has defined.</value>
         /// </summary>
-        public Int32 ComponentCount
+        public int ComponentCount
         {
             get
             {

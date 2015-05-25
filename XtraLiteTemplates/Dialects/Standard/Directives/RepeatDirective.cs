@@ -39,7 +39,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     {
         private int m_expressionIndex;
 
-        public RepeatDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+        public RepeatDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2);
@@ -61,10 +61,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
         protected internal override FlowDecision Execute(
             int tagIndex, 
-            Object[] components, 
-            ref Object state,
-            IExpressionEvaluationContext context, 
-            out String text)
+            object[] components, 
+            ref object state,
+            IExpressionEvaluationContext context,
+            out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);
@@ -98,4 +98,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         }
     }
 }
-

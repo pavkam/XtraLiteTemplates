@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
@@ -38,7 +36,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     public sealed class ValueFormatOperator : StandardBinaryOperator
     {
         /// <summary>
-        /// Specifies culture-specific format options used by this operation.
+        /// Gets the culture-specific format options used by this operation.
         /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// </summary>
         /// <value>
@@ -54,7 +52,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> or <paramref name="formatProvider" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public ValueFormatOperator(String symbol, IFormatProvider formatProvider, IPrimitiveTypeConverter typeConverter)
+        public ValueFormatOperator(string symbol, IFormatProvider formatProvider, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 2, typeConverter)
         {
             Expect.NotNull("formatProvider", formatProvider);
@@ -84,7 +82,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// The evaluated object.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
+        public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
             Expect.NotNull("context", context);
 
@@ -104,4 +102,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         }
     }
 }
-

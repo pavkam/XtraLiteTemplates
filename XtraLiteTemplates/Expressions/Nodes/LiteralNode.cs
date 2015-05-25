@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
@@ -37,7 +35,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
     internal class LiteralNode : LeafNode
     {
-        public Object Literal { get; private set; }
+        public object Literal { get; private set; }
 
         public LiteralNode(ExpressionNode parent, Object literal)
             : base(parent)
@@ -45,9 +43,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Literal = literal;
         }
 
-        public override String ToString(ExpressionFormatStyle style)
+        public override string ToString(ExpressionFormatStyle style)
         {
-            if (Literal is String)
+            if (Literal is string)
             {
                 using (var writer = new StringWriter())
                 {
@@ -62,7 +60,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 return Literal.ToString();
         }
 
-        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
+        protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
             Debug.Assert(reduceContext != null);
 
@@ -70,7 +68,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return true;
         }
 
-        protected override Func<IExpressionEvaluationContext, Object> Build()
+        protected override Func<IExpressionEvaluationContext, object> Build()
         {
             return context => Literal;
         }

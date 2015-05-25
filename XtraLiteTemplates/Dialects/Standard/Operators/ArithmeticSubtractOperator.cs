@@ -42,7 +42,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public ArithmeticSubtractOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+        public ArithmeticSubtractOperator(string symbol, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 4, typeConverter)
         {
         }
@@ -67,7 +67,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// The evaluated object.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
+        public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
             Expect.NotNull("context", context);
 
@@ -75,4 +75,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         }
     }
 }
-

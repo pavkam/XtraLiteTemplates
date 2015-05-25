@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
@@ -42,7 +40,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     {
         private int m_expressionIndex;
 
-        public ForDirective(String startTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+        public ForDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2);
@@ -62,8 +60,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
         }
 
-        protected internal override FlowDecision Execute(Int32 tagIndex, Object[] components, ref Object state,
-            IExpressionEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state,
+            IExpressionEvaluationContext context, out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
             Debug.Assert(components != null);
@@ -87,17 +85,22 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
             else if (tagIndex == 0)
             {
-                enumerator = state as IEnumerator<Object>;
+                enumerator = state as IEnumerator<object>;
                 Debug.Assert(enumerator != null);
             }
             else
+            {
                 return FlowDecision.Restart;
+            }
 
             if (!enumerator.MoveNext())
+            {
                 return FlowDecision.Terminate;
+            }
             else
+            {
                 return FlowDecision.Evaluate;
+            }
         }
     }
 }
-

@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
@@ -88,13 +86,17 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 {
                     var sequence = TypeConverter.ConvertToSequence(components[m_expressionIndex]);
                     if (sequence == null)
+                    {
                         return FlowDecision.Terminate;
+                    }
 
                     var enumerator = sequence.GetEnumerator();
                     if (!enumerator.MoveNext())
+                    {
                         return FlowDecision.Terminate;
+                    }
 
-                    context.SetVariable(components[m_identifierIndex] as String, enumerator.Current);
+                    context.SetVariable(components[m_identifierIndex] as string, enumerator.Current);
                     state = new State
                     {
                         Enumerator = enumerator,
@@ -131,4 +133,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         }
     }
 }
-

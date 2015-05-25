@@ -37,13 +37,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     public abstract class StandardRelationalOperator : StandardBinaryOperator
     {
         /// <summary>
-        /// Specifies a <see cref="IComparer{String}"/> object used to compare string literals.
+        /// Gets the <see cref="IComparer{String}"/> object used to compare string literals.
         /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// </summary>
         /// <value>
         /// The string literal comparer.
         /// </value>
-        public IComparer<String> StringComparer { get; private set; }
+        public IComparer<string> StringComparer { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StandardRelationalOperator" /> class.
@@ -55,8 +55,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Arguments <paramref name="symbol" />, <paramref name="typeConverter" /> or <paramref name="stringComparer" /> are <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
-        public StandardRelationalOperator(String symbol, Int32 precedence, 
-            IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public StandardRelationalOperator(string symbol, int precedence, 
+            IComparer<string> stringComparer, IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, typeConverter)
         {
             Expect.NotNull("stringComparer", stringComparer);
@@ -74,15 +74,19 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// A <seealso cref="Boolean"/> value indicating the result of the comparison.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public sealed override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
+        public sealed override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
             Expect.NotNull("context", context);
 
             Int32 relation;
             if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)
+            {
                 relation = StringComparer.Compare(TypeConverter.ConvertToString(left), TypeConverter.ConvertToString(right));
+            }
             else
+            {
                 relation = TypeConverter.ConvertToNumber(left).CompareTo(TypeConverter.ConvertToNumber(right));
+            }
 
             return Evaluate(relation, left, right);
         }
@@ -96,7 +100,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <returns>
         /// A <see cref="Boolean"/> value indicating the result of the validation.
         /// </returns>
-        public abstract bool Evaluate(Int32 relation, Object left, Object right);
+        public abstract bool Evaluate(int relation, object left, object right);
     }
 }
-

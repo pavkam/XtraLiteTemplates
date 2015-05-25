@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -90,7 +88,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The value of the token.
         /// </value>
-        public String Value { get; private set; }
+        public string Value { get; private set; }
 
         /// <summary>
         /// Specifies the index of the token's first character 
@@ -99,7 +97,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The index the first character.
         /// </value>
-        public Int32 CharacterIndex { get; private set; }
+        public int CharacterIndex { get; private set; }
 
         /// <summary>
         /// Specifies the original length of the token (as seen in the input template).
@@ -109,7 +107,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The original length of the token.
         /// </value>
-        public Int32 OriginalLength { get; private set; }
+        public int OriginalLength { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Token"/> class.
@@ -119,17 +117,16 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="characterIndex">Index of the first character.</param>
         /// <param name="originalLength">The original length of the token.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="characterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        public Token(TokenType type, String value, Int32 characterIndex, Int32 originalLength)
+        public Token(TokenType type, string value, int characterIndex, int originalLength)
         {
             Expect.GreaterThanOrEqual("characterIndex", characterIndex, 0);
             Expect.GreaterThan("originalLength", originalLength, 0);
+
             if (type != TokenType.String)
-            {
                 Expect.NotEmpty("value", value);
-            }
 
             this.Type = type;
-            this.Value = value ?? String.Empty;
+            this.Value = value ?? string.Empty;
             this.CharacterIndex = characterIndex;
             this.OriginalLength = originalLength;
         }

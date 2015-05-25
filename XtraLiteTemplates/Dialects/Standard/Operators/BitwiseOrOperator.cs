@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
@@ -44,7 +42,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public BitwiseOrOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+        public BitwiseOrOperator(string symbol, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 10, typeConverter)
         {
         }
@@ -69,7 +67,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// The evaluated object.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
+        public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
             Expect.NotNull("context", context);
 
@@ -77,4 +75,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         }
     }
 }
-

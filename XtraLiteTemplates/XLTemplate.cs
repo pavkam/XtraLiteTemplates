@@ -1,5 +1,4 @@
-﻿//
-//  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
+﻿//  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -21,7 +20,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates
 {
@@ -51,18 +49,18 @@ namespace XtraLiteTemplates
         {
             private sealed class Frame
             {
-                public Dictionary<String, Object> Variables;
-                public HashSet<Object> StateObjects;
+                public Dictionary<string, object> Variables;
+                public HashSet<object> StateObjects;
             }
 
             private Stack<Frame> m_frames;
             private Dictionary<Type, SimpleTypeDisemboweler> m_disembowelers;
-            private IEqualityComparer<String> m_identifierComparer;
-            private Boolean m_ignoreEvaluationExceptions;
-            private Func<IExpressionEvaluationContext, String, String> m_unparsedTextHandler;
+            private IEqualityComparer<string> m_identifierComparer;
+            private bool m_ignoreEvaluationExceptions;
+            private Func<IExpressionEvaluationContext, string, string> m_unparsedTextHandler;
 
-            public EvaluationContext(Boolean ignoreEvaluationExceptions, 
-                IEqualityComparer<String> identifierComparer, Func<IExpressionEvaluationContext, String, String> unparsedTextHandler)
+            public EvaluationContext(bool ignoreEvaluationExceptions,
+                IEqualityComparer<string> identifierComparer, Func<IExpressionEvaluationContext, string, string> unparsedTextHandler)
             {
                 Debug.Assert(identifierComparer != null);
                 Debug.Assert(unparsedTextHandler != null);
@@ -75,7 +73,7 @@ namespace XtraLiteTemplates
                 m_frames = new Stack<Frame>();
             }
 
-            public String ProcessUnparsedText(String value)
+            public string ProcessUnparsedText(string value)
             {
                 return m_unparsedTextHandler(this, value);
             }
@@ -101,7 +99,7 @@ namespace XtraLiteTemplates
                 m_frames.Pop();
             }
 
-            public void SetVariable(String identifier, Object value)
+            public void SetVariable(string identifier, object value)
             {
                 var topFrame = TopFrame;
                 if (topFrame.Variables == null)
@@ -110,11 +108,11 @@ namespace XtraLiteTemplates
                 topFrame.Variables[identifier] = value;
             }
 
-            public Object GetVariable(String identifier)
+            public object GetVariable(string identifier)
             {
                 foreach (var frame in m_frames)
                 {
-                    Object result;
+                    object result;
                     if (frame.Variables != null && frame.Variables.TryGetValue(identifier, out result))
                         return result;
                 }
@@ -122,7 +120,7 @@ namespace XtraLiteTemplates
                 return null;
             }
 
-            public Object GetProperty(Object variable, String memberName)
+            public object GetProperty(object variable, string memberName)
             {
                 Expect.Identifier("memberName", memberName);
 
@@ -155,7 +153,7 @@ namespace XtraLiteTemplates
             }
 
 
-            public void AddStateObject(Object state)
+            public void AddStateObject(object state)
             {
                 var topFrame = TopFrame;
                 if (topFrame.StateObjects == null)
@@ -164,14 +162,14 @@ namespace XtraLiteTemplates
                 topFrame.StateObjects.Add(state);
             }
 
-            public void RemoveStateObject(Object state)
+            public void RemoveStateObject(object state)
             {
                 var topFrame = TopFrame;
                 if (topFrame.StateObjects != null)
                     topFrame.StateObjects.Remove(state);
             }
 
-            public bool ContainsStateObject(Object state)
+            public bool ContainsStateObject(object state)
             {
                 var topFrame = TopFrame;
                 return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
@@ -223,7 +221,7 @@ namespace XtraLiteTemplates
         /// This property is provided by the caller at construction time.
         /// </remarks>
         /// </summary>
-        public String Template { get; private set; }
+        public string Template { get; private set; }
 
 
         /// <summary>
@@ -239,7 +237,7 @@ namespace XtraLiteTemplates
         /// <exception cref="ParseException">Parsing error during template compilation.</exception>
         /// <exception cref="ExpressionException">Expression parsing error during template compilation.</exception>
         /// <exception cref="InterpreterException">Lexical error during template compilation.</exception>
-        public XLTemplate(IDialect dialect, String template)
+        public XLTemplate(IDialect dialect, string template)
         {
             Expect.NotNull("dialect", dialect);
             Expect.NotNull("template", template);
@@ -259,7 +257,7 @@ namespace XtraLiteTemplates
         /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
         /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public void Evaluate(TextWriter writer, IReadOnlyDictionary<String, Object> variables)
+        public void Evaluate(TextWriter writer, IReadOnlyDictionary<string, object> variables)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("variables", variables);
@@ -284,7 +282,7 @@ namespace XtraLiteTemplates
         /// <returns>The result of evaluating the template.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="variables"/> is <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public String Evaluate(IReadOnlyDictionary<String, Object> variables)
+        public string Evaluate(IReadOnlyDictionary<string, object> variables)
         {
             /* Call the original version with a created writer. */
             using (var writer = new StringWriter())
@@ -298,7 +296,7 @@ namespace XtraLiteTemplates
         /// Returns a human-readable <see cref="System.String"/> representation of the compiled template.
         /// </summary>
         /// <returns>The <see cref="System.String"/> value.</returns>
-        public override String ToString()
+        public override string ToString()
         {
             Debug.Assert(m_evaluable != null);
             return m_evaluable.ToString();
@@ -310,7 +308,7 @@ namespace XtraLiteTemplates
         /// An optional set of <paramref name="arguments"/> can be provided to the template. These objects will be exposed to the compiled template at evaluation time as follows:
         /// <para>
         /// The first object in <paramref name="arguments"/> can be refereced as <c>_0</c> inside the template. The second object can be referenced as <c>_1</c> and so on. In a sense,
-        /// it tries to mimic the behaviour of <see cref="String.Format(IFormatProvider,String,Object[])"/> method.</para>
+        /// it tries to mimic the behavior of <see cref="String.Format(IFormatProvider,String,Object[])"/> method.</para>
         /// </remarks>
         /// </summary>
         /// <param name="dialect">An instance <see cref="XtraLiteTemplates.Dialects.IDialect"/> used to define the domain-specific language properties.</param>
@@ -322,7 +320,7 @@ namespace XtraLiteTemplates
         /// <exception cref="ExpressionException">Expression parsing error during template compilation.</exception>
         /// <exception cref="InterpreterException">Lexical error during template compilation.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public static String Evaluate(IDialect dialect, String template, params Object[] arguments)
+        public static string Evaluate(IDialect dialect, string template, params object[] arguments)
         {
             Expect.NotNull("dialect", dialect);
             Expect.NotNull("template", template);
@@ -333,7 +331,7 @@ namespace XtraLiteTemplates
             /* Instatiate the variables */
             var variables = new Dictionary<String, Object>();
             for (var i = 0; i < arguments.Length; i++)
-                variables.Add(String.Format("_{0}", i), arguments[i]);
+                variables.Add(string.Format("_{0}", i), arguments[i]);
             
             return instance.Evaluate(variables);
         }

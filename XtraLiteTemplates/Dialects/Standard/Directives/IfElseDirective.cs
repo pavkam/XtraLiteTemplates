@@ -38,9 +38,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class IfElseDirective : StandardDirective
     {
-        private Int32 m_expressionIndex;
+        private int m_expressionIndex;
 
-        public IfElseDirective(String startTagMarkup, String midTagMarkup, String endTagMarkup, IPrimitiveTypeConverter typeConverter)
+        public IfElseDirective(string startTagMarkup, string midTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(midTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 3);
@@ -60,7 +60,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
         }
 
-        protected internal override FlowDecision Execute(int tagIndex, Object[] components, ref Object state, IExpressionEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state, IExpressionEvaluationContext context, out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
             Debug.Assert(components != null);
@@ -88,4 +88,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         }
     }
 }
-

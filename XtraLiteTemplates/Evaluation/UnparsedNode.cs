@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Evaluation
 {
@@ -36,11 +34,11 @@ namespace XtraLiteTemplates.Evaluation
 
     internal sealed class UnparsedNode : TemplateNode, IEvaluable
     {
-        public Int32 FirstCharacterIndex { get; private set; }
+        public int FirstCharacterIndex { get; private set; }
 
-        public Int32 OriginalLength { get; private set; }
+        public int OriginalLength { get; private set; }
 
-        public String UnparsedText { get; private set; }
+        public string UnparsedText { get; private set; }
 
         public UnparsedNode(TemplateNode parent, UnparsedLex lex)
             : base(parent)
@@ -61,10 +59,9 @@ namespace XtraLiteTemplates.Evaluation
             writer.Write(context.ProcessUnparsedText(UnparsedText));
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             return UnparsedText;
         }
     }
 }
-

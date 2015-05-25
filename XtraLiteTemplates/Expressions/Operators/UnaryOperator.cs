@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Operators
 {
@@ -41,7 +39,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="symbol">The operator's symbol.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
-        protected UnaryOperator(String symbol)
+        protected UnaryOperator(string symbol)
             : base(symbol, 1) 
         {
         }
@@ -53,7 +51,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="arg">The operand.</param>
         /// <returns>The evaluated object.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public abstract Object Evaluate(IExpressionEvaluationContext context, Object arg);
+        public abstract object Evaluate(IExpressionEvaluationContext context, object arg);
     }
 }
 

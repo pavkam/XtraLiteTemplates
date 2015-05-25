@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
@@ -61,15 +59,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
-
-        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object reducedValue)
+        protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)
         {
             Debug.Assert(reduceContext != null);
 
             if (LeftNode.Reduce(reduceContext))
             {
                 if (Operator.EvaluateLhs(reduceContext, LeftNode.ReducedValue, out reducedValue))
+                {
                     return true;
+                }
                 else if (RightNode.Reduce(reduceContext))
                 {
                     reducedValue = Operator.Evaluate(reduceContext, LeftNode.ReducedValue, RightNode.ReducedValue);
@@ -81,7 +80,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        protected override Func<IExpressionEvaluationContext, Object> Build()
+        protected override Func<IExpressionEvaluationContext, object> Build()
         {
             var leftFunc = LeftNode.GetEvaluationFunction();
             var rightFunc = RightNode.GetEvaluationFunction();
@@ -89,32 +88,41 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return (context) =>
             {
                 var left = leftFunc(context);
-                Object evaluatedByLeft;
+                object evaluatedByLeft;
 
                 if (Operator.EvaluateLhs(context, left, out evaluatedByLeft))
+                {
                     return evaluatedByLeft;
+                }
                 else
+                {
                     return Operator.Evaluate(context, left, rightFunc(context));
+                }
             };
         }
 
-        public override String ToString(ExpressionFormatStyle style)
+        public override string ToString(ExpressionFormatStyle style)
         {
             var leftAsString = LeftNode != null ? LeftNode.ToString(style) : "??";
             var rightAsString = RightNode != null ? RightNode.ToString(style) : "??";
 
-            String result = null;
+            string result = null;
 
             if (style == ExpressionFormatStyle.Arithmetic)
-                result = String.Format("{0} {1} {2}", leftAsString, Operator, rightAsString);
+            {
+                result = string.Format("{0} {1} {2}", leftAsString, Operator, rightAsString);
+            }
             else if (style == ExpressionFormatStyle.Polish)
-                result = String.Format("{0} {1} {2}", Operator, leftAsString, rightAsString);
+            {
+                result = string.Format("{0} {1} {2}", Operator, leftAsString, rightAsString);
+            }
             else if (style == ExpressionFormatStyle.Canonical)
-                result = String.Format("{0}{{{1},{2}}}", Operator, leftAsString, rightAsString);
+            {
+                result = string.Format("{0}{{{1},{2}}}", Operator, leftAsString, rightAsString);
+            }
 
             Debug.Assert(result != null);
             return result;
         }
     }
 }
-

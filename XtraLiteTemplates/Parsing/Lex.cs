@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -42,7 +40,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The index of the first character.
         /// </value>
-        public Int32 FirstCharacterIndex { get; private set; }
+        public int FirstCharacterIndex { get; private set; }
 
         /// <summary>
         /// The original length of all tokens combined that make up this lex object.
@@ -51,7 +49,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The total length of all tokens that make up this lex.
         /// </value>
-        public Int32 OriginalLength { get; private set; }
+        public int OriginalLength { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Lex"/> class.
@@ -59,7 +57,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="firstCharacterIndex">The index of the first character in the input template</param>
         /// <param name="originalLength">The combined length of all tokens that make up this lex object.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        protected Lex(Int32 firstCharacterIndex, Int32 originalLength)
+        protected Lex(int firstCharacterIndex, int originalLength)
         {
             Expect.GreaterThanOrEqual("firstCharacterIndex", firstCharacterIndex, 0);
             Expect.GreaterThan("originalLength", originalLength, 0);

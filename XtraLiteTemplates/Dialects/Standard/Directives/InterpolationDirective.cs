@@ -38,9 +38,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
     public sealed class InterpolationDirective : StandardDirective
     {
-        private Int32 m_expressionIndex;
+        private int m_expressionIndex;
 
-        public InterpolationDirective(String tagMarkup, IPrimitiveTypeConverter typeConverter)
+        public InterpolationDirective(string tagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(tagMarkup))
         {
             Debug.Assert(Tags.Count == 1);
@@ -60,8 +60,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
         }
 
-        protected internal override FlowDecision Execute(int tagIndex, Object[] components,
-            ref Object state, IExpressionEvaluationContext context, out String text)
+        protected internal override FlowDecision Execute(int tagIndex, object[] components,
+            ref object state, IExpressionEvaluationContext context, out string text)
         {
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);
@@ -74,4 +74,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         }
     }
 }
-

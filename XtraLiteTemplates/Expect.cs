@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates
 {
@@ -34,20 +32,25 @@ namespace XtraLiteTemplates
 
     internal static class Expect
     {
-        public static void NotNull(String name, Object value)
+        public static void NotNull(string name, object value)
         {
             if (value == null)
+            {
                 ExceptionHelper.ArgumentIsNull(name);
+            }
         }
 
-        public static void NotEmpty<T>(String name, IEnumerable<T> value)
+        public static void NotEmpty<T>(string name, IEnumerable<T> value)
         {
             NotNull(name, value);
+
             if (!value.Any())
+            {
                 ExceptionHelper.ArgumentIsEmpty(name);
+            }
         }
 
-        public static void Identifier(String name, String value)
+        public static void Identifier(string name, string value)
         {
             NotEmpty(name, value);
 
@@ -56,43 +59,57 @@ namespace XtraLiteTemplates
                 value.All(c => Char.IsLetterOrDigit(c) || c == '_');
 
             if (!isValid)
+            {
                 ExceptionHelper.ArgumentIsNotValidIdentifier(name);
+            }
         }
 
-        public static void NotEqual<T>(String name1, String name2, T value1, T value2)
+        public static void NotEqual<T>(string name1, string name2, T value1, T value2)
         {
             if (EqualityComparer<T>.Default.Equals(value1, value2))
+            {
                 ExceptionHelper.ArgumentsAreEqual(name1, name2);
+            }
         }
 
-        public static void GreaterThan<T>(String name, T value, T than)
+        public static void GreaterThan<T>(string name, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) <= 0)
+            {
                 ExceptionHelper.ArgumentNotGreaterThan(name, than == null ? null : than.ToString());
+            }
         }
 
-        public static void GreaterThanOrEqual<T>(String name, T value, T than)
+        public static void GreaterThanOrEqual<T>(string name, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) < 0)
+            {
                 ExceptionHelper.ArgumentNotGreaterThanOrEqual(name, than == null ? null : than.ToString());
+            }
         }
 
-        public static void LessThan<T>(String name, T value, T than)
+        public static void LessThan<T>(string name, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) >= 0)
+            {
                 ExceptionHelper.ArgumentNotLessThan(name, than == null ? null : than.ToString());
+            }
         }
 
-        public static void LessThanOrEqual<T>(String name, T value, T than)
+        public static void LessThanOrEqual<T>(string name, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) > 0)
+            {
                 ExceptionHelper.ArgumentNotLessThanOrEqual(name, than == null ? null : than.ToString());
+            }
         }
 
-        public static void IsTrue(String name, Boolean condition)
+        public static void IsTrue(string name, bool condition)
         {
             if (!condition)
+            {
                 ExceptionHelper.ConditionFailed(name);
+            }
         }
     }
 }

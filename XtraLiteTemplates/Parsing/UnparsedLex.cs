@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -42,7 +40,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The unparsed text.
         /// </value>
-        public String UnparsedText { get; private set; }
+        public string UnparsedText { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UnparsedLex"/> class.
@@ -53,7 +51,7 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="ArgumentNullException">Argument <paramref name="unparsedText"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="unparsedText"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        public UnparsedLex(String unparsedText, Int32 firstCharacterIndex, Int32 originalLength)
+        public UnparsedLex(string unparsedText, int firstCharacterIndex, int originalLength)
             : base(firstCharacterIndex, originalLength)
         {
             Expect.NotEmpty("unparsedText", unparsedText);

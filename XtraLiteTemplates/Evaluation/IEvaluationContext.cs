@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Evaluation
 {
@@ -41,22 +39,22 @@ namespace XtraLiteTemplates.Evaluation
     public interface IEvaluationContext : IExpressionEvaluationContext
     {
         /// <summary>
-        /// Specifies whether evaluation exceptions are silently ignored (or result in <c>null</c> values) during template evaluation.
+        /// Gets a value indicating whether evaluation exceptions are silently ignored (or result in <c>null</c> values) during template evaluation.
         /// </summary>
         /// <value>
         /// <c>true</c> if evaluation exceptions are ignored; otherwise, <c>false</c>.
         /// </value>
-        Boolean IgnoreEvaluationExceptions { get; }
+        bool IgnoreEvaluationExceptions { get; }
 
         /// <summary>
-        /// Processeses the unparsed text blocks.
+        /// Processes the unparsed text blocks.
         /// <remarks>
-        /// <see cref="ProcessUnparsedText"/> is invoked during the evaluation process for each unparsed text block before it is commited to the result.
+        /// <see cref="ProcessUnparsedText"/> is invoked during the evaluation process for each unparsed text block before it is committed to the result.
         /// </remarks>
         /// </summary>
         /// <param name="value">The unparsed text block to process.</param>
         /// <returns>The processed text.</returns>
-        String ProcessUnparsedText(String value);
+        string ProcessUnparsedText(string value);
 
         /// <summary>
         /// Opens an evaluation frame. An evaluation frame can be considered as a rudimentary stack frame.

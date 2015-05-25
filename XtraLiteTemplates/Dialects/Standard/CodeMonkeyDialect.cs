@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
@@ -65,7 +63,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public static new IDialect Default { get; private set; }
 
         /// <summary>
-        /// Initializes the <see cref="CodeMonkeyDialect"/> class.
+        /// Initializes static members of the <see cref="CodeMonkeyDialect"/> class.
         /// </summary>
         static CodeMonkeyDialect()
         {
@@ -76,7 +74,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <summary>
         /// Override in descendant classes to supply all dialect supported directives.
         /// </summary>
-        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implentation used for type conversions.</param>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
         /// <returns>
         /// An array of all supported directives.
         /// </returns>
@@ -98,20 +96,19 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeMonkeyDialect"/> class.
         /// </summary>
-        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behaviour.</param>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
         public CodeMonkeyDialect(DialectCasing casing)
             : base("Code Monkey", CultureInfo.InvariantCulture, casing)
         {
         }
 
         /// <summary>
-        /// Initializes a new case-insensitive instance of the <see cref="CodeMonkeyDialect" /> class.
+        /// Initializes a new instance of the <see cref="CodeMonkeyDialect" /> class. The instance is case-insensitive.
         /// </summary>
         public CodeMonkeyDialect()
             : this(DialectCasing.IgnoreCase)
         {
         }
-
 
         /// <summary>
         /// Specifies the string literal start character (used by the tokenization process).
@@ -141,7 +138,6 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
-
         /// <summary>
         /// Determines whether the specified <see cref="Object" /> is equal to the current <see cref="CodeMonkeyDialect" />.
         /// </summary>
@@ -149,7 +145,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         ///   <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(Object obj)
+        public override bool Equals(object obj)
         {
             return base.Equals(obj as CodeMonkeyDialect);
         }

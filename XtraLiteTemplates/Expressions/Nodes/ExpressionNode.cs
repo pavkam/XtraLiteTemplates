@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
@@ -37,9 +35,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
     {
         public ExpressionNode Parent { get; set; }
 
-        public Boolean IsReduced { get; private set; }
+        public bool IsReduced { get; private set; }
         
-        public Object ReducedValue { get; private set; }
+        public object ReducedValue { get; private set; }
 
 
         protected ExpressionNode(ExpressionNode parent)
@@ -47,7 +45,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Parent = parent;
         }
 
-        protected virtual Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object reducedValue)
+        protected virtual bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)
         {
             Debug.Assert(reduceContext != null);
 
@@ -55,7 +53,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        protected abstract Func<IExpressionEvaluationContext, Object> Build();
+        protected abstract Func<IExpressionEvaluationContext, object> Build();
 
 
         public abstract PermittedContinuations Continuity { get; }
@@ -67,7 +65,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
             if (!IsReduced)
             {
-                Object value;
+                object value;
                 if (TryReduce(reduceContext, out value))
                 {
                     IsReduced = true;
@@ -78,7 +76,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return IsReduced;
         }
 
-        public Func<IExpressionEvaluationContext, Object> GetEvaluationFunction()
+        public Func<IExpressionEvaluationContext, object> GetEvaluationFunction()
         {
             if (IsReduced)
                 return context => ReducedValue;
@@ -86,9 +84,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 return Build();
         }
 
-        public abstract String ToString(ExpressionFormatStyle style);
+        public abstract string ToString(ExpressionFormatStyle style);
 
-        public override String ToString()
+        public override string ToString()
         {
             return ToString(ExpressionFormatStyle.Arithmetic);
         }

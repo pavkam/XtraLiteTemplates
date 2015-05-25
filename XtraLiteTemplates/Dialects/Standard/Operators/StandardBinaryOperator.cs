@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
@@ -37,7 +35,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     public abstract class StandardBinaryOperator : BinaryOperator
     {
         /// <summary>
-        /// Specifies the type converter used to convert to primitive types.
+        /// Gets the type converter used to convert to primitive types.
         /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
         /// </summary>
         /// <value>
@@ -54,7 +52,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected StandardBinaryOperator(String symbol, Int32 precedence, IPrimitiveTypeConverter typeConverter)
+        protected StandardBinaryOperator(string symbol, int precedence, IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, Associativity.LeftToRight)
         {
             Expect.NotNull("typeConverter", typeConverter);
@@ -63,4 +61,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         }
     }
 }
-

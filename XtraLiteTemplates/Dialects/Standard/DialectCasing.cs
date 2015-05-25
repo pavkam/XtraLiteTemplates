@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
@@ -38,11 +36,13 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// their case.
         /// </summary>
         IgnoreCase,
+
         /// <summary>
         /// The dialect is upper-cased. All keywords are required to be upper case to match. The variables and properties are
         /// case-sensitive.
         /// </summary>
         UpperCase,
+
         /// <summary>
         /// The dialect is upper-cased. All keywords are required to be lower case to match. The variables and properties are
         /// case-sensitive.

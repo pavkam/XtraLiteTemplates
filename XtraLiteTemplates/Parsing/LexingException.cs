@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -49,7 +47,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="token">The token that resulted in the error being thrown.</param>
         /// <param name="format">A format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal LexingException(Exception innerException, Token token, String format, params Object[] args)
+        internal LexingException(Exception innerException, Token token, string format, params object[] args)
             : base(innerException, token.CharacterIndex, format, args)
         {
             this.Token = token;

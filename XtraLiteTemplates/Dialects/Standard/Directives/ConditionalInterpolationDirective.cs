@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
@@ -74,10 +72,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
         protected internal override FlowDecision Execute(
             int tagIndex, 
-            Object[] components,
-            ref Object state, 
+            object[] components,
+            ref object state, 
             IExpressionEvaluationContext context, 
-            out String text)
+            out string text)
         {
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0);
@@ -86,12 +84,15 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Debug.Assert(context != null);
 
             if (TypeConverter.ConvertToBoolean(components[m_conditionalExpressionIndex]))
+            {
                 text = TypeConverter.ConvertToString(components[m_interpolatedExpressionIndex]);
+            }
             else
+            {
                 text = null;
+            }
 
             return FlowDecision.Terminate;
         }
     }
 }
-

@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Operators
 {
@@ -45,7 +43,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <value>
         /// The operator's symbol.
         /// </value>
-        public String Symbol { get; private set; }
+        public string Symbol { get; private set; }
 
         /// <summary>
         /// Specifies the operator's precedence, used in the expression building process.
@@ -54,7 +52,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <value>
         /// The operator's precedence.
         /// </value>
-        public Int32 Precedence { get; private set; }
+        public int Precedence { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Operator"/> class.
@@ -64,7 +62,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
-        protected Operator(String symbol, Int32 precedence)
+        protected Operator(string symbol, int precedence)
         {
             Expect.NotEmpty("symbol", symbol);
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
@@ -79,7 +77,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <returns>
         /// A string that represents the current operator object.
         /// </returns>
-        public override String ToString()
+        public override string ToString()
         {
             return Symbol;
         }

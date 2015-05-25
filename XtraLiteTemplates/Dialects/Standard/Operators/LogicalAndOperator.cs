@@ -42,7 +42,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public LogicalAndOperator(String symbol, IPrimitiveTypeConverter typeConverter)
+        public LogicalAndOperator(string symbol, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 11, typeConverter)
         {
         }
@@ -84,7 +84,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <returns>
         ///   <c>true</c> if the operation is supported; <c>false</c> otherwise.
         /// </returns>
-        public override bool EvaluateLhs(IExpressionEvaluationContext context, Object left, out Object result)
+        public override bool EvaluateLhs(IExpressionEvaluationContext context, object left, out object result)
         {
             Expect.NotNull("context", context);
 
@@ -93,4 +93,3 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         }
     }
 }
-

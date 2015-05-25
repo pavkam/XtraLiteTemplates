@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions
 {
@@ -43,19 +41,19 @@ namespace XtraLiteTemplates.Expressions
             Default = new ExpressionFlowSymbols(",", ".", "(", ")");
         }
 
-        public String Separator { get; private set; }
+        public string Separator { get; private set; }
 
-        public String MemberAccess { get; private set; }
+        public string MemberAccess { get; private set; }
 
-        public String GroupOpen { get; private set; }
+        public string GroupOpen { get; private set; }
 
-        public String GroupClose { get; private set; }
+        public string GroupClose { get; private set; }
 
         public ExpressionFlowSymbols(
-            String separatorSymbol, 
-            String memberAccessSymbol,
-            String groupOpenSymbol,
-            String groupCloseSymbol)
+            string separatorSymbol,
+            string memberAccessSymbol,
+            string groupOpenSymbol,
+            string groupCloseSymbol)
         {
             Expect.NotEmpty("separatorSymbol", separatorSymbol);
             Expect.NotEmpty("memberAccessSymbol", memberAccessSymbol);
@@ -76,4 +74,3 @@ namespace XtraLiteTemplates.Expressions
         }
     }
 }
-

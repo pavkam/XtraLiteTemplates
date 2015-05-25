@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Evaluation
 {
@@ -34,12 +32,12 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Expressions;
 
     /// <summary>
-    /// Exception type thrown for any encountered intrepretation error.
+    /// Exception type thrown for any encountered interpretation error.
     /// </summary>
     public class InterpreterException : FormatException
     {
         /// <summary>
-        /// Lists all candidate directives for which the exception applies.
+        /// Gets all candidate directives for which the exception applies.
         /// </summary>
         /// <value>
         /// The candidate directives.
@@ -52,7 +50,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <value>
         /// The index of the first character.
         /// </value>
-        public Int32 FirstCharacterIndex { get; private set; }
+        public int FirstCharacterIndex { get; private set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InterpreterException"/> class.
@@ -63,8 +61,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="format">The format string.</param>
         /// <param name="args">Format arguments.</param>
         internal InterpreterException(Exception innerException, Directive[] candidateDirectives, 
-            Int32 firstCharacterIndex, String format, params Object[] args)
-            : base(String.Format(format, args), innerException)
+            int firstCharacterIndex, string format, params object[] args)
+            : base(string.Format(format, args), innerException)
         {
             Debug.Assert(firstCharacterIndex >= 0);
 
@@ -79,7 +77,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="firstCharacterIndex">Index of the first character.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal InterpreterException(Directive[] candidateDirectives, Int32 firstCharacterIndex, String format, params Object[] args)
+        internal InterpreterException(Directive[] candidateDirectives, int firstCharacterIndex, string format, params Object[] args)
             : this(null, candidateDirectives, firstCharacterIndex, format, args)
         {
         }

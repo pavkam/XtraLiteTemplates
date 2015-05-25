@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Evaluation
 {
@@ -33,7 +31,7 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Expressions;
 
     /// <summary>
-    /// The exception type thrown for any errors encountered dutin the evaluation of a template.
+    /// The exception type thrown for any errors encountered during the evaluation of a template.
     /// </summary>
     [Serializable]
     public class EvaluationException : InvalidOperationException
@@ -44,8 +42,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="innerException">The inner exception.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">The format arguments.</param>
-        internal EvaluationException(Exception innerException, String format, params Object[] args)
-            : base(String.Format(format, args), innerException)
+        internal EvaluationException(Exception innerException, string format, params object[] args)
+            : base(string.Format(format, args), innerException)
         {
         }
     }

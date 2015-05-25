@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
@@ -39,7 +37,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     {
         public ExpressionNode ObjectNode { get; private set; }
 
-        public String MemberName { get; internal set; }
+        public string MemberName { get; internal set; }
 
         internal DisembowelerNode(ExpressionNode parent, ExpressionNode objectNode)
             : base(parent)
@@ -71,17 +69,23 @@ namespace XtraLiteTemplates.Expressions.Nodes
             var memberName = MemberName ?? "??";
 
             if (style == ExpressionFormatStyle.Arithmetic)
-                return String.Format("{0} . {1}", ObjectNode.ToString(style), memberName);
+            {
+                return string.Format("{0} . {1}", ObjectNode.ToString(style), memberName);
+            }
             else if (style == ExpressionFormatStyle.Canonical)
-                return String.Format(".{{{0},{1}}}", ObjectNode.ToString(style), memberName);
+            {
+                return string.Format(".{{{0},{1}}}", ObjectNode.ToString(style), memberName);
+            }
             else if (style == ExpressionFormatStyle.Polish)
-                return String.Format(". {0} {1}", ObjectNode.ToString(style), memberName);
+            {
+                return string.Format(". {0} {1}", ObjectNode.ToString(style), memberName);
+            }
 
             Debug.Fail("Unreachable code.");
             return null;
         }
 
-        protected override Boolean TryReduce(IExpressionEvaluationContext reduceContext, out Object value)
+        protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
             Debug.Assert(reduceContext != null);
 
@@ -102,4 +106,3 @@ namespace XtraLiteTemplates.Expressions.Nodes
         }
     }
 }
-

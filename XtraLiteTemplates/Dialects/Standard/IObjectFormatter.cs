@@ -33,7 +33,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Defines a method that allows obtaing the string representation of an untyped <see cref="Object"/>.
+    /// Defines a method that allows obtaining the string representation of an un-typed <see cref="Object"/>.
     /// </summary>
     public interface IObjectFormatter
     {
@@ -42,7 +42,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <returns>The string representation.</returns>
-        String ToString(Object obj);
+        String ToString(object obj);
 
         /// <summary>
         /// Gets the string representation of an <see cref="Object" /> using the given <paramref name="formatProvider"/>.
@@ -53,6 +53,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The string representation.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
-        String ToString(Object obj, IFormatProvider formatProvider);
+        string ToString(object obj, IFormatProvider formatProvider);
     }
 }

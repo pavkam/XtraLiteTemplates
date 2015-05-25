@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
@@ -52,14 +50,14 @@ namespace XtraLiteTemplates.Dialects.Standard
         private DialectCasing m_casing;
         private List<Operator> m_operators;
         private List<Directive> m_directives;
-        private Dictionary<String, Object> m_specials;
-        private Dictionary<Object, String> m_specialsIdentifiers;
-        private String m_undefinedSpecialIdentifier;
+        private Dictionary<string, object> m_specials;
+        private Dictionary<object, string> m_specialsIdentifiers;
+        private string m_undefinedSpecialIdentifier;
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported operators.
         /// </summary>
-        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implentation used for type conversions.</param>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
         /// <returns>
         /// An array of all supported operators.
         /// </returns>
@@ -82,7 +80,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// An array of all supported special constants.
         /// </returns>
-        protected abstract KeyValuePair<String, Object>[] CreateSpecials();
+        protected abstract KeyValuePair<string, object>[] CreateSpecials();
 
         /// <summary>
         /// Adjusts the case of a string based on the <see cref="DialectCasing" /> supplied during construction.
@@ -94,31 +92,39 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <remarks>
         /// Descendant classes need to call this method when creating directives and operators to adjust the case accordingly.
         /// </remarks>
-        protected String AdjustCasing(String markup)
+        protected String AdjustCasing(string markup)
         {
-            if (String.IsNullOrEmpty(markup))
+            if (string.IsNullOrEmpty(markup))
+            {
                 return markup;
+            }
 
             if (this.m_casing == DialectCasing.LowerCase)
+            {
                 return markup.ToLower(this.Culture);
+            }
             else if (this.m_casing == DialectCasing.UpperCase)
+            {
                 return markup.ToUpper(this.Culture);
+            }
             else
+            {
                 return markup;
+            }
         }
 
         /// <summary>
-        /// Creates a new instance of <see cref="StandardDialectBase" /> class.
+        /// Initializes a new instance of the <see cref="StandardDialectBase" /> class.
         /// <remarks>
         /// This constructor is not actually called directly.
         /// </remarks>
         /// </summary>
         /// <param name="name">A human-readable name for the dialect.</param>
-        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behaviour of the dialect.</param>
-        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behaviour.</param>
+        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
         /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
-        protected StandardDialectBase(String name, CultureInfo culture, DialectCasing casing)
+        protected StandardDialectBase(string name, CultureInfo culture, DialectCasing casing)
         {
             Expect.NotEmpty("name", name);
             Expect.NotNull("culture", culture);
@@ -137,7 +143,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         }
 
         /// <summary>
-        /// Specifies the <see cref="CultureInfo" /> object that drives the formatting and collation behaviour of the dialect.
+        /// Gets the <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.
         /// <remarks>The value of this property is supplied by the caller at construction time.</remarks>
         /// </summary>
         /// <value>
@@ -146,35 +152,35 @@ namespace XtraLiteTemplates.Dialects.Standard
         public CultureInfo Culture { get; private set;  }
 
         /// <summary>
-        /// Specifies the <see cref="IEqualityComparer{String}" /> object used to compare keywords and identifiers.
+        /// Gets the <see cref="IEqualityComparer{String}" /> object used to compare keywords and identifiers.
         /// <remarks>The value of this property is synthesized at construction time from the provided <see cref="CultureInfo" /> and
         /// <see cref="DialectCasing" /> properties.</remarks>
         /// </summary>
         /// <value>
         /// The identifier comparer.
         /// </value>
-        public IEqualityComparer<String> IdentifierComparer { get; private set; }
+        public IEqualityComparer<string> IdentifierComparer { get; private set; }
 
         /// <summary>
-        /// Specifies the <see cref="IComparer{String}" /> object used to compare string literals when evaluating expressions.
+        /// Gets the <see cref="IComparer{String}" /> object used to compare string literals when evaluating expressions.
         /// <remarks>The value of this property is synthesized at construction time from the provided <see cref="CultureInfo" /> object.</remarks>
         /// </summary>
         /// <value>
         /// The string literal comparer.
         /// </value>
-        public IComparer<String> StringLiteralComparer { get; private set; }
+        public IComparer<string> StringLiteralComparer { get; private set; }
 
         /// <summary>
-        /// Specifies the dialect's human-readable name.
+        /// Gets the dialect's human-readable name.
         /// <remarks>The value of this property is supplied at construction time.</remarks>
         /// </summary>
         /// <value>
         /// The name of the dialect.
         /// </value>
-        public String Name { get; private set; }
+        public string Name { get; private set; }
 
         /// <summary>
-        /// Specifies the expression flow symbols used in expressions of this dialect.
+        /// Gets the expression flow symbols used in expressions of this dialect.
         /// <remarks>The standard set of flow symbols, specified by <see cref="ExpressionFlowSymbols.Default" /> property are returned.</remarks>
         /// </summary>
         /// <value>
@@ -189,7 +195,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         }
 
         /// <summary>
-        /// Lists all dialect supported expression operators.
+        /// Gets all dialect supported expression operators.
         /// </summary>
         /// <value>
         /// The operators.
@@ -199,14 +205,16 @@ namespace XtraLiteTemplates.Dialects.Standard
             get
             {
                 if (m_operators == null)
+                {
                     m_operators = new List<Operator>(CreateOperators(m_typeConverter));
+                }
 
                 return m_operators;
             }
         }
 
         /// <summary>
-        /// Lists all dialect supported directives.
+        /// Gets all dialect supported directives.
         /// </summary>
         /// <value>
         /// The directives.
@@ -216,34 +224,40 @@ namespace XtraLiteTemplates.Dialects.Standard
             get
             {
                 if (m_directives == null)
+                {
                     m_directives = new List<Directive>(CreateDirectives(m_typeConverter));
+                }
 
                 return m_directives;
             }
         }
 
         /// <summary>
-        /// Lists all dialect supported special constants.
+        /// Gets all dialect supported special constants.
         /// </summary>
         /// <value>
         /// The special keywords.
         /// </value>
-        public IReadOnlyDictionary<String, Object> SpecialKeywords
+        public IReadOnlyDictionary<string, object> SpecialKeywords
         {
             get
             {
                 if (m_specials == null)
                 {
-                    m_specials = new Dictionary<String, Object>(IdentifierComparer);
-                    m_specialsIdentifiers = new Dictionary<Object, String>();
+                    m_specials = new Dictionary<string, object>(IdentifierComparer);
+                    m_specialsIdentifiers = new Dictionary<object, string>();
 
                     foreach (var kvp in CreateSpecials())
                     {
                         m_specials.Add(kvp.Key, kvp.Value);
                         if (kvp.Value == null)
+                        {
                             m_undefinedSpecialIdentifier = kvp.Key;
+                        }
                         else
+                        {
                             m_specialsIdentifiers[kvp.Value] = kvp.Key;
+                        }
                     }
                 }
 
@@ -254,7 +268,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <summary>
         /// Processes all unparsed text blocks read from the original template. The method current implementation
         /// trims all white-spaces and new line characters and replaces them with a single white-space character (emulates how HTML trimming works).
-        /// <remarks>Descendant classes can override this method and modify this behaviour.</remarks>
+        /// <remarks>Descendant classes can override this method and modify this behavior.</remarks>
         /// </summary>
         /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
         /// <param name="unparsedText">The text block being processed.</param>
@@ -262,12 +276,14 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The processed text value.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public virtual String DecorateUnparsedText(IExpressionEvaluationContext context, String unparsedText)
+        public virtual string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText)
         {
             Expect.NotNull("context", context);
 
-            if (String.IsNullOrEmpty(unparsedText))
-                return String.Empty;
+            if (string.IsNullOrEmpty(unparsedText))
+            {
+                return string.Empty;
+            }
             else
             {
                 /* Trim all 1+ white spaces to one space character. */
@@ -291,14 +307,16 @@ namespace XtraLiteTemplates.Dialects.Standard
                 }
 
                 if (result.Length > 0 && char.IsWhiteSpace(result[result.Length - 1]))
+                {
                     result.Length -= 1;
+                }
 
                 return result.ToString();
             }
         }
 
         /// <summary>
-        /// Override in descendant classes to specify the tag start character (used by the tokenization process).
+        /// Gets the tag start character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The tag start character.
@@ -306,7 +324,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public abstract char StartTagCharacter { get; }
 
         /// <summary>
-        /// Override in descendant classes to specify the tag end character (used by the tokenization process).
+        /// Gets the tag end character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The tag end character.
@@ -314,7 +332,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public abstract char EndTagCharacter { get; }
 
         /// <summary>
-        /// Override in descendant classes to specify the string literal start character (used by the tokenization process).
+        /// Gets the string literal start character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The string literal start character.
@@ -322,7 +340,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public abstract char StartStringLiteralCharacter { get; }
 
         /// <summary>
-        /// Override in descendant classes to specify the string literal end character (used by the tokenization process).
+        /// Gets the string literal end character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The string literal end character.
@@ -330,7 +348,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public abstract char EndStringLiteralCharacter { get; }
 
         /// <summary>
-        /// Override in descendant classes to specify the string literal escape character (used by the tokenization process).
+        /// Gets the string literal escape character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The string literal escape character.
@@ -338,7 +356,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public abstract char StringLiteralEscapeCharacter { get; }
 
         /// <summary>
-        /// Override in descendant classes to specify the number literal decimal separator character (used by the tokenization process).
+        /// Gets the number literal decimal separator character (used by the tokenization process).
         /// </summary>
         /// <value>
         /// The number literal decimal separator character.
@@ -368,9 +386,13 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
 
             if (String.IsNullOrEmpty(Culture.Name))
+            {
                 return String.Format("{0} ({1})", Name, caseDescr);
+            }
             else
+            {
                 return String.Format("{0} ({1}, {2})", Name, Culture.Name, caseDescr);
+            }
         }
 
         /// <summary>
@@ -380,7 +402,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// <c>true</c> if the specified object is equal to the current object; otherwise, <c>false</c>.
         /// </returns>
-        public override bool Equals(Object obj)
+        public override bool Equals(object obj)
         {
             var other = obj as StandardDialect;
             return
@@ -413,20 +435,28 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The string representation.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
-        String IObjectFormatter.ToString(Object obj, IFormatProvider formatProvider)
+        string IObjectFormatter.ToString(object obj, IFormatProvider formatProvider)
         {
-            String result;
+            string result;
 
             if (obj == null)
+            {
                 return m_undefinedSpecialIdentifier;
+            }
             else if (!m_specialsIdentifiers.TryGetValue(obj, out result))
             {
-                if (obj is String)
-                    result = (String)obj;
+                if (obj is string)
+                {
+                    result = (string)obj;
+                }
                 else if (obj is IFormattable)
+                {
                     result = (obj as IFormattable).ToString(null, formatProvider);
+                }
                 else
+                {
                     result = obj.ToString();
+                }
             }
 
             return result;
@@ -437,7 +467,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <returns>The string representation.</returns>
-        String IObjectFormatter.ToString(Object obj)
+        string IObjectFormatter.ToString(object obj)
         {
             return ((IObjectFormatter)this).ToString(obj, Culture);
         }

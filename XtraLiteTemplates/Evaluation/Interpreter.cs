@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Evaluation
 {
@@ -43,7 +41,7 @@ namespace XtraLiteTemplates.Evaluation
         private List<Directive> m_directives;
         private Lexer m_lexer;
 
-        public IEqualityComparer<String> Comparer
+        public IEqualityComparer<string> Comparer
         {
             get
             {
@@ -51,7 +49,7 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        public Interpreter(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<String> comparer)
+        public Interpreter(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<string> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
             Expect.NotNull("comparer", comparer);
@@ -69,7 +67,9 @@ namespace XtraLiteTemplates.Evaluation
             if (!m_directives.Contains(directive))
             {
                 foreach (var tag in directive.Tags)
+                {
                     m_lexer.RegisterTag(tag);
+                }
 
                 m_directives.Add(directive);
             }
@@ -83,7 +83,7 @@ namespace XtraLiteTemplates.Evaluation
             return this;
         }
 
-        public Interpreter RegisterSpecial(String keyword, Object value)
+        public Interpreter RegisterSpecial(string keyword, object value)
         {
             m_lexer.RegisterSpecial(keyword, value);
             return this;
@@ -99,7 +99,9 @@ namespace XtraLiteTemplates.Evaluation
                 /* Read the next lex out of the lexer. */
                 var lex = this.m_lexer.ReadNext();
                 if (lex == null)
+                {
                     break;
+                }
 
                 var unparsedLex = lex as UnparsedLex;
                 if (unparsedLex != null)
@@ -122,9 +124,13 @@ namespace XtraLiteTemplates.Evaluation
                         compositeNode.AddChild(new TagNode(directiveCompositeNode, tagLex));
 
                         if (directiveCompositeNode.CandidateDirectiveLockedIn)
+                        {
                             break;
+                        }
                         else
+                        {
                             continue;
+                        }
                     }
 
                     /* Match any directive that starts with this tag. */
@@ -165,4 +171,3 @@ namespace XtraLiteTemplates.Evaluation
         }
     }
 }
-

@@ -55,53 +55,83 @@ namespace XtraLiteTemplates.Dialects.Standard
             yield return obj;
         }
 
-        private Object ReduceObject(object obj)
+        private object ReduceObject(object obj)
         {
-            Object reduced;
+            object reduced;
 
             /* Identify standard types */
             if (obj is double || obj is bool || obj is string)
+            {
                 reduced = obj;
+            }
             else if (obj is byte)
+            {
                 reduced = (double)(byte)obj;
+            }
             else if (obj is sbyte)
+            {
                 reduced = (double)(sbyte)obj;
+            }
             else if (obj is short)
+            {
                 reduced = (double)(short)obj;
+            }
             else if (obj is ushort)
+            {
                 reduced = (double)(ushort)obj;
+            }
             else if (obj is int)
+            {
                 reduced = (double)(int)obj;
+            }
             else if (obj is uint)
+            {
                 reduced = (double)(uint)obj;
+            }
             else if (obj is long)
+            {
                 reduced = (double)(long)obj;
+            }
             else if (obj is ulong)
+            {
                 reduced = (double)(ulong)obj;
+            }
             else if (obj is float)
+            {
                 reduced = (double)(float)obj;
+            }
             else if (obj is decimal)
+            {
                 reduced = (double)(decimal)obj;
+            }
             else
+            {
                 reduced = obj;
+            }
 
             return reduced;
         }
 
         /// <summary>
-        /// <value>Specifies the formatting options used to parse string values. Primarily used when parsing <see cref="Double"/> values.</value>
+        /// Gets the formatting options used to parse string values. Primarily used when parsing <see cref="Double" /> values.
         /// <remarks>The value of the property is set by the caller during class construction.</remarks>
         /// </summary>
+        /// <value>
+        /// The format provider.
+        /// </value>
         public IFormatProvider FormatProvider { get; private set; }
 
         /// <summary>
-        /// <value>Specifies the object formatter used to transform objects to their string representations.</value>
+        /// Gets the object formatter used to transform objects to their string representations.
         /// <remarks>The value of the property is set by the caller during class construction.</remarks>
         /// </summary>
+        /// <value>
+        /// The object formatter.
+        /// </value>
         public IObjectFormatter ObjectFormatter { get; private set; }
 
         /// <summary>
-        /// Creates a new instance of <see cref="FlexiblePrimitiveTypeConverter" /> class.
+        /// Initializes a new instance of the <see cref="FlexiblePrimitiveTypeConverter" /> class.
         /// </summary>
         /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="Double" /> values.</param>
         /// <param name="objectFormatter">The object formatter.</param>
@@ -125,9 +155,13 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             var number = this.ConvertToNumber(obj);
             if (double.IsNaN(number) || double.IsInfinity(number))
+            {
                 return 0;
+            }
             else
+            {
                 return (int)number;
+            }
         }
 
         /// <summary>
@@ -143,23 +177,35 @@ namespace XtraLiteTemplates.Dialects.Standard
             double result;
 
             if (obj == null)
+            {
                 result = double.NaN;
+            }
             else if (obj is double)
+            {
                 result = (double)obj;
+            }
             else if (obj is bool)
+            {
                 result = (bool)obj ? 1 : 0;
+            }
             else
             {
                 var str = obj as string;
                 if (str != null)
                 {
                     if (str.Length == 0)
+                    {
                         result = 0;
+                    }
                     else if (!double.TryParse(str, System.Globalization.NumberStyles.Number, FormatProvider, out result))
+                    {
                         result = double.NaN;
+                    }
                 }
                 else
+                {
                     result = double.NaN;
+                }
             }
 
             return result;
@@ -189,15 +235,25 @@ namespace XtraLiteTemplates.Dialects.Standard
 
             bool result;
             if (obj == null)
+            {
                 result = false;
+            }
             else if (obj is bool)
+            {
                 result = (bool)obj;
+            }
             else if (obj is double)
+            {
                 result = (double)obj != 0;
+            }
             else if (obj is string)
+            {
                 result = ((string)obj).Length > 0;
+            }
             else
+            {
                 result = true;
+            }
 
             return result;
         }
@@ -212,13 +268,21 @@ namespace XtraLiteTemplates.Dialects.Standard
         public virtual IEnumerable<object> ConvertToSequence(object obj)
         {
             if (obj == null)
+            {
                 return null;
-            else if (obj is IEnumerable<Object>)
-                return (IEnumerable<Object>)obj;
+            }
+            else if (obj is IEnumerable<object>)
+            {
+                return (IEnumerable<object>)obj;
+            }
             else if (obj is IEnumerable)
+            {
                 return UpgradeEnumerable((IEnumerable)obj);
+            }
             else
+            {
                 return ObjectToSequence(obj);
+            }
         }
 
         /// <summary>
@@ -229,18 +293,28 @@ namespace XtraLiteTemplates.Dialects.Standard
         public PrimitiveType TypeOf(object obj)
         {
             if (obj == null)
+            {
                 return PrimitiveType.Undefined;
+            }
 
             obj = ReduceObject(obj);
 
             if (obj is double)
+            {
                 return PrimitiveType.Number;
+            }
             else if (obj is bool)
+            {
                 return PrimitiveType.Boolean;
+            }
             else if (obj is string)
+            {
                 return PrimitiveType.String;
+            }
             else
+            {
                 return PrimitiveType.Object;
+            }
         }
     }
 }

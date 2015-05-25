@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
@@ -39,31 +37,31 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     public sealed class RelationalLowerThanOperator : StandardRelationalOperator
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="RelationalGreaterThanOperator" /> class.
+        /// Initializes a new instance of the <see cref="RelationalLowerThanOperator" /> class.
         /// </summary>
         /// <param name="symbol">The operator's symbol.</param>
         /// <param name="stringComparer">The string literal comparer.</param>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> or <paramref name="stringComparer" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public RelationalLowerThanOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public RelationalLowerThanOperator(string symbol, IComparer<string> stringComparer, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 6, stringComparer, typeConverter)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RelationalGreaterThanOperator" /> class using the standard '&lt;' symbol.
+        /// Initializes a new instance of the <see cref="RelationalLowerThanOperator" /> class using the standard '&lt;' symbol.
         /// </summary>
         /// <param name="stringComparer">The string literal comparer.</param>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> or <paramref name="stringComparer" /> is <c>null</c>.</exception>
-        public RelationalLowerThanOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public RelationalLowerThanOperator(IComparer<string> stringComparer, IPrimitiveTypeConverter typeConverter)
             : this("<", stringComparer, typeConverter)
         {
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="RelationalGreaterThanOperator" /> class using the standard '&lt;' symbol and current culture string comparer.
+        /// Initializes a new instance of the <see cref="RelationalLowerThanOperator" /> class using the standard '&lt;' symbol and current culture string comparer.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
@@ -81,10 +79,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <returns>
         /// <c>true</c> if <paramref name="relation"/> is less than zero; <c>false</c> otherwise.
         /// </returns>
-        public override bool Evaluate(Int32 relation, Object left, Object right)
+        public override bool Evaluate(int relation, object left, object right)
         {
             return relation < 0;
         }
     }
 }
-

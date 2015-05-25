@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Evaluation
 {
@@ -44,11 +42,11 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        public Int32 FirstCharacterIndex { get; private set; }
+        public int FirstCharacterIndex { get; private set; }
 
-        public Int32 OriginalLength { get; private set; }
+        public int OriginalLength { get; private set; }
 
-        public Object[] Components { get; private set; }
+        public object[] Components { get; private set; }
 
         public Tag Tag { get; private set; }
 
@@ -64,10 +62,10 @@ namespace XtraLiteTemplates.Evaluation
             Tag = lex.Tag;
         }
 
-        public Object[] Evaluate(IExpressionEvaluationContext context)
+        public object[] Evaluate(IExpressionEvaluationContext context)
         {
             Debug.Assert(context != null);
-            Object[] result = new Object[Components.Length];
+            object[] result = new object[Components.Length];
             for (var i = 0; i < Components.Length; i++)
             {
                 var expression = Components[i] as Expression;
@@ -77,25 +75,28 @@ namespace XtraLiteTemplates.Evaluation
                     result[i] = expression.Evaluate(context);
                 }
                 else
+                {
                     result[i] = Components[i];
+                }
             }
 
             return result;
         }
 
-        public override String ToString()
+        public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
             foreach (var component in Components)
-            {                
+            {
                 if (sb.Length > 0)
+                {
                     sb.Append(" ");
+                }
 
                 sb.Append(component.ToString());
             }
 
-            return String.Format("{{{0}}}", sb.ToString());
+            return string.Format("{{{0}}}", sb.ToString());
         }
     }
 }
-

@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex@ciobanu.org
 //
 //  Copyright (c) 2015, Alexandru Ciobanu (alex@ciobanu.org)
@@ -24,7 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -48,15 +46,15 @@ namespace XtraLiteTemplates.Parsing
     {
         private ExpressionFlowSymbols m_expressionFlowSymbols;
         private List<Operator> m_expressionOperators;
-        private HashSet<String> m_unaryExpressionOperators;
-        private HashSet<String> m_binaryExpressionOperators;
-        private Dictionary<String, Object> m_specials;
+        private HashSet<string> m_unaryExpressionOperators;
+        private HashSet<string> m_binaryExpressionOperators;
+        private Dictionary<string, Object> m_specials;
         private List<Tag> m_tags;
 
         private Token m_currentToken;
-        private Boolean m_isEndOfStream;
+        private bool m_isEndOfStream;
 
-        private Boolean NextToken()
+        private bool NextToken()
         {
             if (this.m_isEndOfStream)
                 return false;
@@ -70,25 +68,25 @@ namespace XtraLiteTemplates.Parsing
 
         private Expression CreateExpression()
         {
-            var expression = new Expression(m_expressionFlowSymbols, Comparer);
+            var expression = new Expression(this.m_expressionFlowSymbols, this.Comparer);
 
-            foreach (var @operator in m_expressionOperators)
+            foreach (var @operator in this.m_expressionOperators)
                 expression.RegisterOperator(@operator);
 
             return expression;
         }
 
-        private Boolean KnownSymbol(String symbol)
+        private bool KnownSymbol(string symbol)
         {
-            Debug.Assert(!String.IsNullOrEmpty(symbol));
+            Debug.Assert(!string.IsNullOrEmpty(symbol));
 
-            if (Comparer.Equals(symbol, m_expressionFlowSymbols.GroupClose) ||
-                Comparer.Equals(symbol, m_expressionFlowSymbols.GroupOpen) ||
-                Comparer.Equals(symbol, m_expressionFlowSymbols.Separator) ||
-                Comparer.Equals(symbol, m_expressionFlowSymbols.MemberAccess))
+            if (Comparer.Equals(symbol, this.m_expressionFlowSymbols.GroupClose) ||
+                Comparer.Equals(symbol, this.m_expressionFlowSymbols.GroupOpen) ||
+                Comparer.Equals(symbol, this.m_expressionFlowSymbols.Separator) ||
+                Comparer.Equals(symbol, this.m_expressionFlowSymbols.MemberAccess))
                 return true;
 
-            foreach (var @operator in m_expressionOperators)
+            foreach (var @operator in this.m_expressionOperators)
             {
                 if (Comparer.Equals(@operator.Symbol, symbol))
                     return true;
@@ -99,16 +97,16 @@ namespace XtraLiteTemplates.Parsing
 
         private void InterpretSymbolChainToken(Expression expression, Token token)
         {
-            String _symbols = token.Value;
+            var _symbols = token.Value;
 
             while (_symbols.Length > 0)
             {
-                Boolean found = false;
+                var found = false;
 
                 for (var i = _symbols.Length; i > 0; i--)
                 {
                     var potentialOperator = _symbols.Substring(0, i);
-                    if (KnownSymbol(potentialOperator))
+                    if (this.KnownSymbol(potentialOperator))
                     {
                         try
                         {
@@ -137,10 +135,10 @@ namespace XtraLiteTemplates.Parsing
         public ITokenizer Tokenizer { get; private set; }
 
         /// <summary>
-        /// <value>The <see cref="System.Collections.Generic.IEqualityComparer{String}"/> object used to match keywords and identifiers.</value>
+        /// <value>The <see cref="IEqualityComparer{String}"/> object used to match keywords and identifiers.</value>
         /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
         /// </summary>
-        public IEqualityComparer<String> Comparer { get; private set; }
+        public IEqualityComparer<string> Comparer { get; private set; }
 
         /// <summary>
         /// <value>A collection of <see cref="XtraLiteTemplates.Parsing.Tag"/> objects registered using <see cref="RegisterTag"/> method.</value>
@@ -161,28 +159,28 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="expressionFlowSymbols">The <see cref="XtraLiteTemplates.Expressions.ExpressionFlowSymbols"/> object containing the standard expression flow control symbols.</param>
         /// <param name="comparer">The <see cref="System.Collections.Generic.IEqualityComparer{String}"/> object used to match keywords and identifiers.</param>
         /// <exception cref="System.ArgumentNullException">Either <paramref name="tokenizer"/>, <paramref name="expressionFlowSymbols"/> or <paramref name="expressionFlowSymbols"/> are <c>null</c>.</exception>
-        public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<String> comparer)
+        public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<string> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
             Expect.NotNull("comparer", comparer);
             Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
 
-            Tokenizer = tokenizer;
-            Comparer = comparer;
+            this.Tokenizer = tokenizer;
+            this.Comparer = comparer;
 
-            m_tags = new List<Tag>();
-            m_expressionOperators = new List<Operator>();
-            m_unaryExpressionOperators = new HashSet<String>(comparer);
-            m_binaryExpressionOperators = new HashSet<String>(comparer);
-            m_specials = new Dictionary<String, Object>(comparer);
+            this.m_tags = new List<Tag>();
+            this.m_expressionOperators = new List<Operator>();
+            this.m_unaryExpressionOperators = new HashSet<string>(comparer);
+            this.m_binaryExpressionOperators = new HashSet<string>(comparer);
+            this.m_specials = new Dictionary<string, Object>(comparer);
 
-            m_expressionFlowSymbols = expressionFlowSymbols;
+            this.m_expressionFlowSymbols = expressionFlowSymbols;
 
             /* Register the flow symbols in */
-            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.Separator);
-            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.MemberAccess);
-            m_unaryExpressionOperators.Add(m_expressionFlowSymbols.GroupOpen);
-            m_binaryExpressionOperators.Add(m_expressionFlowSymbols.GroupClose);
+            this.m_binaryExpressionOperators.Add(m_expressionFlowSymbols.Separator);
+            this.m_binaryExpressionOperators.Add(m_expressionFlowSymbols.MemberAccess);
+            this.m_unaryExpressionOperators.Add(m_expressionFlowSymbols.GroupOpen);
+            this.m_binaryExpressionOperators.Add(m_expressionFlowSymbols.GroupClose);
         }
 
         /// <summary>
@@ -199,13 +197,13 @@ namespace XtraLiteTemplates.Parsing
                 ExceptionHelper.CannotRegisterTagWithNoComponents();
 
             /* Check for an equivalent tag in the list */
-            foreach (var ot in m_tags)
+            foreach (var ot in this.m_tags)
             {
                 if (ot.Equals(tag, Comparer))
                     return this;
             }
 
-            m_tags.Add(tag);
+            this.m_tags.Add(tag);
             return this;
         }
 
@@ -223,24 +221,24 @@ namespace XtraLiteTemplates.Parsing
             var unaryOperator = @operator as UnaryOperator;
             if (unaryOperator != null)
             {
-                if (m_unaryExpressionOperators.Contains(unaryOperator.Symbol) || 
-                    m_specials.ContainsKey(unaryOperator.Symbol))
+                if (this.m_unaryExpressionOperators.Contains(unaryOperator.Symbol) ||
+                    this.m_specials.ContainsKey(unaryOperator.Symbol))
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
                 else
-                    m_unaryExpressionOperators.Add(unaryOperator.Symbol);
+                    this.m_unaryExpressionOperators.Add(unaryOperator.Symbol);
             }
 
             var binaryOperator = @operator as BinaryOperator;
             if (binaryOperator != null)
             {
-                if (m_binaryExpressionOperators.Contains(binaryOperator.Symbol) ||
-                    m_specials.ContainsKey(binaryOperator.Symbol))
+                if (this.m_binaryExpressionOperators.Contains(binaryOperator.Symbol) ||
+                    this.m_specials.ContainsKey(binaryOperator.Symbol))
                     ExceptionHelper.OperatorAlreadyRegistered(@operator);
                 else
-                    m_binaryExpressionOperators.Add(binaryOperator.Symbol);
+                    this.m_binaryExpressionOperators.Add(binaryOperator.Symbol);
             }
 
-            m_expressionOperators.Add(@operator);
+            this.m_expressionOperators.Add(@operator);
 
             return this;
         }
@@ -258,17 +256,17 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="System.ArgumentNullException"><paramref name="keyword"/> is <c>null</c>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="keyword"/> is not a valid identifier.</exception>
         /// <exception cref="System.InvalidOperationException"><paramref name="keyword"/> is already in use by an operator.</exception>
-        public Lexer RegisterSpecial(String keyword, Object value)
+        public Lexer RegisterSpecial(string keyword, Object value)
         {
             Expect.Identifier("keyword", keyword);
-            
-            if (m_unaryExpressionOperators.Contains(keyword) ||
-                m_binaryExpressionOperators.Contains(keyword))
+
+            if (this.m_unaryExpressionOperators.Contains(keyword) ||
+                this.m_binaryExpressionOperators.Contains(keyword))
             {
                 ExceptionHelper.SpecialCannotBeRegistered(keyword);
             }
 
-            m_specials[keyword] = value;
+            this.m_specials[keyword] = value;
             return this;
         }
 
@@ -307,7 +305,7 @@ namespace XtraLiteTemplates.Parsing
 
             Int32 tokenIndex = -1;
 
-            var matchingTags = new HashSet<Tag>(m_tags);
+            var matchingTags = new HashSet<Tag>(this.m_tags);
             List<Token> _allTokens = new List<Token>() { this.m_currentToken }; 
             List<Object> _components = new List<Object>();
 
@@ -342,12 +340,12 @@ namespace XtraLiteTemplates.Parsing
                             }
                         }
 
-                        Object[] actualComponents = new Object[_components.Count];
+                        object[] actualComponents = new object[_components.Count];
                         for (var i = 0; i < _components.Count; i++)
                         {
                             var component = _components[i];
 
-                            var tuple = component as Tuple<String, Expression>;
+                            var tuple = component as Tuple<string, Expression>;
                             if (tuple != null)
                             {
                                 if (matchingTag.MatchesExpression(i))
@@ -480,8 +478,8 @@ namespace XtraLiteTemplates.Parsing
                     {
                         if (this.m_currentToken.Type == Token.TokenType.Number)
                         {
-                            Double _float;
-                            if (Double.TryParse(this.m_currentToken.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out _float))
+                            double _float;
+                            if (double.TryParse(this.m_currentToken.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out _float))
                                 currentExpression.FeedLiteral(_float);
                             else
                                 ExceptionHelper.UnexpectedToken(this.m_currentToken);
@@ -492,7 +490,7 @@ namespace XtraLiteTemplates.Parsing
                         }
                         else
                         {
-                            Object keywordedLiteral;
+                            object keywordedLiteral;
                             if (m_specials.TryGetValue(this.m_currentToken.Value, out keywordedLiteral))
                                 currentExpression.FeedLiteral(keywordedLiteral);
                             else

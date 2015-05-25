@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> or <paramref name="stringComparer" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public RelationalEqualsOperator(String symbol, IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public RelationalEqualsOperator(string symbol, IComparer<string> stringComparer, IPrimitiveTypeConverter typeConverter)
             : base(symbol, 7, stringComparer, typeConverter)
         {
         }
@@ -54,7 +54,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="stringComparer">The string literal comparer.</param>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> or <paramref name="stringComparer" /> is <c>null</c>.</exception>
-        public RelationalEqualsOperator(IComparer<String> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public RelationalEqualsOperator(IComparer<string> stringComparer, IPrimitiveTypeConverter typeConverter)
             : this("==", stringComparer, typeConverter)
         {
         }
@@ -78,10 +78,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <returns>
         /// <c>true</c> if <paramref name="relation"/> is zero; <c>false</c> otherwise.
         /// </returns>
-        public override bool Evaluate(Int32 relation, Object left, Object right)
+        public override bool Evaluate(int relation, object left, object right)
         {
             return relation == 0;
         }
     }
 }
-
