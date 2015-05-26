@@ -266,6 +266,18 @@ namespace XtraLiteTemplates.NUnit.Dialects
             /* 6 */
             Assert.AreEqual(cclc, cclc);
 
+            /* 7 */
+            var cmic = new CodeMonkeyDialect(DialectCasing.IgnoreCase);
+            var cmuc = new CodeMonkeyDialect(DialectCasing.UpperCase);
+            var cmlc = new CodeMonkeyDialect(DialectCasing.LowerCase);
+
+            Assert.AreNotEqual(iic, cmic);
+            Assert.AreNotEqual(iuc, cmuc);
+            Assert.AreNotEqual(ilc, cmlc);
+            Assert.AreNotEqual(iic.GetHashCode(), cmic.GetHashCode());
+            Assert.AreNotEqual(iuc.GetHashCode(), cmuc.GetHashCode());
+            Assert.AreNotEqual(ilc.GetHashCode(), cmlc.GetHashCode());
+
             /* Special */
             Assert.AreNotEqual(cclc, this);
             Assert.AreNotEqual(cclc, null);

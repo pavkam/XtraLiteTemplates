@@ -201,6 +201,18 @@ namespace XtraLiteTemplates.NUnit.Dialects
             /* 3 */
             Assert.AreEqual(ilc, ilc);
 
+            /* 4 */
+            var siic = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
+            var siuc = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
+            var silc = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.LowerCase);
+
+            Assert.AreNotEqual(iic, siic);
+            Assert.AreNotEqual(iuc, siuc);
+            Assert.AreNotEqual(ilc, silc);
+            Assert.AreNotEqual(iic.GetHashCode(), siic.GetHashCode());
+            Assert.AreNotEqual(iuc.GetHashCode(), siuc.GetHashCode());
+            Assert.AreNotEqual(ilc.GetHashCode(), silc.GetHashCode());
+
             /* Special */
             Assert.AreNotEqual(iic, this);
             Assert.AreNotEqual(iic, null);
