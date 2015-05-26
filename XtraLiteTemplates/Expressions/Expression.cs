@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.Expressions
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using XtraLiteTemplates.Expressions.Nodes;
     using XtraLiteTemplates.Expressions.Operators;
 
@@ -39,56 +40,48 @@ namespace XtraLiteTemplates.Expressions
     /// </summary>
     public sealed class Expression
     {
-        private ExpressionNode m_current;
-        private RootNode m_root;
-        private List<Operator> m_supportedOperators;
-        private Func<IExpressionEvaluationContext, object> m_function;
-        private Dictionary<string, UnaryOperator> m_unaryOperatorSymbols;
-        private Dictionary<string, BinaryOperator> m_binaryOperatorSymbols;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private ExpressionNode currentNode;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private RootNode currentGroupRootNode;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private List<Operator> registeredOperators;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Func<IExpressionEvaluationContext, object> evaluationFunction;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Dictionary<string, UnaryOperator> unaryOperatorSymbols;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Dictionary<string, BinaryOperator> binaryOperatorSymbols;
 
         /// <summary>
-        /// Gets a value indicating whether this <see cref="Expression"/> is constructed.
+        /// Initializes a new instance of the <see cref="Expression"/> class.
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if constructed; otherwise, <c>false</c>.
-        /// </value>
-        public bool Constructed
+        /// <param name="flowSymbols">The flow symbols.</param>
+        /// <param name="comparer">The symbol and identifier comparer.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="flowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
+        public Expression(ExpressionFlowSymbols flowSymbols, IEqualityComparer<string> comparer)
         {
-            get
-            {
-                return this.m_function != null;
-            }
+            Expect.NotNull("comparer", comparer);
+            Expect.NotNull("flowSymbols", flowSymbols);
+
+            this.FlowSymbols = flowSymbols;
+            this.unaryOperatorSymbols = new Dictionary<string, UnaryOperator>(comparer);
+            this.binaryOperatorSymbols = new Dictionary<string, BinaryOperator>(comparer);
+            this.registeredOperators = new List<Operator>();
+            this.Comparer = comparer;
         }
 
         /// <summary>
-        /// Gets a value indicating whether the construction of this <see cref="Expression"/> has started.
+        /// Initializes a new instance of the <see cref="Expression"/> class using the default flow symbols and a culture-invariant, case-insensitive comparer.
         /// </summary>
-        /// <value>
-        ///   <c>true</c> if started; otherwise, <c>false</c>.
-        /// </value>
-        public bool Started
+        public Expression()
+            : this(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
         {
-            get
-            {
-                return this.m_current != null;
-            }
-        }
-
-        /// <summary>
-        /// Determines whether the specified <paramref name="symbol" /> is a supported operator.
-        /// </summary>
-        /// <param name="symbol">The symbol to verify.</param>
-        /// <returns>
-        ///   <c>true</c> if the symbol is supported; otherwise, <c>false</c>.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
-        public bool IsSupportedOperator(string symbol)
-        {
-            Expect.NotEmpty("symbol", symbol);
-
-            return
-                this.m_unaryOperatorSymbols.ContainsKey(symbol) || this.m_binaryOperatorSymbols.ContainsKey(symbol);
         }
 
         /// <summary>
@@ -101,7 +94,7 @@ namespace XtraLiteTemplates.Expressions
         {
             get
             {
-                return this.m_supportedOperators;
+                return this.registeredOperators;
             }
         }
 
@@ -122,29 +115,48 @@ namespace XtraLiteTemplates.Expressions
         public IEqualityComparer<string> Comparer { get; private set; }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Expression"/> class.
+        /// Gets a value indicating whether this <see cref="Expression"/> is constructed.
         /// </summary>
-        /// <param name="flowSymbols">The flow symbols.</param>
-        /// <param name="comparer">The symbol and identifier comparer.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="flowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
-        public Expression(ExpressionFlowSymbols flowSymbols, IEqualityComparer<string> comparer)
+        /// <value>
+        ///   <c>true</c> if constructed; otherwise, <c>false</c>.
+        /// </value>
+        public bool Constructed
         {
-            Expect.NotNull("comparer", comparer);
-            Expect.NotNull("flowSymbols", flowSymbols);
-
-            this.FlowSymbols = flowSymbols;
-            this.m_unaryOperatorSymbols = new Dictionary<String, UnaryOperator>(comparer);
-            this.m_binaryOperatorSymbols = new Dictionary<String, BinaryOperator>(comparer);
-            this.m_supportedOperators = new List<Operator>();
-            this.Comparer = comparer;
+            get
+            {
+                return this.evaluationFunction != null;
+            }
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="Expression"/> class using the default flow symbols and a culture-invariant, case-insensitive comparer.
+        /// Gets a value indicating whether the construction of this <see cref="Expression"/> has started.
         /// </summary>
-        public Expression()
-            : this(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
+        /// <value>
+        ///   <c>true</c> if started; otherwise, <c>false</c>.
+        /// </value>
+        public bool Started
         {
+            get
+            {
+                return this.currentNode != null;
+            }
+        }
+
+        /// <summary>
+        /// Determines whether the specified <paramref name="symbol" /> is a supported operator.
+        /// </summary>
+        /// <param name="symbol">The symbol to verify.</param>
+        /// <returns>
+        ///   <c>true</c> if the symbol is supported; otherwise, <c>false</c>.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
+        public bool IsSupportedOperator(string symbol)
+        {
+            Expect.NotEmpty("symbol", symbol);
+
+            return
+                this.unaryOperatorSymbols.ContainsKey(symbol) || this.binaryOperatorSymbols.ContainsKey(symbol);
         }
 
         /// <summary>
@@ -158,12 +170,12 @@ namespace XtraLiteTemplates.Expressions
         {
             Expect.NotNull("operator", @operator);
 
-            if (Started)
+            if (this.Started)
             {
                 ExceptionHelper.CannotRegisterOperatorsForStartedExpression();
             }
 
-            Debug.Assert(!Constructed);
+            Debug.Assert(!this.Constructed, "must not be constructed.");
 
             /* Standards. */
             if (@operator.Symbol == this.FlowSymbols.Separator ||
@@ -177,29 +189,29 @@ namespace XtraLiteTemplates.Expressions
             if (@operator is UnaryOperator)
             {
                 var unaryOperator = (UnaryOperator)@operator;
-                if (this.m_unaryOperatorSymbols.ContainsKey(unaryOperator.Symbol))
+                if (this.unaryOperatorSymbols.ContainsKey(unaryOperator.Symbol))
                 {
                     ExceptionHelper.OperatorAlreadyRegistered(unaryOperator);
                 }
 
-                this.m_unaryOperatorSymbols.Add(@operator.Symbol, unaryOperator);
+                this.unaryOperatorSymbols.Add(@operator.Symbol, unaryOperator);
             }
             else if (@operator is BinaryOperator)
             {
                 var binaryOperator = (BinaryOperator)@operator;
-                if (this.m_binaryOperatorSymbols.ContainsKey(binaryOperator.Symbol))
+                if (this.binaryOperatorSymbols.ContainsKey(binaryOperator.Symbol))
                 {
                     ExceptionHelper.OperatorAlreadyRegistered(binaryOperator);
                 }
 
-                this.m_binaryOperatorSymbols.Add(@operator.Symbol, binaryOperator);
+                this.binaryOperatorSymbols.Add(@operator.Symbol, binaryOperator);
             }
             else
             {
                 Debug.Fail("Unsupported operator type.");
             }
 
-            this.m_supportedOperators.Add(@operator);
+            this.registeredOperators.Add(@operator);
             return this;
         }
 
@@ -219,7 +231,7 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.CannotModifyAConstructedExpression();
             }
 
-            FeedTerm(literal, true);
+            this.FeedTerm(literal, true);
             return this;
         }
 
@@ -243,7 +255,7 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.CannotModifyAConstructedExpression();
             }
 
-            FeedTerm(symbol, false);
+            this.FeedTerm(symbol, false);
             return this;
         }
 
@@ -262,27 +274,27 @@ namespace XtraLiteTemplates.Expressions
             if (!this.Constructed)
             {
                 bool fail = false;
-                if (this.m_root.Parent != null)
+                if (this.currentGroupRootNode.Parent != null)
                 {
                     fail = true;
                 }
                 else
                 {
-                    var currentRootNode = this.m_current as RootNode;
+                    var currentRootNode = this.currentNode as RootNode;
                     if (currentRootNode != null)
                     {
                         fail = !currentRootNode.Closed;
                     }
                     else
                     {
-                        var currentDisembowelerNode = this.m_current as DisembowelerNode;
+                        var currentDisembowelerNode = this.currentNode as DisembowelerNode;
                         if (currentDisembowelerNode != null)
                         {
                             fail = currentDisembowelerNode.MemberName == null;
                         }
                         else
                         {
-                            fail = !(this.m_current is LeafNode);
+                            fail = !(this.currentNode is LeafNode);
                         }
                     }
                 }
@@ -293,8 +305,8 @@ namespace XtraLiteTemplates.Expressions
                 }
 
                 /* Reduce the expression if so was desired. */
-                this.m_root.Reduce(ReduceExpressionEvaluationContext.Instance);
-                this.m_function = this.m_root.GetEvaluationFunction();
+                this.currentGroupRootNode.Reduce(ReduceExpressionEvaluationContext.Instance);
+                this.evaluationFunction = this.currentGroupRootNode.GetEvaluationFunction();
             }
         }
 
@@ -309,12 +321,12 @@ namespace XtraLiteTemplates.Expressions
         {
             Expect.NotNull("context", context);
 
-            if (!Constructed)
+            if (!this.Constructed)
             {
                 ExceptionHelper.CannotEvaluateUnconstructedExpression();
             }
 
-            return this.m_function(context);
+            return this.evaluationFunction(context);
         }
 
         /// <summary>
@@ -325,7 +337,7 @@ namespace XtraLiteTemplates.Expressions
         /// </returns>
         public override string ToString()
         {
-            return ToString(ExpressionFormatStyle.Arithmetic);
+            return this.ToString(ExpressionFormatStyle.Arithmetic);
         }
 
         /// <summary>
@@ -337,117 +349,122 @@ namespace XtraLiteTemplates.Expressions
         /// </returns>
         public string ToString(ExpressionFormatStyle style)
         {
-            if (this.m_root == null)
+            if (this.currentGroupRootNode == null)
             {
                 return "??";
             }
             else
             {
-                return this.m_root.ToString(style);
+                return this.currentGroupRootNode.ToString(style);
             }
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void OpenNewGroup()
         {
-            if (!this.m_current.Continuity.HasFlag(PermittedContinuations.NewGroup))
+            if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.NewGroup))
             {
                 ExceptionHelper.InvalidExpressionTerm(this.FlowSymbols.GroupOpen);
             }
 
-            if (m_current is OperatorNode)
+            if (this.currentNode is OperatorNode)
             {
-                var currentOperatorNode = (OperatorNode)this.m_current;
-                Debug.Assert(currentOperatorNode.RightNode == null);
+                var currentOperatorNode = (OperatorNode)this.currentNode;
+                Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                 /* Flip to the new root */
-                this.m_root = new RootNode(currentOperatorNode);
-                currentOperatorNode.RightNode = this.m_root;
-                this.m_current = this.m_root;
+                this.currentGroupRootNode = new RootNode(currentOperatorNode);
+                currentOperatorNode.RightNode = this.currentGroupRootNode;
+                this.currentNode = this.currentGroupRootNode;
             }
-            else if (this.m_current is RootNode)
+            else if (this.currentNode is RootNode)
             {
-                var currentRootNode = (RootNode)this.m_current;
+                var currentRootNode = (RootNode)this.currentNode;
 
-                Debug.Assert(currentRootNode == this.m_root);
-                Debug.Assert(!currentRootNode.Closed);
+                Debug.Assert(currentRootNode == this.currentGroupRootNode, "current operator node must be the current root node.");
+                Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
                 /* Flip to the new root */
-                this.m_root = new RootNode(currentRootNode);
-                currentRootNode.AddChild(m_root);
-                this.m_current = m_root;
+                this.currentGroupRootNode = new RootNode(currentRootNode);
+                currentRootNode.AddChild(this.currentGroupRootNode);
+                this.currentNode = this.currentGroupRootNode;
             }
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void CloseExistingGroup()
         {
             /* Special case just here! */
-            if (this.m_root.Parent == null)
+            if (this.currentGroupRootNode.Parent == null)
             {
                 ExceptionHelper.InvalidExpressionTerm(this.FlowSymbols.GroupClose);
             }
 
-            if (!this.m_current.Continuity.HasFlag(PermittedContinuations.CloseGroup))
+            if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.CloseGroup))
             {
                 ExceptionHelper.InvalidExpressionTerm(this.FlowSymbols.GroupClose);
             }
 
-            this.m_root.Close();
-            this.m_current = m_root;
+            this.currentGroupRootNode.Close();
+            this.currentNode = this.currentGroupRootNode;
 
             /* Find the actual root now. */
-            var rootNode = this.m_root.Parent;
+            var rootNode = this.currentGroupRootNode.Parent;
             while (!(rootNode is RootNode))
             {
                 rootNode = rootNode.Parent;
             }
 
-            this.m_root = (RootNode)rootNode;
+            this.currentGroupRootNode = (RootNode)rootNode;
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void ContinueExistingGroup()
         {
-            if (!this.m_current.Continuity.HasFlag(PermittedContinuations.ContinueGroup))
+            if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.ContinueGroup))
             {
-                ExceptionHelper.InvalidExpressionTerm(FlowSymbols.Separator);
+                ExceptionHelper.InvalidExpressionTerm(this.FlowSymbols.Separator);
             }
 
-            this.m_current = this.m_root;
+            this.currentNode = this.currentGroupRootNode;
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void StartUnary(UnaryOperator unaryOperator)
         {
-            if (!this.m_current.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
+            if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
             {
                 ExceptionHelper.UnexpectedOperator(unaryOperator.Symbol);
             }
 
-            if (this.m_current is OperatorNode)
+            if (this.currentNode is OperatorNode)
             {
-                var currentOperatorNode = this.m_current as OperatorNode;
-                Debug.Assert(currentOperatorNode.RightNode == null);
+                var currentOperatorNode = this.currentNode as OperatorNode;
+                Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                 currentOperatorNode.RightNode = new UnaryOperatorNode(currentOperatorNode, unaryOperator);
-                this.m_current = currentOperatorNode.RightNode;
+                this.currentNode = currentOperatorNode.RightNode;
             }
-            else if (m_current is RootNode)
+            else if (this.currentNode is RootNode)
             {
-                var currentRootNode = this.m_current as RootNode;
-                Debug.Assert(!currentRootNode.Closed);
+                var currentRootNode = this.currentNode as RootNode;
+                Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
                 var newNode = new UnaryOperatorNode(currentRootNode, unaryOperator);
                 currentRootNode.AddChild(newNode);
-                this.m_current = newNode;
+                this.currentNode = newNode;
             }
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void StartBinary(BinaryOperator binaryOperator)
         {
-            if (!this.m_current.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
+            if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
             {
                 ExceptionHelper.UnexpectedOperator(binaryOperator.Symbol);
             }
 
-            var leftNode = this.m_current;
+            var leftNode = this.currentNode;
             var comparand = binaryOperator.Associativity == Associativity.LeftToRight ? 0 : -1;
 
             /* Go up the tree while the precedence allows. */
@@ -459,7 +476,7 @@ namespace XtraLiteTemplates.Expressions
 
             var leftNodeParentOperatorNode = leftNode.Parent as OperatorNode;
 
-            this.m_current = new BinaryOperatorNode(leftNode.Parent, binaryOperator)
+            this.currentNode = new BinaryOperatorNode(leftNode.Parent, binaryOperator)
             {
                 LeftNode = leftNode,
             };
@@ -467,59 +484,61 @@ namespace XtraLiteTemplates.Expressions
             /* Re-jig the tree. */
             if (leftNodeParentOperatorNode != null)
             {
-                leftNodeParentOperatorNode.RightNode = this.m_current;
+                leftNodeParentOperatorNode.RightNode = this.currentNode;
             }
 
-            leftNode.Parent = m_current;
-            if (this.m_root.LastChild == leftNode)
+            leftNode.Parent = this.currentNode;
+            if (this.currentGroupRootNode.LastChild == leftNode)
             {
-                this.m_root.LastChild = m_current;
+                this.currentGroupRootNode.LastChild = this.currentNode;
             }
 
             return;
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void CompleteWithSymbol(string symbol)
         {
-            if (!this.m_current.Continuity.HasFlag(PermittedContinuations.Identifier))
+            if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.Identifier))
             {
                 ExceptionHelper.InvalidExpressionTerm(symbol);
             }
 
-            var newNode = new ReferenceNode(this.m_current, symbol);
+            var newNode = new ReferenceNode(this.currentNode, symbol);
 
-            if (this.m_current is OperatorNode)
+            if (this.currentNode is OperatorNode)
             {
-                var currentOperatorNode = this.m_current as OperatorNode;
-                Debug.Assert(currentOperatorNode.RightNode == null);
+                var currentOperatorNode = this.currentNode as OperatorNode;
+                Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                 currentOperatorNode.RightNode = newNode;
-                this.m_current = newNode;
+                this.currentNode = newNode;
             }
-            else if (this.m_current is RootNode)
+            else if (this.currentNode is RootNode)
             {
-                var currentRootNode = this.m_current as RootNode;
-                Debug.Assert(!currentRootNode.Closed);
+                var currentRootNode = this.currentNode as RootNode;
+                Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
                 currentRootNode.AddChild(newNode);
-                this.m_current = newNode;
+                this.currentNode = newNode;
             }
-            else if (this.m_current is DisembowelerNode && ((DisembowelerNode)this.m_current).MemberName == null)
+            else if (this.currentNode is DisembowelerNode && ((DisembowelerNode)this.currentNode).MemberName == null)
             {
-                var currentDisembowelerNode = this.m_current as DisembowelerNode;
-                Debug.Assert(currentDisembowelerNode.ObjectNode != null);
+                var currentDisembowelerNode = this.currentNode as DisembowelerNode;
+                Debug.Assert(currentDisembowelerNode.ObjectNode != null, "current disemboweler node's object must not be null.");
 
                 currentDisembowelerNode.MemberName = symbol;
             }
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void CompleteWithLiteral(object literal)
         {
-            if (!this.m_current.Continuity.HasFlag(PermittedContinuations.Literal))
+            if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.Literal))
             {
-                if (this.m_current is DisembowelerNode && ((DisembowelerNode)this.m_current).MemberName == null)
+                if (this.currentNode is DisembowelerNode && ((DisembowelerNode)this.currentNode).MemberName == null)
                 {
-                    ExceptionHelper.UnexpectedLiteralRequiresIdentifier(FlowSymbols.MemberAccess, literal);
+                    ExceptionHelper.UnexpectedLiteralRequiresIdentifier(this.FlowSymbols.MemberAccess, literal);
                 }
                 else
                 {
@@ -527,63 +546,65 @@ namespace XtraLiteTemplates.Expressions
                 }
             }
 
-            var newNode = new LiteralNode(this.m_current, literal);
+            var newNode = new LiteralNode(this.currentNode, literal);
 
-            if (this.m_current is OperatorNode)
+            if (this.currentNode is OperatorNode)
             {
-                var currentOperatorNode = this.m_current as OperatorNode;
+                var currentOperatorNode = this.currentNode as OperatorNode;
 
-                Debug.Assert(currentOperatorNode.RightNode == null);
+                Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                 currentOperatorNode.RightNode = newNode;
-                this.m_current = newNode;
+                this.currentNode = newNode;
             }
-            else if (this.m_current is RootNode)
+            else if (this.currentNode is RootNode)
             {
-                var currentRootNode = this.m_current as RootNode;
-                Debug.Assert(!currentRootNode.Closed);
+                var currentRootNode = this.currentNode as RootNode;
+                Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
                 currentRootNode.AddChild(newNode);
-                this.m_current = newNode;
+                this.currentNode = newNode;
             }
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void ContinueWithMemberAccess()
         {
-            if (!m_current.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
+            if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
             {
                 ExceptionHelper.UnexpectedOperator(this.FlowSymbols.MemberAccess);
             }
 
             /* Left side now becomes the "object" of disembowlement and the right side will be the member name */
-            var newNode = new DisembowelerNode(this.m_current.Parent, this.m_current);
-            var parentOperatorNode = this.m_current.Parent as OperatorNode;
+            var newNode = new DisembowelerNode(this.currentNode.Parent, this.currentNode);
+            var parentOperatorNode = this.currentNode.Parent as OperatorNode;
             if (parentOperatorNode != null)
             {
-                Debug.Assert(parentOperatorNode.RightNode == this.m_current);
+                Debug.Assert(parentOperatorNode.RightNode == this.currentNode, "parent operator node's right node must be the current node.");
                 parentOperatorNode.RightNode = newNode;
             }
-            else if (this.m_current.Parent == m_root)
+            else if (this.currentNode.Parent == this.currentGroupRootNode)
             {
-                Debug.Assert(this.m_root.LastChild == this.m_current);
-                this.m_root.LastChild = newNode;
+                Debug.Assert(this.currentGroupRootNode.LastChild == this.currentNode, "the last child of the current root node must be the current node.");
+                this.currentGroupRootNode.LastChild = newNode;
             }
 
-            this.m_current = newNode;
+            this.currentNode = newNode;
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void FeedTerm(object term, bool isLiteral)
         {
-            Debug.Assert(isLiteral || term is string);
+            Debug.Assert(isLiteral || term is string, "the term expected to be a string for non-literals.");
 
-            if (this.m_root == null)
+            if (this.currentGroupRootNode == null)
             {
                 /* Init! */
-                this.m_root = new RootNode(null);
-                this.m_current = m_root;
+                this.currentGroupRootNode = new RootNode(null);
+                this.currentNode = this.currentGroupRootNode;
             }
 
-            if (Constructed)
+            if (this.Constructed)
             {
                 ExceptionHelper.CannotModifyAConstructedExpression();
             }
@@ -611,21 +632,21 @@ namespace XtraLiteTemplates.Expressions
                 else
                 {
                     UnaryOperator unaryOperator;
-                    if (this.m_unaryOperatorSymbols.TryGetValue(symbol, out unaryOperator))
+                    if (this.unaryOperatorSymbols.TryGetValue(symbol, out unaryOperator))
                     {
-                        if (this.m_current.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
+                        if (this.currentNode.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
                         {
-                            StartUnary(unaryOperator);
+                            this.StartUnary(unaryOperator);
                             return;
                         }
                     }
 
                     BinaryOperator binaryOperator;
-                    if (this.m_binaryOperatorSymbols.TryGetValue(symbol, out binaryOperator))
+                    if (this.binaryOperatorSymbols.TryGetValue(symbol, out binaryOperator))
                     {
-                        if (this.m_current.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
+                        if (this.currentNode.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
                         {
-                            StartBinary(binaryOperator);
+                            this.StartBinary(binaryOperator);
                             return;
                         }
                     }

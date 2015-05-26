@@ -29,28 +29,20 @@
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Text;
-    using XtraLiteTemplates.Parsing;
+    using System.Linq;
+    using System.Text;    
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// Abstract base class for all supported directives.
     /// </summary>
     public abstract class Directive
     {
-        private readonly List<Tag> m_tags;
-
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        internal IReadOnlyList<Tag> Tags
-        {
-            get 
-            {
-                return m_tags;
-            }
-        }
+        private readonly List<Tag> directiveComponentTags;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Directive"/> class.
@@ -73,7 +65,7 @@ namespace XtraLiteTemplates.Evaluation
                 }
             }
 
-            m_tags = new List<Tag>(tags);
+            this.directiveComponentTags = new List<Tag>(tags);
         }
 
         /// <summary>
@@ -102,6 +94,15 @@ namespace XtraLiteTemplates.Evaluation
             Skip,
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        internal IReadOnlyList<Tag> Tags
+        {
+            get
+            {
+                return this.directiveComponentTags;
+            }
+        }
+
         /// <summary>
         /// Returns a human-readable representation of the current directive object.
         /// </summary>
@@ -111,7 +112,7 @@ namespace XtraLiteTemplates.Evaluation
         public override string ToString()
         {
             StringBuilder sb = new StringBuilder();
-            foreach (var tag in m_tags)
+            foreach (var tag in this.directiveComponentTags)
             {
                 if (sb.Length > 0)
                 {
@@ -140,7 +141,7 @@ namespace XtraLiteTemplates.Evaluation
             Expect.NotNull("comparer", comparer);
 
             var directiveObj = obj as Directive;
-            if (directiveObj == null || directiveObj.m_tags.Count != this.m_tags.Count)
+            if (directiveObj == null || directiveObj.directiveComponentTags.Count != this.directiveComponentTags.Count)
             {
                 return false;
             }
@@ -149,9 +150,9 @@ namespace XtraLiteTemplates.Evaluation
                 return true;
             }
 
-            for (var i = 0; i < m_tags.Count; i++)
+            for (var i = 0; i < this.directiveComponentTags.Count; i++)
             {
-                if (!this.m_tags[i].Equals(directiveObj.m_tags[i], comparer))
+                if (!this.directiveComponentTags[i].Equals(directiveObj.directiveComponentTags[i], comparer))
                 {
                     return false;
                 }
@@ -172,7 +173,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         public override bool Equals(object obj)
         {
-            return Equals(obj, StringComparer.CurrentCulture);
+            return this.Equals(obj, StringComparer.CurrentCulture);
         }
 
         /// <summary>
@@ -206,7 +207,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         public override int GetHashCode()
         {
-            return GetHashCode(StringComparer.CurrentCulture);
+            return this.GetHashCode(StringComparer.CurrentCulture);
         }
 
         /// <summary>

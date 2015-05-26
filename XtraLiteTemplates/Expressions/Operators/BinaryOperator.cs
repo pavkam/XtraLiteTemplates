@@ -36,15 +36,6 @@ namespace XtraLiteTemplates.Expressions.Operators
     public abstract class BinaryOperator : Operator
     {
         /// <summary>
-        /// Gets the operator's associativity.
-        /// </summary>
-        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
-        /// <value>
-        /// The operator's associativity.
-        /// </value>
-        public Associativity Associativity { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="BinaryOperator"/> class.
         /// </summary>
         /// <param name="symbol">The operator's symbol.</param>
@@ -59,6 +50,15 @@ namespace XtraLiteTemplates.Expressions.Operators
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
             Associativity = associativity;
         }
+
+        /// <summary>
+        /// Gets the operator's associativity.
+        /// </summary>
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// <value>
+        /// The operator's associativity.
+        /// </value>
+        public Associativity Associativity { get; private set; }
 
         /// <summary>
         /// Override in descendant classes to evaluate the operation for <paramref name="left"/> and <paramref name="right"/> operands.

@@ -36,16 +36,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class OperatorNode : ExpressionNode
     {
-        public Operator Operator { get; private set; }
-
-        public ExpressionNode RightNode { get; internal set; }
-
         internal OperatorNode(ExpressionNode parent, Operator @operator)
             : base(parent)
         {
-            Debug.Assert(@operator != null);
+            Debug.Assert(@operator != null, "operator cannot be null.");
 
             Operator = @operator;
         }
+
+        public Operator Operator { get; private set; }
+
+        public ExpressionNode RightNode { get; internal set; }
     }
 }

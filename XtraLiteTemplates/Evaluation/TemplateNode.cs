@@ -36,11 +36,11 @@ namespace XtraLiteTemplates.Evaluation
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class TemplateNode
     {
-        public TemplateNode Parent { get; private set; }
-
         protected TemplateNode(TemplateNode parent)
         {
-            Parent = parent;
+            this.Parent = parent;
         }
+
+        public TemplateNode Parent { get; private set; }
     }
 }

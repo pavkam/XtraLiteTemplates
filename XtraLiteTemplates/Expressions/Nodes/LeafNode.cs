@@ -30,11 +30,11 @@ namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
     using System.CodeDom;
-    using System.CodeDom.Compiler;
-    using System.IO;
+    using System.CodeDom.Compiler;    
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using XtraLiteTemplates.Expressions.Operators;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class LeafNode : ExpressionNode

@@ -25,6 +25,7 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
@@ -34,17 +35,17 @@ namespace XtraLiteTemplates.Expressions.Nodes
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class UnaryOperatorNode : OperatorNode
     {
+        public UnaryOperatorNode(ExpressionNode parent, UnaryOperator @operator)
+            : base(parent, @operator)
+        {
+        }
+
         public new UnaryOperator Operator
         {
             get
             {
                 return base.Operator as UnaryOperator;
             }
-        }
-
-        public UnaryOperatorNode(ExpressionNode parent, UnaryOperator @operator)
-            : base(parent, @operator)
-        {
         }
 
         public override PermittedContinuations Continuity
@@ -59,18 +60,22 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
-        public override String ToString(ExpressionFormatStyle style)
+        public override string ToString(ExpressionFormatStyle style)
         {
             var childAsString = this.RightNode != null ? this.RightNode.ToString(style) : "??";
 
             string result = null;
 
             if (style == ExpressionFormatStyle.Canonical)
+            {
                 result = string.Format("{0}{{{1}}}", this.Operator, childAsString);
+            }
             else
+            {
                 result = string.Format("{0}{1}", this.Operator, childAsString);
+            }
 
-            Debug.Assert(result != null);
+            Debug.Assert(result != null, "resulting string cannot be null.");
             return result;
         }
 
@@ -82,7 +87,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
-            Debug.Assert(reduceContext != null);
+            Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
             if (this.RightNode.Reduce(reduceContext))
             {

@@ -25,21 +25,28 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
     using System.CodeDom;
     using System.CodeDom.Compiler;
-    using System.IO;
-    using System.Diagnostics;
     using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.IO;
     using System.Linq;
     using System.Text;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class RootNode : ExpressionNode
     {
-        private List<ExpressionNode> m_children;
+        private List<ExpressionNode> groupChildrenNodes;
+
+        public RootNode(ExpressionNode parent)
+            : base(parent)
+        {
+            this.groupChildrenNodes = new List<ExpressionNode>();
+        }
 
         public IReadOnlyList<ExpressionNode> Children { get; private set; }
 
@@ -47,37 +54,20 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             get
             {
-                Debug.Assert(this.m_children.Count > 0);
-                return this.m_children[m_children.Count - 1];
+                Debug.Assert(this.groupChildrenNodes.Count > 0, "Must have at least one child node.");
+                return this.groupChildrenNodes[this.groupChildrenNodes.Count - 1];
             }
 
             set
             {
-                Debug.Assert(this.m_children.Count > 0);
-                Debug.Assert(value != null);
+                Debug.Assert(this.groupChildrenNodes.Count > 0, "Must have at least one child node.");
+                Debug.Assert(value != null, "value cannot be null.");
 
-                this.m_children[m_children.Count - 1] = value;
+                this.groupChildrenNodes[this.groupChildrenNodes.Count - 1] = value;
             }
         }
 
         public bool Closed { get; private set; }
-
-        public RootNode(ExpressionNode parent)
-            : base(parent)
-        {
-            this.m_children = new List<ExpressionNode>();
-        }
-
-        public void AddChild(ExpressionNode child)
-        {
-            this.m_children.Add(child);
-        }
-
-        public void Close()
-        {
-            Debug.Assert(!this.Closed);
-            this.Closed = true;
-        }
 
         public override PermittedContinuations Continuity
         {
@@ -100,9 +90,20 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
+        public void AddChild(ExpressionNode child)
+        {
+            this.groupChildrenNodes.Add(child);
+        }
+
+        public void Close()
+        {
+            Debug.Assert(!this.Closed, "Cannot be closed.");
+            this.Closed = true;
+        }
+
         public override string ToString(ExpressionFormatStyle style)
         {
-            var result = string.Join(" , ", this.m_children.Select(s => s.ToString(style)));
+            var result = string.Join(" , ", this.groupChildrenNodes.Select(s => s.ToString(style)));
 
             if (this.Parent != null)
             {
@@ -125,27 +126,27 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)
         {
-            Debug.Assert(reduceContext != null);
+            Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
-            if (m_children.Count == 1)
+            if (this.groupChildrenNodes.Count == 1)
             {
-                if (m_children[0].Reduce(reduceContext))
+                if (this.groupChildrenNodes[0].Reduce(reduceContext))
                 {
-                    reducedValue = m_children[0].ReducedValue;
+                    reducedValue = this.groupChildrenNodes[0].ReducedValue;
                     return true;
                 }
             }
             else
             {
                 var allReduced = true;
-                foreach (var child in m_children)
+                foreach (var child in this.groupChildrenNodes)
                 {
                     allReduced &= child.Reduce(reduceContext);
                 }
 
                 if (allReduced)
                 {
-                    reducedValue = m_children.Select(s => s.ReducedValue).ToArray();
+                    reducedValue = this.groupChildrenNodes.Select(s => s.ReducedValue).ToArray();
                     return true;
                 }
             }
@@ -156,7 +157,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override Func<IExpressionEvaluationContext, object> Build()
         {
-            var childFuncs = m_children.Select(s => s.GetEvaluationFunction()).ToArray();
+            var childFuncs = this.groupChildrenNodes.Select(s => s.GetEvaluationFunction()).ToArray();
 
             if (childFuncs.Length == 1)
             {

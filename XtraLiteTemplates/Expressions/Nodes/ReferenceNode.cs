@@ -31,23 +31,23 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System;
     using System.CodeDom;
     using System.CodeDom.Compiler;
-    using System.IO;
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
     using System.Diagnostics.CodeAnalysis;
-
+    using System.IO;
+    using XtraLiteTemplates.Expressions.Operators;
+    
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class ReferenceNode : LeafNode
     {
-        public string Identifier { get; private set; }
-
         public ReferenceNode(ExpressionNode parent, string identifier)
             : base(parent)
         {
-            Debug.Assert(!string.IsNullOrEmpty(identifier));
+            Debug.Assert(!string.IsNullOrEmpty(identifier), "identifier cannot be empty.");
 
             this.Identifier = identifier;
         }
+
+        public string Identifier { get; private set; }
 
         public override string ToString(ExpressionFormatStyle style)
         {
@@ -56,7 +56,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
-            Debug.Assert(reduceContext != null);
+            Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
             value = null;
             return false;

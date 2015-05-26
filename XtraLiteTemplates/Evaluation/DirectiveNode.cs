@@ -40,39 +40,41 @@ namespace XtraLiteTemplates.Evaluation
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class DirectiveNode : CompositeNode, IEvaluable
     {
-        private Directive[] m_directives;
+        private Directive[] candidateOrSelectedDirectives;
+
+        public DirectiveNode(TemplateNode parent, Directive[] candidateDirectives)
+            : base(parent)
+        {
+            Debug.Assert(parent != null, "parent cannot be null.");
+            Debug.Assert(candidateDirectives != null, "candidateDirectives cannot be null.");
+            Debug.Assert(candidateDirectives.Length > 0, "candidateDirectives cannot be empty");
+
+            this.candidateOrSelectedDirectives = candidateDirectives;
+        }
 
         public Directive[] CandidateDirectives
         {
             get
             {
-                return this.m_directives;
+                return this.candidateOrSelectedDirectives;
             }
         }
 
-        public DirectiveNode(TemplateNode parent, Directive[] candidateDirectives)
-            : base(parent)
-        {
-            Debug.Assert(parent != null);
-            Debug.Assert(candidateDirectives != null);
-            Debug.Assert(candidateDirectives.Length > 0);
-
-            this.m_directives = candidateDirectives;
-        }
+        public bool CandidateDirectiveLockedIn { get; private set; }
 
         public override void Evaluate(TextWriter writer, IEvaluationContext context)
         {
-            Debug.Assert(writer != null);
-            Debug.Assert(context != null);
-            Debug.Assert(this.Children.Count > 0);
-            Debug.Assert(this.m_directives.Length == 1);
+            Debug.Assert(writer != null, "writer cannot be null.");
+            Debug.Assert(context != null, "context cannot be null.");
+            Debug.Assert(this.Children.Count > 0, "must have at leat one child node.");
+            Debug.Assert(this.candidateOrSelectedDirectives.Length == 1, "must have exactly one directive.");
 
             context.OpenEvaluationFrame();
 
             var directiveComponentIndex = 0;
             var tagIndex = 0;
             var tagNode = this.Children[directiveComponentIndex] as TagNode;
-            Debug.Assert(tagNode != null);
+            Debug.Assert(tagNode != null, "first child node must be a TagNode.");
 
             object state = null;
             while (tagNode != null)
@@ -83,7 +85,7 @@ namespace XtraLiteTemplates.Evaluation
 
                 try
                 {
-                    flow = this.m_directives[0].Execute(tagIndex, tagComponents, ref state, context, out text);
+                    flow = this.candidateOrSelectedDirectives[0].Execute(tagIndex, tagComponents, ref state, context, out text);
                 }
                 catch (Exception exception)
                 {
@@ -92,7 +94,7 @@ namespace XtraLiteTemplates.Evaluation
 
                     if (!context.IgnoreEvaluationExceptions)
                     {
-                        ExceptionHelper.DirectiveEvaluationError(exception, this.m_directives[0]);
+                        ExceptionHelper.DirectiveEvaluationError(exception, this.candidateOrSelectedDirectives[0]);
                     }
                 }
 
@@ -127,7 +129,7 @@ namespace XtraLiteTemplates.Evaluation
                         }
 
                         var evaluable = this.Children[i] as IEvaluable;
-                        Debug.Assert(evaluable != null);
+                        Debug.Assert(evaluable != null, "All children must be evaluable.");
 
                         evaluable.Evaluate(writer, context);
                     }
@@ -154,30 +156,28 @@ namespace XtraLiteTemplates.Evaluation
 
         public bool SelectDirective(int presenceIndex, Tag tag, IEqualityComparer<string> comparer)
         {
-            Debug.Assert(presenceIndex >= 0);
-            Debug.Assert(tag != null);
-            Debug.Assert(comparer != null);
-            Debug.Assert(!this.CandidateDirectiveLockedIn);
+            Debug.Assert(presenceIndex >= 0, "presenceIndex cannot be less than zero.");
+            Debug.Assert(tag != null, "tag cannot be null.");
+            Debug.Assert(comparer != null, "comparer cannot be null.");
+            Debug.Assert(!this.CandidateDirectiveLockedIn, "Must not have locked in the candidate directive.");
 
-            var options = this.m_directives.Where(d => d.Tags.Count > presenceIndex && d.Tags[presenceIndex].Equals(tag, comparer)).ToArray();
+            var options = this.candidateOrSelectedDirectives.Where(d => d.Tags.Count > presenceIndex && d.Tags[presenceIndex].Equals(tag, comparer)).ToArray();
             if (options.Length > 0)
             {
                 var firstFullySelected = options.FirstOrDefault(o => o.Tags.Count == presenceIndex + 1);
 
                 if (firstFullySelected != null)
                 {
-                    this.m_directives = new Directive[] { firstFullySelected };
+                    this.candidateOrSelectedDirectives = new Directive[] { firstFullySelected };
                     this.CandidateDirectiveLockedIn = true;
                 }
                 else
                 {
-                    this.m_directives = options;
+                    this.candidateOrSelectedDirectives = options;
                 }
             }
 
             return options.Length > 0;
         }
-
-        public bool CandidateDirectiveLockedIn { get; private set; }
     }
 }

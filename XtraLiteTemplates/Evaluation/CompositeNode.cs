@@ -38,30 +38,30 @@ namespace XtraLiteTemplates.Evaluation
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class CompositeNode : TemplateNode, IEvaluable
     {
-        private readonly List<TemplateNode> m_children;
+        private readonly List<TemplateNode> childNodes;
 
         protected CompositeNode(TemplateNode parent)
             : base(parent)
         {
-            this.m_children = new List<TemplateNode>();
+            this.childNodes = new List<TemplateNode>();
         }
 
         public IReadOnlyList<TemplateNode> Children
         {
             get
             {
-                return this.m_children;
+                return this.childNodes;
             }
         }
 
         public void AddChild(TemplateNode child)
         {
-            Debug.Assert(child != null);
-            Debug.Assert(child.Parent == this);
+            Debug.Assert(child != null, "child cannot be null.");
+            Debug.Assert(child.Parent == this, "child's Parent must be this.");
 
-            if (!this.m_children.Contains(child))
+            if (!this.childNodes.Contains(child))
             {
-                this.m_children.Add(child);
+                this.childNodes.Add(child);
             }
         }
 

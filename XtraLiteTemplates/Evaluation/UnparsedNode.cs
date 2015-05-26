@@ -41,8 +41,8 @@ namespace XtraLiteTemplates.Evaluation
         public UnparsedNode(TemplateNode parent, UnparsedLex lex)
             : base(parent)
         {
-            Debug.Assert(parent != null);
-            Debug.Assert(lex != null);
+            Debug.Assert(parent != null, "parent cannot be null.");
+            Debug.Assert(lex != null, "lex cannot be null.");
 
             this.FirstCharacterIndex = lex.FirstCharacterIndex;
             this.OriginalLength = lex.OriginalLength;

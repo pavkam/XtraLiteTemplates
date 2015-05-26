@@ -36,6 +36,11 @@ namespace XtraLiteTemplates.Expressions.Nodes
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class BinaryOperatorNode : OperatorNode
     {
+        internal BinaryOperatorNode(ExpressionNode parent, BinaryOperator @operator)
+            : base(parent, @operator)
+        {
+        }
+
         public new BinaryOperator Operator
         {
             get
@@ -45,11 +50,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
         }
 
         public ExpressionNode LeftNode { get; internal set; }
-
-        internal BinaryOperatorNode(ExpressionNode parent, BinaryOperator @operator)
-            : base(parent, @operator)
-        {
-        }
 
         public override PermittedContinuations Continuity 
         { 
@@ -83,13 +83,13 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 result = string.Format("{0}{{{1},{2}}}", this.Operator, leftAsString, rightAsString);
             }
 
-            Debug.Assert(result != null);
+            Debug.Assert(result != null, "resulting string cannot be null.");
             return result;
         }
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)
         {
-            Debug.Assert(reduceContext != null);
+            Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
             if (this.LeftNode.Reduce(reduceContext))
             {

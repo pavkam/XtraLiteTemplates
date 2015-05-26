@@ -25,11 +25,12 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
+    using System.Linq;
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     /// <summary>
@@ -50,8 +51,8 @@ namespace XtraLiteTemplates.Expressions.Operators
             Expect.NotEmpty("symbol", symbol);
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
 
-            Symbol = symbol;
-            Precedence = precedence;
+            this.Symbol = symbol;
+            this.Precedence = precedence;
         }
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// </returns>
         public override string ToString()
         {
-            return Symbol;
+            return this.Symbol;
         }
     }
 }

@@ -31,21 +31,21 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System;
     using System.CodeDom;
     using System.CodeDom.Compiler;
-    using System.IO;
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
     using System.Diagnostics.CodeAnalysis;
+    using System.IO;
+    using XtraLiteTemplates.Expressions.Operators;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class LiteralNode : LeafNode
     {
-        public object Literal { get; private set; }
-
         public LiteralNode(ExpressionNode parent, object literal)
             : base(parent)
         {
             this.Literal = literal;
         }
+
+        public object Literal { get; private set; }
 
         public override string ToString(ExpressionFormatStyle style)
         {
@@ -68,7 +68,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
-            Debug.Assert(reduceContext != null);
+            Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
             value = this.Literal;
             return true;

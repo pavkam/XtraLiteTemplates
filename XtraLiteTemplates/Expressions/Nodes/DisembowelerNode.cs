@@ -31,18 +31,18 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System;
     using System.CodeDom;
     using System.CodeDom.Compiler;
-    using System.IO;
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Operators;
     using System.Diagnostics.CodeAnalysis;
-
+    using System.IO;
+    using XtraLiteTemplates.Expressions.Operators;
+    
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class DisembowelerNode : ExpressionNode
     {
         internal DisembowelerNode(ExpressionNode parent, ExpressionNode objectNode)
             : base(parent)
         {
-            Debug.Assert(objectNode != null);
+            Debug.Assert(objectNode != null, "objectNode cannot be null.");
 
             this.ObjectNode = objectNode;
         }
@@ -68,7 +68,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             }
         }
 
-        public override String ToString(ExpressionFormatStyle style)
+        public override string ToString(ExpressionFormatStyle style)
         {
             var memberName = this.MemberName ?? "??";
 
@@ -91,7 +91,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
-            Debug.Assert(reduceContext != null);
+            Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
             this.ObjectNode.Reduce(reduceContext);
 

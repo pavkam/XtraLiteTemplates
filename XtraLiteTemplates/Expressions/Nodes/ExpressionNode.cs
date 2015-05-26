@@ -37,40 +37,45 @@ namespace XtraLiteTemplates.Expressions.Nodes
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class ExpressionNode
     {
+        protected ExpressionNode(ExpressionNode parent)
+        {
+            this.Parent = parent;
+        }
+
         public ExpressionNode Parent { get; set; }
 
         public bool IsReduced { get; private set; }
-        
+
         public object ReducedValue { get; private set; }
 
         public abstract PermittedContinuations Continuity { get; }
 
         public bool Reduce(IExpressionEvaluationContext reduceContext)
         {
-            Debug.Assert(reduceContext != null);
+            Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
-            if (!IsReduced)
+            if (!this.IsReduced)
             {
                 object value;
-                if (TryReduce(reduceContext, out value))
+                if (this.TryReduce(reduceContext, out value))
                 {
-                    IsReduced = true;
-                    ReducedValue = value;
+                    this.IsReduced = true;
+                    this.ReducedValue = value;
                 }
             }
 
-            return IsReduced;
+            return this.IsReduced;
         }
 
         public Func<IExpressionEvaluationContext, object> GetEvaluationFunction()
         {
-            if (IsReduced)
+            if (this.IsReduced)
             {
-                return context => ReducedValue;
+                return context => this.ReducedValue;
             }
             else
             {
-                return Build();
+                return this.Build();
             }
         }
 
@@ -78,17 +83,12 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public override string ToString()
         {
-            return ToString(ExpressionFormatStyle.Arithmetic);
-        }
-
-        protected ExpressionNode(ExpressionNode parent)
-        {
-            Parent = parent;
+            return this.ToString(ExpressionFormatStyle.Arithmetic);
         }
 
         protected virtual bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)
         {
-            Debug.Assert(reduceContext != null);
+            Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
             reducedValue = null;
             return false;

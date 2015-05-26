@@ -41,13 +41,13 @@ namespace XtraLiteTemplates.Evaluation
         public TagNode(DirectiveNode parent, TagLex lex)
             : base(parent)
         {
-            Debug.Assert(parent != null);
-            Debug.Assert(lex != null);
+            Debug.Assert(parent != null, "parent cannot be null.");
+            Debug.Assert(lex != null, "lex cannot be null.");
 
-            FirstCharacterIndex = lex.FirstCharacterIndex;
-            OriginalLength = lex.OriginalLength;
-            Components = lex.Components;
-            Tag = lex.Tag;
+            this.FirstCharacterIndex = lex.FirstCharacterIndex;
+            this.OriginalLength = lex.OriginalLength;
+            this.Components = lex.Components;
+            this.Tag = lex.Tag;
         }
 
         public new DirectiveNode Parent
@@ -68,7 +68,8 @@ namespace XtraLiteTemplates.Evaluation
 
         public object[] Evaluate(IExpressionEvaluationContext context)
         {
-            Debug.Assert(context != null);
+            Debug.Assert(context != null, "context cannot be null.");
+
             object[] result = new object[this.Components.Length];
             for (var i = 0; i < this.Components.Length; i++)
             {
@@ -80,7 +81,7 @@ namespace XtraLiteTemplates.Evaluation
                 }
                 else
                 {
-                    result[i] = Components[i];
+                    result[i] = this.Components[i];
                 }
             }
 

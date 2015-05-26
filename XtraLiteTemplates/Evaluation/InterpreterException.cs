@@ -39,22 +39,6 @@ namespace XtraLiteTemplates.Evaluation
     public class InterpreterException : FormatException
     {
         /// <summary>
-        /// Gets all candidate directives for which the exception applies.
-        /// </summary>
-        /// <value>
-        /// The candidate directives.
-        /// </value>
-        public Directive[] CandidateDirectives { get; private set; }
-
-        /// <summary>
-        /// Gets the index of the first character in the input template that matches the candidate directives.
-        /// </summary>
-        /// <value>
-        /// The index of the first character.
-        /// </value>
-        public int FirstCharacterIndex { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="InterpreterException"/> class.
         /// </summary>
         /// <param name="innerException">The inner exception.</param>
@@ -70,7 +54,7 @@ namespace XtraLiteTemplates.Evaluation
             params object[] args)
             : base(string.Format(format, args), innerException)
         {
-            Debug.Assert(firstCharacterIndex >= 0);
+            Debug.Assert(firstCharacterIndex >= 0, "firstCharacterIndex cannot be less than zero.");
 
             this.FirstCharacterIndex = firstCharacterIndex;
             this.CandidateDirectives = candidateDirectives;
@@ -87,5 +71,21 @@ namespace XtraLiteTemplates.Evaluation
             : this(null, candidateDirectives, firstCharacterIndex, format, args)
         {
         }
+
+        /// <summary>
+        /// Gets all candidate directives for which the exception applies.
+        /// </summary>
+        /// <value>
+        /// The candidate directives.
+        /// </value>
+        public Directive[] CandidateDirectives { get; private set; }
+
+        /// <summary>
+        /// Gets the index of the first character in the input template that matches the candidate directives.
+        /// </summary>
+        /// <value>
+        /// The index of the first character.
+        /// </value>
+        public int FirstCharacterIndex { get; private set; }
     }
 }

@@ -28,41 +28,28 @@
 
 namespace XtraLiteTemplates.Evaluation
 {
-    using System;
-    using System.IO;
+    using System;    
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.IO;
     using System.Linq;
     using System.Text;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
-
+    
     /// <summary>
     /// Provides <c>lex</c> interpretation facilities. Instances of this class are used to interpret
     /// sequences of <see cref="Lex" /> objects and assemble the final <see cref="IEvaluable" /> objects.
     /// </summary>
     public sealed class Interpreter
     {
-        private List<Directive> m_directives;
-        private Lexer m_lexer;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private List<Directive> registeredDirectives;
 
-        /// <summary>
-        /// Gets the comparer used for keyword and identifier comparison.
-        /// </summary>
-        /// <value>
-        /// The keyword and identifier comparer.
-        /// </value>
-        /// <remarks>
-        /// Value of this property is specified by the caller at construction time.
-        /// </remarks>
-        public IEqualityComparer<string> Comparer
-        {
-            get
-            {
-                return m_lexer.Comparer;
-            }
-        }
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Lexer lexer;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Interpreter"/> class.
@@ -77,8 +64,25 @@ namespace XtraLiteTemplates.Evaluation
             Expect.NotNull("comparer", comparer);
             Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
 
-            m_lexer = new Lexer(tokenizer, expressionFlowSymbols, comparer);
-            m_directives = new List<Directive>();
+            this.lexer = new Lexer(tokenizer, expressionFlowSymbols, comparer);
+            this.registeredDirectives = new List<Directive>();
+        }
+
+        /// <summary>
+        /// Gets the comparer used for keyword and identifier comparison.
+        /// </summary>
+        /// <value>
+        /// The keyword and identifier comparer.
+        /// </value>
+        /// <remarks>
+        /// Value of this property is specified by the caller at construction time.
+        /// </remarks>
+        public IEqualityComparer<string> Comparer
+        {
+            get
+            {
+                return this.lexer.Comparer;
+            }
         }
 
         /// <summary>
@@ -90,16 +94,16 @@ namespace XtraLiteTemplates.Evaluation
         public Interpreter RegisterDirective(Directive directive)
         {
             Expect.NotNull("directive", directive);
-            Debug.Assert(directive.Tags.Any());
+            Debug.Assert(directive.Tags.Any(), "Directive must have at least one tag defined.");
 
-            if (!m_directives.Contains(directive))
+            if (!this.registeredDirectives.Contains(directive))
             {
                 foreach (var tag in directive.Tags)
                 {
-                    m_lexer.RegisterTag(tag);
+                    this.lexer.RegisterTag(tag);
                 }
 
-                m_directives.Add(directive);
+                this.registeredDirectives.Add(directive);
             }
 
             return this;
@@ -114,7 +118,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="InvalidOperationException">The symbol used by <paramref name="operator"/> is already registered with the interpreter.</exception>
         public Interpreter RegisterOperator(Operator @operator)
         {
-            m_lexer.RegisterOperator(@operator);
+            this.lexer.RegisterOperator(@operator);
             return this;
         }
 
@@ -128,7 +132,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="keyword"/> is empty.</exception>
         public Interpreter RegisterSpecial(string keyword, object value)
         {
-            m_lexer.RegisterSpecial(keyword, value);
+            this.lexer.RegisterSpecial(keyword, value);
             return this;
         }
 
@@ -139,20 +143,21 @@ namespace XtraLiteTemplates.Evaluation
         public IEvaluable Construct()
         {
             var document = new TemplateDocument();
-            Interpret(document);
+            this.Interpret(document);
 
             return document;
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void Interpret(CompositeNode compositeNode)
         {
-            Debug.Assert(compositeNode != null);
+            Debug.Assert(compositeNode != null, "compositeNode cannot be null.");
             var matchIndex = 1;
 
             while (true)
             {
                 /* Read the next lex out of the lexer. */
-                var lex = this.m_lexer.ReadNext();
+                var lex = this.lexer.ReadNext();
                 if (lex == null)
                 {
                     break;
@@ -168,11 +173,11 @@ namespace XtraLiteTemplates.Evaluation
                 {
                     /* This can only be a tag lex. */
                     var tagLex = lex as TagLex;
-                    Debug.Assert(tagLex != null);
+                    Debug.Assert(tagLex != null, "lex must be a tag lex.");
 
                     var directiveCompositeNode = compositeNode as DirectiveNode;
                     if (directiveCompositeNode != null &&
-                        directiveCompositeNode.SelectDirective(matchIndex, tagLex.Tag, Comparer))
+                        directiveCompositeNode.SelectDirective(matchIndex, tagLex.Tag, this.Comparer))
                     {
                         /* OK, this is the N'th part of the current directive. */
                         matchIndex++;
@@ -189,7 +194,7 @@ namespace XtraLiteTemplates.Evaluation
                     }
 
                     /* Match any directive that starts with this tag. */
-                    var candidateDirectives = m_directives.Where(p => p.Tags[0].Equals(tagLex.Tag, Comparer)).ToArray();
+                    var candidateDirectives = this.registeredDirectives.Where(p => p.Tags[0].Equals(tagLex.Tag, this.Comparer)).ToArray();
                     if (candidateDirectives.Length == 0)
                     {
                         /* No directive found that starts with the supplied tag! Nothing we can do but bail at this point. */
@@ -201,11 +206,11 @@ namespace XtraLiteTemplates.Evaluation
                     directiveNode.AddChild(new TagNode(directiveNode, tagLex));
 
                     /* Select the current directive. */
-                    directiveNode.SelectDirective(0, tagLex.Tag, Comparer);
+                    directiveNode.SelectDirective(0, tagLex.Tag, this.Comparer);
 
                     if (!directiveNode.CandidateDirectiveLockedIn)
                     {
-                        Interpret(directiveNode);
+                        this.Interpret(directiveNode);
 
                         if (!directiveNode.CandidateDirectiveLockedIn)
                         {

@@ -33,17 +33,51 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics.CodeAnalysis;
     using XtraLiteTemplates.Expressions.Operators;
 
+    /// <summary>
+    /// Defines a set of permitted continuations that each expression node can expose to the expression builder.
+    /// Depending on the state of the expression and the position of the node these can differ.
+    /// </summary>
     [Flags]
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal enum PermittedContinuations
     {
+        /// <summary>
+        /// No expression term allowed next.
+        /// </summary>
         None = 0x00,
+
+        /// <summary>
+        /// Any literal is allowed next.
+        /// </summary>
         Literal = 0x01,
-        Identifier = 0x02,        
+
+        /// <summary>
+        /// Any identifier is allowed next.
+        /// </summary>
+        Identifier = 0x02,
+
+        /// <summary>
+        /// An unary operator can follow.
+        /// </summary>
         UnaryOperator = 0x04,
+
+        /// <summary>
+        /// A binary operator can follow.
+        /// </summary>
         BinaryOperator = 0x08,
+
+        /// <summary>
+        /// A new group can be opened next.
+        /// </summary>
         NewGroup = 0x10,
+
+        /// <summary>
+        /// The current group can be closed next.
+        /// </summary>
         CloseGroup = 0x20,
+
+        /// <summary>
+        /// A group separator symbol can follow next.
+        /// </summary>
         ContinueGroup = CloseGroup,
     }
 }
