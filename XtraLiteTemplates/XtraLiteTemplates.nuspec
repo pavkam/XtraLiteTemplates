@@ -8,8 +8,8 @@
     <licenseUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/pavkam/XtraLiteTemplates</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
-    <description>A highly customizable and lightweight templating engine for Microsoft .NET and Mono.</description>
-    <releaseNotes>@releaseNotes@</releaseNotes>
+    <description>A highly customizable and lightweight template engine for Microsoft .NET and Mono.</description>
+    <releaseNotes>Final version 1.0 of XtraLiteTemplates, including more full test suite and XML documentation.</releaseNotes>
     <copyright>Copyright Alexandru Ciobanu (alex@ciobanu.org) 2015</copyright>
     <tags>Template Domain Language Expression Parser</tags>
     <dependencies>
