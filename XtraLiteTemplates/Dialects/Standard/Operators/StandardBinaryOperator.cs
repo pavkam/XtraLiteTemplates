@@ -61,6 +61,5 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// The type converter.
         /// </value>
         protected IPrimitiveTypeConverter TypeConverter { get; private set; }
-
     }
 }

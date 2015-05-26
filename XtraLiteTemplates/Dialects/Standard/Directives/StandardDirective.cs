@@ -31,10 +31,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Text;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Parsing;
 
     /// <summary>

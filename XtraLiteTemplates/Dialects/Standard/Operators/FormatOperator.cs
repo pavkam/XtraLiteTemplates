@@ -38,15 +38,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     public sealed class FormatOperator : StandardBinaryOperator
     {
         /// <summary>
-        /// Gets the culture-specific format options used by this operation.
-        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
-        /// </summary>
-        /// <value>
-        /// The culture-specific formatting options.
-        /// </value>
-        public IFormatProvider FormatProvider { get; private set; }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="FormatOperator" /> class.
         /// </summary>
         /// <param name="symbol">The operator's symbol.</param>
@@ -72,6 +63,15 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             : this(":", formatProvider, typeConverter)
         {
         }
+
+        /// <summary>
+        /// Gets the culture-specific format options used by this operation.
+        /// <remarks>Value of this property is specified by the caller at construction time.</remarks>
+        /// </summary>
+        /// <value>
+        /// The culture-specific formatting options.
+        /// </value>
+        public IFormatProvider FormatProvider { get; private set; }
 
         /// <summary>
         /// Evaluates the result of formatting operation for <paramref name="left" /> and <paramref name="right" /> operands.

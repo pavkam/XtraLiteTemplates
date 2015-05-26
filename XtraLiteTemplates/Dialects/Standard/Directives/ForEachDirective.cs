@@ -30,21 +30,25 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Collections;
     using System.Diagnostics;
-    using XtraLiteTemplates.Parsing;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Text;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The FOR EACH directive implementation.
     /// </summary>
     public sealed class ForEachDirective : StandardDirective
     {
-        private int m_expressionIndex;
-        private int m_identifierIndex;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int expressionComponentIndex;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int identifierComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForEachDirective"/> class.
@@ -61,7 +65,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public ForEachDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 2);
+            Debug.Assert(Tags.Count == 2, "Expected a tag count of 2.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -73,8 +77,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
             Expect.IsTrue("one identifier component", identifierComponents.Length == 1);
 
-            this.m_expressionIndex = expressionComponents[0];
-            this.m_identifierIndex = identifierComponents[0];
+            this.expressionComponentIndex = expressionComponents[0];
+            this.identifierComponentIndex = identifierComponents[0];
         }
 
         /// <summary>
@@ -108,20 +112,20 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             IExpressionEvaluationContext context,
             out string text)
         {
-            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
-            Debug.Assert(context != null);
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 1, "tagIndex must be between 0 and 1.");
+            Debug.Assert(components != null, "components cannot be null.");
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
 
-            IEnumerator enumerator;
+            IEnumerator<object> enumerator;
             if (state == null)
             {
                 /* Starting up. */
-                Debug.Assert(tagIndex == 0);
+                Debug.Assert(tagIndex == 0, "tagIndex expected to be 0.");
 
-                var sequence = this.TypeConverter.ConvertToSequence(components[this.m_expressionIndex]);
+                var sequence = this.TypeConverter.ConvertToSequence(components[this.expressionComponentIndex]);
                 if (sequence == null)
                 {
                     return FlowDecision.Terminate;
@@ -133,7 +137,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             else if (tagIndex == 0)
             {
                 enumerator = state as IEnumerator<object>;
-                Debug.Assert(enumerator != null);
+                Debug.Assert(enumerator != null, "state object expected to be an enumerator.");
             }
             else
             {
@@ -146,8 +150,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
             else
             {
-                var variableName = components[this.m_identifierIndex] as string;
-                Debug.Assert(variableName != null);
+                var variableName = components[this.identifierComponentIndex] as string;
+                Debug.Assert(variableName != null, "variable name expected to be set.");
                 context.SetVariable(variableName, enumerator.Current);
                 return FlowDecision.Evaluate;
             }

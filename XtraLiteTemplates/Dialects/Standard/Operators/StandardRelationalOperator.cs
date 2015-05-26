@@ -56,7 +56,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             : base(symbol, precedence, typeConverter)
         {
             Expect.NotNull("stringComparer", stringComparer);
-            StringComparer = stringComparer;
+
+            this.StringComparer = stringComparer;
         }
 
         /// <summary>
@@ -67,7 +68,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// The string literal comparer.
         /// </value>
         public IComparer<string> StringComparer { get; private set; }
-
 
         /// <summary>
         /// Evaluates the current operator for a given <paramref name="left" /> and <paramref name="right" /> operands. This method calls <see cref="Evaluate(Int32,Object,Object)"/>, which
@@ -94,7 +94,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
                 relation = this.TypeConverter.ConvertToNumber(left).CompareTo(this.TypeConverter.ConvertToNumber(right));
             }
 
-            return Evaluate(relation, left, right);
+            return this.Evaluate(relation, left, right);
         }
 
         /// <summary>

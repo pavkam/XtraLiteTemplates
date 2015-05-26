@@ -31,8 +31,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Text;    
+    using System.Text;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
@@ -44,7 +45,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     /// </summary>
     public sealed class PreFormattedUnparsedTextDirective : StandardDirective    
     {
-        private object m_stateObject;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private object stateObject;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="PreFormattedUnparsedTextDirective" /> class.
@@ -58,11 +60,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public PreFormattedUnparsedTextDirective(string startTagMarkup, string endTagMarkup, object stateObject, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(Tags.Count == 2);
+            Debug.Assert(this.Tags.Count == 2, "Expected a tag count of 2.");
 
             Expect.NotNull("stateObject", stateObject);
 
-            m_stateObject = stateObject;
+            this.stateObject = stateObject;
         }
 
         /// <summary>
@@ -97,20 +99,20 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             IExpressionEvaluationContext context, 
             out string text)
         {
-            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);            
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
-            Debug.Assert(context != null);
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 1, "tagIndex must be between 0 and 1.");
+            Debug.Assert(components != null, "components cannot be null.");
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
             if (tagIndex == 0)
             {
-                context.AddStateObject(this.m_stateObject);
+                context.AddStateObject(this.stateObject);
                 return FlowDecision.Evaluate;
             }
             else
             {
-                context.RemoveStateObject(this.m_stateObject);
+                context.RemoveStateObject(this.stateObject);
                 return FlowDecision.Terminate;
             }
         }

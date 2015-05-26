@@ -29,10 +29,11 @@
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Text;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
@@ -43,8 +44,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     /// </summary>
     public sealed class SeparatedForEachDirective : StandardDirective
     {
-        private int m_expressionIndex;
-        private int m_identifierIndex;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int sequenceExpressionComponentIndex;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int identifierComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SeparatedForEachDirective" /> class.
@@ -62,7 +66,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public SeparatedForEachDirective(string startTagMarkup, string separatorTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(separatorTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 3);
+            Debug.Assert(this.Tags.Count == 3, "Expected a tag count of 3.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -74,8 +78,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
             Expect.IsTrue("one identifier component", identifierComponents.Length == 1);
 
-            this.m_expressionIndex = expressionComponents[0];
-            this.m_identifierIndex = identifierComponents[0];
+            this.sequenceExpressionComponentIndex = expressionComponents[0];
+            this.identifierComponentIndex = identifierComponents[0];
         }
 
         /// <summary>
@@ -85,14 +89,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public SeparatedForEachDirective(IPrimitiveTypeConverter typeConverter) :
             this("FOR EACH ? IN $", "WITH", "END", typeConverter)
         {
-        }
-
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private class State
-        {
-            public IEnumerator<object> Enumerator { get; set; }
-
-            public bool IsLast { get; set; }
         }
 
         /// <summary>
@@ -108,7 +104,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// </returns>
         /// <remarks>
         /// If the expression is evaluated to <c>null</c>, the directive does not evaluate. It evaluates once for non-sequences and once for each element if the
-        /// expression is a sequence. On each cycle the indentifer is set to the value of the enumerated object.
+        /// expression is a sequence. On each cycle the identifier is set to the value of the enumerated object.
         /// <para>
         /// The contents between the middle tag and the end tag are inserted between the evaluated items, simulating the <see cref="String.Join(String,IEnumerable{String})" /> method.
         /// </para>
@@ -120,17 +116,17 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             IExpressionEvaluationContext context, 
             out string text)
         {
-            Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
-            Debug.Assert(context != null);
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 2, "tagIndex must be between 0 and 2.");
+            Debug.Assert(components != null, "components cannot be null.");
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
             if (tagIndex == 0)
             {
                 if (state == null)
                 {
-                    var sequence = this.TypeConverter.ConvertToSequence(components[m_expressionIndex]);
+                    var sequence = TypeConverter.ConvertToSequence(components[this.sequenceExpressionComponentIndex]);
                     if (sequence == null)
                     {
                         return FlowDecision.Terminate;
@@ -142,7 +138,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                         return FlowDecision.Terminate;
                     }
 
-                    context.SetVariable(components[this.m_identifierIndex] as string, enumerator.Current);
+                    context.SetVariable(components[this.identifierComponentIndex] as string, enumerator.Current);
                     state = new State
                     {
                         Enumerator = enumerator,
@@ -155,11 +151,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 {
                     var sstate = state as State;
 
-                    Debug.Assert(sstate != null);
-                    Debug.Assert(sstate.Enumerator != null);
-                    Debug.Assert(!sstate.IsLast);
+                    Debug.Assert(sstate != null, "state should be a proper object.");
+                    Debug.Assert(sstate.Enumerator != null, "state enumerator cannot not be null.");
+                    Debug.Assert(!sstate.IsLast, "iteration cannot be the last.");
 
-                    context.SetVariable(components[m_identifierIndex] as string, sstate.Enumerator.Current);
+                    context.SetVariable(components[this.identifierComponentIndex] as string, sstate.Enumerator.Current);
                     sstate.IsLast = !sstate.Enumerator.MoveNext();
 
                     return FlowDecision.Evaluate;
@@ -169,8 +165,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             {
                 var sstate = state as State;
 
-                Debug.Assert(sstate != null);
-                Debug.Assert(sstate.Enumerator != null);
+                Debug.Assert(sstate != null, "state should be a proper object.");
+                Debug.Assert(sstate.Enumerator != null, "state enumerator cannot be null.");
 
                 return sstate.IsLast ? FlowDecision.Terminate : FlowDecision.Evaluate;
             }
@@ -178,6 +174,14 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             {
                 return FlowDecision.Restart;
             }
+        }
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private class State
+        {
+            public IEnumerator<object> Enumerator { get; set; }
+
+            public bool IsLast { get; set; }
         }
     }
 }

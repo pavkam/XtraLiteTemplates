@@ -28,12 +28,13 @@
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
-    using System;
-    using System.Linq;
+    using System;    
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Dialects.Standard.Operators;    
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Parsing;
@@ -43,8 +44,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     /// </summary>
     public sealed class ConditionalInterpolationDirective : StandardDirective
     {
-        private int m_interpolatedExpressionIndex;
-        private int m_conditionalExpressionIndex;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int interpolatedExpressionComponentIndex;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int conditionalExpressionComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConditionalInterpolationDirective" /> class.
@@ -61,7 +65,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public ConditionalInterpolationDirective(string markup, bool invertExpressionOrder, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(markup))
         {
-            Debug.Assert(Tags.Count == 1);
+            Debug.Assert(Tags.Count == 1, "Expected a tag count of 1.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -72,13 +76,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             if (invertExpressionOrder)
             {
-                this.m_interpolatedExpressionIndex = expressionComponents[1];
-                this.m_conditionalExpressionIndex = expressionComponents[0];
+                this.interpolatedExpressionComponentIndex = expressionComponents[1];
+                this.conditionalExpressionComponentIndex = expressionComponents[0];
             }
             else
             {
-                this.m_interpolatedExpressionIndex = expressionComponents[0];
-                this.m_conditionalExpressionIndex = expressionComponents[1];
+                this.interpolatedExpressionComponentIndex = expressionComponents[0];
+                this.conditionalExpressionComponentIndex = expressionComponents[1];
             }
         }
 
@@ -111,14 +115,14 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             out string text)
         {
             /* It is a simple directive. Expecting just one tag here. */
-            Debug.Assert(tagIndex == 0);
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
-            Debug.Assert(context != null);
+            Debug.Assert(tagIndex == 0, "Expected a single known tag.");
+            Debug.Assert(components != null, "components cannot be null.");
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(context != null, "context cannot be null.");
 
-            if (TypeConverter.ConvertToBoolean(components[m_conditionalExpressionIndex]))
+            if (this.TypeConverter.ConvertToBoolean(components[this.conditionalExpressionComponentIndex]))
             {
-                text = this.TypeConverter.ConvertToString(components[m_interpolatedExpressionIndex]);
+                text = this.TypeConverter.ConvertToString(components[this.interpolatedExpressionComponentIndex]);
             }
             else
             {

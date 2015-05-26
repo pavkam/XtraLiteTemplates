@@ -29,21 +29,23 @@
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Text;
-    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The simple interpolation directive implementation.
     /// </summary>
     public sealed class InterpolationDirective : StandardDirective
     {
-        private int m_expressionIndex;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int interpolatedExpressionComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InterpolationDirective"/> class.
@@ -58,7 +60,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public InterpolationDirective(string tagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(tagMarkup))
         {
-            Debug.Assert(Tags.Count == 1);
+            Debug.Assert(this.Tags.Count == 1, "Expected a tag count of 1.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -67,7 +69,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
 
-            m_expressionIndex = expressionComponents[0];
+            this.interpolatedExpressionComponentIndex = expressionComponents[0];
         }
 
         /// <summary>
@@ -98,12 +100,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             out string text)
         {
             /* It is a simple directive. Expecting just one tag here. */
-            Debug.Assert(tagIndex == 0);
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount);
-            Debug.Assert(context != null);
+            Debug.Assert(tagIndex == 0, "tagIndex must be 0.");
+            Debug.Assert(components != null, "components cannot be null.");
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(context != null, "context cannot be null.");
 
-            text = this.TypeConverter.ConvertToString(components[this.m_expressionIndex]);
+            text = TypeConverter.ConvertToString(components[this.interpolatedExpressionComponentIndex]);
             return FlowDecision.Terminate;
         }
     }

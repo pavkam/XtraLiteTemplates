@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Reflection;
@@ -38,10 +39,9 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Threading.Tasks;
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Evaluation;
-    
 
     /// <summary>
     /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviors that concrete
@@ -49,13 +49,55 @@ namespace XtraLiteTemplates.Dialects.Standard
     /// </summary>
     public abstract class StandardDialectBase : IDialect, IObjectFormatter
     {
-        private IPrimitiveTypeConverter m_typeConverter;
-        private DialectCasing m_casing;
-        private List<Operator> m_operators;
-        private List<Directive> m_directives;
-        private Dictionary<string, object> m_specials;
-        private Dictionary<object, string> m_specialsIdentifiers;
-        private string m_undefinedSpecialIdentifier;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private IPrimitiveTypeConverter typeConverter;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private DialectCasing dialectCasing;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private List<Operator> dialectOperators;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private List<Directive> dialectDirectives;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Dictionary<string, object> dialectSpecialConstants;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private Dictionary<object, string> dialectSpecialConstantIdentifiers;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private string dialectUndefinedSpecialIdentifier;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="StandardDialectBase" /> class.
+        /// <remarks>
+        /// This constructor is not actually called directly.
+        /// </remarks>
+        /// </summary>
+        /// <param name="name">A human-readable name for the dialect.</param>
+        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
+        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
+        protected StandardDialectBase(string name, CultureInfo culture, DialectCasing casing)
+        {
+            Expect.NotEmpty("name", name);
+            Expect.NotNull("culture", culture);
+
+            /* Build culture-aware values.*/
+            this.Name = name;
+            this.Culture = culture;
+            this.typeConverter = new FlexiblePrimitiveTypeConverter(this.Culture, this);
+            this.dialectCasing = casing;
+            this.dialectUndefinedSpecialIdentifier = this.AdjustCasing("Undefined");
+
+            var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
+
+            this.IdentifierComparer = comparer;
+            this.StringLiteralComparer = comparer;
+        }
 
         /// <summary>
         /// Gets the <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.
@@ -119,12 +161,12 @@ namespace XtraLiteTemplates.Dialects.Standard
         { 
             get
             {
-                if (m_operators == null)
+                if (this.dialectOperators == null)
                 {
-                    m_operators = new List<Operator>(CreateOperators(m_typeConverter));
+                    this.dialectOperators = new List<Operator>(this.CreateOperators(this.typeConverter));
                 }
 
-                return m_operators;
+                return this.dialectOperators;
             }
         }
 
@@ -138,12 +180,12 @@ namespace XtraLiteTemplates.Dialects.Standard
         { 
             get
             {
-                if (m_directives == null)
+                if (this.dialectDirectives == null)
                 {
-                    m_directives = new List<Directive>(CreateDirectives(m_typeConverter));
+                    this.dialectDirectives = new List<Directive>(this.CreateDirectives(this.typeConverter));
                 }
 
-                return m_directives;
+                return this.dialectDirectives;
             }
         }
 
@@ -157,76 +199,26 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             get
             {
-                if (m_specials == null)
+                if (this.dialectSpecialConstants == null)
                 {
-                    m_specials = new Dictionary<string, object>(IdentifierComparer);
-                    m_specialsIdentifiers = new Dictionary<object, string>();
+                    this.dialectSpecialConstants = new Dictionary<string, object>(this.IdentifierComparer);
+                    this.dialectSpecialConstantIdentifiers = new Dictionary<object, string>();
 
-                    foreach (var kvp in CreateSpecials())
+                    foreach (var kvp in this.CreateSpecials())
                     {
-                        m_specials.Add(kvp.Key, kvp.Value);
+                        this.dialectSpecialConstants.Add(kvp.Key, kvp.Value);
                         if (kvp.Value == null)
                         {
-                            m_undefinedSpecialIdentifier = kvp.Key;
+                            this.dialectUndefinedSpecialIdentifier = kvp.Key;
                         }
                         else
                         {
-                            m_specialsIdentifiers[kvp.Value] = kvp.Key;
+                            this.dialectSpecialConstantIdentifiers[kvp.Value] = kvp.Key;
                         }
                     }
                 }
 
-                return m_specials;
-            }
-        }
-
-        /// <summary>
-        /// Processes all unparsed text blocks read from the original template. The method current implementation
-        /// trims all white-spaces and new line characters and replaces them with a single white-space character (emulates how HTML trimming works).
-        /// <remarks>Descendant classes can override this method and modify this behavior.</remarks>
-        /// </summary>
-        /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
-        /// <param name="unparsedText">The text block being processed.</param>
-        /// <returns>
-        /// The processed text value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public virtual string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText)
-        {
-            Expect.NotNull("context", context);
-
-            if (string.IsNullOrEmpty(unparsedText))
-            {
-                return string.Empty;
-            }
-            else
-            {
-                /* Trim all 1+ white spaces to one space character. */
-                StringBuilder result = new StringBuilder();
-                bool putSpace = false;
-                foreach (var c in unparsedText)
-                {
-                    if (char.IsWhiteSpace(c))
-                    {
-                        if (putSpace)
-                        {
-                            putSpace = false;
-                            result.Append(' ');
-                        }
-                    }
-                    else
-                    {
-                        result.Append(c);
-                        putSpace = true;
-                    }
-                }
-
-                if (result.Length > 0 && char.IsWhiteSpace(result[result.Length - 1]))
-                {
-                    result.Length -= 1;
-                }
-
-                return result.ToString();
+                return this.dialectSpecialConstants;
             }
         }
 
@@ -279,6 +271,56 @@ namespace XtraLiteTemplates.Dialects.Standard
         public abstract char NumberDecimalSeparatorCharacter { get; }
 
         /// <summary>
+        /// Processes all unparsed text blocks read from the original template. The method current implementation
+        /// trims all white-spaces and new line characters and replaces them with a single white-space character (emulates how HTML trimming works).
+        /// <remarks>Descendant classes can override this method and modify this behavior.</remarks>
+        /// </summary>
+        /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
+        /// <param name="unparsedText">The text block being processed.</param>
+        /// <returns>
+        /// The processed text value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
+        public virtual string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText)
+        {
+            Expect.NotNull("context", context);
+
+            if (string.IsNullOrEmpty(unparsedText))
+            {
+                return string.Empty;
+            }
+            else
+            {
+                /* Trim all 1+ white spaces to one space character. */
+                StringBuilder result = new StringBuilder();
+                bool putSpace = false;
+                foreach (var c in unparsedText)
+                {
+                    if (char.IsWhiteSpace(c))
+                    {
+                        if (putSpace)
+                        {
+                            putSpace = false;
+                            result.Append(' ');
+                        }
+                    }
+                    else
+                    {
+                        result.Append(c);
+                        putSpace = true;
+                    }
+                }
+
+                if (result.Length > 0 && char.IsWhiteSpace(result[result.Length - 1]))
+                {
+                    result.Length -= 1;
+                }
+
+                return result.ToString();
+            }
+        }
+
+        /// <summary>
         /// Returns a human-readable representation of the dialect instance.
         /// </summary>
         /// <returns>
@@ -287,7 +329,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public override string ToString()
         {
             string caseDescr = null;
-            switch (m_casing)
+            switch (this.dialectCasing)
             {
                 case DialectCasing.IgnoreCase:
                     caseDescr = "Ignore Case";
@@ -300,13 +342,13 @@ namespace XtraLiteTemplates.Dialects.Standard
                     break;
             }
 
-            if (string.IsNullOrEmpty(Culture.Name))
+            if (string.IsNullOrEmpty(this.Culture.Name))
             {
-                return string.Format("{0} ({1})", Name, caseDescr);
+                return string.Format("{0} ({1})", this.Name, caseDescr);
             }
             else
             {
-                return string.Format("{0} ({1}, {2})", Name, Culture.Name, caseDescr);
+                return string.Format("{0} ({1}, {2})", this.Name, this.Culture.Name, caseDescr);
             }
         }
 
@@ -322,9 +364,9 @@ namespace XtraLiteTemplates.Dialects.Standard
             var other = obj as StandardDialect;
             return
                 other != null &&
-                other.Name.Equals(Name) &&
-                other.m_casing.Equals(m_casing) &&
-                other.Culture.Equals(Culture);
+                other.Name.Equals(this.Name) &&
+                other.dialectCasing.Equals(this.dialectCasing) &&
+                other.Culture.Equals(this.Culture);
         }
 
         /// <summary>
@@ -336,9 +378,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         public override int GetHashCode()
         {
             return
-                Name.GetHashCode() ^
-                m_casing.GetHashCode() ^
-                Culture.GetHashCode();
+                this.Name.GetHashCode() ^
+                this.dialectCasing.GetHashCode() ^
+                this.Culture.GetHashCode();
         }
 
         /// <summary>
@@ -356,9 +398,9 @@ namespace XtraLiteTemplates.Dialects.Standard
 
             if (obj == null)
             {
-                return m_undefinedSpecialIdentifier;
+                return this.dialectUndefinedSpecialIdentifier;
             }
-            else if (!m_specialsIdentifiers.TryGetValue(obj, out result))
+            else if (!this.dialectSpecialConstantIdentifiers.TryGetValue(obj, out result))
             {
                 if (obj is string)
                 {
@@ -384,7 +426,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>The string representation.</returns>
         string IObjectFormatter.ToString(object obj)
         {
-            return ((IObjectFormatter)this).ToString(obj, Culture);
+            return ((IObjectFormatter)this).ToString(obj, this.Culture);
         }
 
         /// <summary>
@@ -425,18 +467,18 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <remarks>
         /// Descendant classes need to call this method when creating directives and operators to adjust the case accordingly.
         /// </remarks>
-        protected String AdjustCasing(string markup)
+        protected string AdjustCasing(string markup)
         {
             if (string.IsNullOrEmpty(markup))
             {
                 return markup;
             }
 
-            if (this.m_casing == DialectCasing.LowerCase)
+            if (this.dialectCasing == DialectCasing.LowerCase)
             {
                 return markup.ToLower(this.Culture);
             }
-            else if (this.m_casing == DialectCasing.UpperCase)
+            else if (this.dialectCasing == DialectCasing.UpperCase)
             {
                 return markup.ToUpper(this.Culture);
             }
@@ -444,35 +486,6 @@ namespace XtraLiteTemplates.Dialects.Standard
             {
                 return markup;
             }
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StandardDialectBase" /> class.
-        /// <remarks>
-        /// This constructor is not actually called directly.
-        /// </remarks>
-        /// </summary>
-        /// <param name="name">A human-readable name for the dialect.</param>
-        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
-        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
-        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
-        protected StandardDialectBase(string name, CultureInfo culture, DialectCasing casing)
-        {
-            Expect.NotEmpty("name", name);
-            Expect.NotNull("culture", culture);
-
-            /* Build culture-aware values.*/
-            this.Name = name;
-            this.Culture = culture;
-            this.m_typeConverter = new FlexiblePrimitiveTypeConverter(Culture, this);
-            this.m_casing = casing;
-            this.m_undefinedSpecialIdentifier = this.AdjustCasing("Undefined");
-
-            var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
-
-            this.IdentifierComparer = comparer;
-            this.StringLiteralComparer = comparer;
         }
     }
 }

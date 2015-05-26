@@ -30,19 +30,22 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
     using System.Diagnostics;
-    using XtraLiteTemplates.Parsing;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
+    using System.Text;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The REAPEAT directive implementation.
     /// </summary>
     public sealed class RepeatDirective : StandardDirective
     {
-        private int m_expressionIndex;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int iterationCountExpressionComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RepeatDirective" /> class.
@@ -58,7 +61,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public RepeatDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 2);
+            Debug.Assert(this.Tags.Count == 2, "Expected a tag count of 2.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -67,7 +70,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
 
-            this.m_expressionIndex = expressionComponents[0];
+            this.iterationCountExpressionComponentIndex = expressionComponents[0];
         }
 
         /// <summary>
@@ -101,22 +104,22 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             IExpressionEvaluationContext context,
             out string text)
         {
-            Debug.Assert(tagIndex >= 0 && tagIndex <= 1);
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
-            Debug.Assert(context != null);
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 1, "tagIndex must be between 0 and 1.");
+            Debug.Assert(components != null, "components cannot be null.");
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
             int remainingIterations;
             if (state == null)
             {
                 /* Starting up. */
-                Debug.Assert(tagIndex == 0);
-                remainingIterations = this.TypeConverter.ConvertToInteger(components[m_expressionIndex]);
+                Debug.Assert(tagIndex == 0, "tagIndex expected to be 0.");
+                remainingIterations = TypeConverter.ConvertToInteger(components[this.iterationCountExpressionComponentIndex]);
             }
             else if (tagIndex == 0)
             {
-                Debug.Assert(state is int);
+                Debug.Assert(state is int, "state expected to be an integer.");
                 remainingIterations = (int)state;
             }
             else

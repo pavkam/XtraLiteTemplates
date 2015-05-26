@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using XtraLiteTemplates.Dialects.Standard.Operators;
@@ -54,8 +55,8 @@ namespace XtraLiteTemplates.Dialects.Standard
             Expect.NotNull("formatProvider", formatProvider);
             Expect.NotNull("objectFormatter", objectFormatter);
 
-            FormatProvider = formatProvider;
-            ObjectFormatter = objectFormatter;
+            this.FormatProvider = formatProvider;
+            this.ObjectFormatter = objectFormatter;
         }
 
         /// <summary>
@@ -103,7 +104,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>A <see cref="Double"/> value.</returns>
         public virtual double ConvertToNumber(object obj)
         {
-            obj = ReduceObject(obj);
+            obj = this.ReduceObject(obj);
 
             double result;
 
@@ -128,7 +129,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                     {
                         result = 0;
                     }
-                    else if (!double.TryParse(str, System.Globalization.NumberStyles.Number, FormatProvider, out result))
+                    else if (!double.TryParse(str, System.Globalization.NumberStyles.Number, this.FormatProvider, out result))
                     {
                         result = double.NaN;
                     }
@@ -150,8 +151,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>A <see cref="String"/> value.</returns>
         public virtual string ConvertToString(object obj)
         {
-            obj = ReduceObject(obj);
-            return ObjectFormatter.ToString(obj, this.FormatProvider);
+            obj = this.ReduceObject(obj);
+            return this.ObjectFormatter.ToString(obj, this.FormatProvider);
         }
 
         /// <summary>
@@ -162,7 +163,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>A <see cref="Boolean"/> value.</returns>
         public virtual bool ConvertToBoolean(object obj)
         {
-            obj = ReduceObject(obj);
+            obj = this.ReduceObject(obj);
 
             bool result;
             if (obj == null)
@@ -208,11 +209,11 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
             else if (obj is IEnumerable)
             {
-                return UpgradeEnumerable((IEnumerable)obj);
+                return this.UpgradeEnumerable((IEnumerable)obj);
             }
             else
             {
-                return ObjectToSequence(obj);
+                return this.ObjectToSequence(obj);
             }
         }
 
@@ -228,7 +229,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return PrimitiveType.Undefined;
             }
 
-            obj = ReduceObject(obj);
+            obj = this.ReduceObject(obj);
 
             if (obj is double)
             {
@@ -248,20 +249,23 @@ namespace XtraLiteTemplates.Dialects.Standard
             }
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private IEnumerable<object> UpgradeEnumerable(IEnumerable enumerable)
         {
-            Debug.Assert(enumerable != null);
+            Debug.Assert(enumerable != null, "enumerable cannot be null.");
             foreach (var o in enumerable)
             {
                 yield return o;
             }
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private IEnumerable<object> ObjectToSequence(object obj)
         {
             yield return obj;
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private object ReduceObject(object obj)
         {
             object reduced;

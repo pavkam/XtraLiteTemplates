@@ -49,7 +49,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull("typeConverter", typeConverter);
 
-            TypeConverter = typeConverter;
+            this.TypeConverter = typeConverter;
         }
 
         /// <summary>

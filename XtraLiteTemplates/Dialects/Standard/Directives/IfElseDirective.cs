@@ -29,21 +29,23 @@
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Text;
-    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The IF - ELSE directive implementation.
     /// </summary>
     public sealed class IfElseDirective : StandardDirective
     {
-        private int m_expressionIndex;
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private int conditionalExpressionComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IfElseDirective" /> class.
@@ -60,7 +62,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public IfElseDirective(string startTagMarkup, string midTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(midTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 3);
+            Debug.Assert(this.Tags.Count == 3, "Expected a tag count of 3.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -69,7 +71,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
 
-            this.m_expressionIndex = expressionComponents[0];
+            this.conditionalExpressionComponentIndex = expressionComponents[0];
         }
 
         /// <summary>
@@ -98,22 +100,22 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// </remarks>
         protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state, IExpressionEvaluationContext context, out string text)
         {
-            Debug.Assert(tagIndex >= 0 && tagIndex <= 2);
-            Debug.Assert(components != null);
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount);
-            Debug.Assert(context != null);
+            Debug.Assert(tagIndex >= 0 && tagIndex <= 2, "tagIndex must be between 0 and 2.");
+            Debug.Assert(components != null, "components cannot be null.");
+            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
             if (tagIndex == 0)
             {
-                var conditionIsTrue = this.TypeConverter.ConvertToBoolean(components[m_expressionIndex]) == true;
+                var conditionIsTrue = TypeConverter.ConvertToBoolean(components[this.conditionalExpressionComponentIndex]) == true;
                 state = conditionIsTrue;
 
                 return conditionIsTrue ? FlowDecision.Evaluate : FlowDecision.Skip;
             }
             else if (tagIndex == 1)
             {
-                Debug.Assert(state is bool);
+                Debug.Assert(state is bool, "state object expected to be a boolean.");
                 var conditionWasTrue = (bool)state;
 
                 if (!conditionWasTrue)

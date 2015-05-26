@@ -42,7 +42,6 @@ namespace XtraLiteTemplates.Dialects.Standard
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     
-
     /// <summary>
     /// A minimalistic, programmer-oriented standard dialect. Contains the full set of supported expression operators, directives and special constants.
     /// See <seealso cref="StandardDialect" /> for a medium verbose dialect.

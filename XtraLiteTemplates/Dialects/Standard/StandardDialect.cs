@@ -38,10 +38,10 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Threading.Tasks;
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Evaluation;
-
+    
     /// <summary>
     /// The standard dialect. Contains the full set of supported expression operators, directives and special constants.
     /// This is the default, medium-verbosity dialect exposed by this library.
@@ -49,22 +49,6 @@ namespace XtraLiteTemplates.Dialects.Standard
     /// </summary>
     public class StandardDialect : StandardDialectBase
     {
-        /// <summary>
-        /// Gets a culture-invariant, case-insensitive instance of <see cref="StandardDialect"/> class.
-        /// </summary>
-        /// <value>
-        /// The culture-invariant, case-insensitive instance of <see cref="StandardDialect"/> class.
-        /// </value>
-        public static IDialect DefaultIgnoreCase { get; private set; }
-
-        /// <summary>
-        /// Gets a culture-invariant, case-sensitive (upper cased) instance of <see cref="StandardDialect"/> class.
-        /// </summary>
-        /// <value>
-        /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
-        /// </value>
-        public static IDialect Default { get; private set; }
-
         /// <summary>
         /// Initializes static members of the <see cref="StandardDialect"/> class.
         /// </summary>
@@ -94,29 +78,34 @@ namespace XtraLiteTemplates.Dialects.Standard
         }
 
         /// <summary>
-        /// Processes all unparsed text blocks read from the original template. The method current implementation
-        /// trims all white-spaces and new line characters and replaces them with a single white-space character (emulates how HTML trimming works).
-        /// A preformatted directive is available to allow disabling this default behavior and preserving all original formatting.
+        /// Initializes a new instance of the <see cref="StandardDialect"/> class.
         /// </summary>
-        /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
-        /// <param name="unparsedText">The text block being processed.</param>
-        /// <returns>
-        /// The processed text value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public override string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText)
+        /// <param name="name">A human-readable name for the dialect.</param>
+        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
+        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
+        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
+        protected StandardDialect(string name, CultureInfo culture, DialectCasing casing)
+            : base(name, culture, casing)
         {
-            Expect.NotNull("context", context);
-
-            if (PreformattedStateObject != null && context.ContainsStateObject(PreformattedStateObject))
-            {
-                return unparsedText;
-            }
-            else
-            {
-                return base.DecorateUnparsedText(context, unparsedText);
-            }
+            this.PreformattedStateObject = new object();
         }
+
+        /// <summary>
+        /// Gets a culture-invariant, case-insensitive instance of <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <value>
+        /// The culture-invariant, case-insensitive instance of <see cref="StandardDialect"/> class.
+        /// </value>
+        public static IDialect DefaultIgnoreCase { get; private set; }
+
+        /// <summary>
+        /// Gets a culture-invariant, case-sensitive (upper cased) instance of <see cref="StandardDialect"/> class.
+        /// </summary>
+        /// <value>
+        /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
+        /// </value>
+        public static IDialect Default { get; private set; }
 
         /// <summary>
         /// Specifies the tag start character (used by the tokenization process).
@@ -210,6 +199,39 @@ namespace XtraLiteTemplates.Dialects.Standard
         }
 
         /// <summary>
+        /// Gets the state object that can be used by directive to disable the unhandled text trimming behavior.
+        /// </summary>
+        /// <value>
+        /// The preformatted state object.
+        /// </value>
+        protected object PreformattedStateObject { get; private set; }
+
+        /// <summary>
+        /// Processes all unparsed text blocks read from the original template. The method current implementation
+        /// trims all white-spaces and new line characters and replaces them with a single white-space character (emulates how HTML trimming works).
+        /// A preformatted directive is available to allow disabling this default behavior and preserving all original formatting.
+        /// </summary>
+        /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
+        /// <param name="unparsedText">The text block being processed.</param>
+        /// <returns>
+        /// The processed text value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
+        public override string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText)
+        {
+            Expect.NotNull("context", context);
+
+            if (this.PreformattedStateObject != null && context.ContainsStateObject(this.PreformattedStateObject))
+            {
+                return unparsedText;
+            }
+            else
+            {
+                return base.DecorateUnparsedText(context, unparsedText);
+            }
+        }
+
+        /// <summary>
         /// Determines whether the specified <see cref="Object" /> is equal to the current <see cref="StandardDialect" />.
         /// </summary>
         /// <param name="obj">The object to compare with the current dialect class instance.</param>
@@ -231,14 +253,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             return base.GetHashCode() ^ GetType().GetHashCode();
         }
-
-        /// <summary>
-        /// Gets the state object that can be used by directive to disable the unhandled text trimming behavior.
-        /// </summary>
-        /// <value>
-        /// The preformatted state object.
-        /// </value>
-        protected object PreformattedStateObject { get; private set; }
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported operators.
@@ -297,7 +311,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new IfElseDirective(AdjustCasing("IF $ THEN"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
                 new InterpolationDirective(typeConverter),
                 new RepeatDirective(AdjustCasing("REPEAT $ TIMES"), AdjustCasing("END"), typeConverter),
-                new PreFormattedUnparsedTextDirective(AdjustCasing("PREFORMATTED"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
+                new PreFormattedUnparsedTextDirective(AdjustCasing("PREFORMATTED"), AdjustCasing("END"), this.PreformattedStateObject, typeConverter),
             };
         }
 
@@ -317,20 +331,6 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new KeyValuePair<string, object>(AdjustCasing("NaN"), double.NaN),
                 new KeyValuePair<string, object>(AdjustCasing("Infinity"), double.PositiveInfinity),
             };
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="StandardDialect"/> class.
-        /// </summary>
-        /// <param name="name">A human-readable name for the dialect.</param>
-        /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
-        /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
-        /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
-        protected StandardDialect(string name, CultureInfo culture, DialectCasing casing)
-            : base(name, culture, casing)
-        {
-            this.PreformattedStateObject = new object();
         }
     }
 }
