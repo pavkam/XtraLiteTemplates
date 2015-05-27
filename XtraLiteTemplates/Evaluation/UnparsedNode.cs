@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Parsing;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-    internal sealed class UnparsedNode : TemplateNode, IEvaluable
+    internal sealed class UnparsedNode : TemplateNode
     {
         public UnparsedNode(TemplateNode parent, UnparsedLex lex)
             : base(parent)
@@ -54,14 +54,6 @@ namespace XtraLiteTemplates.Evaluation
         public int OriginalLength { get; private set; }
 
         public string UnparsedText { get; private set; }
-
-        public void Evaluate(TextWriter writer, IEvaluationContext context)
-        {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("context", context);
-
-            writer.Write(context.ProcessUnparsedText(this.UnparsedText));
-        }
 
         public override string ToString()
         {

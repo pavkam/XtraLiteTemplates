@@ -98,6 +98,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
         public void Close()
         {
             Debug.Assert(!this.Closed, "Cannot be closed.");
+
             this.Closed = true;
         }
 
@@ -136,7 +137,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
                     return true;
                 }
             }
-            else
+            else if (this.groupChildrenNodes.Count > 1)
             {
                 var allReduced = true;
                 foreach (var child in this.groupChildrenNodes)
@@ -159,7 +160,11 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             var childFuncs = this.groupChildrenNodes.Select(s => s.GetEvaluationFunction()).ToArray();
 
-            if (childFuncs.Length == 1)
+            if (childFuncs.Length == 0)
+            {
+                return context => null;
+            }
+            else if (childFuncs.Length == 1)
             {
                 /* We're transparent */
                 var childFunc = childFuncs[0];

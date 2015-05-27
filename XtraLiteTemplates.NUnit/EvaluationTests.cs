@@ -245,5 +245,49 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreEqual("{ b = { c = exists } } { b = { c = exists } } { c = exists } { c = exists } { c = exists } exists exists exists exists", exo);
         }
+
+        [Test]
+        public void TestCaseEvaluationComplex1()
+        {
+            const String template = @"
+            {IF 1 THEN}
+                _unparsed1_
+                {1}
+                _unparsed2_
+                {2}
+                {3}
+                _unparsed3_
+                {4}
+                {5}
+                {6}
+                {IF 0 THEN}
+                {ELSE}
+                    {IF 1 THEN}{100}{END}
+                    {IF 1 THEN}{100}{200}{END}
+                    _unparsed21_
+                    {11}
+                    _unparsed22_
+                    {12}
+                    {13}
+                    _unparsed23_
+                    {14}
+                    {15}
+                    {16}
+                {END}
+            {END}
+";
+
+            var evaluable = new Interpreter(new Tokenizer(template),
+                ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new IfDirective(TypeConverter))
+                .RegisterDirective(new IfElseDirective(TypeConverter))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .Construct();
+
+            var originalResult = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
+            var result = new String(originalResult.Where(c => !char.IsWhiteSpace(c)).ToArray());
+
+            Assert.AreEqual("_unparsed1_1_unparsed2_23_unparsed3_456100100200_unparsed21_11_unparsed22_1213_unparsed23_141516", result);
+        }
     }
 }

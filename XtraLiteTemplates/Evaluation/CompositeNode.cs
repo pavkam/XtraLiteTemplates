@@ -36,7 +36,7 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Expressions;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-    internal abstract class CompositeNode : TemplateNode, IEvaluable
+    internal abstract class CompositeNode : TemplateNode
     {
         private readonly List<TemplateNode> childNodes;
 
@@ -62,21 +62,6 @@ namespace XtraLiteTemplates.Evaluation
             if (!this.childNodes.Contains(child))
             {
                 this.childNodes.Add(child);
-            }
-        }
-
-        public virtual void Evaluate(TextWriter writer, IEvaluationContext context)
-        {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("context", context);
-
-            foreach (var child in this.Children)
-            {
-                var evaluable = child as IEvaluable;
-                if (evaluable != null)
-                {
-                    evaluable.Evaluate(writer, context);
-                }
             }
         }
 

@@ -43,37 +43,37 @@ namespace XtraLiteTemplates.Expressions.Nodes
         /// <summary>
         /// No expression term allowed next.
         /// </summary>
-        None = 0x00,
+        None = 0,
 
         /// <summary>
         /// Any literal is allowed next.
         /// </summary>
-        Literal = 0x01,
+        Literal = 1,
 
         /// <summary>
         /// Any identifier is allowed next.
         /// </summary>
-        Identifier = 0x02,
+        Identifier = 2,
 
         /// <summary>
         /// An unary operator can follow.
         /// </summary>
-        UnaryOperator = 0x04,
+        UnaryOperator = 4,
 
         /// <summary>
         /// A binary operator can follow.
         /// </summary>
-        BinaryOperator = 0x08,
+        BinaryOperator = 8,
 
         /// <summary>
         /// A new group can be opened next.
         /// </summary>
-        NewGroup = 0x10,
+        NewGroup = 16,
 
         /// <summary>
         /// The current group can be closed next.
         /// </summary>
-        CloseGroup = 0x20,
+        CloseGroup = 32,
 
         /// <summary>
         /// A group separator symbol can follow next.

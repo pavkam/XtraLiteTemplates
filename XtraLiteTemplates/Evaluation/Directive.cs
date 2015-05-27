@@ -76,22 +76,22 @@ namespace XtraLiteTemplates.Evaluation
             /// <summary>
             /// Terminate execution of directive immediately after.
             /// </summary>
-            Terminate,
+            Terminate = 0,
 
             /// <summary>
             /// Restart the execution of the directive immediately by jumping to the first tag.
             /// </summary>
-            Restart,
+            Restart = 1,
 
             /// <summary>
             /// Evaluate the all child directives and unparsed text blocks between the current tag and the following one.
             /// </summary>
-            Evaluate,
+            Evaluate = 2,
 
             /// <summary>
             /// Skip directly to the next following tag in the directive.
             /// </summary>
-            Skip,
+            Skip = 3,
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]

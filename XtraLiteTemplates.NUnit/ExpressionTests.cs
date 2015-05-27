@@ -320,7 +320,6 @@ namespace XtraLiteTemplates.NUnit
             ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
             ExpectInvalidExpressionTermException(",", () => expression.FeedSymbol(","));
             expression.FeedSymbol("a");
-            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
             expression.FeedSymbol(",");
             ExpectInvalidExpressionTermException(",", () => expression.FeedSymbol(","));
             ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
@@ -570,7 +569,7 @@ namespace XtraLiteTemplates.NUnit
             expression.FeedLiteral(100);
 
             var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
-            Assert.AreEqual("*{!{.{.{@variable,length},some_else}},100}", canonical);
+            Assert.AreEqual("*{!{@variable.length.some_else},100}", canonical);
         }
 
         [Test]
@@ -594,6 +593,136 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(1, list[0]);
             Assert.AreEqual(4, list[1]);
             Assert.AreEqual(6, list[2]);
+        }
+
+        [Test]
+        public void TestCaseFunctions1()
+        {
+            var expression = CreateBloatedExpression();
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("b");
+            expression.FeedSymbol(")");
+            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
+            expression.FeedSymbol("+");
+            ExpectInvalidExpressionTermException(")", () => expression.FeedSymbol(")"));
+            expression.FeedSymbol("c");
+            expression.Construct();
+
+            var arithmetic = expression.ToString(ExpressionFormatStyle.Arithmetic);
+            var polish = expression.ToString(ExpressionFormatStyle.Polish);
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+
+            Assert.AreEqual("@a( @b ) + @c", arithmetic);
+            Assert.AreEqual("+ @a(@b) @c", polish);
+            Assert.AreEqual("+{@a(){@b},@c}", canonical);
+        }
+
+        [Test]
+        public void TestCaseFunctions2()
+        {
+            var expression = CreateBloatedExpression();
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("b");
+            expression.FeedSymbol(",");
+            expression.FeedSymbol("c");
+            expression.FeedSymbol(")");
+            expression.FeedSymbol(")");
+            expression.Construct();
+
+            var arithmetic = expression.ToString(ExpressionFormatStyle.Arithmetic);
+            var polish = expression.ToString(ExpressionFormatStyle.Polish);
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+
+            Assert.AreEqual("@a( ( @b , @c ) )", arithmetic);
+            Assert.AreEqual("@a((@b , @c))", polish);
+            Assert.AreEqual("@a(){(){@b , @c}}", canonical);
+        }
+
+        [Test]
+        public void TestCaseFunctions3()
+        {
+            var expression = CreateBloatedExpression();
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol(".");
+            expression.FeedSymbol("b");
+            expression.FeedSymbol("(");
+            ExpectInvalidExpressionTermException(",", () => expression.FeedSymbol(","));
+            expression.FeedSymbol("c");
+            expression.FeedSymbol(")");
+            expression.FeedSymbol(".");
+            expression.FeedSymbol("d");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("e");
+            expression.FeedSymbol(",");
+            expression.FeedSymbol("f");
+            expression.FeedSymbol(")");
+            expression.Construct();
+
+            var arithmetic = expression.ToString(ExpressionFormatStyle.Arithmetic);
+            var polish = expression.ToString(ExpressionFormatStyle.Polish);
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+
+            Assert.AreEqual("@a.b( @c ).d( @e , @f )", arithmetic);
+            Assert.AreEqual("@a.b(@c).d(@e , @f)", polish);
+            Assert.AreEqual("@a.b(){@c}.d(){@e , @f}", canonical);
+        }
+
+        [Test]
+        public void TestCaseFunctions4()
+        {
+            var expression = CreateBloatedExpression();
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("b");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("c");
+            expression.FeedSymbol(")");
+            expression.FeedSymbol(".");
+            expression.FeedSymbol("d");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("e");
+            expression.FeedSymbol(",");
+            expression.FeedSymbol("f");
+            expression.FeedSymbol(")");
+            expression.FeedSymbol(")");
+            expression.Construct();
+
+            var arithmetic = expression.ToString(ExpressionFormatStyle.Arithmetic);
+            var polish = expression.ToString(ExpressionFormatStyle.Polish);
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+
+            Assert.AreEqual("@a( @b( @c ).d( @e , @f ) )", arithmetic);
+            Assert.AreEqual("@a(@b(@c).d(@e , @f))", polish);
+            Assert.AreEqual("@a(){@b(){@c}.d(){@e , @f}}", canonical);
+        }
+
+        [Test]
+        public void TestCaseFunctions5()
+        {
+            var expression = CreateBloatedExpression();
+
+            expression.FeedSymbol("a");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol("b");
+            expression.FeedSymbol("(");
+            expression.FeedSymbol(")");
+            expression.FeedSymbol(")");
+            expression.Construct();
+
+            var arithmetic = expression.ToString(ExpressionFormatStyle.Arithmetic);
+            var polish = expression.ToString(ExpressionFormatStyle.Polish);
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+
+            Assert.AreEqual("@a( @b( ) )", arithmetic);
+            Assert.AreEqual("@a(@b())", polish);
+            Assert.AreEqual("@a(){@b(){}}", canonical);
         }
     }
 }

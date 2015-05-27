@@ -34,9 +34,9 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Expressions;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-    internal sealed class TemplateDocument : CompositeNode, IEvaluable
+    internal sealed class TemplateDocument : CompositeNode
     {
-        internal TemplateDocument()
+        public TemplateDocument()
             : base(null)
         {
         }

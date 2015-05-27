@@ -44,6 +44,7 @@
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
     <Compile Include="Dialects\Standard\IObjectFormatter.cs" />
     <Compile Include="Dialects\Standard\Operators\FormatOperator.cs" />
+    <Compile Include="Evaluation\ContextualEvaluable.cs" />
     <Compile Include="Expressions\Nodes\PermittedContinuations.cs" />
     <Compile Include="Expressions\Nodes\LiteralNode.cs" />
     <Compile Include="Expressions\Nodes\ReferenceNode.cs" />
@@ -53,7 +54,6 @@
     <Compile Include="Dialects\Standard\StandardDialectBase.cs" />
     <Compile Include="ExceptionHelper.cs" />
     <Compile Include="Expressions\ExpressionFlowSymbols.cs" />
-    <Compile Include="Expressions\Nodes\DisembowelerNode.cs" />
     <Compile Include="Expressions\Nodes\RootNode.cs" />
     <Compile Include="Expressions\ReduceExpressionEvaluationContext.cs" />
     <Compile Include="Expressions\IExpressionEvaluationContext.cs" />

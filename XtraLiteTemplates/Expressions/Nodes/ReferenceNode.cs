@@ -39,6 +39,14 @@ namespace XtraLiteTemplates.Expressions.Nodes
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class ReferenceNode : LeafNode
     {
+        public ReferenceNode(ExpressionNode parent, ExpressionNode @object)
+            : base(parent)
+        {
+            Debug.Assert(@object != null, "object cannot be null.");
+
+            this.Object = @object;
+        }
+
         public ReferenceNode(ExpressionNode parent, string identifier)
             : base(parent)
         {
@@ -47,16 +55,45 @@ namespace XtraLiteTemplates.Expressions.Nodes
             this.Identifier = identifier;
         }
 
-        public string Identifier { get; private set; }
+        public ExpressionNode Object { get; private set; }
+
+        public string Identifier { get; set; }
+
+        public RootNode Arguments { get; set; }
+
+        public override PermittedContinuations Continuity
+        {
+            get
+            {
+                if (this.Identifier == null)
+                {
+                    return PermittedContinuations.Identifier;
+                }
+                else
+                {
+                    return base.Continuity | PermittedContinuations.NewGroup;
+                }
+            }
+        }
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            return string.Format("@{0}", this.Identifier);
+            String arguments = Arguments != null ? Arguments.ToString(style) : String.Empty;
+
+            if (Object != null)
+                return string.Format("{0}.{1}{2}", this.Object.ToString(style), this.Identifier, arguments);
+            else
+                return string.Format("@{0}{1}", this.Identifier, arguments);
         }
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
+
+            if (this.Object != null)
+                this.Object.Reduce(reduceContext);
+            if (this.Arguments != null)
+                this.Arguments.Reduce(reduceContext);
 
             value = null;
             return false;
@@ -64,7 +101,19 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override Func<IExpressionEvaluationContext, object> Build()
         {
-            return context => context.GetVariable(this.Identifier);
+            if (this.Object != null)
+            {
+                var objectFunc = this.Object.GetEvaluationFunction();
+                return context =>
+                {
+                    var variable = objectFunc(context);
+                    return variable == null ? null : context.GetProperty(variable, this.Identifier);
+                };
+            }
+            else
+            {
+                return context => context.GetVariable(this.Identifier);
+            }
         }
     }
 }

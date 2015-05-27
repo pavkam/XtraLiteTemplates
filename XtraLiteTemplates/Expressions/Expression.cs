@@ -287,10 +287,10 @@ namespace XtraLiteTemplates.Expressions
                     }
                     else
                     {
-                        var currentDisembowelerNode = this.currentNode as DisembowelerNode;
-                        if (currentDisembowelerNode != null)
+                        var currentReferenceNode = this.currentNode as ReferenceNode;
+                        if (currentReferenceNode != null)
                         {
-                            fail = currentDisembowelerNode.MemberName == null;
+                            fail = currentReferenceNode.Identifier == null;
                         }
                         else
                         {
@@ -367,7 +367,17 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.InvalidExpressionTerm(this.FlowSymbols.GroupOpen);
             }
 
-            if (this.currentNode is OperatorNode)
+            if (this.currentNode is ReferenceNode)
+            {
+                var currentReferenceNode = (ReferenceNode)this.currentNode;
+                Debug.Assert(currentReferenceNode.Identifier != null, "current reference node's identifier must not be null.");
+
+                /* Flip to the new root */
+                this.currentGroupRootNode = new RootNode(currentReferenceNode);
+                currentReferenceNode.Arguments = currentGroupRootNode;
+                this.currentNode = this.currentGroupRootNode;
+            }
+            else if (this.currentNode is OperatorNode)
             {
                 var currentOperatorNode = (OperatorNode)this.currentNode;
                 Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
@@ -406,10 +416,18 @@ namespace XtraLiteTemplates.Expressions
             }
 
             this.currentGroupRootNode.Close();
-            this.currentNode = this.currentGroupRootNode;
+
+            if (this.currentGroupRootNode.Parent is ReferenceNode)
+            {
+                this.currentNode = this.currentGroupRootNode.Parent;
+            }
+            else
+            {
+                this.currentNode = this.currentGroupRootNode;
+            }
 
             /* Find the actual root now. */
-            var rootNode = this.currentGroupRootNode.Parent;
+            var rootNode = this.currentNode.Parent;
             while (!(rootNode is RootNode))
             {
                 rootNode = rootNode.Parent;
@@ -504,30 +522,34 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.InvalidExpressionTerm(symbol);
             }
 
-            var newNode = new ReferenceNode(this.currentNode, symbol);
-
-            if (this.currentNode is OperatorNode)
+            if (this.currentNode is ReferenceNode)
             {
-                var currentOperatorNode = this.currentNode as OperatorNode;
-                Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
+                var currentDisembowelerNode = this.currentNode as ReferenceNode;
+                Debug.Assert(currentDisembowelerNode.Object != null, "current reference node's object must not be null.");
+                Debug.Assert(currentDisembowelerNode.Identifier == null, "current reference node's identifier must be null.");
 
-                currentOperatorNode.RightNode = newNode;
-                this.currentNode = newNode;
+                currentDisembowelerNode.Identifier = symbol;
             }
-            else if (this.currentNode is RootNode)
+            else
             {
-                var currentRootNode = this.currentNode as RootNode;
-                Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
+                var newNode = new ReferenceNode(this.currentNode, symbol);
 
-                currentRootNode.AddChild(newNode);
-                this.currentNode = newNode;
-            }
-            else if (this.currentNode is DisembowelerNode && ((DisembowelerNode)this.currentNode).MemberName == null)
-            {
-                var currentDisembowelerNode = this.currentNode as DisembowelerNode;
-                Debug.Assert(currentDisembowelerNode.ObjectNode != null, "current disemboweler node's object must not be null.");
+                if (this.currentNode is OperatorNode)
+                {
+                    var currentOperatorNode = this.currentNode as OperatorNode;
+                    Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
-                currentDisembowelerNode.MemberName = symbol;
+                    currentOperatorNode.RightNode = newNode;
+                    this.currentNode = newNode;
+                }
+                else if (this.currentNode is RootNode)
+                {
+                    var currentRootNode = this.currentNode as RootNode;
+                    Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
+
+                    currentRootNode.AddChild(newNode);
+                    this.currentNode = newNode;
+                }
             }
         }
 
@@ -536,7 +558,8 @@ namespace XtraLiteTemplates.Expressions
         {
             if (!this.currentNode.Continuity.HasFlag(PermittedContinuations.Literal))
             {
-                if (this.currentNode is DisembowelerNode && ((DisembowelerNode)this.currentNode).MemberName == null)
+                var currentReferenceNode = this.currentNode as ReferenceNode;
+                if (currentReferenceNode != null && currentReferenceNode.Identifier == null)
                 {
                     ExceptionHelper.UnexpectedLiteralRequiresIdentifier(this.FlowSymbols.MemberAccess, literal);
                 }
@@ -576,7 +599,7 @@ namespace XtraLiteTemplates.Expressions
             }
 
             /* Left side now becomes the "object" of disembowlement and the right side will be the member name */
-            var newNode = new DisembowelerNode(this.currentNode.Parent, this.currentNode);
+            var newNode = new ReferenceNode(this.currentNode.Parent, this.currentNode);
             var parentOperatorNode = this.currentNode.Parent as OperatorNode;
             if (parentOperatorNode != null)
             {

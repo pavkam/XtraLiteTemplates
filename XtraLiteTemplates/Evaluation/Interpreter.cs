@@ -145,7 +145,7 @@ namespace XtraLiteTemplates.Evaluation
             var document = new TemplateDocument();
             this.Interpret(document);
 
-            return document;
+            return new ContextualEvaluable(document);
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
