@@ -30,6 +30,7 @@
     </DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Microsoft.CSharp" />
     <Reference Include="System" />
     <Reference Include="nunit.framework">
       <HintPath>..\packages\NUnit.2.6.4\lib\nunit.framework.dll</HintPath>
@@ -75,6 +76,7 @@
     <Compile Include="Operators\SequenceOperatorTests.cs" />
     <Compile Include="Operators\OperatorTestsBase.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="StandardSelfObjectTests.cs" />
     <Compile Include="SimpleTypeDisembowelerTests.cs" />
     <Compile Include="FlexiblePrimitiveTypeConverterTests.cs" />
     <Compile Include="XLTemplateTests.cs" />

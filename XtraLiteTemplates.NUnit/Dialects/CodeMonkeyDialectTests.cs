@@ -48,6 +48,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
         {
             var dialect = new CodeMonkeyDialect(casing);
 
+            Assert.IsInstanceOf<StandardSelfObject>(dialect.Self);
             Assert.AreEqual(dialect.Culture, CultureInfo.InvariantCulture);
             Assert.AreEqual('\'', dialect.EndStringLiteralCharacter);
             Assert.AreEqual('}', dialect.EndTagCharacter);

@@ -190,6 +190,22 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreEqual("Funky World", result);
         }
+
+        [Test]
+        public void TestCaseEvaluationWithSelf()
+        {
+            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Number('199') + Number(true)}");
+            Assert.AreEqual("200", result);
+
+            result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Number('Ha')}");
+            Assert.AreEqual("NaN", result);
+
+            result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{String(100) + 1 + true}");
+            Assert.AreEqual("1001True", result);
+
+            result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Boolean(-3.95)}");
+            Assert.AreEqual("True", result);
+        }
     }
 }
 

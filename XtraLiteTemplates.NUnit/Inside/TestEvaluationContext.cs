@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Globalization;
     using System.Linq;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
@@ -55,9 +56,11 @@ namespace XtraLiteTemplates.NUnit.Inside
             SimpleTypeDisemboweler disemboweler;
             if (!m_disembowelers.TryGetValue(type, out disemboweler))
             {
-                disemboweler = new SimpleTypeDisemboweler(type,
+                disemboweler = new SimpleTypeDisemboweler(
+                    type,
                     SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
-                    SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, m_identifierComparer);
+                    SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, 
+                    m_identifierComparer, new TestObjectFormatter(CultureInfo.InvariantCulture));
 
                 m_disembowelers.Add(type, disemboweler);
             }

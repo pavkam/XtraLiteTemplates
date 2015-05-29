@@ -146,7 +146,12 @@ namespace XtraLiteTemplates
             Expect.NotNull("variables", variables);
 
             /* Create a standard evaluation context that will be used for evaluation of said template. */
-            var context = new EvaluationContext(true, this.Dialect.IdentifierComparer, this.Dialect.DecorateUnparsedText);
+            var context = new EvaluationContext(
+                true, 
+                this.Dialect.IdentifierComparer, 
+                this.Dialect.ObjectFormatter, 
+                this.Dialect.Self, 
+                this.Dialect.DecorateUnparsedText);
 
             /* Load in the variables. */
             context.OpenEvaluationFrame();
@@ -238,21 +243,28 @@ namespace XtraLiteTemplates
             private Stack<Frame> frames;
             private Dictionary<Type, SimpleTypeDisemboweler> disembowelers;
             private IEqualityComparer<string> identifierComparer;
+            private IObjectFormatter objectFormatter;
             private bool ignoreEvaluationExceptions;
+            private object selfObject;
             private Func<IExpressionEvaluationContext, string, string> unparsedTextHandler;
 
             public EvaluationContext(
                 bool ignoreEvaluationExceptions,
-                IEqualityComparer<string> identifierComparer, 
+                IEqualityComparer<string> identifierComparer,
+                IObjectFormatter objectFormatter,
+                object selfObject,
                 Func<IExpressionEvaluationContext, string, string> unparsedTextHandler)
             {
                 Debug.Assert(identifierComparer != null, "identifierComparer cannot be null.");
+                Debug.Assert(objectFormatter != null, "objectFormatter cannot be null.");
                 Debug.Assert(unparsedTextHandler != null, "unparsedTextHandler cannot be null.");
 
                 this.identifierComparer = identifierComparer;
+                this.objectFormatter = objectFormatter;
                 this.ignoreEvaluationExceptions = ignoreEvaluationExceptions;
                 this.unparsedTextHandler = unparsedTextHandler;
-
+                this.selfObject = selfObject;
+ 
                 this.disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
                 this.frames = new Stack<Frame>();
             }
@@ -303,6 +315,7 @@ namespace XtraLiteTemplates
             
             public object GetProperty(string property)
             {
+                /* Obtain the propety from the list given to us. */
                 foreach (var frame in this.frames)
                 {
                     object result;
@@ -312,7 +325,8 @@ namespace XtraLiteTemplates
                     }
                 }
 
-                return null;
+                /* Not there. Let's go to the self object now. */
+                return this.GetProperty(this.selfObject, property);
             }
 
             public object GetProperty(object @object, string property)
@@ -332,7 +346,8 @@ namespace XtraLiteTemplates
 
             public object Invoke(string method, object[] arguments)
             {
-                throw new NotImplementedException();
+                /* Go to self object. */
+                return this.Invoke(this.selfObject, method, arguments);
             }
 
             public object Invoke(object @object, string method, object[] arguments)
@@ -387,7 +402,7 @@ namespace XtraLiteTemplates
                         SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
                         SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties;
 
-                    disemboweler = new SimpleTypeDisemboweler(type, options, this.identifierComparer);
+                    disemboweler = new SimpleTypeDisemboweler(type, options, this.identifierComparer, this.objectFormatter);
 
                     this.disembowelers.Add(type, disemboweler);
                 }

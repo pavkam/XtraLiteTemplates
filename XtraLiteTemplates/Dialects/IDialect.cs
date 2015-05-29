@@ -37,6 +37,7 @@ namespace XtraLiteTemplates.Dialects
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Defines all the common properties and behaviors specific to a template language dialect.
@@ -61,6 +62,14 @@ namespace XtraLiteTemplates.Dialects
         /// The identifier comparer.
         /// </value>
         IEqualityComparer<string> IdentifierComparer { get; }
+
+        /// <summary>
+        /// Gets the <see cref="IObjectFormatter" /> object used obtain string representation of objects.
+        /// </summary>
+        /// <value>
+        /// The object formatter.
+        /// </value>
+        IObjectFormatter ObjectFormatter { get; }
 
         /// <summary>
         /// Gets the expression flow symbols used by expressions of this dialect.
@@ -141,6 +150,15 @@ namespace XtraLiteTemplates.Dialects
         /// The number literal decimal separator character.
         /// </value>
         char NumberDecimalSeparatorCharacter { get; }
+
+        /// <summary>
+        /// Gets the <c>self</c> object. The <c>self</c> object is used to expose global properties and methods
+        /// to the evaluation engine.
+        /// </summary>
+        /// <value>
+        /// The self object.
+        /// </value>
+        object Self { get; }
 
         /// <summary>
         /// Processes all unparsed text blocks read from the original template.

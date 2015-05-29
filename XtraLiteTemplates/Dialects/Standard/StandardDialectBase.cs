@@ -71,6 +71,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private string dialectUndefinedSpecialIdentifier;
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private object selfObject;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StandardDialectBase" /> class.
         /// <remarks>
@@ -93,6 +96,7 @@ namespace XtraLiteTemplates.Dialects.Standard
             this.typeConverter = new FlexiblePrimitiveTypeConverter(this.Culture, this);
             this.dialectCasing = casing;
             this.dialectUndefinedSpecialIdentifier = this.AdjustCasing("Undefined");
+            this.selfObject = new StandardSelfObject(this.typeConverter);
 
             var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
 
@@ -118,6 +122,20 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The identifier comparer.
         /// </value>
         public IEqualityComparer<string> IdentifierComparer { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IObjectFormatter" /> object used obtain string representation of objects.
+        /// </summary>
+        /// <value>
+        /// The object formatter.
+        /// </value>
+        public IObjectFormatter ObjectFormatter
+        {
+            get
+            {
+                return this;
+            }
+        }
 
         /// <summary>
         /// Gets the <see cref="IComparer{String}" /> object used to compare string literals when evaluating expressions.
@@ -270,6 +288,21 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The number literal decimal separator character.
         /// </value>
         public abstract char NumberDecimalSeparatorCharacter { get; }
+
+        /// <summary>
+        /// Gets the <c>self</c> object. The <c>self</c> object is used to expose global properties and methods
+        /// to the evaluation engine.
+        /// </summary>
+        /// <value>
+        /// The self object.
+        /// </value>
+        public virtual object Self
+        {
+            get
+            {
+                return this.selfObject;
+            }
+        }
 
         /// <summary>
         /// Processes all unparsed text blocks read from the original template. The method current implementation

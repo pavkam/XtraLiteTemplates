@@ -49,19 +49,26 @@ namespace XtraLiteTemplates.Introspection
         private IReadOnlyDictionary<string, Func<object, object[], object>> methodMap;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleTypeDisemboweler"/> class.
+        /// Initializes a new instance of the <see cref="SimpleTypeDisemboweler" /> class.
         /// </summary>
         /// <param name="type">The <see cref="System.Type" /> to inspect.</param>
         /// <param name="options">A set of <see cref="EvaluationOptions" /> options.</param>
         /// <param name="memberComparer">An instance of <see cref="IEqualityComparer{String}" /> used when looking up properties in the inspected type.</param>
+        /// <param name="objectFormatter">The object formatter.</param>
         /// <exception cref="ArgumentNullException">Either <paramref name="type" /> or <paramref name="memberComparer" /> parameters are <c>null</c>.</exception>
-        public SimpleTypeDisemboweler(Type type, EvaluationOptions options, IEqualityComparer<string> memberComparer)
+        public SimpleTypeDisemboweler(
+            Type type, 
+            EvaluationOptions options, 
+            IEqualityComparer<string> memberComparer, 
+            IObjectFormatter objectFormatter)
         {
             Expect.NotNull("type", type);
             Expect.NotNull("memberComparer", memberComparer);
+            Expect.NotNull("objectFormatter", objectFormatter);
 
             this.Type = type;
             this.Comparer = memberComparer;
+            this.ObjectFormatter = objectFormatter;
             this.Options = options;
 
             this.propertyMap = this.BuildPropertyMapping();
@@ -113,6 +120,15 @@ namespace XtraLiteTemplates.Introspection
         /// The equality comparer.
         /// </value>
         public IEqualityComparer<string> Comparer { get; private set; }
+
+        /// <summary>
+        /// Gets the <see cref="IObjectFormatter" /> used by <see cref="SimpleTypeDisemboweler" /> to convert object instances to their string representation.
+        /// <remarks>Value provided by the caller during construction.</remarks>
+        /// </summary>
+        /// <value>
+        /// The object formatter.
+        /// </value>
+        public IObjectFormatter ObjectFormatter { get; private set; }
 
         /// <summary>
         /// Gets the set of <see cref="EvaluationOptions" /> options that modifies the behavior of this
@@ -238,14 +254,22 @@ namespace XtraLiteTemplates.Introspection
             for (var argumentIndex = 0; argumentIndex < expectedArgumentTypes.Length; argumentIndex++)
             {
                 Type expectedType = expectedArgumentTypes[argumentIndex];
-                if (actualArguments.Length <= argumentIndex)
+                if (actualArguments == null || actualArguments.Length <= argumentIndex)
                 {
                     /* No actual argument at that position. Default to NULL. */
                     result[argumentIndex] = null;
                 }
-                else if (expectedType == typeof(object) || actualArguments[argumentIndex] == null)
+                else if (actualArguments[argumentIndex] == null)
+                {
+                    result[argumentIndex] = null;
+                }
+                else if (expectedType == typeof(object))
                 {
                     result[argumentIndex] = actualArguments[argumentIndex];
+                }
+                else if (expectedType == typeof(string))
+                {
+                    result[argumentIndex] = this.ObjectFormatter.ToString(actualArguments[argumentIndex]);
                 }
                 else
                 {

@@ -48,6 +48,8 @@ namespace XtraLiteTemplates.NUnit.Dialects
         {
             var dialect = new StandardDialect(culture, casing);
 
+            Assert.IsInstanceOf<StandardSelfObject>(dialect.Self);
+
             Assert.AreEqual(dialect.Culture, culture);
             Assert.AreEqual('"', dialect.EndStringLiteralCharacter);
             Assert.AreEqual('}', dialect.EndTagCharacter);
