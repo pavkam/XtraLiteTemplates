@@ -26,7 +26,7 @@
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
-namespace XtraLiteTemplates.Dialects.Standard
+namespace XtraLiteTemplates.Introspection
 {
     using System;
     using System.Collections.Generic;

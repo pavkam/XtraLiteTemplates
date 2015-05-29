@@ -247,6 +247,21 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseEvaluationFunctions1()
+        {
+            var evaluable = new Interpreter(
+                new Tokenizer("{1.ToString() + 2}"),
+                ExpressionFlowSymbols.Default, 
+                StringComparer.OrdinalIgnoreCase)
+                .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .Construct();
+
+            var result = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
+            Assert.AreEqual("12", result);
+        }
+
+        [Test]
         public void TestCaseEvaluationComplex1()
         {
             const String template = @"

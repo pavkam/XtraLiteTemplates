@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Collections.Generic;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Implements the standard relational not equals ('!=') operation.

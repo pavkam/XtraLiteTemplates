@@ -31,7 +31,8 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System;
     using System.Diagnostics;
     using System.Globalization;
-using XtraLiteTemplates.Dialects.Standard;
+    using XtraLiteTemplates.Dialects.Standard;
+    using XtraLiteTemplates.Introspection;
 
     public sealed class TestObjectFormatter : IObjectFormatter
     {

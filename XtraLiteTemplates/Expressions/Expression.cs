@@ -373,8 +373,8 @@ namespace XtraLiteTemplates.Expressions
                 Debug.Assert(currentReferenceNode.Identifier != null, "current reference node's identifier must not be null.");
 
                 /* Flip to the new root */
-                this.currentGroupRootNode = new RootNode(currentReferenceNode);
-                currentReferenceNode.Arguments = currentGroupRootNode;
+                this.currentGroupRootNode = new RootNode(currentReferenceNode, true);
+                currentReferenceNode.Arguments = this.currentGroupRootNode;
                 this.currentNode = this.currentGroupRootNode;
             }
             else if (this.currentNode is OperatorNode)
@@ -383,7 +383,7 @@ namespace XtraLiteTemplates.Expressions
                 Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                 /* Flip to the new root */
-                this.currentGroupRootNode = new RootNode(currentOperatorNode);
+                this.currentGroupRootNode = new RootNode(currentOperatorNode, false);
                 currentOperatorNode.RightNode = this.currentGroupRootNode;
                 this.currentNode = this.currentGroupRootNode;
             }
@@ -395,7 +395,7 @@ namespace XtraLiteTemplates.Expressions
                 Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
                 /* Flip to the new root */
-                this.currentGroupRootNode = new RootNode(currentRootNode);
+                this.currentGroupRootNode = new RootNode(currentRootNode, false);
                 currentRootNode.AddChild(this.currentGroupRootNode);
                 this.currentNode = this.currentGroupRootNode;
             }
@@ -623,7 +623,7 @@ namespace XtraLiteTemplates.Expressions
             if (this.currentGroupRootNode == null)
             {
                 /* Init! */
-                this.currentGroupRootNode = new RootNode(null);
+                this.currentGroupRootNode = new RootNode(null, false);
                 this.currentNode = this.currentGroupRootNode;
             }
 

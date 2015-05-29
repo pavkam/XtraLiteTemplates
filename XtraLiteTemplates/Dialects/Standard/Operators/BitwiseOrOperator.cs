@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using System.Diagnostics;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Implements the standard 32-bit bitwise or ('|') operation.

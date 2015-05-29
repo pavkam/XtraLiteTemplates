@@ -26,7 +26,7 @@
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
-namespace XtraLiteTemplates
+namespace XtraLiteTemplates.Introspection
 {
     using System;
     using System.Collections.Generic;
@@ -43,7 +43,10 @@ namespace XtraLiteTemplates
     public sealed class SimpleTypeDisemboweler
     {
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IReadOnlyDictionary<string, Func<object, object>> propertyNameMap;
+        private IReadOnlyDictionary<string, Func<object, object>> propertyMap;
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private IReadOnlyDictionary<string, Func<object, object[], object>> methodMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleTypeDisemboweler"/> class.
@@ -61,7 +64,8 @@ namespace XtraLiteTemplates
             this.Comparer = memberComparer;
             this.Options = options;
 
-            this.propertyNameMap = this.BuildMapping();
+            this.propertyMap = this.BuildPropertyMapping();
+            this.methodMap = this.BuildMethodMapping();
         }
 
         /// <summary>
@@ -123,16 +127,16 @@ namespace XtraLiteTemplates
         public EvaluationOptions Options { get; private set; }
 
         /// <summary>
-        /// Reads the <paramref name="property" /> of <paramref name="instance" />.
+        /// Reads the <paramref name="property" /> of <paramref name="object" />.
         /// </summary>
+        /// <param name="object">The object whose property is being read.</param>
         /// <param name="property">The property name.</param>
-        /// <param name="instance">The object whose property is being read.</param>
         /// <returns>The value of the read property.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="property" /> is <c>null</c>. The <paramref name="instance" /> is <c>null</c> and this instance of <see cref="SimpleTypeDisemboweler" />
+        /// <exception cref="ArgumentNullException"><paramref name="property" /> is <c>null</c>. The <paramref name="object" /> is <c>null</c> and this instance of <see cref="SimpleTypeDisemboweler" />
         /// is not instructed to ignore evaluation errors.</exception>
         /// <exception cref="ArgumentException"><paramref name="property" /> is not a valid identifier.</exception>
-        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any error while reading the property value</exception>
-        public object Read(string property, object instance)
+        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any error while reading the property value.</exception>
+        public object Read(object @object, string property)
         {
             Expect.Identifier("property", property);
 
@@ -140,17 +144,17 @@ namespace XtraLiteTemplates
 
             if (!ignoreErrors)
             {
-                Expect.NotNull("instance", instance);
+                Expect.NotNull("object", @object);
             }
             
-            if (instance != null)
+            if (@object != null)
             {
                 Func<object, object> reader;
-                if (this.propertyNameMap.TryGetValue(property, out reader))
+                if (this.propertyMap.TryGetValue(property, out reader))
                 {
                     try
                     {
-                        return reader(instance);
+                        return reader(@object);
                     }
                     catch (Exception e)
                     {
@@ -172,8 +176,102 @@ namespace XtraLiteTemplates
             return null;
         }
 
+        /// <summary>
+        /// Invokes a <paramref name="method" /> of <paramref name="object" /> and returns its value.
+        /// </summary>
+        /// <param name="object">The object whose method is being invoked.</param>
+        /// <param name="method">The invoked method.</param>
+        /// <param name="arguments">The arguments.</param>
+        /// <returns>
+        /// The return value of the method.
+        /// </returns>
+        /// <exception cref="ArgumentNullException"><paramref name="method" /> is <c>null</c>. The <paramref name="object" /> is <c>null</c> and this instance of <see cref="SimpleTypeDisemboweler" />
+        /// is not instructed to ignore evaluation errors.</exception>
+        /// <exception cref="ArgumentException"><paramref name="method" /> is not a valid identifier.</exception>
+        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any error while invoking method.</exception>
+        public object Invoke(object @object, string method, object[] arguments)
+        {
+            Expect.Identifier("method", method);
+
+            var ignoreErrors = this.Options.HasFlag(EvaluationOptions.TreatAllErrorsAsNull);
+
+            if (!ignoreErrors)
+            {
+                Expect.NotNull("object", @object);
+            }
+
+            if (@object != null)
+            {
+                Func<object, object[], object> reader;
+                if (this.methodMap.TryGetValue(method, out reader))
+                {
+                    try
+                    {
+                        return reader(@object, arguments);
+                    }
+                    catch (Exception e)
+                    {
+                        if (!ignoreErrors)
+                        {
+                            ExceptionHelper.ObjectMemberEvaluationError(e, method);
+                        }
+                    }
+                }
+                else
+                {
+                    if (!ignoreErrors)
+                    {
+                        ExceptionHelper.InvalidObjectMemberName(method);
+                    }
+                }
+            }
+
+            return null;
+        }
+
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IReadOnlyDictionary<string, Func<object, object>> BuildMapping()
+        private object[] ReconcileArguments(Type[] expectedArgumentTypes, object[] actualArguments)
+        {
+            Debug.Assert(expectedArgumentTypes != null, "expectedArgumentTypes cannot be null.");
+            object[] result = new object[expectedArgumentTypes.Length];
+
+            for (var argumentIndex = 0; argumentIndex < expectedArgumentTypes.Length; argumentIndex++)
+            {
+                Type expectedType = expectedArgumentTypes[argumentIndex];
+                if (actualArguments.Length <= argumentIndex)
+                {
+                    /* No actual argument at that position. Default to NULL. */
+                    result[argumentIndex] = null;
+                }
+                else if (expectedType == typeof(object) || actualArguments[argumentIndex] == null)
+                {
+                    result[argumentIndex] = actualArguments[argumentIndex];
+                }
+                else
+                {
+                    try
+                    {
+                        result[argumentIndex] = Convert.ChangeType(actualArguments[argumentIndex], expectedType);
+                    }
+                    catch (Exception e)
+                    {
+                        if (this.Options.HasFlag(EvaluationOptions.TreatAllErrorsAsNull))
+                        {
+                            result[argumentIndex] = null;
+                        }
+                        else
+                        {
+                            throw e;
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private IReadOnlyDictionary<string, Func<object, object>> BuildPropertyMapping()
         {
             var mapping = new Dictionary<string, Func<object, object>>(this.Comparer);
 
@@ -190,8 +288,6 @@ namespace XtraLiteTemplates
 
             if (this.Options.HasFlag(EvaluationOptions.TreatParameterlessFunctionsAsProperties))
             {
-                var zeroParams = new object[0];
-
                 /* Load methods in. */
                 foreach (var method in Type.GetMethods())
                 {
@@ -203,8 +299,77 @@ namespace XtraLiteTemplates
 
                     if (!mapping.ContainsKey(method.Name))
                     {
-                        mapping[method.Name] = instance => method.Invoke(instance, zeroParams);
+                        mapping[method.Name] = instance => method.Invoke(instance, null);
                     }
+                }
+            }
+
+            return mapping;
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private IReadOnlyDictionary<string, Func<object, object[], object>> BuildMethodMapping()
+        {
+            var mapping = new Dictionary<string, Func<object, object[], object>>(this.Comparer);
+            var scoreMapping = new Dictionary<string, double>(this.Comparer);
+
+            /* Load methods in. */
+            foreach (var method in Type.GetMethods())
+            {
+                if (method.IsAbstract || method.IsConstructor || method.IsPrivate)
+                {
+                    continue;
+                }
+
+                var methodParameters = method.GetParameters();
+                foreach (var parameter in methodParameters)
+                {
+                    /* Scan for unsupported method parameter types. */
+                    if (parameter.IsRetval || parameter.IsOut)
+                    {
+                        continue;
+                    }
+                }
+
+                /* Get the method arguments and calculate the matching score. */
+                double score = 0;
+                var methodArgumentTypes = methodParameters.Select(s => s.ParameterType).ToArray();
+                if (methodArgumentTypes.Length == 0)
+                {
+                    score = 1;
+                }
+                else
+                {
+                    foreach (var argumentType in methodArgumentTypes)
+                    {
+                        if (argumentType == typeof(object))
+                        {
+                            score += 1.00;
+                        }
+                        else if (argumentType == typeof(string))
+                        {
+                            score += 0.75;
+                        }
+                        else if (argumentType == typeof(double))
+                        {
+                            score += 0.50;
+                        }
+                    }
+
+                    score = score / methodArgumentTypes.Length;
+                }
+
+                double previousScore;
+                if (!scoreMapping.TryGetValue(method.Name, out previousScore) || previousScore < score)
+                { 
+                    Func<object, object[], object> invokationFunc = (@object, arguments) =>
+                    {
+                        var actualArguments = ReconcileArguments(methodArgumentTypes, arguments);
+                        return method.Invoke(@object, actualArguments);
+                    };
+
+                    mapping[method.Name] = invokationFunc;
+                    scoreMapping[method.Name] = score;
                 }
             }
 

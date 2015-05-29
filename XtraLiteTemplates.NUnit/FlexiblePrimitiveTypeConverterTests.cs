@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.NUnit
     using System.Linq;
     using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
     using XtraLiteTemplates.NUnit.Inside;
 
     [TestFixture]

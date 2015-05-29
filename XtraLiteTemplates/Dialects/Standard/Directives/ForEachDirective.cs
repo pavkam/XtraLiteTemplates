@@ -37,6 +37,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
     using XtraLiteTemplates.Parsing;
 
     /// <summary>
@@ -150,9 +151,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
             else
             {
-                var variableName = components[this.identifierComponentIndex] as string;
-                Debug.Assert(variableName != null, "variable name expected to be set.");
-                context.SetVariable(variableName, enumerator.Current);
+                var propertyName = components[this.identifierComponentIndex] as string;
+                Debug.Assert(propertyName != null, "variable name expected to be set.");
+                context.SetProperty(propertyName, enumerator.Current);
                 return FlowDecision.Evaluate;
             }
         }

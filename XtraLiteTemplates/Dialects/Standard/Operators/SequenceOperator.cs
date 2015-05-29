@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Diagnostics;
     using System.Linq;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Implements the standard integer sequence operator ('..').

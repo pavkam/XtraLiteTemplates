@@ -37,17 +37,6 @@ namespace XtraLiteTemplates.Expressions
     {
         public static readonly IExpressionEvaluationContext Instance = new ReduceExpressionEvaluationContext();
 
-        public void SetVariable(string identifier, object value)
-        {
-            Debug.Fail("Invalid operation.");
-        }
-
-        public object GetVariable(string identifier)
-        {
-            Debug.Fail("Invalid operation.");
-            return null;
-        }
-
         public void AddStateObject(object state)
         {
             Debug.Fail("Invalid operation.");
@@ -64,7 +53,30 @@ namespace XtraLiteTemplates.Expressions
             return false;
         }
 
-        public object GetProperty(object variable, string memberName)
+        public void SetProperty(string property, object value)
+        {
+            Debug.Fail("Invalid operation.");
+        }
+
+        public object GetProperty(string property)
+        {
+            Debug.Fail("Invalid operation.");
+            return false;
+        }
+
+        public object GetProperty(object @object, string property)
+        {
+            Debug.Fail("Invalid operation.");
+            return false;
+        }
+
+        public object Invoke(string method, object[] arguments)
+        {
+            Debug.Fail("Invalid operation.");
+            return false;
+        }
+
+        public object Invoke(object @object, string method, object[] arguments)
         {
             Debug.Fail("Invalid operation.");
             return false;

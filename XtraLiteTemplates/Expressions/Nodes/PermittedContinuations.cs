@@ -78,6 +78,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
         /// <summary>
         /// A group separator symbol can follow next.
         /// </summary>
-        ContinueGroup = CloseGroup,
+        ContinueGroup = 64,
     }
 }

@@ -42,14 +42,14 @@
     <Compile Include="Dialects\Standard\Directives\PreFormattedUnparsedTextDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
-    <Compile Include="Dialects\Standard\IObjectFormatter.cs" />
+    <Compile Include="Introspection\IObjectFormatter.cs" />
     <Compile Include="Dialects\Standard\Operators\FormatOperator.cs" />
     <Compile Include="Evaluation\ContextualEvaluable.cs" />
     <Compile Include="Expressions\Nodes\PermittedContinuations.cs" />
     <Compile Include="Expressions\Nodes\LiteralNode.cs" />
     <Compile Include="Expressions\Nodes\ReferenceNode.cs" />
     <Compile Include="Parsing\LexingException.cs" />
-    <Compile Include="SimpleTypeDisemboweler.cs" />
+    <Compile Include="Introspection\SimpleTypeDisemboweler.cs" />
     <Compile Include="Dialects\Standard\CodeMonkeyDialect.cs" />
     <Compile Include="Dialects\Standard\StandardDialectBase.cs" />
     <Compile Include="ExceptionHelper.cs" />
@@ -64,8 +64,8 @@
     <Compile Include="Dialects\Standard\Operators\BitwiseOrOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\BitwiseNotOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\StandardRelationalOperator.cs" />
-    <Compile Include="Dialects\Standard\PrimitiveType.cs" />
-    <Compile Include="Dialects\Standard\IPrimitiveTypeConverter.cs" />
+    <Compile Include="Introspection\PrimitiveType.cs" />
+    <Compile Include="Introspection\IPrimitiveTypeConverter.cs" />
     <Compile Include="Dialects\Standard\Operators\BitwiseShiftRightOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\BitwiseShiftLeftOperator.cs" />
     <Compile Include="Dialects\Standard\Operators\RelationalGreaterThanOrEqualsOperator.cs" />
@@ -101,7 +101,7 @@
     <Compile Include="Evaluation\TemplateNode.cs" />
     <Compile Include="Evaluation\Directive.cs" />
     <Compile Include="Evaluation\Interpreter.cs" />
-    <Compile Include="Dialects\Standard\FlexiblePrimitiveTypeConverter.cs" />
+    <Compile Include="Introspection\FlexiblePrimitiveTypeConverter.cs" />
     <Compile Include="Dialects\Standard\StandardDialect.cs" />
     <Compile Include="Dialects\IDialect.cs" />
     <Compile Include="Parsing\TagLex.cs" />

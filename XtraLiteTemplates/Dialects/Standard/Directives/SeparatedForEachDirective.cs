@@ -37,6 +37,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
     using XtraLiteTemplates.Parsing;
 
     /// <summary>
@@ -138,7 +139,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                         return FlowDecision.Terminate;
                     }
 
-                    context.SetVariable(components[this.identifierComponentIndex] as string, enumerator.Current);
+                    var propertyName = components[this.identifierComponentIndex] as string;
+                    context.SetProperty(propertyName, enumerator.Current);
+
                     state = new State
                     {
                         Enumerator = enumerator,
@@ -155,7 +158,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                     Debug.Assert(sstate.Enumerator != null, "state enumerator cannot not be null.");
                     Debug.Assert(!sstate.IsLast, "iteration cannot be the last.");
 
-                    context.SetVariable(components[this.identifierComponentIndex] as string, sstate.Enumerator.Current);
+                    var propertyName = components[this.identifierComponentIndex] as string;
+                    context.SetProperty(propertyName, sstate.Enumerator.Current);
                     sstate.IsLast = !sstate.Enumerator.MoveNext();
 
                     return FlowDecision.Evaluate;

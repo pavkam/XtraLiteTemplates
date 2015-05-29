@@ -175,6 +175,21 @@ namespace XtraLiteTemplates.NUnit
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, template, "initial");
             Assert.AreEqual("initial/1/  3  /  4  /1/2/  3  /  4  /2/initial", result);
         }
+
+        [Test]
+        public void TestCaseEvaluationWithMethods1()
+        {
+            var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, @"{_0.GetType().Name}", this);
+            Assert.AreEqual(this.GetType().Name, result);
+        }
+
+        [Test]
+        public void TestCaseEvaluationWithMethods2()
+        {
+            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{_0.Replace('Hello', _1)}", "Hello World", "Funky");
+
+            Assert.AreEqual("Funky World", result);
+        }
     }
 }
 

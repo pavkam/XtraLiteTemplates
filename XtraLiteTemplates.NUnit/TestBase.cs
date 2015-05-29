@@ -42,6 +42,7 @@ namespace XtraLiteTemplates.NUnit
     using System.IO;
     using System.Diagnostics;
     using XtraLiteTemplates.Dialects.Standard.Directives;
+    using XtraLiteTemplates.Introspection;
 
     public class TestBase
     {
@@ -54,7 +55,7 @@ namespace XtraLiteTemplates.NUnit
             var context = new TestEvaluationContext(comparer);
             context.OpenEvaluationFrame();
             foreach (var kvp in values)
-                context.SetVariable(kvp.Key, kvp.Value);
+                context.SetProperty(kvp.Key, kvp.Value);
 
             String result = null;
             using (var sw = new StringWriter())
@@ -679,8 +680,6 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-
-
         protected static void ExpectInvalidObjectMemberNameException(String memberName, Action action)
         {
             try
@@ -706,7 +705,7 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(EvaluationException), e);
-                Assert.AreEqual(String.Format("Evaluation of property or method '{0}' failed. An exception was raised: Exception has been thrown by the target of an invocation.", memberName), e.Message);
+                Assert.IsTrue(e.Message.StartsWith(String.Format("Evaluation of property or method '{0}' failed. An exception was raised:", memberName)));
                 return;
             }
 

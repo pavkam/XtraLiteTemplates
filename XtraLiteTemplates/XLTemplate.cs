@@ -38,6 +38,7 @@ namespace XtraLiteTemplates
     using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
     using XtraLiteTemplates.Parsing;
 
     /// <summary>
@@ -151,7 +152,7 @@ namespace XtraLiteTemplates
             context.OpenEvaluationFrame();
             foreach (var variable in variables)
             {
-                context.SetVariable(variable.Key, variable.Value);
+                context.SetProperty(variable.Key, variable.Value);
             }
 
             /* Evaluate. */
@@ -289,7 +290,7 @@ namespace XtraLiteTemplates
                 this.frames.Pop();
             }
 
-            public void SetVariable(string identifier, object value)
+            public void SetProperty(string property, object value)
             {
                 var topFrame = this.TopFrame;
                 if (topFrame.Variables == null)
@@ -297,15 +298,15 @@ namespace XtraLiteTemplates
                     topFrame.Variables = new Dictionary<string, object>(this.identifierComparer);
                 }
 
-                topFrame.Variables[identifier] = value;
+                topFrame.Variables[property] = value;
             }
-
-            public object GetVariable(string identifier)
+            
+            public object GetProperty(string property)
             {
                 foreach (var frame in this.frames)
                 {
                     object result;
-                    if (frame.Variables != null && frame.Variables.TryGetValue(identifier, out result))
+                    if (frame.Variables != null && frame.Variables.TryGetValue(property, out result))
                     {
                         return result;
                     }
@@ -314,27 +315,34 @@ namespace XtraLiteTemplates
                 return null;
             }
 
-            public object GetProperty(object variable, string memberName)
+            public object GetProperty(object @object, string property)
             {
-                Expect.Identifier("memberName", memberName);
+                Expect.Identifier("property", property);
 
-                if (variable != null)
+                if (@object != null)
                 {
-                    var type = variable.GetType();
+                    var type = @object.GetType();
+                    return this.GetDisembowelerForType(type).Read(@object, property);
+                }
+                else
+                {
+                    return null;
+                }
+            }
 
-                    SimpleTypeDisemboweler disemboweler;
-                    if (!this.disembowelers.TryGetValue(type, out disemboweler))
-                    {
-                        var options = 
-                            SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
-                            SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties;
+            public object Invoke(string method, object[] arguments)
+            {
+                throw new NotImplementedException();
+            }
 
-                        disemboweler = new SimpleTypeDisemboweler(type, options, this.identifierComparer);
+            public object Invoke(object @object, string method, object[] arguments)
+            {
+                Expect.Identifier("method", method);
 
-                        this.disembowelers.Add(type, disemboweler);
-                    }
-
-                    return disemboweler.Read(memberName, variable);
+                if (@object != null)
+                {
+                    var type = @object.GetType();
+                    return this.GetDisembowelerForType(type).Invoke(@object, method, arguments);
                 }
                 else
                 {
@@ -366,6 +374,25 @@ namespace XtraLiteTemplates
             {
                 var topFrame = this.TopFrame;
                 return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
+            }
+
+            private SimpleTypeDisemboweler GetDisembowelerForType(Type type)
+            {
+                Debug.Assert(type != null, "type cannot be null.");
+
+                SimpleTypeDisemboweler disemboweler;
+                if (!this.disembowelers.TryGetValue(type, out disemboweler))
+                {
+                    var options =
+                        SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
+                        SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties;
+
+                    disemboweler = new SimpleTypeDisemboweler(type, options, this.identifierComparer);
+
+                    this.disembowelers.Add(type, disemboweler);
+                }
+
+                return disemboweler;
             }
         }
     }

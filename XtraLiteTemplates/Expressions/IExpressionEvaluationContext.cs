@@ -36,32 +36,61 @@ namespace XtraLiteTemplates.Expressions
     public interface IExpressionEvaluationContext
     {
         /// <summary>
-        /// Sets the value of a variable.
+        /// Sets the value of context property (variable).
         /// </summary>
-        /// <param name="identifier">The variable name.</param>
+        /// <param name="property">The property name.</param>
         /// <param name="value">The variable value.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="identifier"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="identifier"/> is not a valid identifier.</exception>
-        void SetVariable(string identifier, object value);
+        /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
+        void SetProperty(string property, object value);
 
         /// <summary>
-        /// Gets the value of a variable.
+        /// Gets the value of context property (variable).
         /// </summary>
-        /// <param name="identifier">The variable name.</param>
-        /// <returns>The variable value.</returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="identifier" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="identifier" /> is not a valid identifier.</exception>
-        object GetVariable(string identifier);
+        /// <param name="property">The property name.</param>
+        /// <returns>
+        /// The variable value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
+        object GetProperty(string property);
 
         /// <summary>
         /// Gets the value of an object's property.
         /// </summary>
-        /// <param name="variable">The variable.</param>
-        /// <param name="memberName">Name of the property to read.</param>
-        /// <returns>The value of the property.</returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="memberName" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="memberName" /> is not a valid identifier.</exception>
-        object GetProperty(object variable, string memberName);
+        /// <param name="object">The object to get the property for.</param>
+        /// <param name="property">The variable name.</param>
+        /// <returns>
+        /// The variable value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
+        object GetProperty(object @object, string property);
+
+        /// <summary>
+        /// Invokes a context method (global).
+        /// </summary>
+        /// <param name="method">The method name.</param>
+        /// <param name="arguments">The arguments to be passed to the method. <c>null</c> value means no arguments.</param>
+        /// <returns>
+        /// The return value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
+        object Invoke(string method, object[] arguments);
+
+        /// <summary>
+        /// Invokes an object's method.
+        /// </summary>
+        /// <param name="object">The object.</param>
+        /// <param name="method">The method name.</param>
+        /// <param name="arguments">The arguments to be passed to the method. <c>null</c> value means no arguments.</param>
+        /// <returns>
+        /// The return value.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
+        object Invoke(object @object, string method, object[] arguments);
 
         /// <summary>
         /// Adds a state object.

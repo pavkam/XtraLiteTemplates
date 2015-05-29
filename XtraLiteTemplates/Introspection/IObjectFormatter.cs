@@ -26,7 +26,7 @@
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
-namespace XtraLiteTemplates.Dialects.Standard
+namespace XtraLiteTemplates.Introspection
 {
     using System;
     using System.Collections.Generic;
@@ -35,33 +35,26 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Defines one of the types the standard dialects support and can operate upon.
+    /// Defines a method that allows obtaining the string representation of an un-typed <see cref="Object"/>.
     /// </summary>
-    public enum PrimitiveType
+    public interface IObjectFormatter
     {
         /// <summary>
-        /// Undefined data type. Normally maps to the <c>null</c> object values.
+        /// Gets the string representation of an <see cref="Object"/>.
         /// </summary>
-        Undefined = 0,
+        /// <param name="obj">The object to obtain the string representation for.</param>
+        /// <returns>The string representation.</returns>
+        string ToString(object obj);
 
         /// <summary>
-        /// Number data type. Represented internally as a double-precision floating point number.
+        /// Gets the string representation of an <see cref="Object" /> using the given <paramref name="formatProvider"/>.
         /// </summary>
-        Number,
-
-        /// <summary>
-        /// The string data type. There is no <c>null</c> string as that is equivalent to a <see cref="Undefined"/> value.
-        /// </summary>
-        String,
-
-        /// <summary>
-        /// The boolean data type.
-        /// </summary>
-        Boolean,
-
-        /// <summary>
-        /// Any object that does not map directly to the other four types.
-        /// </summary>
-        Object,
+        /// <param name="obj">The object to obtain the string representation for.</param>
+        /// <param name="formatProvider">The format provider.</param>
+        /// <returns>
+        /// The string representation.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
+        string ToString(object obj, IFormatProvider formatProvider);
     }
 }

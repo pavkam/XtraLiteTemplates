@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.NUnit
     using System.Linq;
     using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     [TestFixture]
     public class SimpleTypeDisembowelerTests : TestBase
@@ -56,21 +57,22 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseNoMethodsCaseSensitive()
+        public void TestCasePropertiesExcludingMethodsCaseSensitive()
         {
             var disemboweler = new SimpleTypeDisemboweler(typeof(String),
                 SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull, StringComparer.Ordinal);
 
             var value = "Hello World";
 
-            Assert.AreEqual(value.Length, disemboweler.Read("Length", value));
-            Assert.IsNull(disemboweler.Read("length", value));
-            Assert.IsNull(disemboweler.Read("LENGTH", value));
-            Assert.IsNull(disemboweler.Read("ToUpper", value));
+            /* Properties */
+            Assert.AreEqual(value.Length, disemboweler.Read(value, "Length"));
+            Assert.IsNull(disemboweler.Read(value, "length"));
+            Assert.IsNull(disemboweler.Read(value, "LENGTH"));
+            Assert.IsNull(disemboweler.Read(value, "ToUpper"));
         }
 
         [Test]
-        public void TestCaseWithMethodsCaseSensitive()
+        public void TestCasePropertiesInclusingMethodsCaseSensitive()
         {
             var disemboweler = new SimpleTypeDisemboweler(typeof(String),
                 SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties |
@@ -78,14 +80,14 @@ namespace XtraLiteTemplates.NUnit
 
             var value = "Hello World";
 
-            Assert.AreEqual(value.Length, disemboweler.Read("Length", value));
-            Assert.IsNull(disemboweler.Read("length", value));
-            Assert.IsNull(disemboweler.Read("LENGTH", value));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Read("ToUpper", value));
+            Assert.AreEqual(value.Length, disemboweler.Read(value, "Length"));
+            Assert.IsNull(disemboweler.Read(value, "length"));
+            Assert.IsNull(disemboweler.Read(value, "LENGTH"));
+            Assert.AreEqual(value.ToUpper(), disemboweler.Read(value, "ToUpper"));
         }
 
         [Test]
-        public void TestCaseWithMethodsCaseInsensitive()
+        public void TestCasePropertiesIncludingMethodsCaseInsensitive()
         {
             var disemboweler = new SimpleTypeDisemboweler(typeof(String),
                 SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties |
@@ -93,13 +95,34 @@ namespace XtraLiteTemplates.NUnit
 
             var value = "Hello World";
 
-            Assert.AreEqual(value.Length, disemboweler.Read("Length", value));
-            Assert.AreEqual(value.Length, disemboweler.Read("length", value));
-            Assert.AreEqual(value.Length, disemboweler.Read("LENGTH", value));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Read("ToUpper", value));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Read("toupper", value));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Read("TOUPPER", value));
+            Assert.AreEqual(value.Length, disemboweler.Read(value, "Length"));
+            Assert.AreEqual(value.Length, disemboweler.Read(value, "length"));
+            Assert.AreEqual(value.Length, disemboweler.Read(value, "LENGTH"));
+            Assert.AreEqual(value.ToUpper(), disemboweler.Read(value, "ToUpper"));
+            Assert.AreEqual(value.ToUpper(), disemboweler.Read(value, "toupper"));
+            Assert.AreEqual(value.ToUpper(), disemboweler.Read(value, "TOUPPER"));
         }
+
+
+        [Test]
+        public void TestCaseMethodsCaseSensitive()
+        {
+            var disemboweler = new SimpleTypeDisemboweler(
+                typeof(String),
+                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull, 
+                StringComparer.Ordinal);
+
+            var value = "Hello World";
+
+            /* Properties */
+            Assert.IsNull(disemboweler.Invoke(value, "Length", null));
+            Assert.AreEqual("HELLO WORLD", disemboweler.Invoke(value, "ToUpper", null));
+            Assert.AreEqual("HELLO WORLD", disemboweler.Invoke(value, "ToUpper", new Object[] { 1 }));
+            Assert.AreEqual("Good bye World", disemboweler.Invoke(value, "Replace", new Object[] { "Hello", "Good bye" }));
+            Assert.IsNull(disemboweler.Invoke(value, "replace", null));
+            Assert.IsNull(disemboweler.Invoke(value, "toUpper", null));
+        }
+
 
         [Test]
         public void TestCaseSelectionTactics1()
@@ -113,9 +136,9 @@ namespace XtraLiteTemplates.NUnit
             var disemboweler1 = new SimpleTypeDisemboweler(anon1.GetType(),
                 SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, StringComparer.OrdinalIgnoreCase);
 
-            Assert.AreEqual("2", disemboweler1.Read("Value", anon1));
-            Assert.AreEqual("2", disemboweler1.Read("value", anon1));
-            Assert.AreEqual("2", disemboweler1.Read("VALUE", anon1));
+            Assert.AreEqual("2", disemboweler1.Read(anon1, "Value"));
+            Assert.AreEqual("2", disemboweler1.Read(anon1, "value"));
+            Assert.AreEqual("2", disemboweler1.Read(anon1, "VALUE"));
         }
 
         [Test]
@@ -131,9 +154,9 @@ namespace XtraLiteTemplates.NUnit
                 SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties | 
                 SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull, StringComparer.Ordinal);
 
-            Assert.AreEqual("1", disemboweler1.Read("VALUE", anon1));
-            Assert.AreEqual("2", disemboweler1.Read("Value", anon1));
-            Assert.AreEqual(null, disemboweler1.Read("value", anon1));
+            Assert.AreEqual("1", disemboweler1.Read(anon1, "VALUE"));
+            Assert.AreEqual("2", disemboweler1.Read(anon1, "Value"));
+            Assert.AreEqual(null, disemboweler1.Read(anon1, "value"));
         }
 
         [Test]
@@ -142,8 +165,9 @@ namespace XtraLiteTemplates.NUnit
             var disemboweler = new SimpleTypeDisemboweler(typeof(String), SimpleTypeDisemboweler.EvaluationOptions.None, StringComparer.Ordinal);
             var test = "test";
 
-            ExpectInvalidObjectMemberNameException("length", () => disemboweler.Read("length", test));
-            ExpectInvalidObjectMemberNameException("ToString", () => disemboweler.Read("ToString", test));
+            ExpectInvalidObjectMemberNameException("length", () => disemboweler.Read(test, "length"));
+            ExpectInvalidObjectMemberNameException("ToString", () => disemboweler.Read(test, "ToString"));
+            ExpectInvalidObjectMemberNameException("NoMethod", () => disemboweler.Read(test, "NoMethod"));
         }
 
         private class ThrowsErrorOnRead
@@ -155,6 +179,16 @@ namespace XtraLiteTemplates.NUnit
                     throw new InvalidOperationException("Whoops!");
                 }
             }
+
+            public String f1(Int32 arg)
+            {
+                return arg.ToString();
+            }
+
+            public String f2()
+            {
+                throw new InvalidOperationException("Whoops!");
+            }
         }
 
         [Test]
@@ -163,7 +197,9 @@ namespace XtraLiteTemplates.NUnit
             var disemboweler = new SimpleTypeDisemboweler(typeof(ThrowsErrorOnRead), SimpleTypeDisemboweler.EvaluationOptions.None, StringComparer.Ordinal);
             var test = new ThrowsErrorOnRead();
 
-            ExpectObjectMemberEvaluationErrorException("Value", () => disemboweler.Read("Value", test));
+            ExpectObjectMemberEvaluationErrorException("Value", () => disemboweler.Read(test, "Value"));
+            ExpectObjectMemberEvaluationErrorException("f1", () => disemboweler.Invoke(test, "f1", new Object[] { this }));
+            ExpectObjectMemberEvaluationErrorException("f2", () => disemboweler.Invoke(test, "f2", null));
         }
 
         [Test]
@@ -171,7 +207,8 @@ namespace XtraLiteTemplates.NUnit
         {
             var disemboweler = new SimpleTypeDisemboweler(typeof(String), SimpleTypeDisemboweler.EvaluationOptions.None, StringComparer.Ordinal);
 
-            ExpectArgumentNullException("instance", () => disemboweler.Read("Value", null));
+            ExpectArgumentNullException("object", () => disemboweler.Read(null, "Value"));
+            ExpectArgumentNullException("object", () => disemboweler.Invoke(null, "Value", null));
         }
 
         [Test]
@@ -179,9 +216,13 @@ namespace XtraLiteTemplates.NUnit
         {
             var disemboweler = new SimpleTypeDisemboweler(typeof(String), SimpleTypeDisemboweler.EvaluationOptions.None, StringComparer.Ordinal);
 
-            ExpectArgumentNullException("property", () => disemboweler.Read(null, String.Empty));
-            ExpectArgumentEmptyException("property", () => disemboweler.Read("", String.Empty));
-            ExpectArgumentNotIdentifierException("property", () => disemboweler.Read("+Value", String.Empty));
+            ExpectArgumentNullException("property", () => disemboweler.Read(String.Empty, null));
+            ExpectArgumentEmptyException("property", () => disemboweler.Read(String.Empty, ""));
+            ExpectArgumentNotIdentifierException("property", () => disemboweler.Read(String.Empty, "+Value"));
+
+            ExpectArgumentNullException("method", () => disemboweler.Invoke(String.Empty, null, null));
+            ExpectArgumentEmptyException("method", () => disemboweler.Invoke(String.Empty, "", null));
+            ExpectArgumentNotIdentifierException("method", () => disemboweler.Invoke(String.Empty, "+Value", null));
         }
     }
 }

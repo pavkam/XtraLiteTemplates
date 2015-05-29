@@ -41,11 +41,13 @@ namespace XtraLiteTemplates.Expressions.Nodes
     internal class RootNode : ExpressionNode
     {
         private List<ExpressionNode> groupChildrenNodes;
+        private bool allowEmptyGroup;
 
-        public RootNode(ExpressionNode parent)
+        public RootNode(ExpressionNode parent, bool allowEmptyGroup)
             : base(parent)
         {
             this.groupChildrenNodes = new List<ExpressionNode>();
+            this.allowEmptyGroup = allowEmptyGroup;
         }
 
         public IReadOnlyList<ExpressionNode> Children { get; private set; }
@@ -77,15 +79,28 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 {
                     return
                         PermittedContinuations.BinaryOperator |
+                        PermittedContinuations.ContinueGroup |
                         PermittedContinuations.CloseGroup;
                 }
                 else
                 {
-                    return
-                        PermittedContinuations.UnaryOperator |
-                        PermittedContinuations.Literal |
-                        PermittedContinuations.Identifier |
-                        PermittedContinuations.NewGroup;
+                    if (this.groupChildrenNodes.Count == 0 && this.allowEmptyGroup)
+                    {
+                        return
+                            PermittedContinuations.UnaryOperator |
+                            PermittedContinuations.Literal |
+                            PermittedContinuations.Identifier |
+                            PermittedContinuations.CloseGroup |
+                            PermittedContinuations.NewGroup;
+                    }
+                    else
+                    {
+                        return
+                            PermittedContinuations.UnaryOperator |
+                            PermittedContinuations.Literal |
+                            PermittedContinuations.Identifier |
+                            PermittedContinuations.NewGroup;
+                    }
                 }
             }
         }
@@ -98,6 +113,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
         public void Close()
         {
             Debug.Assert(!this.Closed, "Cannot be closed.");
+            Debug.Assert(this.groupChildrenNodes.Count > 0 || this.allowEmptyGroup, "Children must be defined for [mandatory children] groups.");
 
             this.Closed = true;
         }
@@ -114,7 +130,14 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 }
                 else if (style == ExpressionFormatStyle.Arithmetic)
                 {
-                    result = string.Format("( {0} )", result);
+                    if (!string.IsNullOrEmpty(result))
+                    {
+                        result = string.Format("( {0} )", result);
+                    }
+                    else
+                    {
+                        result = "( )";
+                    }
                 }
                 else if (style == ExpressionFormatStyle.Polish)
                 {

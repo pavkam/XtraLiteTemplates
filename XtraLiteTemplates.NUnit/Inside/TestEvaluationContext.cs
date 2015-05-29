@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Introspection;
 
     public class TestEvaluationContext : IEvaluationContext
     {
@@ -48,6 +49,21 @@ namespace XtraLiteTemplates.NUnit.Inside
         private Stack<Frame> m_frames;
         private Dictionary<Type, SimpleTypeDisemboweler> m_disembowelers;
         private IEqualityComparer<String> m_identifierComparer;
+
+        private SimpleTypeDisemboweler GetDisemboweler(Type type)
+        {
+            SimpleTypeDisemboweler disemboweler;
+            if (!m_disembowelers.TryGetValue(type, out disemboweler))
+            {
+                disemboweler = new SimpleTypeDisemboweler(type,
+                    SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
+                    SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, m_identifierComparer);
+
+                m_disembowelers.Add(type, disemboweler);
+            }
+
+            return disemboweler;
+        }
 
         public TestEvaluationContext(IEqualityComparer<String> identifierComparer)
         {
@@ -83,31 +99,6 @@ namespace XtraLiteTemplates.NUnit.Inside
             Assert.Greater(m_frames.Count, 0);
 
             m_frames.Pop();
-        }
-
-        public void SetVariable(String identifier, Object value)
-        {
-            Assert.IsNotEmpty(identifier);
-
-            var topFrame = TopFrame;
-            if (topFrame.Variables == null)
-                topFrame.Variables = new Dictionary<String, Object>(m_identifierComparer);
-
-            topFrame.Variables[identifier] = value;
-        }
-
-        public Object GetVariable(String identifier)
-        {
-            Assert.IsNotEmpty(identifier);
-
-            foreach (var frame in m_frames)
-            {
-                Object result;
-                if (frame.Variables != null && frame.Variables.TryGetValue(identifier, out result))
-                    return result;
-            }
-
-            return null;
         }
 
         public bool IgnoreEvaluationExceptions
@@ -147,25 +138,57 @@ namespace XtraLiteTemplates.NUnit.Inside
         }
 
 
-        public Object GetProperty(Object variable, String memberName)
+        public void SetProperty(string property, Object value)
         {
-            Assert.IsNotEmpty(memberName);
+            Assert.IsNotEmpty(property);
 
-            if (variable != null)
+            var topFrame = TopFrame;
+            if (topFrame.Variables == null)
+                topFrame.Variables = new Dictionary<String, Object>(m_identifierComparer);
+
+            topFrame.Variables[property] = value;
+        }
+
+        public object GetProperty(string property)
+        {
+            Assert.IsNotEmpty(property);
+
+            foreach (var frame in m_frames)
             {
-                var type = variable.GetType();
+                Object result;
+                if (frame.Variables != null && frame.Variables.TryGetValue(property, out result))
+                    return result;
+            }
 
-                SimpleTypeDisemboweler disemboweler;
-                if (!m_disembowelers.TryGetValue(type, out disemboweler))
-                {
-                    disemboweler = new SimpleTypeDisemboweler(type,
-                        SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
-                        SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, m_identifierComparer);
+            return null;
+        }
 
-                    m_disembowelers.Add(type, disemboweler);
-                }
+        public Object GetProperty(object @object, string property)
+        {
+            Assert.IsNotEmpty(property);
 
-                return disemboweler.Read(memberName, variable);
+            if (@object != null)
+            {
+                var disemboweler = GetDisemboweler(@object.GetType());
+                return disemboweler.Read(@object, property);
+            }
+            else
+                return null;
+        }
+
+        public object Invoke(string method, object[] arguments)
+        {
+            throw new NotImplementedException();
+        }
+
+        public object Invoke(object @object, string method, object[] arguments)
+        {
+            Assert.IsNotEmpty(method);
+
+            if (@object != null)
+            {
+                var disemboweler = GetDisemboweler(@object.GetType());
+                return disemboweler.Invoke(@object, method, arguments);
             }
             else
                 return null;

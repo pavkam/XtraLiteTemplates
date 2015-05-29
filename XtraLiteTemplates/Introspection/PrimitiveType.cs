@@ -26,7 +26,7 @@
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
-namespace XtraLiteTemplates.Dialects.Standard
+namespace XtraLiteTemplates.Introspection
 {
     using System;
     using System.Collections.Generic;
@@ -35,26 +35,33 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Threading.Tasks;
 
     /// <summary>
-    /// Defines a method that allows obtaining the string representation of an un-typed <see cref="Object"/>.
+    /// Defines one of the types the standard dialects support and can operate upon.
     /// </summary>
-    public interface IObjectFormatter
+    public enum PrimitiveType
     {
         /// <summary>
-        /// Gets the string representation of an <see cref="Object"/>.
+        /// Undefined data type. Normally maps to the <c>null</c> object values.
         /// </summary>
-        /// <param name="obj">The object to obtain the string representation for.</param>
-        /// <returns>The string representation.</returns>
-        string ToString(object obj);
+        Undefined = 0,
 
         /// <summary>
-        /// Gets the string representation of an <see cref="Object" /> using the given <paramref name="formatProvider"/>.
+        /// Number data type. Represented internally as a double-precision floating point number.
         /// </summary>
-        /// <param name="obj">The object to obtain the string representation for.</param>
-        /// <param name="formatProvider">The format provider.</param>
-        /// <returns>
-        /// The string representation.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
-        string ToString(object obj, IFormatProvider formatProvider);
+        Number,
+
+        /// <summary>
+        /// The string data type. There is no <c>null</c> string as that is equivalent to a <see cref="Undefined"/> value.
+        /// </summary>
+        String,
+
+        /// <summary>
+        /// The boolean data type.
+        /// </summary>
+        Boolean,
+
+        /// <summary>
+        /// Any object that does not map directly to the other four types.
+        /// </summary>
+        Object,
     }
 }

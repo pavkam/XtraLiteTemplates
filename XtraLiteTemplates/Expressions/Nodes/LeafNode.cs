@@ -50,6 +50,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
             {
                 return
                     PermittedContinuations.BinaryOperator |
+                    PermittedContinuations.ContinueGroup |
                     PermittedContinuations.CloseGroup;
             }
         }

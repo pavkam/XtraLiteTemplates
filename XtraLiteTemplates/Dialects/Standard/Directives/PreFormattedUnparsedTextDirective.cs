@@ -37,6 +37,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
     using XtraLiteTemplates.Parsing;
 
     /// <summary>

@@ -30,6 +30,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
     using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// The abstract base class for all standard binary expression operators.

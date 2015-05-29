@@ -127,7 +127,7 @@ namespace XtraLiteTemplates.NUnit
 
             result.OpenEvaluationFrame();
             foreach(var kvp in variables)
-                result.SetVariable(kvp.Key, kvp.Value);
+                result.SetProperty(kvp.Key, kvp.Value);
 
             return result;
         }
@@ -473,6 +473,42 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseMemberAccess4()
+        {
+            var expression = CreateBloatedExpression();
+
+            expression.FeedSymbol("!");
+            expression.FeedSymbol("variable");
+            expression.FeedSymbol(".");
+            ExpectUnexpectedExpressionOperatorException(".", () => expression.FeedSymbol("."));
+            ExpectUnexpectedExpressionOperatorException("+", () => expression.FeedSymbol("+"));
+            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", "literal", () => expression.FeedLiteral("literal"));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1, () => expression.FeedLiteral(1));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1.00, () => expression.FeedLiteral(1.00));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", false, () => expression.FeedLiteral(false));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", null, () => expression.FeedLiteral(null));
+
+            expression.FeedSymbol("length");
+            expression.FeedSymbol(".");
+
+            ExpectUnexpectedExpressionOperatorException("+", () => expression.FeedSymbol("+"));
+            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", "some_else", () => expression.FeedLiteral("some_else"));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1, () => expression.FeedLiteral(1));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1.00, () => expression.FeedLiteral(1.00));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", false, () => expression.FeedLiteral(false));
+            ExpectUnexpectedLiteralRequiresIdentifierException(".", null, () => expression.FeedLiteral(null));
+
+            expression.FeedSymbol("some_else");
+            expression.FeedSymbol("*");
+            expression.FeedLiteral(100);
+
+            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
+            Assert.AreEqual("*{!{@variable.length.some_else},100}", canonical);
+        }
+        
+        [Test]
         public void TestCaseAssociativityRtl()
         {
             var expression = new Expression();
@@ -534,42 +570,6 @@ namespace XtraLiteTemplates.NUnit
 
             var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
             Assert.AreEqual("+{+{+{@a,*{@b,@c}},@d},*{@e,*{@f,@g}}}", canonical);
-        }
-
-        [Test]
-        public void TestCaseMemberAccess()
-        {
-            var expression = CreateBloatedExpression();
-
-            expression.FeedSymbol("!");
-            expression.FeedSymbol("variable");
-            expression.FeedSymbol(".");
-            ExpectUnexpectedExpressionOperatorException(".", () => expression.FeedSymbol("."));
-            ExpectUnexpectedExpressionOperatorException("+", () => expression.FeedSymbol("+"));
-            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", "literal", () => expression.FeedLiteral("literal"));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1, () => expression.FeedLiteral(1));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1.00, () => expression.FeedLiteral(1.00));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", false, () => expression.FeedLiteral(false));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", null, () => expression.FeedLiteral(null));
-
-            expression.FeedSymbol("length");
-            expression.FeedSymbol(".");
-
-            ExpectUnexpectedExpressionOperatorException("+", () => expression.FeedSymbol("+"));
-            ExpectInvalidExpressionTermException("(", () => expression.FeedSymbol("("));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", "some_else", () => expression.FeedLiteral("some_else"));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1, () => expression.FeedLiteral(1));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", 1.00, () => expression.FeedLiteral(1.00));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", false, () => expression.FeedLiteral(false));
-            ExpectUnexpectedLiteralRequiresIdentifierException(".", null, () => expression.FeedLiteral(null));
-
-            expression.FeedSymbol("some_else");
-            expression.FeedSymbol("*");
-            expression.FeedLiteral(100);
-
-            var canonical = expression.ToString(ExpressionFormatStyle.Canonical);
-            Assert.AreEqual("*{!{@variable.length.some_else},100}", canonical);
         }
 
         [Test]

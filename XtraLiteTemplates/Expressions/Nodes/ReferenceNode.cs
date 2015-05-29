@@ -78,12 +78,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            String arguments = Arguments != null ? Arguments.ToString(style) : String.Empty;
+            string arguments = this.Arguments != null ? this.Arguments.ToString(style) : string.Empty;
 
-            if (Object != null)
+            if (this.Object != null)
+            {
                 return string.Format("{0}.{1}{2}", this.Object.ToString(style), this.Identifier, arguments);
+            }
             else
+            {
                 return string.Format("@{0}{1}", this.Identifier, arguments);
+            }
         }
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
@@ -91,9 +95,14 @@ namespace XtraLiteTemplates.Expressions.Nodes
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
             if (this.Object != null)
+            {
                 this.Object.Reduce(reduceContext);
+            }
+
             if (this.Arguments != null)
+            {
                 this.Arguments.Reduce(reduceContext);
+            }
 
             value = null;
             return false;
@@ -101,18 +110,58 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override Func<IExpressionEvaluationContext, object> Build()
         {
-            if (this.Object != null)
+            if (this.Arguments != null)
             {
-                var objectFunc = this.Object.GetEvaluationFunction();
-                return context =>
+                /* Method invokation. */
+                var argumentsFunc = this.Arguments.GetEvaluationFunction();
+                
+                if (this.Object != null)
                 {
-                    var variable = objectFunc(context);
-                    return variable == null ? null : context.GetProperty(variable, this.Identifier);
-                };
+                    var objectFunc = this.Object.GetEvaluationFunction();
+                    return context =>
+                    {
+                        var @object = objectFunc(context);
+                        var arguments = argumentsFunc(context);
+                        var argumentsArray = arguments as object[];
+                        if (argumentsArray == null && arguments != null)
+                        {
+                            argumentsArray = new object[] { arguments };
+                        }
+
+                        return context.Invoke(@object, this.Identifier, argumentsArray);
+                    };
+                }
+                else
+                {
+                    return context =>
+                    {
+                        var arguments = argumentsFunc(context);
+                        var argumentsArray = arguments as object[];
+                        if (argumentsArray == null && arguments != null)
+                        {
+                            argumentsArray = new object[] { arguments };
+                        }
+
+                        return context.Invoke(this.Identifier, argumentsArray);
+                    };
+                }
             }
             else
             {
-                return context => context.GetVariable(this.Identifier);
+                /* Property access. */
+                if (this.Object != null)
+                {
+                    var objectFunc = this.Object.GetEvaluationFunction();
+                    return context =>
+                    {
+                        var variable = objectFunc(context);
+                        return variable == null ? null : context.GetProperty(variable, this.Identifier);
+                    };
+                }
+                else
+                {
+                    return context => context.GetProperty(this.Identifier);
+                }
             }
         }
     }
