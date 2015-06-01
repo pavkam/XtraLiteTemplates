@@ -56,11 +56,7 @@ namespace XtraLiteTemplates.NUnit.Inside
             SimpleTypeDisemboweler disemboweler;
             if (!m_disembowelers.TryGetValue(type, out disemboweler))
             {
-                disemboweler = new SimpleTypeDisemboweler(
-                    type,
-                    SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
-                    SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, 
-                    m_identifierComparer, new TestObjectFormatter(CultureInfo.InvariantCulture));
+                disemboweler = new SimpleTypeDisemboweler(type, m_identifierComparer, new TestObjectFormatter(CultureInfo.InvariantCulture));
 
                 m_disembowelers.Add(type, disemboweler);
             }
@@ -173,7 +169,7 @@ namespace XtraLiteTemplates.NUnit.Inside
             if (@object != null)
             {
                 var disemboweler = GetDisemboweler(@object.GetType());
-                return disemboweler.Read(@object, property);
+                return disemboweler.Invoke(@object, property);
             }
             else
                 return null;

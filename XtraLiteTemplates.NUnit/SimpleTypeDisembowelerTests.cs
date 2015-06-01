@@ -45,102 +45,57 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConstruction()
         {
-            ExpectArgumentNullException("type", () => new SimpleTypeDisemboweler(null, SimpleTypeDisemboweler.EvaluationOptions.None, StringComparer.Ordinal, ObjectFormatter));
-            ExpectArgumentNullException("memberComparer", () => new SimpleTypeDisemboweler(typeof(String), SimpleTypeDisemboweler.EvaluationOptions.None, null, ObjectFormatter));
-            ExpectArgumentNullException("objectFormatter", () => new SimpleTypeDisemboweler(typeof(String), SimpleTypeDisemboweler.EvaluationOptions.None, StringComparer.Ordinal, null));
+            ExpectArgumentNullException("type", () => new SimpleTypeDisemboweler(null, StringComparer.Ordinal, ObjectFormatter));
+            ExpectArgumentNullException("memberComparer", () => new SimpleTypeDisemboweler(typeof(String), null, ObjectFormatter));
+            ExpectArgumentNullException("objectFormatter", () => new SimpleTypeDisemboweler(typeof(String), StringComparer.Ordinal, null));
 
             var disemboweler = new SimpleTypeDisemboweler(
                 typeof(String),
-                SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties |
-                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull, 
                 StringComparer.CurrentCultureIgnoreCase,
                 ObjectFormatter);
 
             Assert.AreEqual(typeof(String), disemboweler.Type);
-            Assert.AreEqual(SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties | 
-                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull, disemboweler.Options);
             Assert.AreEqual(StringComparer.CurrentCultureIgnoreCase, disemboweler.Comparer);
             Assert.AreEqual(ObjectFormatter, disemboweler.ObjectFormatter);
         }
 
         [Test]
-        public void TestCasePropertiesExcludingMethodsCaseSensitive()
+        public void TestCaseSensitive()
         {
             var disemboweler = new SimpleTypeDisemboweler(
                 typeof(String),
-                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull,
                 StringComparer.Ordinal, 
                 ObjectFormatter);
 
             var value = "Hello World";
 
-            /* Properties */
-            Assert.AreEqual(value.Length, disemboweler.Read(value, "Length"));
-            Assert.IsNull(disemboweler.Read(value, "length"));
-            Assert.IsNull(disemboweler.Read(value, "LENGTH"));
-            Assert.IsNull(disemboweler.Read(value, "ToUpper"));
+            Assert.AreEqual(value.Length, disemboweler.Invoke(value, "Length"));
+            Assert.AreEqual("HELLO WORLD", disemboweler.Invoke(value, "ToUpper"));
+            Assert.IsNull(disemboweler.Invoke(value, "length"));
+            Assert.IsNull(disemboweler.Invoke(value, "LENGTH"));
+            Assert.IsNull(disemboweler.Invoke(value, "Toupper"));
         }
 
         [Test]
-        public void TestCasePropertiesInclusingMethodsCaseSensitive()
+        public void TestCaseInsensitive()
         {
             var disemboweler = new SimpleTypeDisemboweler(
                 typeof(String),
-                SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties |
-                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull,
-                StringComparer.Ordinal, 
-                ObjectFormatter);
-
-            var value = "Hello World";
-
-            Assert.AreEqual(value.Length, disemboweler.Read(value, "Length"));
-            Assert.IsNull(disemboweler.Read(value, "length"));
-            Assert.IsNull(disemboweler.Read(value, "LENGTH"));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Read(value, "ToUpper"));
-        }
-
-        [Test]
-        public void TestCasePropertiesIncludingMethodsCaseInsensitive()
-        {
-            var disemboweler = new SimpleTypeDisemboweler(
-                typeof(String),
-                SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties |
-                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull,
                 StringComparer.OrdinalIgnoreCase, 
                 ObjectFormatter);
 
             var value = "Hello World";
 
-            Assert.AreEqual(value.Length, disemboweler.Read(value, "Length"));
-            Assert.AreEqual(value.Length, disemboweler.Read(value, "length"));
-            Assert.AreEqual(value.Length, disemboweler.Read(value, "LENGTH"));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Read(value, "ToUpper"));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Read(value, "toupper"));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Read(value, "TOUPPER"));
+            Assert.AreEqual(value.Length, disemboweler.Invoke(value, "Length"));
+            Assert.AreEqual(value.Length, disemboweler.Invoke(value, "length"));
+            Assert.AreEqual(value.Length, disemboweler.Invoke(value, "LENGTH"));
+            Assert.AreEqual(value.ToUpper(), disemboweler.Invoke(value, "ToUpper"));
+            Assert.AreEqual(value.ToUpper(), disemboweler.Invoke(value, "toupper"));
+            Assert.AreEqual(value.ToUpper(), disemboweler.Invoke(value, "TOUPPER"));
         }
 
         [Test]
-        public void TestCaseMethodsCaseSensitive()
-        {
-            var disemboweler = new SimpleTypeDisemboweler(
-                typeof(String),
-                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull, 
-                StringComparer.Ordinal,
-                ObjectFormatter);
-
-            var value = "Hello World";
-
-            /* Properties */
-            Assert.IsNull(disemboweler.Invoke(value, "Length", null));
-            Assert.AreEqual("HELLO WORLD", disemboweler.Invoke(value, "ToUpper", null));
-            Assert.AreEqual("HELLO WORLD", disemboweler.Invoke(value, "ToUpper", new Object[] { 1 }));
-            Assert.AreEqual("Good bye World", disemboweler.Invoke(value, "Replace", new Object[] { "Hello", "Good bye" }));
-            Assert.IsNull(disemboweler.Invoke(value, "replace", null));
-            Assert.IsNull(disemboweler.Invoke(value, "toUpper", null));
-        }
-
-        [Test]
-        public void TestCaseSelectionTactics1()
+        public void TestCaseCasingSelectionTactics1()
         {
             var anon1 = new
             {
@@ -150,16 +105,15 @@ namespace XtraLiteTemplates.NUnit
 
             var disemboweler1 = new SimpleTypeDisemboweler(
                 anon1.GetType(),
-                SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties, 
                 StringComparer.OrdinalIgnoreCase, ObjectFormatter);
 
-            Assert.AreEqual("2", disemboweler1.Read(anon1, "Value"));
-            Assert.AreEqual("2", disemboweler1.Read(anon1, "value"));
-            Assert.AreEqual("2", disemboweler1.Read(anon1, "VALUE"));
+            Assert.AreEqual("1", disemboweler1.Invoke(anon1, "Value"));
+            Assert.AreEqual("1", disemboweler1.Invoke(anon1, "value"));
+            Assert.AreEqual("1", disemboweler1.Invoke(anon1, "VALUE"));
         }
 
         [Test]
-        public void TestCaseSelectionTactics2()
+        public void TestCaseCasingSelectionTactics2()
         {
             var anon1 = new
             {
@@ -169,98 +123,25 @@ namespace XtraLiteTemplates.NUnit
 
             var disemboweler1 = new SimpleTypeDisemboweler(
                 anon1.GetType(),
-                SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties | 
-                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull,
                 StringComparer.Ordinal, 
                 ObjectFormatter);
 
-            Assert.AreEqual("1", disemboweler1.Read(anon1, "VALUE"));
-            Assert.AreEqual("2", disemboweler1.Read(anon1, "Value"));
-            Assert.AreEqual(null, disemboweler1.Read(anon1, "value"));
+            Assert.AreEqual("1", disemboweler1.Invoke(anon1, "VALUE"));
+            Assert.AreEqual("2", disemboweler1.Invoke(anon1, "Value"));
+            Assert.AreEqual(null, disemboweler1.Invoke(anon1, "value"));
         }
 
         [Test]
-        public void TestCaseError1()
+        public void TestCaseParamErrors()
         {
             var disemboweler = new SimpleTypeDisemboweler(
                 typeof(String), 
-                SimpleTypeDisemboweler.EvaluationOptions.None,
                 StringComparer.Ordinal, 
                 ObjectFormatter);
 
-            var test = "test";
-
-            ExpectInvalidObjectMemberNameException("length", () => disemboweler.Read(test, "length"));
-            ExpectInvalidObjectMemberNameException("ToString", () => disemboweler.Read(test, "ToString"));
-            ExpectInvalidObjectMemberNameException("NoMethod", () => disemboweler.Read(test, "NoMethod"));
-        }
-
-        private class ThrowsErrorOnRead
-        {
-            public String Value
-            {
-                get
-                {
-                    throw new InvalidOperationException("Whoops!");
-                }
-            }
-
-            public String f1(Int32 arg)
-            {
-                return arg.ToString();
-            }
-
-            public String f2()
-            {
-                throw new InvalidOperationException("Whoops!");
-            }
-        }
-
-        [Test]
-        public void TestCaseError2()
-        {
-            var disemboweler = new SimpleTypeDisemboweler(
-                typeof(ThrowsErrorOnRead), 
-                SimpleTypeDisemboweler.EvaluationOptions.None,
-                StringComparer.Ordinal, 
-                ObjectFormatter);
-
-            var test = new ThrowsErrorOnRead();
-
-            ExpectObjectMemberEvaluationErrorException("Value", () => disemboweler.Read(test, "Value"));
-            ExpectObjectMemberEvaluationErrorException("f1", () => disemboweler.Invoke(test, "f1", new Object[] { this }));
-            ExpectObjectMemberEvaluationErrorException("f2", () => disemboweler.Invoke(test, "f2", null));
-        }
-
-        [Test]
-        public void TestCaseError3()
-        {
-            var disemboweler = new SimpleTypeDisemboweler(
-                typeof(String), 
-                SimpleTypeDisemboweler.EvaluationOptions.None,
-                StringComparer.Ordinal, 
-                ObjectFormatter);
-
-            ExpectArgumentNullException("object", () => disemboweler.Read(null, "Value"));
-            ExpectArgumentNullException("object", () => disemboweler.Invoke(null, "Value", null));
-        }
-
-        [Test]
-        public void TestCaseError4()
-        {
-            var disemboweler = new SimpleTypeDisemboweler(
-                typeof(String), 
-                SimpleTypeDisemboweler.EvaluationOptions.None,
-                StringComparer.Ordinal, 
-                ObjectFormatter);
-
-            ExpectArgumentNullException("property", () => disemboweler.Read(String.Empty, null));
-            ExpectArgumentEmptyException("property", () => disemboweler.Read(String.Empty, ""));
-            ExpectArgumentNotIdentifierException("property", () => disemboweler.Read(String.Empty, "+Value"));
-
-            ExpectArgumentNullException("method", () => disemboweler.Invoke(String.Empty, null, null));
-            ExpectArgumentEmptyException("method", () => disemboweler.Invoke(String.Empty, "", null));
-            ExpectArgumentNotIdentifierException("method", () => disemboweler.Invoke(String.Empty, "+Value", null));
+            ExpectArgumentNullException("member", () => disemboweler.Invoke(String.Empty, null));
+            ExpectArgumentEmptyException("member", () => disemboweler.Invoke(String.Empty, ""));
+            ExpectArgumentNotIdentifierException("member", () => disemboweler.Invoke(String.Empty, "+Value"));
         }
 
         private class SelectiveObject
@@ -305,18 +186,17 @@ namespace XtraLiteTemplates.NUnit
 
             var disemboweler = new SimpleTypeDisemboweler(
                 typeof(SelectiveObject),
-                SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull,
                 StringComparer.Ordinal,
                 ObjectFormatter);
 
             disemboweler.Invoke(selectiveObject, "Function1", null);
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { "text" });
-            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { this } );
+            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { StringComparer.InvariantCulture } );
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { 100 } );
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { 100.0 } );
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { true });
 
-            Assert.AreEqual("Object(), String(text), Object(this), Int32(100), Double(100), Boolean(True)", selectiveObject.ToString());
+            Assert.AreEqual("Object(), String(text), Object(System.CultureAwareComparer), Int32(100), Double(100), Boolean(True)", selectiveObject.ToString());
         }
     }
 }

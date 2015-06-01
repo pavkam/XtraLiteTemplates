@@ -33,6 +33,7 @@ namespace XtraLiteTemplates.Introspection
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
+    using System.Reflection;
     using System.Text;
     using System.Threading.Tasks;
 
@@ -42,23 +43,17 @@ namespace XtraLiteTemplates.Introspection
     /// </summary>
     public sealed class SimpleTypeDisemboweler
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IReadOnlyDictionary<string, Func<object, object>> propertyMap;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IReadOnlyDictionary<string, Func<object, object[], object>> methodMap;
+        private IDictionary<string, Func<object, object[], object>> cachedMemberMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleTypeDisemboweler" /> class.
         /// </summary>
         /// <param name="type">The <see cref="System.Type" /> to inspect.</param>
-        /// <param name="options">A set of <see cref="EvaluationOptions" /> options.</param>
         /// <param name="memberComparer">An instance of <see cref="IEqualityComparer{String}" /> used when looking up properties in the inspected type.</param>
         /// <param name="objectFormatter">The object formatter.</param>
         /// <exception cref="ArgumentNullException">Either <paramref name="type" /> or <paramref name="memberComparer" /> parameters are <c>null</c>.</exception>
         public SimpleTypeDisemboweler(
             Type type, 
-            EvaluationOptions options, 
             IEqualityComparer<string> memberComparer, 
             IObjectFormatter objectFormatter)
         {
@@ -69,35 +64,8 @@ namespace XtraLiteTemplates.Introspection
             this.Type = type;
             this.Comparer = memberComparer;
             this.ObjectFormatter = objectFormatter;
-            this.Options = options;
 
-            this.propertyMap = this.BuildPropertyMapping();
-            this.methodMap = this.BuildMethodMapping();
-        }
-
-        /// <summary>
-        /// Defines a set of options that guides the <see cref="SimpleTypeDisemboweler"/>.
-        /// </summary>
-        [Flags]
-        public enum EvaluationOptions
-        {
-            /// <summary>
-            /// No special options.
-            /// </summary>
-            None = 0,
-
-            /// <summary>
-            /// Instructs the <see cref="SimpleTypeDisemboweler"/> to treat parameterless, methods to be treated as properties.
-            /// The <c>void</c> return type will be treated as <c>null</c>.
-            /// </summary>
-            [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1650:ElementDocumentationMustBeSpelledCorrectly", Justification = "Not an issue.")]
-            TreatParameterlessFunctionsAsProperties = 1,
-
-            /// <summary>
-            /// Instructs the <see cref="SimpleTypeDisemboweler"/> to silently return <c>null</c> for any property that raised an exception
-            /// during evaluation.
-            /// </summary>
-            TreatAllErrorsAsNull = 2,
+            this.cachedMemberMap = new Dictionary<string, Func<object, object[], object>>();
         }
 
         /// <summary>
@@ -131,273 +99,243 @@ namespace XtraLiteTemplates.Introspection
         public IObjectFormatter ObjectFormatter { get; private set; }
 
         /// <summary>
-        /// Gets the set of <see cref="EvaluationOptions" /> options that modifies the behavior of this
-        /// <see cref="SimpleTypeDisemboweler" /> instance.&gt;
+        /// Invokes the <paramref name="member" /> of <paramref name="object" /> and returns its value.
         /// </summary>
-        /// <value>
-        /// The options.
-        /// </value>
-        /// <remarks>
-        /// Value provided by the caller during construction.
-        /// </remarks>
-        public EvaluationOptions Options { get; private set; }
-
-        /// <summary>
-        /// Reads the <paramref name="property" /> of <paramref name="object" />.
-        /// </summary>
-        /// <param name="object">The object whose property is being read.</param>
-        /// <param name="property">The property name.</param>
-        /// <returns>The value of the read property.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="property" /> is <c>null</c>. The <paramref name="object" /> is <c>null</c> and this instance of <see cref="SimpleTypeDisemboweler" />
-        /// is not instructed to ignore evaluation errors.</exception>
-        /// <exception cref="ArgumentException"><paramref name="property" /> is not a valid identifier.</exception>
-        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any error while reading the property value.</exception>
-        public object Read(object @object, string property)
+        /// <param name="object">The object whose member is being invoked.</param>
+        /// <param name="member">The member name.</param>
+        /// <returns>The result of member invoke.</returns>
+        /// <exception cref="ArgumentNullException"><paramref name="member" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="member" /> is not a valid identifier.</exception>
+        public object Invoke(object @object, string member)
         {
-            Expect.Identifier("property", property);
-
-            var ignoreErrors = this.Options.HasFlag(EvaluationOptions.TreatAllErrorsAsNull);
-
-            if (!ignoreErrors)
-            {
-                Expect.NotNull("object", @object);
-            }
-            
-            if (@object != null)
-            {
-                Func<object, object> reader;
-                if (this.propertyMap.TryGetValue(property, out reader))
-                {
-                    try
-                    {
-                        return reader(@object);
-                    }
-                    catch (Exception e)
-                    {
-                        if (!ignoreErrors)
-                        {
-                            ExceptionHelper.ObjectMemberEvaluationError(e, property);
-                        }
-                    }
-                }
-                else
-                {
-                    if (!ignoreErrors)
-                    {
-                        ExceptionHelper.InvalidObjectMemberName(property);
-                    }
-                }
-            }
-
-            return null;
+            return Invoke(@object, member, null);
         }
 
         /// <summary>
-        /// Invokes a <paramref name="method" /> of <paramref name="object" /> and returns its value.
+        /// Invokes the <paramref name="member" /> of <paramref name="object" /> and returns its value.
         /// </summary>
-        /// <param name="object">The object whose method is being invoked.</param>
-        /// <param name="method">The invoked method.</param>
-        /// <param name="arguments">The arguments.</param>
+        /// <param name="object">The object whose member is being invoked.</param>
+        /// <param name="member">The member name.</param>
+        /// <param name="arguments">The arguments to pass to the invoked member.</param>
         /// <returns>
-        /// The return value of the method.
+        /// The result of member invoke.
         /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="method" /> is <c>null</c>. The <paramref name="object" /> is <c>null</c> and this instance of <see cref="SimpleTypeDisemboweler" />
-        /// is not instructed to ignore evaluation errors.</exception>
-        /// <exception cref="ArgumentException"><paramref name="method" /> is not a valid identifier.</exception>
-        /// <exception cref="XtraLiteTemplates.Evaluation.EvaluationException">Any error while invoking method.</exception>
-        public object Invoke(object @object, string method, object[] arguments)
+        /// <exception cref="ArgumentNullException"><paramref name="member" /> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException"><paramref name="member" /> is not a valid identifier.</exception>
+        public object Invoke(object @object, string member, object[] arguments)
         {
-            Expect.Identifier("method", method);
+            Expect.Identifier("member", member);
 
-            var ignoreErrors = this.Options.HasFlag(EvaluationOptions.TreatAllErrorsAsNull);
+            if (@object == null)
+                return null;
 
-            if (!ignoreErrors)
+            /* Create the signature of the member. */
+            StringBuilder signature = new StringBuilder();
+            signature.Append(member);
+
+            if (arguments != null && arguments.Length > 0)
             {
-                Expect.NotNull("object", @object);
+                foreach (var a in arguments)
+                {
+                    signature.Append('#');
+                    if (a == null)
+                        signature.Append('?');
+                    else
+                        signature.Append(a.GetType().Name);
+                }
             }
 
-            if (@object != null)
+            /* Find a cached member from a previous lookup. */
+            Func<object, object[], object> getterMethod;
+            if (this.cachedMemberMap.TryGetValue(signature.ToString(), out getterMethod))
             {
-                Func<object, object[], object> reader;
-                if (this.methodMap.TryGetValue(method, out reader))
+                if (getterMethod != null)
                 {
-                    try
+                    /* Invoke the cached member */
+                    return getterMethod(@object, arguments);
+                }
+                else
+                {
+                    /* Previous lookup returned nothing. No point in repeating it. */
+                    return null;
+                }
+            }
+
+            if (arguments == null || arguments.Length == 0)
+            {
+                /* Scan the type for properties. */
+                foreach (var property in Type.GetProperties())
+                {
+                    if (!Comparer.Equals(property.Name, member) || !property.CanRead || property.GetIndexParameters().Length > 0)
                     {
-                        return reader(@object, arguments);
+                        continue;
                     }
-                    catch (Exception e)
+
+                    /* Found a matching property! */
+                    getterMethod = (i, a) => property.GetValue(i);
+                    this.cachedMemberMap[signature.ToString()] = getterMethod;
+                    break;
+                }
+
+                /* Now scan for fields. */
+                foreach (var field in Type.GetFields())
+                {
+                    if (!Comparer.Equals(field.Name, member) || field.IsPrivate)
                     {
-                        if (!ignoreErrors)
+                        continue;
+                    }
+
+                    /* Found a matching property! */
+                    getterMethod = (i, a) => field.GetValue(i);
+                    this.cachedMemberMap[signature.ToString()] = getterMethod;
+                    break;
+                }
+            }
+
+            if (getterMethod == null)
+            {
+                MethodInfo bestMatchingMethod = null;
+                Func<object, object>[] argumentAdapters = null;
+                double bestMatchingScore = 0;
+
+                /* Scan for methods! */
+                foreach (var method in Type.GetMethods())
+                {                    
+                    if (!Comparer.Equals(method.Name, member) || method.IsAbstract || method.IsConstructor || method.IsPrivate)
+                    {
+                        continue;
+                    }
+
+                    /* Reconcile arguments of the method. */
+                    var methodParameters = method.GetParameters();
+                    foreach (var parameter in methodParameters)
+                    {
+                        /* Scan for unsupported method parameter types. */
+                        if (parameter.IsRetval || parameter.IsOut)
                         {
-                            ExceptionHelper.ObjectMemberEvaluationError(e, method);
+                            continue;
                         }
                     }
-                }
-                else
-                {
-                    if (!ignoreErrors)
-                    {
-                        ExceptionHelper.InvalidObjectMemberName(method);
-                    }
-                }
-            }
 
-            return null;
-        }
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private object[] ReconcileArguments(Type[] expectedArgumentTypes, object[] actualArguments)
-        {
-            Debug.Assert(expectedArgumentTypes != null, "expectedArgumentTypes cannot be null.");
-            object[] result = new object[expectedArgumentTypes.Length];
-
-            for (var argumentIndex = 0; argumentIndex < expectedArgumentTypes.Length; argumentIndex++)
-            {
-                Type expectedType = expectedArgumentTypes[argumentIndex];
-                if (actualArguments == null || actualArguments.Length <= argumentIndex)
-                {
-                    /* No actual argument at that position. Default to NULL. */
-                    result[argumentIndex] = null;
-                }
-                else if (actualArguments[argumentIndex] == null)
-                {
-                    result[argumentIndex] = null;
-                }
-                else if (expectedType == typeof(object))
-                {
-                    result[argumentIndex] = actualArguments[argumentIndex];
-                }
-                else if (expectedType == typeof(string))
-                {
-                    result[argumentIndex] = this.ObjectFormatter.ToString(actualArguments[argumentIndex]);
-                }
-                else
-                {
-                    try
+                    Double methodScore = 0;
+                    List<Func<object, object>> argumentAdapterFuncs = new List<Func<object, object>>();
+                    for (var parameterIndex = 0; parameterIndex < methodParameters.Length; parameterIndex++)
                     {
-                        result[argumentIndex] = Convert.ChangeType(actualArguments[argumentIndex], expectedType);
-                    }
-                    catch (Exception e)
-                    {
-                        if (this.Options.HasFlag(EvaluationOptions.TreatAllErrorsAsNull))
+                        var parameter = methodParameters[parameterIndex];
+                        var parameterType = parameter.ParameterType;
+                        var parameterTypeCode = Type.GetTypeCode(parameterType);
+                        var argument = (arguments != null && arguments.Length > parameterIndex) ? arguments[parameterIndex] : null;
+                        var argumentType = argument != null ? argument.GetType() : null;
+                        var argumentTypeCode = argumentType != null ? Type.GetTypeCode(argumentType) : TypeCode.Empty;
+
+                        Func<object, object> adapterFunc = null;
+
+                        /* Check argument comptibility. */
+                        if (argumentTypeCode == TypeCode.Empty)
                         {
-                            result[argumentIndex] = null;
+                            if (parameterTypeCode == TypeCode.Object || parameterTypeCode == TypeCode.String)
+                            {
+                                methodScore += 0.90;
+                                adapterFunc = a => null;
+                            }
+                            else if (parameterType.IsValueType)
+                            {
+                                var defaultValue = Activator.CreateInstance(parameterType);
+                                adapterFunc = a => defaultValue;
+                            }
+                            else
+                                break;
+                        }
+                        else if (parameterType == argumentType)
+                        {
+                            methodScore += 1.00;
+                            adapterFunc = a => a;
+                        }
+                        else if (
+                            argumentTypeCode >= TypeCode.SByte && argumentTypeCode <= TypeCode.Decimal &&
+                            parameterTypeCode >= TypeCode.SByte && parameterTypeCode <= TypeCode.Decimal)
+                        {
+                            /* Number to number */
+                            if (parameterTypeCode >= argumentTypeCode)
+                            {
+                                methodScore += 1.00;
+                            }
+                            else
+                            {
+                                methodScore += 0.80;
+                            }
+
+                            adapterFunc = a => Convert.ChangeType(a, parameterType);
+                        }
+                        else if (parameterTypeCode == TypeCode.String)
+                        {
+                            methodScore += 0.60;
+                            adapterFunc = a => ObjectFormatter.ToString(a);
+                        }
+                        else if (parameterType == typeof(Object))
+                        {
+                            methodScore += 0.70;
+                            adapterFunc = a => a;
                         }
                         else
-                        {
-                            throw e;
-                        }
+                            break;
+
+                        argumentAdapterFuncs.Add(adapterFunc);
                     }
-                }
-            }
 
-            return result;
-        }
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IReadOnlyDictionary<string, Func<object, object>> BuildPropertyMapping()
-        {
-            var mapping = new Dictionary<string, Func<object, object>>(this.Comparer);
-
-            /* Load properties in. */
-            foreach (var property in Type.GetProperties())
-            {
-                if (!property.CanRead || property.GetIndexParameters().Length > 0)
-                {
-                    continue;
-                }
-
-                mapping[property.Name] = property.GetValue;
-            }
-
-            if (this.Options.HasFlag(EvaluationOptions.TreatParameterlessFunctionsAsProperties))
-            {
-                /* Load methods in. */
-                foreach (var method in Type.GetMethods())
-                {
-                    if (method.GetParameters().Length > 0 || method.IsAbstract || method.IsConstructor ||
-                        method.IsPrivate)
-                    {
+                    /* Skip incomplete adaptations. */
+                    if (argumentAdapterFuncs.Count != methodParameters.Length)
                         continue;
-                    }
 
-                    if (!mapping.ContainsKey(method.Name))
+                    /* Decide on the matching. */
+                    methodScore = methodScore / Math.Max(methodParameters.Length, arguments == null ? 0 : arguments.Length);
+                    if (Double.IsNaN(methodScore) || methodScore == 1.00)
                     {
-                        mapping[method.Name] = instance => method.Invoke(instance, null);
+                        argumentAdapters = argumentAdapterFuncs.ToArray();
+                        bestMatchingMethod = method;
+                        break;
                     }
-                }
-            }
-
-            return mapping;
-        }
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IReadOnlyDictionary<string, Func<object, object[], object>> BuildMethodMapping()
-        {
-            var mapping = new Dictionary<string, Func<object, object[], object>>(this.Comparer);
-            var scoreMapping = new Dictionary<string, double>(this.Comparer);
-
-            /* Load methods in. */
-            foreach (var method in Type.GetMethods())
-            {
-                if (method.IsAbstract || method.IsConstructor || method.IsPrivate)
-                {
-                    continue;
-                }
-
-                var methodParameters = method.GetParameters();
-                foreach (var parameter in methodParameters)
-                {
-                    /* Scan for unsupported method parameter types. */
-                    if (parameter.IsRetval || parameter.IsOut)
+                    else if (methodScore > bestMatchingScore)
                     {
-                        continue;
+                        argumentAdapters = argumentAdapterFuncs.ToArray();
+                        bestMatchingScore = methodScore;
+                        bestMatchingMethod = method;
                     }
                 }
 
-                /* Get the method arguments and calculate the matching score. */
-                double score = 0;
-                var methodArgumentTypes = methodParameters.Select(s => s.ParameterType).ToArray();
-                if (methodArgumentTypes.Length == 0)
+                if (bestMatchingMethod != null)
                 {
-                    score = 1;
-                }
-                else
-                {
-                    foreach (var argumentType in methodArgumentTypes)
+                    /* Yay, we got one that might do what we want it to do. */
+                    getterMethod = (i, a) =>
                     {
-                        if (argumentType == typeof(object))
+                        var adaptedArguments = new object[argumentAdapters.Length];
+                        for (var x = 0; x < argumentAdapters.Length; x++)
                         {
-                            score += 1.00;
+                            if (a != null && x < a.Length)
+                            {
+                                adaptedArguments[x] = argumentAdapters[x](a[x]);
+                            } 
+                            else
+                            {
+                                adaptedArguments[x] = argumentAdapters[x](null);
+                            }
                         }
-                        else if (argumentType == typeof(string))
-                        {
-                            score += 0.75;
-                        }
-                        else if (argumentType == typeof(double))
-                        {
-                            score += 0.50;
-                        }
-                    }
 
-                    score = score / methodArgumentTypes.Length;
-                }
-
-                double previousScore;
-                if (!scoreMapping.TryGetValue(method.Name, out previousScore) || previousScore < score)
-                { 
-                    Func<object, object[], object> invokationFunc = (@object, arguments) =>
-                    {
-                        var actualArguments = ReconcileArguments(methodArgumentTypes, arguments);
-                        return method.Invoke(@object, actualArguments);
+                        return bestMatchingMethod.Invoke(i, adaptedArguments);
                     };
-
-                    mapping[method.Name] = invokationFunc;
-                    scoreMapping[method.Name] = score;
                 }
+
+                this.cachedMemberMap[signature.ToString()] = getterMethod;
             }
 
-            return mapping;
+            if (getterMethod != null)
+            {
+                return getterMethod(@object, arguments);
+            }
+            else
+            { 
+                return null;
+            }
         }
     }
 }

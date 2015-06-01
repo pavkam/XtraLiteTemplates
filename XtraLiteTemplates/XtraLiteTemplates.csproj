@@ -49,8 +49,8 @@
     <Compile Include="Expressions\Nodes\PermittedContinuations.cs" />
     <Compile Include="Expressions\Nodes\LiteralNode.cs" />
     <Compile Include="Expressions\Nodes\ReferenceNode.cs" />
-    <Compile Include="Parsing\LexingException.cs" />
     <Compile Include="Introspection\SimpleTypeDisemboweler.cs" />
+    <Compile Include="Parsing\LexingException.cs" />
     <Compile Include="Dialects\Standard\CodeMonkeyDialect.cs" />
     <Compile Include="Dialects\Standard\StandardDialectBase.cs" />
     <Compile Include="ExceptionHelper.cs" />

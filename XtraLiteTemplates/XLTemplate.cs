@@ -336,7 +336,7 @@ namespace XtraLiteTemplates
                 if (@object != null)
                 {
                     var type = @object.GetType();
-                    return this.GetDisembowelerForType(type).Read(@object, property);
+                    return this.GetDisembowelerForType(type).Invoke(@object, property);
                 }
                 else
                 {
@@ -398,11 +398,7 @@ namespace XtraLiteTemplates
                 SimpleTypeDisemboweler disemboweler;
                 if (!this.disembowelers.TryGetValue(type, out disemboweler))
                 {
-                    var options =
-                        SimpleTypeDisemboweler.EvaluationOptions.TreatAllErrorsAsNull |
-                        SimpleTypeDisemboweler.EvaluationOptions.TreatParameterlessFunctionsAsProperties;
-
-                    disemboweler = new SimpleTypeDisemboweler(type, options, this.identifierComparer, this.objectFormatter);
+                    disemboweler = new SimpleTypeDisemboweler(type, this.identifierComparer, this.objectFormatter);
 
                     this.disembowelers.Add(type, disemboweler);
                 }
