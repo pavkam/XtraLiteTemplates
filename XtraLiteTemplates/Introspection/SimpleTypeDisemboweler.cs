@@ -43,6 +43,7 @@ namespace XtraLiteTemplates.Introspection
     /// </summary>
     public sealed class SimpleTypeDisemboweler
     {
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private IDictionary<string, Func<object, object[], object>> cachedMemberMap;
 
         /// <summary>
@@ -108,7 +109,7 @@ namespace XtraLiteTemplates.Introspection
         /// <exception cref="ArgumentException"><paramref name="member" /> is not a valid identifier.</exception>
         public object Invoke(object @object, string member)
         {
-            return Invoke(@object, member, null);
+            return this.Invoke(@object, member, null);
         }
 
         /// <summary>
@@ -127,7 +128,9 @@ namespace XtraLiteTemplates.Introspection
             Expect.Identifier("member", member);
 
             if (@object == null)
+            {
                 return null;
+            }
 
             /* Create the signature of the member. */
             StringBuilder signature = new StringBuilder();
@@ -139,9 +142,13 @@ namespace XtraLiteTemplates.Introspection
                 {
                     signature.Append('#');
                     if (a == null)
+                    {
                         signature.Append('?');
+                    }
                     else
+                    {
                         signature.Append(a.GetType().Name);
+                    }
                 }
             }
 
@@ -166,7 +173,7 @@ namespace XtraLiteTemplates.Introspection
                 /* Scan the type for properties. */
                 foreach (var property in Type.GetProperties())
                 {
-                    if (!Comparer.Equals(property.Name, member) || !property.CanRead || property.GetIndexParameters().Length > 0)
+                    if (!this.Comparer.Equals(property.Name, member) || !property.CanRead || property.GetIndexParameters().Length > 0)
                     {
                         continue;
                     }
@@ -178,9 +185,9 @@ namespace XtraLiteTemplates.Introspection
                 }
 
                 /* Now scan for fields. */
-                foreach (var field in Type.GetFields())
+                foreach (var field in this.Type.GetFields())
                 {
-                    if (!Comparer.Equals(field.Name, member) || field.IsPrivate)
+                    if (!this.Comparer.Equals(field.Name, member) || field.IsPrivate)
                     {
                         continue;
                     }
@@ -200,8 +207,8 @@ namespace XtraLiteTemplates.Introspection
 
                 /* Scan for methods! */
                 foreach (var method in Type.GetMethods())
-                {                    
-                    if (!Comparer.Equals(method.Name, member) || method.IsAbstract || method.IsConstructor || method.IsPrivate)
+                {
+                    if (!this.Comparer.Equals(method.Name, member) || method.IsAbstract || method.IsConstructor || method.IsPrivate)
                     {
                         continue;
                     }
@@ -217,7 +224,7 @@ namespace XtraLiteTemplates.Introspection
                         }
                     }
 
-                    Double methodScore = 0;
+                    double methodScore = 0;
                     List<Func<object, object>> argumentAdapterFuncs = new List<Func<object, object>>();
                     for (var parameterIndex = 0; parameterIndex < methodParameters.Length; parameterIndex++)
                     {
@@ -244,7 +251,9 @@ namespace XtraLiteTemplates.Introspection
                                 adapterFunc = a => defaultValue;
                             }
                             else
+                            {
                                 break;
+                            }
                         }
                         else if (parameterType == argumentType)
                         {
@@ -270,26 +279,30 @@ namespace XtraLiteTemplates.Introspection
                         else if (parameterTypeCode == TypeCode.String)
                         {
                             methodScore += 0.60;
-                            adapterFunc = a => ObjectFormatter.ToString(a);
+                            adapterFunc = a => this.ObjectFormatter.ToString(a);
                         }
-                        else if (parameterType == typeof(Object))
+                        else if (parameterType == typeof(object))
                         {
                             methodScore += 0.70;
                             adapterFunc = a => a;
                         }
                         else
+                        {
                             break;
+                        }
 
                         argumentAdapterFuncs.Add(adapterFunc);
                     }
 
                     /* Skip incomplete adaptations. */
                     if (argumentAdapterFuncs.Count != methodParameters.Length)
+                    {
                         continue;
+                    }
 
                     /* Decide on the matching. */
                     methodScore = methodScore / Math.Max(methodParameters.Length, arguments == null ? 0 : arguments.Length);
-                    if (Double.IsNaN(methodScore) || methodScore == 1.00)
+                    if (double.IsNaN(methodScore) || methodScore == 1.00)
                     {
                         argumentAdapters = argumentAdapterFuncs.ToArray();
                         bestMatchingMethod = method;

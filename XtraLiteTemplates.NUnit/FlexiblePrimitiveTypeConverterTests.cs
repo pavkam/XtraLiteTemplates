@@ -74,6 +74,8 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(PrimitiveType.Boolean, converter.TypeOf(default(Boolean)));
             Assert.AreEqual(PrimitiveType.String, converter.TypeOf(String.Empty));
             Assert.AreEqual(PrimitiveType.Undefined, converter.TypeOf(null));
+            Assert.AreEqual(PrimitiveType.Sequence, converter.TypeOf(new Object[] { 1, 2 }));
+            Assert.AreEqual(PrimitiveType.Sequence, converter.TypeOf(new Int32[] { 1, 2 }));
             Assert.AreEqual(PrimitiveType.Object, converter.TypeOf(this));
         }
 
@@ -110,6 +112,9 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(true, converter.ConvertToBoolean("anything"));
             Assert.AreEqual(false, converter.ConvertToBoolean(null));
             Assert.AreEqual(true, converter.ConvertToBoolean(this));
+            Assert.AreEqual(true, converter.ConvertToBoolean(new String[0]));
+            Assert.AreEqual(true, converter.ConvertToBoolean(new Int32[] { 1 } ));
+            Assert.AreEqual(true, converter.ConvertToBoolean(new Object[] { "hello", 1 }));
         }
 
         [Test]
@@ -134,6 +139,10 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("anything", converter.ConvertToString("anything"));
             Assert.AreEqual("!undefined!", converter.ConvertToString(null));
             Assert.AreEqual(this.ToString(), converter.ConvertToString(this));
+            Assert.AreEqual(String.Empty, converter.ConvertToString(new Object[0]));
+            Assert.AreEqual("1", converter.ConvertToString(new Int32[] { 1 }));
+            Assert.AreEqual("hello,1", converter.ConvertToString(new Object[] { "hello", 1 }));
+            Assert.AreEqual("1,2,3", converter.ConvertToString(new Object[] { 1, new Object[] { 2, 3 } }));
         }
 
         [Test]
@@ -159,6 +168,12 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(-10.33, converter.ConvertToNumber("-10.33"));
             Assert.AreEqual(Double.NaN, converter.ConvertToNumber(null));
             Assert.AreEqual(Double.NaN, converter.ConvertToNumber(this));
+            Assert.AreEqual(0, converter.ConvertToNumber(new Object[0]));
+            Assert.AreEqual(12, converter.ConvertToNumber(new Int32[] { 12 }));
+            Assert.AreEqual(Double.NaN, converter.ConvertToNumber(new Int32[] { 1, 2 }));
+            Assert.AreEqual(0, converter.ConvertToNumber(new Object[] { "" }));
+            Assert.AreEqual(-77, converter.ConvertToNumber(new Object[] { "-77" }));
+            Assert.AreEqual(Double.NaN, converter.ConvertToNumber(new Object[] { 1, new Object[] { 2, 3 } }));
         }
 
         [Test]
@@ -184,6 +199,12 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(-10, converter.ConvertToInteger("-10.88"));
             Assert.AreEqual(0, converter.ConvertToInteger(null));
             Assert.AreEqual(0, converter.ConvertToInteger(this));
+            Assert.AreEqual(0, converter.ConvertToInteger(new Object[0]));
+            Assert.AreEqual(12, converter.ConvertToInteger(new Int32[] { 12 }));
+            Assert.AreEqual(0, converter.ConvertToInteger(new Int32[] { 1, 2 }));
+            Assert.AreEqual(0, converter.ConvertToInteger(new Object[] { "" }));
+            Assert.AreEqual(-77, converter.ConvertToInteger(new Object[] { "-77" }));
+            Assert.AreEqual(0, converter.ConvertToInteger(new Object[] { 1, new Object[] { 2, 3 } }));
         }
 
         [Test]
@@ -226,8 +247,7 @@ namespace XtraLiteTemplates.NUnit
             var objectFormatter = new TestObjectFormatter(culture);
             var converter = new FlexiblePrimitiveTypeConverter(culture, objectFormatter);
 
-            Assert.AreEqual(-1234.5, converter.ConvertToNumber("-1.234,5"));
-            Assert.AreEqual(-1234, converter.ConvertToInteger("-1.234,5"));
+            Assert.AreEqual(-1.234, converter.ConvertToNumber("-1,234"));
             Assert.AreEqual("-1234,5", converter.ConvertToString(-1234.5));
         }
     }

@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.Introspection
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
+    using System.Text;
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     /// <summary>
@@ -104,7 +105,14 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>A <see cref="Double"/> value.</returns>
         public virtual double ConvertToNumber(object obj)
         {
-            obj = this.ReduceObject(obj);
+            if (obj is IEnumerable)
+            {
+                obj = this.ConvertToString(obj);
+            }
+            else
+            {
+                obj = this.ReduceObject(obj);
+            }
 
             double result;
 
@@ -129,7 +137,7 @@ namespace XtraLiteTemplates.Introspection
                     {
                         result = 0;
                     }
-                    else if (!double.TryParse(str, System.Globalization.NumberStyles.Number, this.FormatProvider, out result))
+                    else if (!double.TryParse(str, System.Globalization.NumberStyles.Float, this.FormatProvider, out result))
                     {
                         result = double.NaN;
                     }
@@ -151,8 +159,30 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>A <see cref="String"/> value.</returns>
         public virtual string ConvertToString(object obj)
         {
-            obj = this.ReduceObject(obj);
-            return this.ObjectFormatter.ToString(obj, this.FormatProvider);
+            if (obj is string)
+            {
+                return (string)obj;
+            }
+            else if (obj is IEnumerable)
+            {
+                var enumerable = (IEnumerable)obj;
+                var builder = new StringBuilder();
+                foreach (object item in enumerable)
+                {
+                    if (builder.Length > 0)
+                    {
+                        builder.Append(',');
+                    }
+
+                    builder.Append(this.ConvertToString(item));
+                }
+
+                return builder.ToString();
+            }
+            else
+            {
+                return this.ObjectFormatter.ToString(this.ReduceObject(obj), this.FormatProvider);
+            }
         }
 
         /// <summary>
@@ -242,6 +272,10 @@ namespace XtraLiteTemplates.Introspection
             else if (obj is string)
             {
                 return PrimitiveType.String;
+            }
+            else if (obj is IEnumerable)
+            {
+                return PrimitiveType.Sequence;
             }
             else
             {

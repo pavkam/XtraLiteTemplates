@@ -163,6 +163,11 @@ namespace XtraLiteTemplates.NUnit
                 journal.Add(String.Format("Boolean({0})", arg));
             }
 
+            public void Function1(Int16 arg)
+            {
+                journal.Add(String.Format("Int16({0})", arg));
+            }
+
             public void Function1(Int32 arg)
             {
                 journal.Add(String.Format("Int32({0})", arg));
@@ -171,6 +176,22 @@ namespace XtraLiteTemplates.NUnit
             public void Function1(Double arg)
             {
                 journal.Add(String.Format("Double({0})", arg));
+            }
+
+
+            public void Function2(Object arg)
+            {
+                journal.Add(String.Format("Object({0})", arg));
+            }
+
+            public void Function3(Object arg0, Int32 arg1)
+            {
+                journal.Add(String.Format("[Object({0}) Int32({1})]", arg0, arg1));
+            }
+
+            public void Function3(Object arg0, Object arg1)
+            {
+                journal.Add(String.Format("[Object({0}) Object({1})]", arg0, arg1));
             }
 
             public override string ToString()
@@ -193,10 +214,54 @@ namespace XtraLiteTemplates.NUnit
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { "text" });
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { StringComparer.InvariantCulture } );
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { 100 } );
+            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { (Int16)99 });
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { 100.0 } );
             disemboweler.Invoke(selectiveObject, "Function1", new Object[] { true });
 
-            Assert.AreEqual("Object(), String(text), Object(System.CultureAwareComparer), Int32(100), Double(100), Boolean(True)", selectiveObject.ToString());
+            Assert.AreEqual("Object(), String(text), Object(System.CultureAwareComparer), Int32(100), Int16(99), Double(100), Boolean(True)", selectiveObject.ToString());
+        }
+
+        [Test]
+        public void TestCaseOverloadedMethodSelection2()
+        {
+            var selectiveObject = new SelectiveObject();
+
+            var disemboweler = new SimpleTypeDisemboweler(
+                typeof(SelectiveObject),
+                StringComparer.Ordinal,
+                ObjectFormatter);
+
+            disemboweler.Invoke(selectiveObject, "Function2", null);
+            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { "text", 34, 78 });
+            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { StringComparer.InvariantCulture, 18 });
+            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { 100, this });
+            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { (Int16)99, String.Empty });
+            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { 100.0, true });
+            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { true, 1, 2 });
+
+            Assert.AreEqual("Object(), Object(text), Object(System.CultureAwareComparer), Object(100), Object(99), Object(100), Object(True)", selectiveObject.ToString());
+        }
+
+        [Test]
+        public void TestCaseOverloadedMethodSelection3()
+        {
+            var selectiveObject = new SelectiveObject();
+
+            var disemboweler = new SimpleTypeDisemboweler(
+                typeof(SelectiveObject),
+                StringComparer.Ordinal,
+                ObjectFormatter);
+
+            disemboweler.Invoke(selectiveObject, "Function3", null);
+            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { null, null } );
+            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { "text", 34, 78 });
+            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { StringComparer.InvariantCulture, (Byte)18 });
+            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { 100, null });
+            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { (Int16)99, String.Empty });
+            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { 100.0, true });
+            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { true, 1.99, 2 });
+
+            Assert.AreEqual("[Object() Object()], [Object() Object()], [Object(text) Int32(34)], [Object(System.CultureAwareComparer) Int32(18)], [Object(100) Object()], [Object(99) Object()], [Object(100) Object(True)], [Object(True) Int32(2)]", selectiveObject.ToString());
         }
     }
 }
