@@ -78,7 +78,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("NAN")) && dialect.SpecialKeywords[transformer("NAN")].Equals(Double.NaN));
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("INFINITY")) && dialect.SpecialKeywords[transformer("INFINITY")].Equals(Double.PositiveInfinity));
 
-            Assert.AreEqual(7, dialect.Directives.Count);
+            Assert.AreEqual(8, dialect.Directives.Count);
             foreach (var directive in dialect.Directives)
             {
                 if (directive is ConditionalInterpolationDirective)
@@ -87,6 +87,8 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.AreEqual(transformer("{FOR $}...{END}"), directive.ToString());
                 else if (directive is ForEachDirective)
                     Assert.AreEqual(transformer("{FOR ? IN $}...{END}"), directive.ToString());
+                else if (directive is SeparatedForEachDirective)
+                    Assert.AreEqual(transformer("{FOR ? IN $}...{WITH}...{END}"), directive.ToString());
                 else if (directive is IfDirective)
                     Assert.AreEqual(transformer("{IF $}...{END}"), directive.ToString());
                 else if (directive is IfElseDirective)
@@ -317,6 +319,15 @@ namespace XtraLiteTemplates.NUnit.Dialects
 
             var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{pre}Hello, {_0.FirstName} {_0.LastName}. You are {_0.Age} years old and you love: {for entity in _0.loves}{entity}, {end}{end}", customer);            
             Assert.AreEqual("Hello, John McMann. You are 31 years old and you love: Apples,Bikes,Everything Nice,", result);
+        }
+
+        [Test]
+        public void TestCaseShowcase2()
+        {
+            var template = "{FOR Member IN GetType.GetMembers() }{ Member.Name }{WITH}{PRE}, {END}{END}";
+            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, template);
+
+            Assert.AreEqual("get_TypeConverter, String, Number, Boolean, ToString, Equals, GetHashCode, GetType, .ctor, TypeConverter", result);
         }
     }
 }
