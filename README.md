@@ -4,6 +4,8 @@ A lightweight templating engine for .NET Framework and Mono.
 ### What it is, and what it is not
 XtraLiteTemplates is a fully managed .NET Framework library that offers easy string templating features. XtraLiteTemplates offers support for `custom template constructs` (akin to statements), and support for `expressions` with custom operators. XtraLiteTemplates is not a programming language or a domain-specific language in its own right, its sole purpose is to aid in the creation and manipulation of string templates. Anything else is out of scope of this project.
 
+> **XtraLiteTemplates does not use the C# compiler services.** No intermediate .NET source-code is generated in the process, and no assemblies are compiled as a result.
+
 ### Usage Examples
 The easiest way to evaluate a template is by using the built-in facade class ```XLTemplate```. It works in conjunction with an instance of ```IDialect``` interface to parse and evaluate a template:
 
