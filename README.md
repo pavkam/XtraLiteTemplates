@@ -42,6 +42,17 @@ Somebody responsible.
 ```
 The above code block exemplifies a possible email template that uses the `Standard` dialect. One is in no way forced to use it; the library allows creation of custom dialects with custom constructs, custom special characters, etc. Nothing is "reserved" by the engine. There are a few small restrictions resulting from the tokenization process but those will be covered in a later area.
 
+And a more exotic example:
+
+```c#
+  var template = "{FOR Member IN GetType().GetMembers()}{Member.Name}{WITH}{PRE}, {END}{END}";
+  var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, template);
+  
+  /* Results in a string (introspection of the IDialect.Self object:
+   * "get_TypeConverter, String, Number, Boolean, ToString, Equals, GetHashCode, GetType, .ctor, TypeConverter" 
+   */
+```
+
 ### Core Concepts & Building Blocks
 Put in the simplest of terms, the process of evaluation of a template follows the following pattern:
 * Tokenization, in which a string is split into tokens. The `tokenizer` requires a set of control characters that drive the process (such as the *directive open & close* characters or *string literal escape* characters).
@@ -56,8 +67,9 @@ The expression builder in XtraLiteTemplates allows for:
 * Unary and binary operators are supported.
 * Short-circuiting is supported (if implemented by the operators).
 * Groups are supported, including the comma character. Groups are evaluated to enumerables.
-* Operators operate on `object`. 
+* Operators operate on `object`.
 * The standard set of operators provided in XtraLiteTemplates tries to emulate the behaviour of JavaScript as much as possible.
+* Support for **invoking object methods, properties and fields**. Runtime selection of overloaded methods is supported to the best possible extent.
 
 #### Tags
 A tag is a collection of keywords, identifier rules and expressions. For example `IF $ THEN` defines a tag that accepts `IF` as a first keyword, followed by an expression and then by `THEN` keyword. A tag of the following form: `FOREACH ? IN $ DO` will match any phrase that starts with the `FOREACH` keyword, followed by any identifier, then by `IN` keyword, an expression and lastly by the `DO` keyword.
