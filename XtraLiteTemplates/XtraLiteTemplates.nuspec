@@ -6,10 +6,11 @@
     <authors>Alexandru Ciobanu (alex@ciobanu.org)</authors>
     <owners>Alexandru Ciobanu (alex@ciobanu.org)</owners>
     <licenseUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/LICENSE</licenseUrl>
+    <iconUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/artwork/32px-transparent-bkg.png</iconUrl>
     <projectUrl>https://github.com/pavkam/XtraLiteTemplates</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A highly customizable and lightweight template engine for Microsoft .NET and Mono.</description>
-    <releaseNotes>Final version 1.0 of XtraLiteTemplates, including more full test suite and XML documentation.</releaseNotes>
+    <releaseNotes>Version 1.0 of XtraLiteTemplates. XML Documentation and Unit Test covered.</releaseNotes>
     <copyright>Copyright Alexandru Ciobanu (alex@ciobanu.org) 2015</copyright>
     <tags>Template Domain Language Expression Parser</tags>
     <dependencies>
