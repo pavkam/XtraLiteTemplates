@@ -29,6 +29,7 @@
 namespace XtraLiteTemplates.Introspection
 {
     using System;
+    using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
@@ -154,20 +155,27 @@ namespace XtraLiteTemplates.Introspection
 
             /* Find a cached member from a previous lookup. */
             Func<object, object[], object> getterMethod;
-            if (this.cachedMemberMap.TryGetValue(signature.ToString(), out getterMethod))
+            if (!this.cachedMemberMap.TryGetValue(signature.ToString(), out getterMethod))
             {
-                if (getterMethod != null)
-                {
-                    /* Invoke the cached member */
-                    return getterMethod(@object, arguments);
-                }
-                else
-                {
-                    /* Previous lookup returned nothing. No point in repeating it. */
-                    return null;
-                }
+                /* No cache made for this call structure. Do it now and cache the invoke candidate. */
+                getterMethod = LocateSuitableInvokeCandidate(@object, member, arguments);
+                this.cachedMemberMap[signature.ToString()] = getterMethod;
             }
 
+            /* Invoke the member if getter was created. */
+            if (getterMethod != null)
+            {
+                return getterMethod(@object, arguments);
+            }
+            else
+            { 
+                return null;
+            }
+        }
+
+
+        private Func<object, object[], object> LocateSuitableInvokeCandidate(object @object, string member, object[] arguments)
+        {
             if (arguments == null || arguments.Length == 0)
             {
                 /* Scan the type for properties. */
@@ -179,9 +187,7 @@ namespace XtraLiteTemplates.Introspection
                     }
 
                     /* Found a matching property! */
-                    getterMethod = (i, a) => property.GetValue(i);
-                    this.cachedMemberMap[signature.ToString()] = getterMethod;
-                    break;
+                    return (i, a) => property.GetValue(i);
                 }
 
                 /* Now scan for fields. */
@@ -193,133 +199,172 @@ namespace XtraLiteTemplates.Introspection
                     }
 
                     /* Found a matching property! */
-                    getterMethod = (i, a) => field.GetValue(i);
-                    this.cachedMemberMap[signature.ToString()] = getterMethod;
-                    break;
+                    return (i, a) => field.GetValue(i);
                 }
             }
 
-            if (getterMethod == null)
+            /* Try to find a suitable method candidate. */
+            return LocateSuitableMethodCandidate(@object, member, arguments);
+        }
+
+        private Func<object, object[], object> LocateSuitableMethodCandidate(object @object, string member, object[] arguments)
+        {
+            Debug.Assert(@object != null, "object cannot be null.");
+            Debug.Assert(!String.IsNullOrEmpty(member), "member cannot be null or empty.");
+
+            MethodInfo bestMatchingMethod = null;
+            Func<object, object>[] argumentAdapters = null;
+            var bestMatchingScore = .0;
+            var indexOfParamsArrayInMethod = -1;
+            Type argsArrayElementType = null;
+
+            /* Scan for methods! */
+            foreach (var method in Type.GetMethods())
             {
-                MethodInfo bestMatchingMethod = null;
-                Func<object, object>[] argumentAdapters = null;
-                double bestMatchingScore = 0;
-
-                /* Scan for methods! */
-                foreach (var method in Type.GetMethods())
+                if (!this.Comparer.Equals(method.Name, member) || method.IsAbstract || method.IsConstructor || method.IsPrivate)
                 {
-                    if (!this.Comparer.Equals(method.Name, member) || method.IsAbstract || method.IsConstructor || method.IsPrivate)
+                    continue;
+                }
+
+                /* Reconcile arguments of the method. */
+                var methodParameters = method.GetParameters();
+                foreach (var parameter in methodParameters)
+                {
+                    /* Scan for unsupported method parameter types. */
+                    if (parameter.IsRetval || parameter.IsOut)
                     {
                         continue;
-                    }
-
-                    /* Reconcile arguments of the method. */
-                    var methodParameters = method.GetParameters();
-                    foreach (var parameter in methodParameters)
-                    {
-                        /* Scan for unsupported method parameter types. */
-                        if (parameter.IsRetval || parameter.IsOut)
-                        {
-                            continue;
-                        }
-                    }
-
-                    double methodScore = 0;
-                    List<Func<object, object>> argumentAdapterFuncs = new List<Func<object, object>>();
-                    for (var parameterIndex = 0; parameterIndex < methodParameters.Length; parameterIndex++)
-                    {
-                        var parameter = methodParameters[parameterIndex];
-                        var parameterType = parameter.ParameterType;
-                        var parameterTypeCode = Type.GetTypeCode(parameterType);
-                        var argument = (arguments != null && arguments.Length > parameterIndex) ? arguments[parameterIndex] : null;
-                        var argumentType = argument != null ? argument.GetType() : null;
-                        var argumentTypeCode = argumentType != null ? Type.GetTypeCode(argumentType) : TypeCode.Empty;
-
-                        Func<object, object> adapterFunc = null;
-
-                        /* Check argument comptibility. */
-                        if (argumentTypeCode == TypeCode.Empty)
-                        {
-                            if (parameterTypeCode == TypeCode.Object || parameterTypeCode == TypeCode.String)
-                            {
-                                methodScore += 0.90;
-                                adapterFunc = a => null;
-                            }
-                            else if (parameterType.IsValueType)
-                            {
-                                var defaultValue = Activator.CreateInstance(parameterType);
-                                adapterFunc = a => defaultValue;
-                            }
-                            else
-                            {
-                                break;
-                            }
-                        }
-                        else if (parameterType == argumentType)
-                        {
-                            methodScore += 1.00;
-                            adapterFunc = a => a;
-                        }
-                        else if (
-                            argumentTypeCode >= TypeCode.SByte && argumentTypeCode <= TypeCode.Decimal &&
-                            parameterTypeCode >= TypeCode.SByte && parameterTypeCode <= TypeCode.Decimal)
-                        {
-                            /* Number to number */
-                            if (parameterTypeCode >= argumentTypeCode)
-                            {
-                                methodScore += 1.00;
-                            }
-                            else
-                            {
-                                methodScore += 0.80;
-                            }
-
-                            adapterFunc = a => Convert.ChangeType(a, parameterType);
-                        }
-                        else if (parameterTypeCode == TypeCode.String)
-                        {
-                            methodScore += 0.60;
-                            adapterFunc = a => this.ObjectFormatter.ToString(a);
-                        }
-                        else if (parameterType == typeof(object))
-                        {
-                            methodScore += 0.70;
-                            adapterFunc = a => a;
-                        }
-                        else
-                        {
-                            break;
-                        }
-
-                        argumentAdapterFuncs.Add(adapterFunc);
-                    }
-
-                    /* Skip incomplete adaptations. */
-                    if (argumentAdapterFuncs.Count != methodParameters.Length)
-                    {
-                        continue;
-                    }
-
-                    /* Decide on the matching. */
-                    methodScore = methodScore / Math.Max(methodParameters.Length, arguments == null ? 0 : arguments.Length);
-                    if (double.IsNaN(methodScore) || methodScore == 1.00)
-                    {
-                        argumentAdapters = argumentAdapterFuncs.ToArray();
-                        bestMatchingMethod = method;
-                        break;
-                    }
-                    else if (methodScore > bestMatchingScore)
-                    {
-                        argumentAdapters = argumentAdapterFuncs.ToArray();
-                        bestMatchingScore = methodScore;
-                        bestMatchingMethod = method;
                     }
                 }
 
-                if (bestMatchingMethod != null)
+                var methodScore = .0;
+                var indexOfParamsArray = -1;
+
+                List<Func<object, object>> argumentAdapterFuncs = new List<Func<object, object>>();
+                for (var parameterIndex = 0; parameterIndex < methodParameters.Length; parameterIndex++)
                 {
-                    /* Yay, we got one that might do what we want it to do. */
-                    getterMethod = (i, a) =>
+                    var parameter = methodParameters[parameterIndex];
+
+                    Func<object, object> adapterFunc = null;
+
+                    if (arguments == null || arguments.Length <= parameterIndex)
+                    {
+                        adapterFunc = ReconcileMissingArgument(parameter, ref methodScore);
+                    }
+                    else
+                    {
+                        var parameterType = parameter.ParameterType;
+                        if (parameterIndex == methodParameters.Length - 1 && parameter.GetCustomAttribute<ParamArrayAttribute>() != null)
+                        {
+                            /* This is the last parameter and it is also a params array[]. Treat it differently. 
+                             */
+                            Debug.Assert(parameterType.IsArray, "parameterType must be an array.");
+                            var elementType = parameterType.GetElementType();
+                            indexOfParamsArray = parameterIndex;
+                            for (var argsIndex = parameterIndex; argsIndex < arguments.Length; argsIndex++)
+                            {
+                                adapterFunc = ReconcileArgument(elementType, arguments[argsIndex], ref methodScore);
+                                if (adapterFunc != null)
+                                {
+                                    methodScore -= 0.05; /* Remove a bit of score since it's in a params array. */
+                                    argumentAdapterFuncs.Add(adapterFunc);
+                                }
+                                else
+                                {
+                                    /* Whoops, fail to reconcile. */
+                                    break;
+                                }
+                            }
+
+                            if (adapterFunc != null)
+                            {
+                                /* Very special case here. */
+                                argsArrayElementType = elementType;
+                                continue;
+                            }
+                        }
+                        else
+                        {
+                            adapterFunc = ReconcileArgument(parameterType, arguments[parameterIndex], ref methodScore);
+                        }
+                    }
+
+                    /* Die if not matching. */
+                    if (adapterFunc == null)
+                    {
+                        break;
+                    }
+                    else
+                    {
+                        argumentAdapterFuncs.Add(adapterFunc);
+                    }
+                }
+
+                /* Skip incomplete adaptations. */
+                if (argumentAdapterFuncs.Count < methodParameters.Length)
+                {
+                    continue;
+                }
+
+                /* Decide on the matching. */
+                var argumentCount = arguments != null ? arguments.Length : 0;
+                if (methodParameters.Length > argumentCount)
+                {
+                    methodScore /= methodParameters.Length;
+                }
+                else
+                {
+                    methodScore /= argumentCount;
+                }
+
+                if (double.IsNaN(methodScore) || methodScore == 1.00)
+                {
+                    indexOfParamsArrayInMethod = indexOfParamsArray;
+                    argumentAdapters = argumentAdapterFuncs.ToArray();
+                    bestMatchingMethod = method;
+                    break;
+                }
+                else if (methodScore >= bestMatchingScore)
+                {
+                    indexOfParamsArrayInMethod = indexOfParamsArray;
+                    argumentAdapters = argumentAdapterFuncs.ToArray();
+                    bestMatchingScore = methodScore;
+                    bestMatchingMethod = method;
+                }
+            }
+
+            if (bestMatchingMethod != null)
+            {
+                /* Yay, we got one that might do what we want it to do. */
+                if (indexOfParamsArrayInMethod >= 0)
+                {
+                    /* We have a params array at the end. Special treatment is a must here. */
+                    Debug.Assert(indexOfParamsArrayInMethod < argumentAdapters.Length, "params argument is never out of the index bounds.");
+
+                    return (i, a) =>
+                    {
+                        /* Normal argument [0...params) */
+                        var adaptedArguments = new object[indexOfParamsArrayInMethod + 1];
+                        for (var x = 0; x < indexOfParamsArrayInMethod; x++)
+                        {
+                            adaptedArguments[x] = argumentAdapters[x](a[x]);
+                        }
+
+                        /* Params argument [params...end] */
+                        IList paramsArgument = (IList)Array.CreateInstance(argsArrayElementType, argumentAdapters.Length - indexOfParamsArrayInMethod);
+                        for (var x = indexOfParamsArrayInMethod; x < argumentAdapters.Length; x++)
+                        {
+                            paramsArgument[x - indexOfParamsArrayInMethod] = argumentAdapters[x](a[x]);
+                        }
+                        adaptedArguments[indexOfParamsArrayInMethod] = paramsArgument;
+
+                        return bestMatchingMethod.Invoke(i, adaptedArguments);
+                    };
+                }
+                else
+                {
+                    /* Standard function mapping. */
+                    return (i, a) =>
                     {
                         var adaptedArguments = new object[argumentAdapters.Length];
                         for (var x = 0; x < argumentAdapters.Length; x++)
@@ -327,7 +372,7 @@ namespace XtraLiteTemplates.Introspection
                             if (a != null && x < a.Length)
                             {
                                 adaptedArguments[x] = argumentAdapters[x](a[x]);
-                            } 
+                            }
                             else
                             {
                                 adaptedArguments[x] = argumentAdapters[x](null);
@@ -337,18 +382,107 @@ namespace XtraLiteTemplates.Introspection
                         return bestMatchingMethod.Invoke(i, adaptedArguments);
                     };
                 }
-
-                this.cachedMemberMap[signature.ToString()] = getterMethod;
-            }
-
-            if (getterMethod != null)
-            {
-                return getterMethod(@object, arguments);
             }
             else
-            { 
+            {
+                /* Found nothing :( return a big fat NULL. */
                 return null;
             }
+        }
+
+        private Func<object, object> ReconcileMissingArgument(ParameterInfo parameter, ref double reconciliationScore)
+        {
+            Debug.Assert(parameter != null, "parameter cannot be null.");
+
+            object defaultValue = null;
+
+            /* No more input arguments left in the input list. We'll need to default to something. */
+            if (parameter.HasDefaultValue)
+            {
+                /* OK, we have a default value! Use it. */
+                reconciliationScore += 1.00;
+                defaultValue = parameter.DefaultValue;
+            }
+            else if (parameter.GetCustomAttribute<ParamArrayAttribute>() != null)
+            {
+                /* It's a "param" array. Use a default elementless one. */
+                reconciliationScore += 1.00;
+                defaultValue = Array.CreateInstance(parameter.ParameterType.GetElementType(), 0);
+            }
+            else
+            {
+                /* Not matching anything. */
+                if (parameter.ParameterType.IsValueType)
+                {
+                    reconciliationScore += 0.10;
+                    defaultValue = Activator.CreateInstance(parameter.ParameterType);
+                }
+                else if (parameter.ParameterType == typeof(string))
+                {
+                    reconciliationScore += 0.20;
+                }
+                else if (parameter.ParameterType == typeof(object))
+                {
+                    reconciliationScore += 0.25;
+                }
+                else
+                {
+                    reconciliationScore += 0.15;
+                }
+            }
+
+            return a => defaultValue;
+        }
+
+        private Func<object, object> ReconcileArgument(Type parameterType, object argument, ref double reconciliationScore)
+        {
+            Debug.Assert(parameterType != null, "parameterType cannot be null.");
+
+            /* Now the real work begins. Trying to reconcile the passed-in argument type with the expected parameter type. */
+            var argumentType = argument != null ? argument.GetType() : null;
+
+            if (parameterType == argumentType)
+            {
+                /* Perfect match. */
+                reconciliationScore += 1.00;
+                return a => a;
+            }
+            else if (parameterType == typeof(string))
+            {
+                /* Expected is string. We'll convert. */
+                reconciliationScore += 0.60;
+                return a => this.ObjectFormatter.ToString(a);
+            }
+            else if (parameterType == typeof(object))
+            {
+                /* Expected is an untyped object. Anything can be accepted in this case. */
+                reconciliationScore += 0.70;
+                return a => a;
+            }
+            else
+            {
+                var parameterTypeCode = Type.GetTypeCode(parameterType);
+                var argumentTypeCode = Type.GetTypeCode(argumentType);
+
+                if (argumentTypeCode >= TypeCode.SByte && argumentTypeCode <= TypeCode.Decimal &&
+                    parameterTypeCode >= TypeCode.SByte && parameterTypeCode <= TypeCode.Decimal)
+                {
+                    /* Number to number */
+                    if (parameterTypeCode >= argumentTypeCode)
+                    {
+                        reconciliationScore += 1.00;
+                    }
+                    else
+                    {
+                        reconciliationScore += 0.80;
+                    }
+
+                    return a => Convert.ChangeType(a, parameterType);
+                }
+            }
+
+            /* Impossible case. Bail! */
+            return null;
         }
     }
 }

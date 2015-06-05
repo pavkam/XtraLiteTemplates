@@ -178,7 +178,6 @@ namespace XtraLiteTemplates.NUnit
                 journal.Add(String.Format("Double({0})", arg));
             }
 
-
             public void Function2(Object arg)
             {
                 journal.Add(String.Format("Object({0})", arg));
@@ -193,6 +192,28 @@ namespace XtraLiteTemplates.NUnit
             {
                 journal.Add(String.Format("[Object({0}) Object({1})]", arg0, arg1));
             }
+
+            public void Function4(params String[] args)
+            {
+                journal.Add(String.Format("[...String({0})]", String.Join(",", args)));
+            }
+
+            public void Function5(params Int32[] args)
+            {
+                journal.Add(String.Format("[...Int32({0})]", String.Join(",", args)));
+            }
+
+
+            public void Function6(Object arg0, Object arg1)
+            {
+                journal.Add(String.Format("[Object({0}) Object({1})]", arg0, arg1));
+            }
+
+            public void Function6(Object arg0, params Object[] args)
+            {
+                journal.Add(String.Format("[Object({0}) ...Object({1})]", arg0, String.Join(",", args)));
+            }
+
 
             public override string ToString()
             {
@@ -262,6 +283,70 @@ namespace XtraLiteTemplates.NUnit
             disemboweler.Invoke(selectiveObject, "Function3", new Object[] { true, 1.99, 2 });
 
             Assert.AreEqual("[Object() Object()], [Object() Object()], [Object(text) Int32(34)], [Object(System.CultureAwareComparer) Int32(18)], [Object(100) Object()], [Object(99) Object()], [Object(100) Object(True)], [Object(True) Int32(2)]", selectiveObject.ToString());
+        }
+
+        [Test]
+        public void TestCaseOverloadedMethodSelection4()
+        {
+            var selectiveObject = new SelectiveObject();
+
+            var disemboweler = new SimpleTypeDisemboweler(
+                typeof(SelectiveObject),
+                StringComparer.Ordinal,
+                ObjectFormatter);
+
+            disemboweler.Invoke(selectiveObject, "Function4", null);
+            disemboweler.Invoke(selectiveObject, "Function4", new Object[] { null, null });
+            disemboweler.Invoke(selectiveObject, "Function4", new Object[] { true, 1.99, 2 });
+
+            Assert.AreEqual("[...String()], [...String(!undefined!,!undefined!)], [...String(True,1.99,2)]", selectiveObject.ToString());
+        }
+
+        [Test]
+        public void TestCaseOverloadedMethodSelection5()
+        {
+            var selectiveObject = new SelectiveObject();
+
+            var disemboweler = new SimpleTypeDisemboweler(
+                typeof(SelectiveObject),
+                StringComparer.Ordinal,
+                ObjectFormatter);
+
+            disemboweler.Invoke(selectiveObject, "Function5", null);
+            disemboweler.Invoke(selectiveObject, "Function5", new Object[] { 1, 2 });
+            disemboweler.Invoke(selectiveObject, "Function5", new Object[] { (byte)1, (ushort)2, (uint)3, (long)4, 5.33, 6.23M });
+
+            Assert.AreEqual("[...Int32()], [...Int32(1,2)], [...Int32(1,2,3,4,5,6)]", selectiveObject.ToString());
+        }
+
+        [Test]
+        public void TestCaseOverloadedMethodSelection6()
+        {
+            var selectiveObject = new SelectiveObject();
+
+            var disemboweler = new SimpleTypeDisemboweler(
+                typeof(SelectiveObject),
+                StringComparer.Ordinal,
+                ObjectFormatter);
+
+            disemboweler.Invoke(selectiveObject, "Function6", null);
+            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { null });
+            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { null, null });
+            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { null, null, null });
+            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { 1 });
+            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { 1, "a" });
+            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { 1, "a", false });
+
+            Assert.AreEqual("[Object() ...Object()], [Object() ...Object()], [Object() Object()], [Object() ...Object()], [Object(1) ...Object()], [Object(1) Object(a)], [Object(1) ...Object(a,False)]", selectiveObject.ToString());
+        }
+
+        [Test]
+        public void TestCaseStringFormat()
+        {
+            var disemboweler = new SimpleTypeDisemboweler(typeof(String), StringComparer.Ordinal, ObjectFormatter);
+            var result = disemboweler.Invoke(String.Empty, "Format", new Object[] { "{0} {1} {2}!", "Hello", "weird", "world" } );
+
+            Assert.AreEqual("Hello weird world!", result);
         }
     }
 }

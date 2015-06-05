@@ -96,7 +96,6 @@ namespace XtraLiteTemplates.Dialects.Standard
             this.typeConverter = new FlexiblePrimitiveTypeConverter(this.Culture, this);
             this.dialectCasing = casing;
             this.dialectUndefinedSpecialIdentifier = this.AdjustCasing("Undefined");
-            this.selfObject = new StandardSelfObject(this.typeConverter);
 
             var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
 
@@ -300,6 +299,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             get
             {
+                if (this.selfObject == null)
+                {
+                    this.selfObject = CreateSelfObject(this.typeConverter);
+                }
+
                 return this.selfObject;
             }
         }
@@ -461,6 +465,21 @@ namespace XtraLiteTemplates.Dialects.Standard
         string IObjectFormatter.ToString(object obj)
         {
             return ((IObjectFormatter)this).ToString(obj, this.Culture);
+        }
+
+        /// <summary>
+        /// Override in descendant classes to supply an instance of the <see cref="Self"/> object.
+        /// </summary>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
+        /// <returns>
+        /// An instance of the self object.
+        /// </returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        protected virtual StandardSelfObject CreateSelfObject(IPrimitiveTypeConverter typeConverter)
+        {
+            Expect.NotNull("typeConverter", typeConverter);
+
+            return new StandardSelfObject(typeConverter);
         }
 
         /// <summary>
