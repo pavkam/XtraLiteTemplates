@@ -348,6 +348,36 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreEqual("Hello weird world!", result);
         }
+
+        [Test]
+        public void TestCaseCasingSelectionRejection()
+        {
+            var anon1 = new
+            {
+                A = "1",
+                a = "2",
+            };
+
+            var disemboweler1 = new SimpleTypeDisemboweler(
+                anon1.GetType(),
+                StringComparer.OrdinalIgnoreCase, ObjectFormatter);
+
+            disemboweler1.ValidateMember += (sender, e) =>
+            {
+                Assert.AreSame(disemboweler1, sender);
+                Assert.IsTrue(e.Accepted);
+                Assert.NotNull(e.Member);
+                Assert.AreSame(e.Member.DeclaringType, anon1.GetType());
+
+                if (e.Member.Name == "A")
+                {
+                    e.Accepted = false;
+                }
+            };
+
+            Assert.AreEqual("2", disemboweler1.Invoke(anon1, "A"));
+            Assert.AreEqual("2", disemboweler1.Invoke(anon1, "a"));
+        }
     }
 }
 
