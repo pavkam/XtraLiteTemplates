@@ -78,11 +78,13 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("NAN")) && dialect.SpecialKeywords[transformer("NAN")].Equals(Double.NaN));
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("INFINITY")) && dialect.SpecialKeywords[transformer("INFINITY")].Equals(Double.PositiveInfinity));
 
-            Assert.AreEqual(8, dialect.Directives.Count);
+            Assert.AreEqual(9, dialect.Directives.Count);
             foreach (var directive in dialect.Directives)
             {
                 if (directive is ConditionalInterpolationDirective)
                     Assert.AreEqual(transformer("{$ IF $}"), directive.ToString());
+                else if (directive is UsingDirective)
+                    Assert.AreEqual(transformer("{? AS $}...{END}"), directive.ToString());
                 else if (directive is ForDirective)
                     Assert.AreEqual(transformer("{FOR $}...{END}"), directive.ToString());
                 else if (directive is ForEachDirective)
@@ -324,7 +326,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
         [Test]
         public void TestCaseShowcase2()
         {
-            var template = "{FOR Member IN GetType.GetMembers() }{ Member.Name }{WITH}{PRE}, {END}{END}";
+            var template = "{TypeMembers AS GetType.GetMembers()}{FOR Member IN TypeMembers }{ Member.Name }{WITH}{PRE}, {END}{END}{END}";
             var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, template);
 
             Assert.AreEqual("get_TypeConverter, String, Number, Boolean, ToString, Equals, GetHashCode, GetType, .ctor, TypeConverter", result);

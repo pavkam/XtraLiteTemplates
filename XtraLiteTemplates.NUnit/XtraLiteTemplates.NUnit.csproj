@@ -40,6 +40,7 @@
     <Compile Include="Dialects\CodeMonkeyDialectTests.cs" />
     <Compile Include="Dialects\StandardDialectTests.cs" />
     <Compile Include="Directives\StandardForDirectiveTests.cs" />
+    <Compile Include="Directives\StandardUsingDirectiveTests.cs" />
     <Compile Include="Directives\StandardSeparatedForEachDirectiveTests.cs" />
     <Compile Include="Directives\StandardPreformattedDirectiveTests.cs" />
     <Compile Include="Directives\StandardRepeatDirectiveTests.cs" />

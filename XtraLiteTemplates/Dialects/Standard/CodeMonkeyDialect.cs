@@ -155,6 +155,7 @@ namespace XtraLiteTemplates.Dialects.Standard
             return new Directive[]
             {
                 new ConditionalInterpolationDirective(AdjustCasing("$ IF $"), false, typeConverter),
+                new UsingDirective(AdjustCasing("? AS $"), AdjustCasing("END"), typeConverter),
                 new ForEachDirective(AdjustCasing("FOR ? IN $"), AdjustCasing("END"), typeConverter),
                 new SeparatedForEachDirective(AdjustCasing("FOR ? IN $"), AdjustCasing("WITH"), AdjustCasing("END"), typeConverter),
                 new ForDirective(AdjustCasing("FOR $"), AdjustCasing("END"), typeConverter),
