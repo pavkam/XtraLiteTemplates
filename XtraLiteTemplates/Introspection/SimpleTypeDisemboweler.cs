@@ -71,6 +71,12 @@ namespace XtraLiteTemplates.Introspection
         }
 
         /// <summary>
+        /// The event handler invoked by this class for each candidate type member. The registered delegates
+        /// are responsible with deciding if a member will be accepted or rejected during candidate selection.
+        /// </summary>
+        public event EventHandler<MemberValidationEventArgs> ValidateMember;
+
+        /// <summary>
         ///   <value>Gets the <see cref="System.Type" /> that represents the type being inspected.</value>
         /// </summary>
         /// <value>
@@ -174,6 +180,23 @@ namespace XtraLiteTemplates.Introspection
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private bool ValidateCandidate(MemberInfo memberInfo)
+        {
+            Debug.Assert(memberInfo != null, "Argument memberInfo cannot be null.");
+
+            var candidateAccepted = true;
+            if (this.ValidateMember != null)
+            {
+                var eventArgs = new MemberValidationEventArgs(memberInfo);
+                this.ValidateMember(this, eventArgs);
+
+                candidateAccepted = eventArgs.Accepted;
+            }
+
+            return candidateAccepted;
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private Func<object, object[], object> LocateSuitableInvokeCandidate(object @object, string member, object[] arguments)
         {
             if (arguments == null || arguments.Length == 0)
@@ -181,7 +204,10 @@ namespace XtraLiteTemplates.Introspection
                 /* Scan the type for properties. */
                 foreach (var property in Type.GetProperties())
                 {
-                    if (!this.Comparer.Equals(property.Name, member) || !property.CanRead || property.GetIndexParameters().Length > 0)
+                    if (!this.Comparer.Equals(property.Name, member) || 
+                        !property.CanRead || 
+                        property.GetIndexParameters().Length > 0 ||
+                        !this.ValidateCandidate(property))
                     {
                         continue;
                     }
@@ -193,7 +219,9 @@ namespace XtraLiteTemplates.Introspection
                 /* Now scan for fields. */
                 foreach (var field in this.Type.GetFields())
                 {
-                    if (!this.Comparer.Equals(field.Name, member) || field.IsPrivate)
+                    if (!this.Comparer.Equals(field.Name, member) || 
+                        field.IsPrivate ||
+                        !this.ValidateCandidate(field))
                     {
                         continue;
                     }
@@ -222,7 +250,11 @@ namespace XtraLiteTemplates.Introspection
             /* Scan for methods! */
             foreach (var method in Type.GetMethods())
             {
-                if (!this.Comparer.Equals(method.Name, member) || method.IsAbstract || method.IsConstructor || method.IsPrivate)
+                if (!this.Comparer.Equals(method.Name, member) || 
+                    method.IsAbstract || 
+                    method.IsConstructor || 
+                    method.IsPrivate ||
+                    !this.ValidateCandidate(method))
                 {
                     continue;
                 }

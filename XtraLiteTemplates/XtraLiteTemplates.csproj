@@ -44,6 +44,7 @@
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
     <Compile Include="Dialects\Standard\StandardSelfObject.cs" />
+    <Compile Include="Introspection\MemberValidationEventArgs.cs" />
     <Compile Include="Introspection\IObjectFormatter.cs" />
     <Compile Include="Dialects\Standard\Operators\FormatOperator.cs" />
     <Compile Include="Evaluation\ContextualEvaluable.cs" />
