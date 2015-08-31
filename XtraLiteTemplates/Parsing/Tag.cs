@@ -588,12 +588,12 @@ namespace XtraLiteTemplates.Parsing
                 candidate = candidate.Trim();
             }
 
-            var isValid =
+            var validIdentifier =
                 !string.IsNullOrEmpty(candidate) &&
                 (char.IsLetter(candidate[0]) || candidate[0] == '_') &&
                 candidate.All(c => char.IsLetterOrDigit(c) || c == '_');
 
-            return isValid ? candidate : null;
+            return validIdentifier ? candidate : null;
         }
     }
 }

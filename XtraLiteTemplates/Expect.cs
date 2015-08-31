@@ -58,11 +58,11 @@ namespace XtraLiteTemplates
         {
             NotEmpty(name, value);
 
-            var isValid =
+            var identifierValid =
                 (char.IsLetter(value[0]) || value[0] == '_') &&
                 value.All(c => char.IsLetterOrDigit(c) || c == '_');
 
-            if (!isValid)
+            if (!identifierValid)
             {
                 ExceptionHelper.ArgumentIsNotValidIdentifier(name);
             }

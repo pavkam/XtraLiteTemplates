@@ -124,7 +124,7 @@ namespace XtraLiteTemplates.Parsing
         /// The registered tags.
         /// </value>
         /// <remarks>
-        /// The caller is responsible with loading up the known tag objects into the lexer before attempting to reading the first <c>lex</c> object.
+        /// The caller is responsible with loading up the known tag objects into the <c>lexer</c> before attempting to reading the first <c>lex</c> object.
         /// </remarks>
         public IReadOnlyCollection<Tag> Tags
         {
@@ -135,11 +135,11 @@ namespace XtraLiteTemplates.Parsing
         }
 
         /// <summary>
-        /// Registers a know tag with this lexer instance. All registered tags will take part in the matching process during the analysis of the
+        /// Registers a know tag with this <c>lexer</c> instance. All registered tags will take part in the matching process during the analysis of the
         /// incoming tokens.
         /// </summary>
         /// <param name="tag">A <see cref="XtraLiteTemplates.Parsing.Tag"/> object to register.</param>
-        /// <returns>This lexer instance.</returns>
+        /// <returns>This <c>lexer</c> instance.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="tag"/> is <c>null</c>.</exception>
         public Lexer RegisterTag(Tag tag)
         {
@@ -163,11 +163,11 @@ namespace XtraLiteTemplates.Parsing
         }
 
         /// <summary>
-        /// Registers a know operator with this lexer instance. All registered operators will take part in the matching process 
+        /// Registers a know operator with this <c>lexer</c> instance. All registered operators will take part in the matching process 
         /// during the expression analysis of the incoming tokens.
         /// </summary>
         /// <param name="operator">A <see cref="XtraLiteTemplates.Expressions.Operators.Operator"/> object to register.</param>
-        /// <returns>This lexer instance.</returns>
+        /// <returns>This <c>lexer</c> instance.</returns>
         /// <exception cref="System.ArgumentNullException">Argument <paramref name="operator"/> is <c>null</c>.</exception>
         public Lexer RegisterOperator(Operator @operator)
         {
@@ -215,7 +215,7 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         /// <param name="keyword">The name of the constant.</param>
         /// <param name="value">The value of the constant.</param>
-        /// <returns>This lexer instance.</returns>
+        /// <returns>This <c>lexer</c> instance.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="keyword"/> is <c>null</c>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="keyword"/> is not a valid identifier.</exception>
         /// <exception cref="System.InvalidOperationException"><paramref name="keyword"/> is already in use by an operator.</exception>

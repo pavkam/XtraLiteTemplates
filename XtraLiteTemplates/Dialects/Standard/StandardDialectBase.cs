@@ -301,7 +301,7 @@ namespace XtraLiteTemplates.Dialects.Standard
             {
                 if (this.selfObject == null)
                 {
-                    this.selfObject = CreateSelfObject(this.typeConverter);
+                    this.selfObject = this.CreateSelfObject(this.typeConverter);
                 }
 
                 return this.selfObject;

@@ -616,9 +616,9 @@ namespace XtraLiteTemplates.Expressions
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private void FeedTerm(object term, bool isLiteral)
+        private void FeedTerm(object term, bool literalTerm)
         {
-            Debug.Assert(isLiteral || term is string, "the term expected to be a string for non-literals.");
+            Debug.Assert(literalTerm || term is string, "the term expected to be a string for non-literals.");
 
             if (this.currentGroupRootNode == null)
             {
@@ -632,7 +632,7 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.CannotModifyAConstructedExpression();
             }
 
-            if (!isLiteral)
+            if (!literalTerm)
             {
                 var symbol = (string)term;
 

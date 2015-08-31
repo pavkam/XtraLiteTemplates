@@ -574,13 +574,13 @@ namespace XtraLiteTemplates.Parsing
                 else if (!this.IsTagSpecialCharacter(this.currentCharacter))
                 {
                     /* Check if this is a "standard symbol" */
-                    var isStandardSymbol = this.IsStandardSymbol(this.currentCharacter);
+                    var validStandardSymbol = this.IsStandardSymbol(this.currentCharacter);
 
                     /* Add the symbol to the token value. */
                     tokenValue.Append(this.currentCharacter);
                     this.NextCharacter(true);
 
-                    if (isStandardSymbol)
+                    if (validStandardSymbol)
                     {
                         /* Lump toghether all "standard symbols" (if this one was a standard one). */
                         while (this.IsStandardSymbol(this.currentCharacter))

@@ -158,7 +158,7 @@ namespace XtraLiteTemplates.Introspection
             if (!this.cachedMemberMap.TryGetValue(signature.ToString(), out getterMethod))
             {
                 /* No cache made for this call structure. Do it now and cache the invoke candidate. */
-                getterMethod = LocateSuitableInvokeCandidate(@object, member, arguments);
+                getterMethod = this.LocateSuitableInvokeCandidate(@object, member, arguments);
                 this.cachedMemberMap[signature.ToString()] = getterMethod;
             }
 
@@ -173,7 +173,7 @@ namespace XtraLiteTemplates.Introspection
             }
         }
 
-
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private Func<object, object[], object> LocateSuitableInvokeCandidate(object @object, string member, object[] arguments)
         {
             if (arguments == null || arguments.Length == 0)
@@ -204,13 +204,14 @@ namespace XtraLiteTemplates.Introspection
             }
 
             /* Try to find a suitable method candidate. */
-            return LocateSuitableMethodCandidate(@object, member, arguments);
+            return this.LocateSuitableMethodCandidate(@object, member, arguments);
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private Func<object, object[], object> LocateSuitableMethodCandidate(object @object, string member, object[] arguments)
         {
             Debug.Assert(@object != null, "object cannot be null.");
-            Debug.Assert(!String.IsNullOrEmpty(member), "member cannot be null or empty.");
+            Debug.Assert(!string.IsNullOrEmpty(member), "member cannot be null or empty.");
 
             MethodInfo bestMatchingMethod = null;
             Func<object, object>[] argumentAdapters = null;
@@ -249,7 +250,7 @@ namespace XtraLiteTemplates.Introspection
 
                     if (arguments == null || arguments.Length <= parameterIndex)
                     {
-                        adapterFunc = ReconcileMissingArgument(parameter, ref methodScore);
+                        adapterFunc = this.ReconcileMissingArgument(parameter, ref methodScore);
                     }
                     else
                     {
@@ -263,7 +264,7 @@ namespace XtraLiteTemplates.Introspection
                             indexOfParamsArray = parameterIndex;
                             for (var argsIndex = parameterIndex; argsIndex < arguments.Length; argsIndex++)
                             {
-                                adapterFunc = ReconcileArgument(elementType, arguments[argsIndex], ref methodScore);
+                                adapterFunc = this.ReconcileArgument(elementType, arguments[argsIndex], ref methodScore);
                                 if (adapterFunc != null)
                                 {
                                     methodScore -= 0.05; /* Remove a bit of score since it's in a params array. */
@@ -285,7 +286,7 @@ namespace XtraLiteTemplates.Introspection
                         }
                         else
                         {
-                            adapterFunc = ReconcileArgument(parameterType, arguments[parameterIndex], ref methodScore);
+                            adapterFunc = this.ReconcileArgument(parameterType, arguments[parameterIndex], ref methodScore);
                         }
                     }
 
@@ -356,6 +357,7 @@ namespace XtraLiteTemplates.Introspection
                         {
                             paramsArgument[x - indexOfParamsArrayInMethod] = argumentAdapters[x](a[x]);
                         }
+
                         adaptedArguments[indexOfParamsArrayInMethod] = paramsArgument;
 
                         return bestMatchingMethod.Invoke(i, adaptedArguments);
@@ -390,6 +392,7 @@ namespace XtraLiteTemplates.Introspection
             }
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private Func<object, object> ReconcileMissingArgument(ParameterInfo parameter, ref double reconciliationScore)
         {
             Debug.Assert(parameter != null, "parameter cannot be null.");
@@ -434,6 +437,7 @@ namespace XtraLiteTemplates.Introspection
             return a => defaultValue;
         }
 
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private Func<object, object> ReconcileArgument(Type parameterType, object argument, ref double reconciliationScore)
         {
             Debug.Assert(parameterType != null, "parameterType cannot be null.");
