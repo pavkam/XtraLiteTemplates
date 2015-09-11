@@ -28,20 +28,21 @@
 
 namespace XtraLiteTemplates.Evaluation
 {
-    using System;    
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
     using System.Text;
+    using XtraLiteTemplates.Compilation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.Parsing;
     
     /// <summary>
     /// Provides <c>lex</c> interpretation facilities. Instances of this class are used to interpret
-    /// sequences of <see cref="Lex" /> objects and assemble the final <see cref="IEvaluable" /> objects.
+    /// sequences of <see cref="Lex" /> objects and assemble the final <see cref="CompiledTemplate" /> objects.
     /// </summary>
     public sealed class Interpreter
     {
@@ -139,13 +140,17 @@ namespace XtraLiteTemplates.Evaluation
         /// <summary>
         /// Compiles a template supplied by the <see cref="ITokenizer"/> instance offered at construction time.
         /// </summary>
+        /// <param name="factory">The factory used to compile the interpreted document into the final <see cref="CompiledTemplate"/>.</param>
         /// <returns>An evaluable object.</returns>
-        public IEvaluable Construct()
+        /// <exception cref="ArgumentNullException">Argument <paramref name="factory"/> is <c>null</c>.</exception>
+        public CompiledTemplate Compile(CompiledTemplateFactory factory)
         {
+            Expect.NotNull("factory", factory);
+
             var document = new TemplateDocument();
             this.Interpret(document);
 
-            return new ContextualEvaluable(document);
+            return new CompiledTemplate(document, factory.CompileTemplate(document));
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]

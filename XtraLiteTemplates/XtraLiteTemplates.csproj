@@ -37,6 +37,8 @@
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compilation\CompiledEvaluationDelegate.cs" />
+    <Compile Include="Compilation\CompiledTemplate.cs" />
     <Compile Include="Dialects\Standard\Directives\ForDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\UsingDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\SeparatedForEachDirective.cs" />
@@ -44,10 +46,11 @@
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
     <Compile Include="Dialects\Standard\StandardSelfObject.cs" />
+    <Compile Include="Compilation\CompiledTemplateFactory.cs" />
+    <Compile Include="Evaluation\EvaluationContext.cs" />
     <Compile Include="Introspection\MemberValidationEventArgs.cs" />
     <Compile Include="Introspection\IObjectFormatter.cs" />
     <Compile Include="Dialects\Standard\Operators\FormatOperator.cs" />
-    <Compile Include="Evaluation\ContextualEvaluable.cs" />
     <Compile Include="Expressions\Nodes\PermittedContinuations.cs" />
     <Compile Include="Expressions\Nodes\LiteralNode.cs" />
     <Compile Include="Expressions\Nodes\ReferenceNode.cs" />
@@ -92,7 +95,6 @@
     <Compile Include="Dialects\Standard\Directives\ForEachDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\RepeatDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\InterpolationDirective.cs" />
-    <Compile Include="Evaluation\IEvaluable.cs" />
     <Compile Include="Evaluation\IEvaluationContext.cs" />
     <Compile Include="Evaluation\EvaluationException.cs" />
     <Compile Include="Evaluation\InterpreterException.cs" />

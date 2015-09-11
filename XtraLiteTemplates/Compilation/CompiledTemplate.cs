@@ -25,25 +25,47 @@
 
 [module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
-namespace XtraLiteTemplates.Evaluation
+namespace XtraLiteTemplates.Compilation
 {
     using System;
+    using System.Diagnostics;
     using System.IO;
     using System.Threading;
+    using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
 
     /// <summary>
-    /// Defines an entry-point method which evaluates the a compiled template. An <see cref="IEvaluable"/> interface is
-    /// returned as a result of compiling a template.
+    /// Class that represents a compiled template. Instances of <see cref="CompiledTemplate"/> created by a call to <see cref="Interpreter.Compile"/>.
     /// </summary>
-    public interface IEvaluable
+    public sealed class CompiledTemplate
     {
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private TemplateDocument document;
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private CompiledEvaluationDelegate evaluationDelegate;
+
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        internal CompiledTemplate(TemplateDocument document, CompiledEvaluationDelegate evaluationDelegate)
+        {
+            Debug.Assert(document != null, "Argument document cannot be null.");
+            Debug.Assert(evaluationDelegate != null, "Argument evaluationDelegate cannot be null.");
+
+            this.document = document;
+            this.evaluationDelegate = evaluationDelegate;
+        }
+
         /// <summary>
         /// Evaluates the specified template using a given evaluation context.
         /// </summary>
         /// <param name="writer">The text writer which will serve as the destination of the evaluated text.</param>
         /// <param name="context">The evaluation context providing all required state and variables.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="writer"/> or <paramref name="context"/> is <c>null</c>.</exception>
-        void Evaluate(TextWriter writer, IEvaluationContext context);
+        public void Evaluate(TextWriter writer, IEvaluationContext context)
+        {
+            Expect.NotNull("writer", writer);
+            Expect.NotNull("context", context);
+
+            this.evaluationDelegate(writer, context);
+        }
     }
 }

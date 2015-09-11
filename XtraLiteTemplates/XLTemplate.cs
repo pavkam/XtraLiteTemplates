@@ -26,21 +26,22 @@
 namespace XtraLiteTemplates
 {
     using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
-using System.Globalization;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using XtraLiteTemplates.Dialects;
-using XtraLiteTemplates.Dialects.Standard;
-using XtraLiteTemplates.Evaluation;
-using XtraLiteTemplates.Expressions;
-using XtraLiteTemplates.Introspection;
-using XtraLiteTemplates.Parsing;
+    using System.Collections.Generic;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
+    using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
+    using XtraLiteTemplates.Compilation;
+    using XtraLiteTemplates.Dialects;
+    using XtraLiteTemplates.Dialects.Standard;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// Facade class that uses all components exposed by the <c>XtraLiteTemplates library</c>. XLTemplate class uses an instance of <see cref="IDialect" /> interface
@@ -50,7 +51,7 @@ using XtraLiteTemplates.Parsing;
     public sealed class XLTemplate
     {
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IEvaluable compiledTemplate;
+        private CompiledTemplate compiledTemplate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XLTemplate"/> class.
@@ -265,7 +266,7 @@ using XtraLiteTemplates.Parsing;
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IEvaluable Compile()
+        private CompiledTemplate Compile()
         {
             using (var reader = new StringReader(this.Template))
             {
@@ -297,196 +298,7 @@ using XtraLiteTemplates.Parsing;
                 }
 
                 /* Construct the template and obtain the evaluable object. */
-                return interpreter.Construct();
-            }
-        }
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private sealed class Frame
-        {
-            public Dictionary<string, object> Variables { get; set; }
-
-            public HashSet<object> StateObjects { get; set; }
-        }
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private sealed class EvaluationContext : IEvaluationContext
-        {
-            private Stack<Frame> frames;
-            private Dictionary<Type, SimpleTypeDisemboweler> disembowelers;
-            private IEqualityComparer<string> identifierComparer;
-            private IObjectFormatter objectFormatter;
-            private bool ignoreEvaluationExceptions;
-            private CancellationToken cancellationToken;
-            private object selfObject;
-            private Func<IExpressionEvaluationContext, string, string> unparsedTextHandler;
-
-            public EvaluationContext(
-                bool ignoreEvaluationExceptions,
-                CancellationToken cancellationToken,
-                IEqualityComparer<string> identifierComparer,
-                IObjectFormatter objectFormatter,
-                object selfObject,
-                Func<IExpressionEvaluationContext, string, string> unparsedTextHandler)
-            {
-                Debug.Assert(identifierComparer != null, "identifierComparer cannot be null.");
-                Debug.Assert(objectFormatter != null, "objectFormatter cannot be null.");
-                Debug.Assert(unparsedTextHandler != null, "unparsedTextHandler cannot be null.");
-
-                this.cancellationToken = cancellationToken;
-                this.identifierComparer = identifierComparer;
-                this.objectFormatter = objectFormatter;
-                this.ignoreEvaluationExceptions = ignoreEvaluationExceptions;
-                this.unparsedTextHandler = unparsedTextHandler;
-                this.selfObject = selfObject;
- 
-                this.disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
-                this.frames = new Stack<Frame>();
-            }
-
-            public bool IgnoreEvaluationExceptions
-            {
-                get
-                {
-                    return this.ignoreEvaluationExceptions;
-                }
-            }
-
-            public CancellationToken CancellationToken
-            {
-                get 
-                {
-                    return this.cancellationToken;
-                }
-            }
-
-            public Frame TopFrame
-            {
-                get
-                {
-                    Debug.Assert(this.frames.Count > 0, "No open frames remaining.");
-                    return this.frames.Peek();
-                }
-            }
-
-            public string ProcessUnparsedText(string value)
-            {
-                return this.unparsedTextHandler(this, value);
-            }
-
-            public void OpenEvaluationFrame()
-            {
-                this.frames.Push(new Frame());
-            }
-
-            public void CloseEvaluationFrame()
-            {
-                Debug.Assert(this.frames.Count > 0, "No open frames remaining.");
-                this.frames.Pop();
-            }
-
-            public void SetProperty(string property, object value)
-            {
-                var topFrame = this.TopFrame;
-                if (topFrame.Variables == null)
-                {
-                    topFrame.Variables = new Dictionary<string, object>(this.identifierComparer);
-                }
-
-                topFrame.Variables[property] = value;
-            }
-            
-            public object GetProperty(string property)
-            {
-                /* Obtain the propety from the list given to us. */
-                foreach (var frame in this.frames)
-                {
-                    object result;
-                    if (frame.Variables != null && frame.Variables.TryGetValue(property, out result))
-                    {
-                        return result;
-                    }
-                }
-
-                /* Not there. Let's go to the self object now. */
-                return this.GetProperty(this.selfObject, property);
-            }
-
-            public object GetProperty(object @object, string property)
-            {
-                Expect.Identifier("property", property);
-
-                if (@object != null)
-                {
-                    var type = @object.GetType();
-                    return this.GetDisembowelerForType(type).Invoke(@object, property);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-
-            public object Invoke(string method, object[] arguments)
-            {
-                /* Go to self object. */
-                return this.Invoke(this.selfObject, method, arguments);
-            }
-
-            public object Invoke(object @object, string method, object[] arguments)
-            {
-                Expect.Identifier("method", method);
-
-                if (@object != null)
-                {
-                    var type = @object.GetType();
-                    return this.GetDisembowelerForType(type).Invoke(@object, method, arguments);
-                }
-                else
-                {
-                    return null;
-                }
-            }
-
-            public void AddStateObject(object state)
-            {
-                var topFrame = this.TopFrame;
-                if (topFrame.StateObjects == null)
-                {
-                    topFrame.StateObjects = new HashSet<object>();
-                }
-
-                topFrame.StateObjects.Add(state);
-            }
-
-            public void RemoveStateObject(object state)
-            {
-                var topFrame = this.TopFrame;
-                if (topFrame.StateObjects != null)
-                {
-                    topFrame.StateObjects.Remove(state);
-                }
-            }
-
-            public bool ContainsStateObject(object state)
-            {
-                var topFrame = this.TopFrame;
-                return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
-            }
-
-            private SimpleTypeDisemboweler GetDisembowelerForType(Type type)
-            {
-                Debug.Assert(type != null, "type cannot be null.");
-
-                SimpleTypeDisemboweler disemboweler;
-                if (!this.disembowelers.TryGetValue(type, out disemboweler))
-                {
-                    disemboweler = new SimpleTypeDisemboweler(type, this.identifierComparer, this.objectFormatter);
-
-                    this.disembowelers.Add(type, disemboweler);
-                }
-
-                return disemboweler;
+                return interpreter.Compile(new CompiledTemplateFactory());
             }
         }
     }
