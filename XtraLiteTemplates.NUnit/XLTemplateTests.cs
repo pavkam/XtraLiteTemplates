@@ -38,6 +38,7 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Parsing;
     using System.Globalization;
     using XtraLiteTemplates.Dialects.Standard;
+    using System.Threading;
 
     [TestFixture]
     public class XLTemplateTests : TestBase
@@ -205,6 +206,31 @@ namespace XtraLiteTemplates.NUnit
 
             result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Boolean(-3.95)}");
             Assert.AreEqual("True", result);
+        }
+
+        private class Waiter
+        {
+            public Int32 Wait(Int32 milliseconds)
+            {
+                Thread.Sleep(milliseconds);
+                return milliseconds;
+            }
+        }
+
+        [Test]
+        public void TestCaseEvaluationWithTimeOut1()
+        {
+            var template = new XLTemplate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Waiter.Wait(100)}");
+
+            using (var writer = new StringWriter())
+            {
+                var result = template.Evaluate(writer, new Dictionary<string, object> { { "Waiter", new Waiter() } }, 200);
+                Assert.IsTrue(true);
+                Assert.AreEqual("100", writer.ToString());
+
+                result = template.Evaluate(writer, new Dictionary<string, object> { { "Waiter", new Waiter() } }, 50);
+                Assert.IsFalse(result);
+            }
         }
     }
 }

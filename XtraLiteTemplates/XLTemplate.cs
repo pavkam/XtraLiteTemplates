@@ -26,20 +26,21 @@
 namespace XtraLiteTemplates
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using XtraLiteTemplates.Dialects;
-    using XtraLiteTemplates.Dialects.Standard;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
+using System.Globalization;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+using XtraLiteTemplates.Dialects;
+using XtraLiteTemplates.Dialects.Standard;
+using XtraLiteTemplates.Evaluation;
+using XtraLiteTemplates.Expressions;
+using XtraLiteTemplates.Introspection;
+using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// Facade class that uses all components exposed by the <c>XtraLiteTemplates library</c>. XLTemplate class uses an instance of <see cref="IDialect" /> interface
@@ -138,31 +139,75 @@ namespace XtraLiteTemplates
         /// </summary>
         /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
         /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <param name="millisecondsTimeout">The number of milliseconds to wait, or <see cref="Timeout.Infinite"/> (<c>-1</c>) to wait indefinitely.</param>
+        /// <returns><c>true</c> if the evaluation ended within the allocated time; <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public void Evaluate(TextWriter writer, IReadOnlyDictionary<string, object> variables)
+        public bool Evaluate(TextWriter writer, IReadOnlyDictionary<string, object> variables, int millisecondsTimeout = Timeout.Infinite)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("variables", variables);
 
-            /* Create a standard evaluation context that will be used for evaluation of said template. */
-            var context = new EvaluationContext(
-                true, 
-                this.Dialect.IdentifierComparer, 
-                this.Dialect.ObjectFormatter, 
-                this.Dialect.Self, 
-                this.Dialect.DecorateUnparsedText);
-
-            /* Load in the variables. */
-            context.OpenEvaluationFrame();
-            foreach (var variable in variables)
+            if (millisecondsTimeout == Timeout.Infinite)
             {
-                context.SetProperty(variable.Key, variable.Value);
+                /* No thread scheduling. */
+                this.EvaluateInternal(writer, variables, CancellationToken.None);
+                return true;
             }
+            else
+            {
+                /* Wait for task to execute within a given timeout range. */
+                var cancellationTokenSource = new CancellationTokenSource(millisecondsTimeout);
 
-            /* Evaluate. */
-            this.compiledTemplate.Evaluate(writer, context);
-            context.CloseEvaluationFrame();
+                var task = this.EvaluateAsync(writer, variables, cancellationTokenSource.Token);
+                Task.WaitAll(new Task[] { task });
+
+                return task.Status == TaskStatus.RanToCompletion;
+            }
+        }
+
+        /// <summary>
+        /// Evaluates the result of the compiled template asynchronously. The resulting text is written to <paramref name="writer"/>. All key-value-pairs
+        /// contained in <paramref name="variables"/> are exposed to the compiled template as variables.
+        /// </summary>
+        /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
+        /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> instance.</param>
+        /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
+        /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
+        public async Task EvaluateAsync(TextWriter writer, IReadOnlyDictionary<string, object> variables, CancellationToken cancellationToken)
+        {
+            Expect.NotNull("writer", writer);
+            Expect.NotNull("variables", variables);
+            Expect.NotNull("cancellationToken", cancellationToken);
+
+            await Task.Run(
+                () =>
+                {
+                    EvaluateInternal(writer, variables, cancellationToken);
+                }, 
+                cancellationToken);
+        }
+
+        /// <summary>
+        /// Evaluates the result of the compiled template asynchronously. The resulting text is written to <paramref name="writer"/>. All key-value-pairs
+        /// contained in <paramref name="variables"/> are exposed to the compiled template as variables.
+        /// </summary>
+        /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
+        /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
+        /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
+        public async Task EvaluateAsync(TextWriter writer, IReadOnlyDictionary<string, object> variables)
+        {
+            Expect.NotNull("writer", writer);
+            Expect.NotNull("variables", variables);
+
+            await Task.Run(() =>
+            {
+                EvaluateInternal(writer, variables, CancellationToken.None);
+            });
         }
 
         /// <summary>
@@ -190,6 +235,33 @@ namespace XtraLiteTemplates
         {
             Debug.Assert(this.compiledTemplate != null, "compiledTemplate cannot be null.");
             return this.compiledTemplate.ToString();
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        private void EvaluateInternal(TextWriter writer, IReadOnlyDictionary<string, object> variables, CancellationToken cancellationToken)
+        {
+            Debug.Assert(writer != null, "Argument writer cannot be null.");
+            Debug.Assert(variables != null, "Argument variables cannot be null.");
+
+            /* Create a standard evaluation context that will be used for evaluation of said template. */
+            var context = new EvaluationContext(
+                true,
+                cancellationToken,
+                this.Dialect.IdentifierComparer,
+                this.Dialect.ObjectFormatter,
+                this.Dialect.Self,
+                this.Dialect.DecorateUnparsedText);
+
+            /* Load in the variables. */
+            context.OpenEvaluationFrame();
+            foreach (var variable in variables)
+            {
+                context.SetProperty(variable.Key, variable.Value);
+            }
+
+            /* Evaluate. */
+            this.compiledTemplate.Evaluate(writer, context);
+            context.CloseEvaluationFrame();
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
@@ -245,11 +317,13 @@ namespace XtraLiteTemplates
             private IEqualityComparer<string> identifierComparer;
             private IObjectFormatter objectFormatter;
             private bool ignoreEvaluationExceptions;
+            private CancellationToken cancellationToken;
             private object selfObject;
             private Func<IExpressionEvaluationContext, string, string> unparsedTextHandler;
 
             public EvaluationContext(
                 bool ignoreEvaluationExceptions,
+                CancellationToken cancellationToken,
                 IEqualityComparer<string> identifierComparer,
                 IObjectFormatter objectFormatter,
                 object selfObject,
@@ -259,6 +333,7 @@ namespace XtraLiteTemplates
                 Debug.Assert(objectFormatter != null, "objectFormatter cannot be null.");
                 Debug.Assert(unparsedTextHandler != null, "unparsedTextHandler cannot be null.");
 
+                this.cancellationToken = cancellationToken;
                 this.identifierComparer = identifierComparer;
                 this.objectFormatter = objectFormatter;
                 this.ignoreEvaluationExceptions = ignoreEvaluationExceptions;
@@ -274,6 +349,14 @@ namespace XtraLiteTemplates
                 get
                 {
                     return this.ignoreEvaluationExceptions;
+                }
+            }
+
+            public CancellationToken CancellationToken
+            {
+                get 
+                {
+                    return this.cancellationToken;
                 }
             }
 

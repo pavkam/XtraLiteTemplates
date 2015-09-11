@@ -29,6 +29,7 @@ namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.IO;
+    using System.Threading;
     using XtraLiteTemplates.Expressions;
 
     /// <summary>

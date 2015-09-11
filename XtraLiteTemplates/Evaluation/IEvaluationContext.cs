@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.Evaluation
     using System;
     using System.Globalization;
     using System.IO;
+    using System.Threading;
     using XtraLiteTemplates.Dialects.Standard.Operators;
     using XtraLiteTemplates.Expressions;
 
@@ -40,6 +41,14 @@ namespace XtraLiteTemplates.Evaluation
     /// </summary>
     public interface IEvaluationContext : IExpressionEvaluationContext
     {
+        /// <summary>
+        /// Gets the <see cref="CancellationToken"/> instance used to signal the interruption of template evaluation.
+        /// </summary>
+        /// <value>
+        /// The assigned <see cref="CancellationToken"/> instance.
+        /// </value>
+        CancellationToken CancellationToken { get; }
+
         /// <summary>
         /// Gets a value indicating whether evaluation exceptions are silently ignored (or result in <c>null</c> values) during template evaluation.
         /// </summary>

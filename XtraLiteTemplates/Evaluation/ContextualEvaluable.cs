@@ -34,6 +34,8 @@ namespace XtraLiteTemplates.Evaluation
     using System.IO;
     using System.Linq;
     using System.Text;
+    using System.Threading;
+    using System.Threading.Tasks;
     using XtraLiteTemplates.Expressions;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
@@ -62,11 +64,14 @@ namespace XtraLiteTemplates.Evaluation
             return this.templateDocument.ToString();
         }
 
-        private static object[] EvaluateTag(IExpressionEvaluationContext context, object[] components)
+        private static object[] EvaluateTag(IEvaluationContext context, object[] components)
         {
             object[] result = new object[components.Length];
             for (var i = 0; i < components.Length; i++)
             {
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 var expression = components[i] as Expression;
                 if (expression != null)
                 {
@@ -97,8 +102,14 @@ namespace XtraLiteTemplates.Evaluation
             var flowDecision = Directive.FlowDecision.Evaluate;
             while (flowDecision != Directive.FlowDecision.Terminate)
             {
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 string directiveText;
                 flowDecision = directive.Execute(0, tagEvaluatedComponents, ref state, context, out directiveText);
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
 
                 if (directiveText != null)
                 {
@@ -123,8 +134,14 @@ namespace XtraLiteTemplates.Evaluation
             object state = null;
             while (true)
             {
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 string directiveText;
                 var flowDecision = directive.Execute(0, beginTagEvaluatedComponents, ref state, context, out directiveText);
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
 
                 if (directiveText != null)
                 {
@@ -148,6 +165,9 @@ namespace XtraLiteTemplates.Evaluation
                 {
                     closeTagEvaluatedComponents = EvaluateTag(context, closeComponents);
                 }
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
 
                 flowDecision = directive.Execute(1, closeTagEvaluatedComponents, ref state, context, out directiveText);
 
@@ -178,6 +198,9 @@ namespace XtraLiteTemplates.Evaluation
             var currentTagIndex = 0;
             while (currentTagIndex >= 0)
             {
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 if (evaluatedComponents[currentTagIndex] == null)
                 {
                     evaluatedComponents[currentTagIndex] = EvaluateTag(context, components[currentTagIndex]);
@@ -185,6 +208,9 @@ namespace XtraLiteTemplates.Evaluation
 
                 string directiveText;
                 var flowDecision = directive.Execute(currentTagIndex, evaluatedComponents[currentTagIndex], ref state, context, out directiveText);
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
 
                 if (directiveText != null)
                 {
@@ -228,7 +254,14 @@ namespace XtraLiteTemplates.Evaluation
                 Debug.Assert(writer != null, "writer cannot be null.");
                 Debug.Assert(context != null, "context cannot be null.");
 
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 var text = context.ProcessUnparsedText(unparsedNode.UnparsedText);
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 if (!string.IsNullOrEmpty(text))
                 {
                     writer.Write(text);
@@ -327,6 +360,10 @@ namespace XtraLiteTemplates.Evaluation
                     {
                         EvaluateSingleTagDirective(writer, context, directive, tagNode.Components);
                     }
+                    catch (OperationCanceledException cancelException)
+                    {
+                        throw cancelException;
+                    }
                     catch (Exception exception)
                     {
                         if (!context.IgnoreEvaluationExceptions)
@@ -358,6 +395,10 @@ namespace XtraLiteTemplates.Evaluation
                             endTagNode.Components,
                             evaluable);
                     }
+                    catch (OperationCanceledException cancelException)
+                    {
+                        throw cancelException;
+                    }
                     catch (Exception exception)
                     {
                         if (!context.IgnoreEvaluationExceptions)
@@ -386,6 +427,10 @@ namespace XtraLiteTemplates.Evaluation
                             directive,
                             componentArray,
                             interTagEvaluables.ToArray());
+                    }
+                    catch (OperationCanceledException cancelException)
+                    {
+                        throw cancelException;
                     }
                     catch (Exception exception)
                     {

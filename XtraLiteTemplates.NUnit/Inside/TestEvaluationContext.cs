@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
+    using System.Threading;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
@@ -191,6 +192,14 @@ namespace XtraLiteTemplates.NUnit.Inside
             }
             else
                 return null;
+        }
+
+        public CancellationToken CancellationToken
+        {
+            get 
+            {
+                return CancellationToken.None;
+            }
         }
     }
 }
