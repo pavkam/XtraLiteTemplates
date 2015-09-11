@@ -40,7 +40,7 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Introspection;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-    internal sealed class EvaluationContext : IEvaluationContext
+    internal sealed class EvaluationContextImpl : IExpressionEvaluationContext
     {
         private Stack<Frame> frames;
         private Dictionary<Type, SimpleTypeDisemboweler> disembowelers;
@@ -51,7 +51,7 @@ namespace XtraLiteTemplates.Evaluation
         private object selfObject;
         private Func<IExpressionEvaluationContext, string, string> unparsedTextHandler;
 
-        public EvaluationContext(
+        public EvaluationContextImpl(
             bool ignoreEvaluationExceptions,
             CancellationToken cancellationToken,
             IEqualityComparer<string> identifierComparer,

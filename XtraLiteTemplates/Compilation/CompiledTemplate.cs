@@ -35,17 +35,18 @@ namespace XtraLiteTemplates.Compilation
     using XtraLiteTemplates.Expressions;
 
     /// <summary>
-    /// Class that represents a compiled template. Instances of <see cref="CompiledTemplate"/> created by a call to <see cref="Interpreter.Compile"/>.
+    /// Class that represents a compiled template. Instances of <see cref="CompiledTemplate{TContext}"/> created by a call to <see cref="Interpreter.Compile"/>.
+    /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
     /// </summary>
-    public sealed class CompiledTemplate
+    public sealed class CompiledTemplate<TContext> where TContext : IExpressionEvaluationContext
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private TemplateDocument document;
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledEvaluationDelegate evaluationDelegate;
+        private CompiledEvaluationDelegate<TContext> evaluationDelegate;
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        internal CompiledTemplate(TemplateDocument document, CompiledEvaluationDelegate evaluationDelegate)
+        internal CompiledTemplate(TemplateDocument document, CompiledEvaluationDelegate<TContext> evaluationDelegate)
         {
             Debug.Assert(document != null, "Argument document cannot be null.");
             Debug.Assert(evaluationDelegate != null, "Argument evaluationDelegate cannot be null.");
@@ -60,7 +61,7 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="writer">The text writer which will serve as the destination of the evaluated text.</param>
         /// <param name="context">The evaluation context providing all required state and variables.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="writer"/> or <paramref name="context"/> is <c>null</c>.</exception>
-        public void Evaluate(TextWriter writer, IEvaluationContext context)
+        public void Evaluate(TextWriter writer, TContext context)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("context", context);

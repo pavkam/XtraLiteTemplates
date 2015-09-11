@@ -46,12 +46,11 @@ namespace XtraLiteTemplates
     /// <summary>
     /// Facade class that uses all components exposed by the <c>XtraLiteTemplates library</c>. XLTemplate class uses an instance of <see cref="IDialect" /> interface
     /// to perform the <c>parsing</c>, <c>lexing</c> and <c>interpretation</c> of the template.
-    /// A private implementation of <see cref="IEvaluationContext" /> interface is used to perform the actual evaluation of the compiled template.
     /// </summary>
     public sealed class XLTemplate
     {
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledTemplate compiledTemplate;
+        private CompiledTemplate<EvaluationContextImpl> compiledTemplate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XLTemplate"/> class.
@@ -245,7 +244,7 @@ namespace XtraLiteTemplates
             Debug.Assert(variables != null, "Argument variables cannot be null.");
 
             /* Create a standard evaluation context that will be used for evaluation of said template. */
-            var context = new EvaluationContext(
+            var context = new EvaluationContextImpl(
                 true,
                 cancellationToken,
                 this.Dialect.IdentifierComparer,
@@ -266,7 +265,7 @@ namespace XtraLiteTemplates
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledTemplate Compile()
+        private CompiledTemplate<EvaluationContextImpl> Compile()
         {
             using (var reader = new StringReader(this.Template))
             {
@@ -298,7 +297,7 @@ namespace XtraLiteTemplates
                 }
 
                 /* Construct the template and obtain the evaluable object. */
-                return interpreter.Compile(new CompiledTemplateFactory());
+                return interpreter.Compile(new CompiledTemplateFactoryImpl());
             }
         }
     }

@@ -30,11 +30,13 @@ namespace XtraLiteTemplates.Compilation
 {
     using System.IO;
     using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
 
     /// <summary>
-    /// Delegate type used by <see cref="CompiledTemplateFactory"/> when compiling a template.
+    /// Delegate type used by <see cref="CompiledTemplateFactory{TContext}"/> when compiling a template.
     /// </summary>
+    /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
     /// <param name="writer">The <see cref="TextWriter"/> that will be written to.</param>
-    /// <param name="context">The <see cref="IEvaluationContext"/> that is passed to the evaluated directives.</param>
-    public delegate void CompiledEvaluationDelegate(TextWriter writer, IEvaluationContext context);
+    /// <param name="context">The evaluation context.</param>
+    public delegate void CompiledEvaluationDelegate<TContext>(TextWriter writer, TContext context) where TContext : IExpressionEvaluationContext;
 }
