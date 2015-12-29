@@ -50,7 +50,7 @@ namespace XtraLiteTemplates
     public sealed class XLTemplate
     {
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledTemplate<EvaluationContextImpl> compiledTemplate;
+        private CompiledTemplate<StandardEvaluationContext> compiledTemplate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XLTemplate"/> class.
@@ -244,7 +244,7 @@ namespace XtraLiteTemplates
             Debug.Assert(variables != null, "Argument variables cannot be null.");
 
             /* Create a standard evaluation context that will be used for evaluation of said template. */
-            var context = new EvaluationContextImpl(
+            var context = new StandardEvaluationContext(
                 true,
                 cancellationToken,
                 this.Dialect.IdentifierComparer,
@@ -265,7 +265,7 @@ namespace XtraLiteTemplates
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledTemplate<EvaluationContextImpl> Compile()
+        private CompiledTemplate<StandardEvaluationContext> Compile()
         {
             using (var reader = new StringReader(this.Template))
             {
@@ -297,7 +297,7 @@ namespace XtraLiteTemplates
                 }
 
                 /* Construct the template and obtain the evaluable object. */
-                return interpreter.Compile(new CompiledTemplateFactoryImpl());
+                return interpreter.Compile();
             }
         }
     }

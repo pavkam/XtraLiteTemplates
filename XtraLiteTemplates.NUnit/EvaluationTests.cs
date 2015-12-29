@@ -57,7 +57,7 @@ namespace XtraLiteTemplates.NUnit
 
             var evaluable = new Interpreter(new Tokenizer("{T}"), ExpressionFlowSymbols.Default,
                 StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(directive).Construct();
+                .RegisterDirective(directive).Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
             Assert.AreEqual("-> {T} -> Restart -> () -> {T} -> Terminate ->", exo);
@@ -72,7 +72,7 @@ namespace XtraLiteTemplates.NUnit
 
             var evaluable = new Interpreter(new Tokenizer("{T1}text{T2}"), ExpressionFlowSymbols.Default, 
                 StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(directive).Construct();
+                .RegisterDirective(directive).Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
             Assert.AreEqual("-> {T1} -> Evaluate -> (text) -> {T2} -> Restart -> () -> {T1} -> Skip -> () -> {T2} -> Terminate ->", exo);
@@ -88,7 +88,7 @@ namespace XtraLiteTemplates.NUnit
 
             var evaluable = new Interpreter(new Tokenizer("{T1}first{T2}second{T3}"), 
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
-                .RegisterDirective(directive).Construct();
+                .RegisterDirective(directive).Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
             Assert.AreEqual("-> {T1} -> Evaluate -> (first) -> {T2} -> Evaluate -> (second) -> {T3} -> Restart -> () -> {T1} -> Skip -> () -> {T2} -> Skip -> () -> {T3} -> Terminate ->", exo);
@@ -100,7 +100,7 @@ namespace XtraLiteTemplates.NUnit
             var evaluable = new Interpreter(new Tokenizer("{1}, {var_string}, {var_integer}, {var_float}, {var_boolean}, {var_object.Item1}"), 
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
-                .Construct();
+                .Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, 
                 kw("var_string", "some string"), 
@@ -121,7 +121,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .RegisterDirective(new ConditionalInterpolationDirective(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
-                .Construct();
+                .Compile();
 
             var dude = new
             {
@@ -153,7 +153,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new RepeatDirective(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
-                .Construct();
+                .Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
 
@@ -167,7 +167,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .RegisterDirective(new ForEachDirective(TypeConverter))
-                .Construct();
+                .Compile();
 
             String[] name = new String[] { "Mary", "Joe", "Peter" };
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("names", name));
@@ -184,7 +184,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterDirective(new ForEachDirective(TypeConverter))
                 .RegisterOperator(new SequenceOperator(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
-                .Construct();
+                .Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
 
@@ -198,7 +198,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new IfDirective(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
-                .Construct();
+                .Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("true", true), kw("false", false));
 
@@ -212,7 +212,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new IfElseDirective(TypeConverter))
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
-                .Construct();
+                .Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("true", true), kw("false", false));
 
@@ -226,7 +226,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new ForEachDirective(TypeConverter))
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
-                .Construct();
+                .Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
 
@@ -239,7 +239,7 @@ namespace XtraLiteTemplates.NUnit
             var evaluable = new Interpreter(new Tokenizer("{a} {(a)} {a.b} {(a).b} {(a.b)} {a.b.c} {(a).b.c} {(a.b).c} {(a.b.c)}"),
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
-                .Construct();
+                .Compile();
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("a", new { b = new { c = "exists" } }));
 
@@ -255,7 +255,7 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.OrdinalIgnoreCase)
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
-                .Construct();
+                .Compile();
 
             var result = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
             Assert.AreEqual("12", result);
@@ -297,7 +297,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterDirective(new IfDirective(TypeConverter))
                 .RegisterDirective(new IfElseDirective(TypeConverter))
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
-                .Construct();
+                .Compile();
 
             var originalResult = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
             var result = new String(originalResult.Where(c => !char.IsWhiteSpace(c)).ToArray());

@@ -48,7 +48,7 @@
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
     <Compile Include="Dialects\Standard\StandardSelfObject.cs" />
     <Compile Include="Compilation\CompiledTemplateFactory.cs" />
-    <Compile Include="Evaluation\EvaluationContextImpl.cs" />
+    <Compile Include="Evaluation\StandardEvaluationContext.cs" />
     <Compile Include="Introspection\MemberValidationEventArgs.cs" />
     <Compile Include="Introspection\IObjectFormatter.cs" />
     <Compile Include="Dialects\Standard\Operators\FormatOperator.cs" />

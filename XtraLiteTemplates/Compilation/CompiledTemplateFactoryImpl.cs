@@ -42,9 +42,9 @@ namespace XtraLiteTemplates.Compilation
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
 
-    internal sealed class CompiledTemplateFactoryImpl : CompiledTemplateFactory<EvaluationContextImpl>
+    internal sealed class CompiledTemplateFactoryImpl : CompiledTemplateFactory<StandardEvaluationContext>
     {
-        protected override CompiledEvaluationDelegate<EvaluationContextImpl> FinalizeEvaluationDelegate(CompiledEvaluationDelegate<EvaluationContextImpl> finalDelegate)
+        protected override CompiledEvaluationDelegate<StandardEvaluationContext> FinalizeEvaluationDelegate(CompiledEvaluationDelegate<StandardEvaluationContext> finalDelegate)
         {
             Debug.Assert(finalDelegate != null, "Argument finalDelegate cannot be null.");
 
@@ -61,9 +61,9 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        protected override CompiledEvaluationDelegate<EvaluationContextImpl> BuildDoubleTagDirectiveEvaluationDelegate(
+        protected override CompiledEvaluationDelegate<StandardEvaluationContext> BuildDoubleTagDirectiveEvaluationDelegate(
             Directive directive,
-            CompiledEvaluationDelegate<EvaluationContextImpl> innerDelegate,
+            CompiledEvaluationDelegate<StandardEvaluationContext> innerDelegate,
             object[] openComponents, 
             object[] closeComponents)
         {
@@ -86,9 +86,9 @@ namespace XtraLiteTemplates.Compilation
                         closeComponents,
                         innerDelegate);
                 }
-                catch (OperationCanceledException cancelException)
+                catch (OperationCanceledException)
                 {
-                    throw cancelException;
+                    throw;
                 }
                 catch (Exception exception)
                 {
@@ -104,9 +104,9 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        protected override CompiledEvaluationDelegate<EvaluationContextImpl> BuildMultipleTagDirectiveEvaluationDelegate(
+        protected override CompiledEvaluationDelegate<StandardEvaluationContext> BuildMultipleTagDirectiveEvaluationDelegate(
             Directive directive,
-            CompiledEvaluationDelegate<EvaluationContextImpl>[] innerDelegates,
+            CompiledEvaluationDelegate<StandardEvaluationContext>[] innerDelegates,
             object[][] components)
         {
             Debug.Assert(directive != null, "Argument directive cannot be null.");
@@ -125,9 +125,9 @@ namespace XtraLiteTemplates.Compilation
                         components,
                         innerDelegates);
                 }
-                catch (OperationCanceledException cancelException)
+                catch (OperationCanceledException)
                 {
-                    throw cancelException;
+                    throw;
                 }
                 catch (Exception exception)
                 {
@@ -143,7 +143,7 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        protected override CompiledEvaluationDelegate<EvaluationContextImpl> BuildUnparsedTextEvaluationDelegate(string unparsedText)
+        protected override CompiledEvaluationDelegate<StandardEvaluationContext> BuildUnparsedTextEvaluationDelegate(string unparsedText)
         {
             Debug.Assert(!string.IsNullOrEmpty(unparsedText), "Argument unparsedText cannot be empty.");
 
@@ -167,7 +167,7 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        protected override CompiledEvaluationDelegate<EvaluationContextImpl> BuildSingleTagDirectiveEvaluationDelegate(
+        protected override CompiledEvaluationDelegate<StandardEvaluationContext> BuildSingleTagDirectiveEvaluationDelegate(
             Directive directive,
             object[] components)
         {
@@ -195,7 +195,7 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        private static object[] EvaluateTag(EvaluationContextImpl context, object[] components)
+        private static object[] EvaluateTag(StandardEvaluationContext context, object[] components)
         {
             object[] result = new object[components.Length];
             for (var i = 0; i < components.Length; i++)
@@ -221,7 +221,7 @@ namespace XtraLiteTemplates.Compilation
 
         private static void EvaluateSingleTagDirective(
             TextWriter writer,
-            EvaluationContextImpl context,
+            StandardEvaluationContext context,
             Directive directive,
             object[] components)
         {
@@ -251,11 +251,11 @@ namespace XtraLiteTemplates.Compilation
 
         private static void EvaluateDoubleTagDirective(
             TextWriter writer,
-            EvaluationContextImpl context,
+            StandardEvaluationContext context,
             Directive directive,
             object[] beginComponents,
             object[] closeComponents,
-            CompiledEvaluationDelegate<EvaluationContextImpl> beginToCloseEvaluateProc)
+            CompiledEvaluationDelegate<StandardEvaluationContext> beginToCloseEvaluateProc)
         {
             /* Get tag components. */
             object[] beginTagEvaluatedComponents = EvaluateTag(context, beginComponents);
@@ -316,10 +316,10 @@ namespace XtraLiteTemplates.Compilation
 
         private static void EvaluateTagDirective(
             TextWriter writer,
-            EvaluationContextImpl context,
+            StandardEvaluationContext context,
             Directive directive,
             object[][] components,
-            CompiledEvaluationDelegate<EvaluationContextImpl>[] evaluationProcs)
+            CompiledEvaluationDelegate<StandardEvaluationContext>[] evaluationProcs)
         {
             /* Get tag components. */
             object[][] evaluatedComponents = new object[components.Length][];

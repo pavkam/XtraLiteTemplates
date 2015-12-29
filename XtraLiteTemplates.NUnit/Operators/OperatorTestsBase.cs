@@ -34,14 +34,14 @@ namespace XtraLiteTemplates.NUnit.Operators
     using System.Collections.Generic;
     using System.Globalization;
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.NUnit.Inside;
 
     [TestFixture]
     public class OperatorTestsBase : TestBase
     {
-        protected readonly TestEvaluationContext EmptyEvaluationContext = new TestEvaluationContext(StringComparer.OrdinalIgnoreCase);
-
+        protected readonly IExpressionEvaluationContext EmptyEvaluationContext = CreateContext(StringComparer.OrdinalIgnoreCase);
 
         protected void AssertEvaluation<T, R>(UnaryOperator @operator, T arg, R expected)
         {

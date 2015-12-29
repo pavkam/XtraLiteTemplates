@@ -43,16 +43,22 @@ namespace XtraLiteTemplates.NUnit
     using System.Diagnostics;
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Introspection;
+    using XtraLiteTemplates.Compilation;
+    using System.Threading;
 
     public class TestBase
     {
         protected static IObjectFormatter ObjectFormatter = new TestObjectFormatter(CultureInfo.InvariantCulture);
         protected static IPrimitiveTypeConverter TypeConverter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
-
-        protected String Evaluate(IEvaluable evaluable, StringComparer comparer, params KeyValuePair<String, Object>[] values)
+        protected static StandardEvaluationContext CreateContext(IEqualityComparer<string> comparer)
         {
-            var context = new TestEvaluationContext(comparer);
+            return new StandardEvaluationContext(true, CancellationToken.None, comparer, ObjectFormatter, null, (context, text) => text);
+        }
+
+        protected String Evaluate(CompiledTemplate<StandardEvaluationContext> compiledTemplate, StringComparer comparer, params KeyValuePair<String, Object>[] values)
+        {
+            var context = CreateContext(comparer);
             context.OpenEvaluationFrame();
             foreach (var kvp in values)
                 context.SetProperty(kvp.Key, kvp.Value);
@@ -60,7 +66,7 @@ namespace XtraLiteTemplates.NUnit
             String result = null;
             using (var sw = new StringWriter())
             {
-                evaluable.Evaluate(sw, context);
+                compiledTemplate.Evaluate(sw, context);
                 result = sw.ToString();
             }
 
@@ -75,7 +81,7 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive)
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
-                .Construct();
+                .Compile();
 
             return Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, values);
         }

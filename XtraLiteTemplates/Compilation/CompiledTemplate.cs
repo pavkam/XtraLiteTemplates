@@ -68,5 +68,17 @@ namespace XtraLiteTemplates.Compilation
 
             this.evaluationDelegate(writer, context);
         }
+
+        // TODO: TEST
+        /// <summary>
+        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// </summary>
+        /// <returns>
+        /// A <see cref="System.String" /> that represents the initial form of the template.
+        /// </returns>
+        public override string ToString()
+        {
+            return this.document.ToString();
+        }
     }
 }

@@ -39,7 +39,7 @@ namespace XtraLiteTemplates.Expressions
         /// Sets the value of context property (variable).
         /// </summary>
         /// <param name="property">The property name.</param>
-        /// <param name="value">The variable value.</param>
+        /// <param name="value">The property value.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
         void SetProperty(string property, object value);
@@ -49,7 +49,7 @@ namespace XtraLiteTemplates.Expressions
         /// </summary>
         /// <param name="property">The property name.</param>
         /// <returns>
-        /// The variable value.
+        /// The property value.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
@@ -59,9 +59,9 @@ namespace XtraLiteTemplates.Expressions
         /// Gets the value of an object's property.
         /// </summary>
         /// <param name="object">The object to get the property for.</param>
-        /// <param name="property">The variable name.</param>
+        /// <param name="property">The property name.</param>
         /// <returns>
-        /// The variable value.
+        /// The property value.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>

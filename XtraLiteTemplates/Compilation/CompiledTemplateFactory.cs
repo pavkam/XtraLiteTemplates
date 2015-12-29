@@ -135,7 +135,7 @@ namespace XtraLiteTemplates.Compilation
                     {
                         delegates[0](writer, context);
                         delegates[1](writer, context);
-                        delegates[3](writer, context);
+                        delegates[2](writer, context);
                     };
                     break;
                 default:
@@ -168,7 +168,7 @@ namespace XtraLiteTemplates.Compilation
         /// </summary>
         /// <remarks>
         /// This method is called prior to returning the fully built <see cref="CompiledEvaluationDelegate{TContext}"/> delegate to the caller. Implementers
-        /// can iverride this method to provide custom functionality.
+        /// can override this method to provide custom functionality.
         /// </remarks>
         /// <param name="finalDelegate">The final root delegate.</param>
         /// <returns>A new finalized delegate.</returns>

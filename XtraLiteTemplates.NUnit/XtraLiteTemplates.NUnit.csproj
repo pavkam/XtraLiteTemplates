@@ -82,7 +82,6 @@
     <Compile Include="FlexiblePrimitiveTypeConverterTests.cs" />
     <Compile Include="XLTemplateTests.cs" />
     <Compile Include="Inside\RippedOpenDirective.cs" />
-    <Compile Include="Inside\TestEvaluationContext.cs" />
     <Compile Include="EvaluationTests.cs" />
     <Compile Include="InterpreterTests.cs" />
     <Compile Include="Directives\DirectiveTests.cs" />

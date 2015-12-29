@@ -154,6 +154,16 @@ namespace XtraLiteTemplates.Evaluation
             return new CompiledTemplate<TContext>(document, factory.CompileTemplate(document));
         }
 
+        // TODO: TEST
+        /// <summary>
+        /// Compiles the template prepated for the standard <see cref="StandardEvaluationContext"/>-based evaluator.
+        /// </summary>
+        /// <returns>A compiled template.</returns>
+        public CompiledTemplate<StandardEvaluationContext> Compile()
+        {
+            return Compile(new CompiledTemplateFactoryImpl());
+        }
+
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void Interpret(CompositeNode compositeNode)
         {

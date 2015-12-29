@@ -123,7 +123,7 @@ namespace XtraLiteTemplates.NUnit
                 { "s", "Hello World" },
             };
 
-            var result = new TestEvaluationContext(e.Comparer);
+            var result = CreateContext(e.Comparer);
 
             result.OpenEvaluationFrame();
             foreach(var kvp in variables)

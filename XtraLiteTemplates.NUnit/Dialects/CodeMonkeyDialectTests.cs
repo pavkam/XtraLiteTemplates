@@ -244,7 +244,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
         public void TestCaseUnparsedTextDecoration()
         {
             var dialect = new CodeMonkeyDialect();
-            var context = new TestEvaluationContext(StringComparer.OrdinalIgnoreCase);
+            var context = CreateContext(StringComparer.OrdinalIgnoreCase);
             context.OpenEvaluationFrame();
 
             ExpectArgumentNullException("context", () => dialect.DecorateUnparsedText(null, String.Empty));

@@ -100,7 +100,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive);
 
-            ExpectUnmatchedDirectiveTagException(new Directive[] { directive }, 0, () => interpreter.Construct());
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive }, 0, () => interpreter.Compile());
         }
 
         [Test]
@@ -115,7 +115,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive);
 
-            ExpectUnmatchedDirectiveTagException(new Directive[] { directive }, 0, () => interpreter.Construct());
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive }, 0, () => interpreter.Compile());
         }
 
         [Test]
@@ -132,7 +132,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
-            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Compile());
         }
 
         [Test]
@@ -149,7 +149,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
-            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Compile());
         }
 
         [Test]
@@ -166,7 +166,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
-            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1 }, 0, () => interpreter.Construct());
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1 }, 0, () => interpreter.Compile());
         }
 
         [Test]
@@ -183,7 +183,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
-            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Construct());
+            ExpectUnmatchedDirectiveTagException(new Directive[] { directive1, directive2 }, 0, () => interpreter.Compile());
         }
 
         [Test]
@@ -197,7 +197,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive);
 
-            ExpectUnexpectedTagException("B", 0, () => interpreter.Construct());
+            ExpectUnexpectedTagException("B", 0, () => interpreter.Compile());
         }
 
         [Test]
@@ -212,7 +212,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive);
 
-            ExpectUnexpectedTagException("C", 3, () => interpreter.Construct());
+            ExpectUnexpectedTagException("C", 3, () => interpreter.Compile());
         }
 
         [Test]
@@ -229,7 +229,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
-            ExpectUnexpectedTagException("D", 5, () => interpreter.Construct());
+            ExpectUnexpectedTagException("D", 5, () => interpreter.Compile());
         }
 
         [Test]
@@ -246,7 +246,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1).RegisterDirective(directive2);
 
-            var evaluable = interpreter.Construct();
+            var evaluable = interpreter.Compile();
             var repr = evaluable.ToString();
 
             Assert.AreEqual("(({A}1({C}2({A}3{B})4{D})5{B}))", repr);
@@ -265,8 +265,8 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive2).RegisterDirective(directive1);
 
-            var repr1 = interpreter1.Construct().ToString();
-            var repr2 = interpreter2.Construct().ToString();
+            var repr1 = interpreter1.Compile().ToString();
+            var repr2 = interpreter2.Compile().ToString();
 
             Assert.AreEqual("(({MATCH ME identifier}))", repr1);
             Assert.AreEqual("(({MATCH ME identifier}))", repr2);
@@ -288,7 +288,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1)
                 .RegisterDirective(directive2)
-                .Construct()
+                .Compile()
                 .ToString();
 
             Assert.AreEqual("(({START}{MID}{OTHER END}))", repr);
@@ -309,7 +309,7 @@ namespace XtraLiteTemplates.NUnit
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(directive1)
                 .RegisterDirective(directive2)
-                .Construct()
+                .Compile()
                 .ToString();
 
             Assert.AreEqual("(({IF A}1({IF B}2{ELSE}3{END})4({IF A}5{END})6{END}))", repr);
