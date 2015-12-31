@@ -42,7 +42,7 @@ namespace XtraLiteTemplates.Evaluation
     /// <summary>
     /// Provides a standard implementation of an evaluation context.
     /// </summary>
-    public class StandardEvaluationContext : IExpressionEvaluationContext
+    public class EvaluationContext : IExpressionEvaluationContext
     {
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private Stack<Frame> frames;
@@ -63,7 +63,7 @@ namespace XtraLiteTemplates.Evaluation
 
         // TODO: TEST
         /// <summary>
-        /// Initializes a new instance of the <see cref="StandardEvaluationContext"/> class.
+        /// Initializes a new instance of the <see cref="EvaluationContext"/> class.
         /// </summary>
         /// <param name="ignoreEvaluationExceptions">If set to <c>true</c>, ignores evaluation exceptions.</param>
         /// <param name="cancellationToken">The cancellation token.</param>
@@ -71,7 +71,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="objectFormatter">The object formatter.</param>
         /// <param name="selfObject">The <c>self</c> object that exposes all global identifiers.</param>
         /// <param name="unparsedTextHandler">The unparsed text handler delegate.</param>
-        public StandardEvaluationContext(
+        public EvaluationContext(
             bool ignoreEvaluationExceptions,
             CancellationToken cancellationToken,
             IEqualityComparer<string> identifierComparer,
@@ -92,6 +92,8 @@ namespace XtraLiteTemplates.Evaluation
 
             this.disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
             this.frames = new Stack<Frame>();
+
+            this.OpenEvaluationFrame();
         }
 
         // TODO: TEST
@@ -315,20 +317,14 @@ namespace XtraLiteTemplates.Evaluation
             return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
         }
 
-        // TODO: TEST
-        /// <summary>
-        /// Opens a new evaluation frame.
-        /// </summary>
-        public void OpenEvaluationFrame()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        internal void OpenEvaluationFrame()
         {
             this.frames.Push(new Frame());
         }
 
-        // TODO: FIX THIS EXCEPTION
-        /// <summary>
-        /// Closes the current evaluation frame.
-        /// </summary>
-        public void CloseEvaluationFrame()
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        internal void CloseEvaluationFrame()
         {
             Debug.Assert(this.frames.Count > 0, "No open frames remaining.");
             this.frames.Pop();
@@ -350,7 +346,7 @@ namespace XtraLiteTemplates.Evaluation
             return disemboweler;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private sealed class Frame
         {
             public Dictionary<string, object> Variables { get; set; }

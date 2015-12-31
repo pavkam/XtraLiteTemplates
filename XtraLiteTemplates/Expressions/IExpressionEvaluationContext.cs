@@ -29,12 +29,21 @@
 namespace XtraLiteTemplates.Expressions
 {
     using System;
+    using System.Threading;
 
     /// <summary>
     /// Defines a standard set of behaviors that have to be implemented by an expression evaluation context.
     /// </summary>
     public interface IExpressionEvaluationContext
     {
+        /// <summary>
+        /// Gets the cancellation token associated with this context.
+        /// </summary>
+        /// <value>
+        /// The cancellation token is used to signal the expression evaluation engine to stop execution.
+        /// </value>
+        CancellationToken CancellationToken { get; }
+
         /// <summary>
         /// Sets the value of context property (variable).
         /// </summary>

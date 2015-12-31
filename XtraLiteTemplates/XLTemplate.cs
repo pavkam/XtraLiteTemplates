@@ -50,7 +50,7 @@ namespace XtraLiteTemplates
     public sealed class XLTemplate
     {
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledTemplate<StandardEvaluationContext> compiledTemplate;
+        private CompiledTemplate<EvaluationContext> compiledTemplate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XLTemplate"/> class.
@@ -139,31 +139,16 @@ namespace XtraLiteTemplates
         /// </summary>
         /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
         /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
-        /// <param name="millisecondsTimeout">The number of milliseconds to wait, or <see cref="Timeout.Infinite"/> (<c>-1</c>) to wait indefinitely.</param>
         /// <returns><c>true</c> if the evaluation ended within the allocated time; <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public bool Evaluate(TextWriter writer, IReadOnlyDictionary<string, object> variables, int millisecondsTimeout = Timeout.Infinite)
+        public void Evaluate(TextWriter writer, IReadOnlyDictionary<string, object> variables)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("variables", variables);
 
-            if (millisecondsTimeout == Timeout.Infinite)
-            {
-                /* No thread scheduling. */
-                this.EvaluateInternal(writer, variables, CancellationToken.None);
-                return true;
-            }
-            else
-            {
-                /* Wait for task to execute within a given timeout range. */
-                var cancellationTokenSource = new CancellationTokenSource(millisecondsTimeout);
-
-                var task = this.EvaluateAsync(writer, variables, cancellationTokenSource.Token);
-                Task.WaitAll(new Task[] { task });
-
-                return task.Status == TaskStatus.RanToCompletion;
-            }
+            /* No thread scheduling. */
+            this.EvaluateInternal(writer, variables, CancellationToken.None);
         }
 
         /// <summary>
@@ -180,7 +165,6 @@ namespace XtraLiteTemplates
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("variables", variables);
-            Expect.NotNull("cancellationToken", cancellationToken);
 
             await Task.Run(
                 () =>
@@ -244,7 +228,7 @@ namespace XtraLiteTemplates
             Debug.Assert(variables != null, "Argument variables cannot be null.");
 
             /* Create a standard evaluation context that will be used for evaluation of said template. */
-            var context = new StandardEvaluationContext(
+            var context = new EvaluationContext(
                 true,
                 cancellationToken,
                 this.Dialect.IdentifierComparer,
@@ -253,7 +237,6 @@ namespace XtraLiteTemplates
                 this.Dialect.DecorateUnparsedText);
 
             /* Load in the variables. */
-            context.OpenEvaluationFrame();
             foreach (var variable in variables)
             {
                 context.SetProperty(variable.Key, variable.Value);
@@ -261,11 +244,10 @@ namespace XtraLiteTemplates
 
             /* Evaluate. */
             this.compiledTemplate.Evaluate(writer, context);
-            context.CloseEvaluationFrame();
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledTemplate<StandardEvaluationContext> Compile()
+        private CompiledTemplate<EvaluationContext> Compile()
         {
             using (var reader = new StringReader(this.Template))
             {

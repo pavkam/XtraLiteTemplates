@@ -31,11 +31,17 @@ namespace XtraLiteTemplates.Expressions
     using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class ReduceExpressionEvaluationContext : IExpressionEvaluationContext
     {
         public static readonly IExpressionEvaluationContext Instance = new ReduceExpressionEvaluationContext();
+
+        public CancellationToken CancellationToken
+        {
+            get { return CancellationToken.None; }
+        }
 
         public void AddStateObject(object state)
         {

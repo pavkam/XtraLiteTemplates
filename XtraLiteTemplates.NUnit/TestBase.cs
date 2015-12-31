@@ -51,15 +51,14 @@ namespace XtraLiteTemplates.NUnit
         protected static IObjectFormatter ObjectFormatter = new TestObjectFormatter(CultureInfo.InvariantCulture);
         protected static IPrimitiveTypeConverter TypeConverter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
-        protected static StandardEvaluationContext CreateContext(IEqualityComparer<string> comparer)
+        protected static EvaluationContext CreateContext(IEqualityComparer<string> comparer)
         {
-            return new StandardEvaluationContext(true, CancellationToken.None, comparer, ObjectFormatter, null, (context, text) => text);
+            return new EvaluationContext(true, CancellationToken.None, comparer, ObjectFormatter, null, (context, text) => text);
         }
 
-        protected String Evaluate(CompiledTemplate<StandardEvaluationContext> compiledTemplate, StringComparer comparer, params KeyValuePair<String, Object>[] values)
+        protected String Evaluate(CompiledTemplate<EvaluationContext> compiledTemplate, StringComparer comparer, params KeyValuePair<String, Object>[] values)
         {
             var context = CreateContext(comparer);
-            context.OpenEvaluationFrame();
             foreach (var kvp in values)
                 context.SetProperty(kvp.Key, kvp.Value);
 

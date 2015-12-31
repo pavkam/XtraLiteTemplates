@@ -41,22 +41,12 @@ namespace XtraLiteTemplates.Compilation
     using XtraLiteTemplates.Expressions;
 
     /// <summary>
-    /// Class that encapsulates <c>compilation</c> logic. The sole purpose of <see cref="CompiledTemplateFactory{TContext}"/> is to
+    /// Class that encapsulates <c>compilation</c> logic defined for the standard <see cref="EvaluationContext"/>. The sole purpose of <see cref="CompiledTemplateFactory{TContext}"/> is to
     /// transform the internal <c>lexed</c> representation of a template to its compiled form (form that can be evaluated).
     /// </summary>
-    /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
-    public abstract class CompiledTemplateFactory<TContext> 
-        where TContext : IExpressionEvaluationContext
+    public class CompiledTemplateFactory : CompiledTemplateFactory<EvaluationContext>
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        internal CompiledEvaluationDelegate<TContext> CompileTemplate(TemplateDocument document)
-        {
-            Debug.Assert(document != null, "Argument document cannot be null.");
-
-            /* Construct the combined node for all the children. */
-            return this.CompileTemplateNodes(document.Children);
-        }
-
+        // TODO: TEST
         /// <summary>
         /// Constructs a delegate used in evaluation of a given double-tag <paramref name="directive"/>.
         /// </summary>
@@ -71,12 +61,50 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="openComponents">The components associated with the opening tag.</param>
         /// <param name="closeComponents">The components associated with the closing tag.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
-        protected abstract CompiledEvaluationDelegate<TContext> BuildDoubleTagDirectiveEvaluationDelegate(
+        protected override CompiledEvaluationDelegate<EvaluationContext> BuildDoubleTagDirectiveEvaluationDelegate(
             Directive directive,
-            CompiledEvaluationDelegate<TContext> innerDelegate,
-            object[] openComponents,
-            object[] closeComponents);
+            CompiledEvaluationDelegate<EvaluationContext> innerDelegate,
+            object[] openComponents, 
+            object[] closeComponents)
+        {
+            Debug.Assert(directive != null, "Argument directive cannot be null.");
+            Debug.Assert(openComponents != null, "Argument openComponents cannot be null.");
+            Debug.Assert(openComponents.Length > 0, "Argument openComponents cannot be empty.");
+            Debug.Assert(closeComponents != null, "Argument closeComponents cannot be null.");
+            Debug.Assert(closeComponents.Length > 0, "Argument closeComponents cannot be empty.");
 
+            return (writer, context) =>
+            {
+                context.OpenEvaluationFrame();
+                try
+                {
+                    EvaluateDoubleTagDirective(
+                        writer,
+                        context,
+                        directive,
+                        openComponents,
+                        closeComponents,
+                        innerDelegate);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    if (!context.IgnoreEvaluationExceptions)
+                    {
+                        ExceptionHelper.DirectiveEvaluationError(exception, directive);
+                    }
+                }
+                finally
+                {
+                    context.CloseEvaluationFrame();
+                }
+            };
+        }
+
+        // TODO: TEST
         /// <summary>
         /// Constructs a delegate used in evaluation of a given multi-tag <paramref name="directive"/>.
         /// </summary>
@@ -91,188 +119,293 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="innerDelegates">A list of evaluable delegates that represent all inner nodes.</param>
         /// <param name="components">A list of tag components.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
-        protected abstract CompiledEvaluationDelegate<TContext> BuildMultipleTagDirectiveEvaluationDelegate(
+        protected override CompiledEvaluationDelegate<EvaluationContext> BuildMultipleTagDirectiveEvaluationDelegate(
             Directive directive,
-            CompiledEvaluationDelegate<TContext>[] innerDelegates,
-            object[][] components);
+            CompiledEvaluationDelegate<EvaluationContext>[] innerDelegates,
+            object[][] components)
+        {
+            Debug.Assert(directive != null, "Argument directive cannot be null.");
+            Debug.Assert(components != null, "Argument components cannot be null.");
+            Debug.Assert(components.Length == directive.Tags.Count, "Argument components must have the same length as the directive tags.");
 
+            return (writer, context) =>
+            {
+                context.OpenEvaluationFrame();
+                try
+                {
+                    EvaluateTagDirective(
+                        writer,
+                        context,
+                        directive,
+                        components,
+                        innerDelegates);
+                }
+                catch (OperationCanceledException)
+                {
+                    throw;
+                }
+                catch (Exception exception)
+                {
+                    if (!context.IgnoreEvaluationExceptions)
+                    {
+                        ExceptionHelper.DirectiveEvaluationError(exception, directive);
+                    }
+                }
+                finally
+                {
+                    context.CloseEvaluationFrame();
+                }
+            };
+        }
+
+        // TODO: TEST
         /// <summary>
         /// Constructs an unparsed text evaluation delegate.
         /// </summary>
         /// <param name="unparsedText">The unparsed text.</param>
         /// <returns>A new delegate that handles the given text.</returns>
-        protected abstract CompiledEvaluationDelegate<TContext> BuildUnparsedTextEvaluationDelegate(string unparsedText);
-
-        /// <summary>
-        /// Combines a sequence of <see cref="CompiledEvaluationDelegate{TContext}"/> delegates into a single evaluation delegate.
-        /// </summary>
-        /// <remarks>
-        /// The implementer is required to generate a new <see cref="CompiledEvaluationDelegate{TContext}"/> that sequentially calls the delegates
-        /// in the provided list.
-        /// </remarks>
-        /// <param name="delegates">The delegates to be merged.</param>
-        /// <returns>A new merged delegate.</returns>
-        protected virtual CompiledEvaluationDelegate<TContext> BuildMergedEvaluationDelegate(CompiledEvaluationDelegate<TContext>[] delegates)
+        protected override CompiledEvaluationDelegate<EvaluationContext> BuildUnparsedTextEvaluationDelegate(string unparsedText)
         {
-            Debug.Assert(delegates != null, "Argument delegates cannot be null.");
-            Debug.Assert(delegates.Length > 0, "Argument delegates cannot be empty.");
+            Debug.Assert(!string.IsNullOrEmpty(unparsedText), "Argument unparsedText cannot be empty.");
 
-            CompiledEvaluationDelegate<TContext> resultingDelegate;
-            switch (delegates.Length)
+            return (writer, context) =>
             {
-                case 1:
-                    resultingDelegate = delegates[0];
-                    break;
-                case 2:
-                    resultingDelegate = (writer, context) =>
-                    {
-                        delegates[0](writer, context);
-                        delegates[1](writer, context);
-                    };
-                    break;
-                case 3:
-                    resultingDelegate = (writer, context) =>
-                    {
-                        delegates[0](writer, context);
-                        delegates[1](writer, context);
-                        delegates[2](writer, context);
-                    };
-                    break;
-                default:
-                    var arrayOfEvalutionProcs = delegates.ToArray();
-                    resultingDelegate = (writer, context) =>
-                    {
-                        foreach (var proc in arrayOfEvalutionProcs)
-                        {
-                            proc(writer, context);
-                        }
-                    };
-                    break;
-            }
+                Debug.Assert(writer != null, "Argument writer cannot be null.");
+                Debug.Assert(context != null, "Argument context cannot be null.");
 
-            return resultingDelegate;
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                var text = context.ProcessUnparsedText(unparsedText);
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                if (!string.IsNullOrEmpty(text))
+                {
+                    writer.Write(text);
+                }
+            };
         }
 
+        // TODO: TEST
         /// <summary>
         /// Constructs a delegate used in evaluation of a given single-tag <paramref name="directive"/>.
         /// </summary>
         /// <param name="directive">The directive.</param>
         /// <param name="components">The components associated with directive's tag.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
-        protected abstract CompiledEvaluationDelegate<TContext> BuildSingleTagDirectiveEvaluationDelegate(
+        protected override CompiledEvaluationDelegate<EvaluationContext> BuildSingleTagDirectiveEvaluationDelegate(
             Directive directive,
-            object[] components);
-
-        /// <summary>
-        /// Finalizes the root <see cref="CompiledEvaluationDelegate{TContext}"/> delegate.
-        /// </summary>
-        /// <remarks>
-        /// This method is called prior to returning the fully built <see cref="CompiledEvaluationDelegate{TContext}"/> delegate to the caller. Implementers
-        /// can override this method to provide custom functionality.
-        /// </remarks>
-        /// <param name="finalDelegate">The final root delegate.</param>
-        /// <returns>A new finalized delegate.</returns>
-        protected virtual CompiledEvaluationDelegate<TContext> FinalizeEvaluationDelegate(CompiledEvaluationDelegate<TContext> finalDelegate)
+            object[] components)
         {
-            Debug.Assert(finalDelegate != null, "Argument finalDelegate cannot be null.");
+            Debug.Assert(directive != null, "Argument directive cannot be null.");
+            Debug.Assert(components != null, "Argument components cannot be null.");
+            Debug.Assert(components.Length > 0, "Argument components cannot be empty.");
 
-            /* Do nothing. */
-            return finalDelegate;
-        }
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledEvaluationDelegate<TContext> CompileUnparsedNode(UnparsedNode unparsedNode)
-        {
-            Debug.Assert(unparsedNode != null, "Argument unparsedNode cannot be null.");
-
-            return this.BuildUnparsedTextEvaluationDelegate(unparsedNode.UnparsedText);
-        }
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledEvaluationDelegate<TContext> CompileDirectiveNode(DirectiveNode directiveNode)
-        {
-            Debug.Assert(directiveNode != null, "Argument directiveNode cannot be null.");
-            Debug.Assert(directiveNode.CandidateDirectiveLockedIn, "Argument directiveNode must have a locked in candidate.");
-
-            var directive = directiveNode.CandidateDirectives[0];
-
-            /* Build inter-tag evaluables. */
-            var innerDelegates = new List<CompiledEvaluationDelegate<TContext>>();
-            var innerTagNodes = new List<TemplateNode>();
-            for (var index = 0; index < directiveNode.Children.Count; index++)
+            return (writer, context) =>
             {
-                if (directiveNode.Children[index] is TagNode)
+                try
                 {
-                    if (innerTagNodes.Count > 0)
+                    EvaluateSingleTagDirective(writer, context, directive, components);
+                }
+                catch (OperationCanceledException cancelException)
+                {
+                    throw cancelException;
+                }
+                catch (Exception exception)
+                {
+                    if (!context.IgnoreEvaluationExceptions)
                     {
-                        innerDelegates.Add(this.CompileTemplateNodes(innerTagNodes));
-                        innerTagNodes.Clear();
+                        ExceptionHelper.DirectiveEvaluationError(exception, directive);
                     }
-                    else if (index > 0)
-                    {
-                        innerDelegates.Add(null);
-                    }
+                }
+            };
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
+        private static object[] EvaluateTag(EvaluationContext context, object[] components)
+        {
+            object[] result = new object[components.Length];
+            for (var i = 0; i < components.Length; i++)
+            {
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                var expression = components[i] as Expression;
+                if (expression != null)
+                {
+                    /* Evaluate the expression. */
+                    result[i] = expression.Evaluate(context);
                 }
                 else
                 {
-                    innerTagNodes.Add(directiveNode.Children[index]);
+                    /* No evaluation required. */
+                    result[i] = components[i];
                 }
             }
 
-            Debug.Assert(innerTagNodes.Count == 0, "No post-tag node can exist in directive node.");
+            return result;
+        }
 
-            if (directive.Tags.Count == 1)
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
+        private static void EvaluateSingleTagDirective(
+            TextWriter writer,
+            EvaluationContext context,
+            Directive directive,
+            object[] components)
+        {
+            /* Pre-evaluate the tag's components, as these  */
+            var tagEvaluatedComponents = EvaluateTag(context, components);
+
+            /* Evaluate tag. */
+            object state = null;
+            var flowDecision = Directive.FlowDecision.Evaluate;
+            while (flowDecision != Directive.FlowDecision.Terminate)
             {
-                var tagNode = directiveNode.Children[0] as TagNode;
-                Debug.Assert(tagNode != null, "The single directive node expected to be a tag node.");
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
 
-                return this.BuildSingleTagDirectiveEvaluationDelegate(directive, tagNode.Components);
-            }
-            else if (directive.Tags.Count == 2)
-            {
-                var beginTagNode = directiveNode.Children[0] as TagNode;
-                var endTagNode = directiveNode.Children[directiveNode.Children.Count - 1] as TagNode;
+                string directiveText;
+                flowDecision = directive.Execute(0, tagEvaluatedComponents, ref state, context, out directiveText);
 
-                Debug.Assert(beginTagNode != null, "The first directive node expected to be a tag node.");
-                Debug.Assert(endTagNode != null, "The last directive node expected to be a tag node.");
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
 
-                return this.BuildDoubleTagDirectiveEvaluationDelegate(directive, innerDelegates[0], beginTagNode.Components, endTagNode.Components);
-            }
-            else
-            {
-                var componentArray = directiveNode.Children.Where(p => p is TagNode).Select(s => ((TagNode)s).Components).ToArray();
-
-                return this.BuildMultipleTagDirectiveEvaluationDelegate(directive, innerDelegates.ToArray(), componentArray);
+                if (directiveText != null)
+                {
+                    writer.Write(directiveText);
+                }
             }
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledEvaluationDelegate<TContext> CompileTemplateNodes(IReadOnlyList<TemplateNode> nodes)
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
+        private static void EvaluateDoubleTagDirective(
+            TextWriter writer,
+            EvaluationContext context,
+            Directive directive,
+            object[] beginComponents,
+            object[] closeComponents,
+            CompiledEvaluationDelegate<EvaluationContext> beginToCloseEvaluateProc)
         {
-            Debug.Assert(nodes != null, "Argument nodes cannot be null.");
-            Debug.Assert(nodes.Count > 0, "Argument nodes cannot be empty.");
+            /* Get tag components. */
+            object[] beginTagEvaluatedComponents = EvaluateTag(context, beginComponents);
+            object[] closeTagEvaluatedComponents = null;
 
-            var delegates = new List<CompiledEvaluationDelegate<TContext>>();
-            foreach (var node in nodes)
+            /* Evaluate tag. */
+            object state = null;
+            while (true)
             {
-                var directiveNode = node as DirectiveNode;
-                if (directiveNode != null)
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                string directiveText;
+                var flowDecision = directive.Execute(0, beginTagEvaluatedComponents, ref state, context, out directiveText);
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                if (directiveText != null)
                 {
-                    delegates.Add(this.CompileDirectiveNode(directiveNode));
+                    writer.Write(directiveText);
+                }
+
+                if (flowDecision == Directive.FlowDecision.Terminate)
+                {
+                    break;
+                }
+                else if (flowDecision == Directive.FlowDecision.Restart)
+                {
+                    continue;
+                }
+                else if (flowDecision == Directive.FlowDecision.Evaluate && beginToCloseEvaluateProc != null)
+                {
+                    beginToCloseEvaluateProc(writer, context);
+                }
+
+                if (closeTagEvaluatedComponents == null)
+                {
+                    closeTagEvaluatedComponents = EvaluateTag(context, closeComponents);
+                }
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                flowDecision = directive.Execute(1, closeTagEvaluatedComponents, ref state, context, out directiveText);
+
+                if (directiveText != null)
+                {
+                    writer.Write(directiveText);
+                }
+
+                if (flowDecision == Directive.FlowDecision.Terminate)
+                {
+                    break;
+                }
+            }
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
+        private static void EvaluateTagDirective(
+            TextWriter writer,
+            EvaluationContext context,
+            Directive directive,
+            object[][] components,
+            CompiledEvaluationDelegate<EvaluationContext>[] evaluationProcs)
+        {
+            /* Get tag components. */
+            object[][] evaluatedComponents = new object[components.Length][];
+
+            /* Evaluate tag. */
+            object state = null;
+            var currentTagIndex = 0;
+            while (currentTagIndex >= 0)
+            {
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                if (evaluatedComponents[currentTagIndex] == null)
+                {
+                    evaluatedComponents[currentTagIndex] = EvaluateTag(context, components[currentTagIndex]);
+                }
+
+                string directiveText;
+                var flowDecision = directive.Execute(currentTagIndex, evaluatedComponents[currentTagIndex], ref state, context, out directiveText);
+
+                /* Check for cancellation. */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                if (directiveText != null)
+                {
+                    writer.Write(directiveText);
+                }
+
+                if (flowDecision == Directive.FlowDecision.Terminate)
+                {
+                    currentTagIndex = -1;
+                }
+                else if (flowDecision == Directive.FlowDecision.Restart)
+                {
+                    currentTagIndex = 0;
                 }
                 else
                 {
-                    var unparsedNode = node as UnparsedNode;
+                    currentTagIndex++;
+                    if (currentTagIndex == components.Length)
+                    {
+                        currentTagIndex = 0;
+                    }
+                    else if (flowDecision == Directive.FlowDecision.Evaluate)
+                    {
+                        var evaluationProc = evaluationProcs[currentTagIndex - 1];
 
-                    Debug.Assert(unparsedNode != null, "Node can only be unparsed at this stage.");
-                    delegates.Add(this.CompileUnparsedNode(unparsedNode));
+                        if (evaluationProc != null)
+                        {
+                            evaluationProc(writer, context);
+                        }
+                    }
                 }
             }
-
-            Debug.Assert(delegates.Count > 0, "The list of compiled delegates must contain at least one item.");
-
-            /* Merge */
-            return this.BuildMergedEvaluationDelegate(delegates.ToArray());
         }
     }
 }

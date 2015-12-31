@@ -307,7 +307,6 @@ namespace XtraLiteTemplates.NUnit.Dialects
         {
             var dialect = new StandardDialect();
             var context = CreateContext(StringComparer.OrdinalIgnoreCase);
-            context.OpenEvaluationFrame();
 
             ExpectArgumentNullException("context", () => dialect.DecorateUnparsedText(null, String.Empty));
 

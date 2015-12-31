@@ -39,6 +39,7 @@ namespace XtraLiteTemplates.NUnit
     using System.Globalization;
     using XtraLiteTemplates.Dialects.Standard;
     using System.Threading;
+    using System.Threading.Tasks;
 
     [TestFixture]
     public class XLTemplateTests : TestBase
@@ -120,7 +121,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseToString1()
+        public void ToString_ForAComplexTemplate_ReturnsTheExpectedRepresentation()
         {
             var text = "{if true then}eat a cookie!{else}{variable}{end}";
             var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
@@ -129,38 +130,50 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseToString2()
+        public void ToString_ForAnEmptyTemplate_ReturnsEmptyRepresentation()
         {
-            var text = "";
-            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, string.Empty);
 
             Assert.AreEqual("()", template.ToString());
         }
 
         [Test]
-        public void TestCaseStaticEvaluate1()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Evaluate_UsingNullDialect_RaisesException()
         {
-            ExpectArgumentNullException("dialect", () => XLTemplate.Evaluate(null, ""));
-            ExpectArgumentNullException("template", () => XLTemplate.Evaluate(StandardDialect.Default, null));
-            ExpectArgumentNullException("arguments", () => XLTemplate.Evaluate(StandardDialect.Default, "", (Object[])null));
+            XLTemplate.Evaluate(null, string.Empty);
         }
 
         [Test]
-        public void TestCaseStaticEvaluate2()
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Evaluate_UsingNullTemplate_RaisesException()
+        {
+            XLTemplate.Evaluate(StandardDialect.Default, null);
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void Evaluate_UsingNullArguments_RaisesException()
+        {
+            XLTemplate.Evaluate(StandardDialect.Default, string.Empty, (Object[])null);
+        }
+
+        [Test]
+        public void Evaluate_WithoutPreformattedDirectove_RemovesExtraWhitespaces()
         {
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{_0} -> {_1}", "string", 100.33);
             Assert.AreEqual("string->100.33", result);
         }
 
         [Test]
-        public void TestCasePreformattedEvaluate()
+        public void Evaluate_UsingPreformattedDirective_ProducesUnformattedResult()
         {
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{preformatted}{_0} -> {_1}{end}", "string", 100.33);
             Assert.AreEqual("string -> 100.33", result);
         }
 
         [Test]
-        public void TestCaseEvaluationFrames()
+        public void Evaluate_ForTwoNestedLoops_ProducesTheExpectedResult()
         {
             String template = @"
             {_0} /
@@ -178,22 +191,21 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseEvaluationWithMethods1()
+        public void Evaluate_InvokingObjectGetTypeMethod_ProducesTheExpectedResult()
         {
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, @"{_0.GetType().Name}", this);
             Assert.AreEqual(this.GetType().Name, result);
         }
 
         [Test]
-        public void TestCaseEvaluationWithMethods2()
+        public void Evaluate_InvokingStringReplaceMethod_ProducesTheExpectedResult()
         {
             var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{_0.Replace('Hello', _1)}", "Hello World", "Funky");
-
             Assert.AreEqual("Funky World", result);
         }
 
         [Test]
-        public void TestCaseEvaluationWithSelf()
+        public void Evaluate_UsingSdandardSelfMethods_CompletesAsExpected()
         {
             var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Number('199') + Number(true)}");
             Assert.AreEqual("200", result);
@@ -208,28 +220,59 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("True", result);
         }
 
-        private class Waiter
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async void EvaluateAsync_ForNullTextWriter_RaisesException()
         {
-            public Int32 Wait(Int32 milliseconds)
+            await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(null, new Dictionary<string, object>());
+        }
+
+        [Test]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public async void EvaluateAsync_ForNullVariablesDictionary_RaisesException()
+        {
+            using (var sw = new StringWriter())
             {
-                Thread.Sleep(milliseconds);
-                return milliseconds;
+                await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(sw, null);
             }
         }
 
         [Test]
-        public void TestCaseEvaluationWithTimeOut1()
+        [ExpectedException(typeof(OperationCanceledException))]
+        public async void EvaluateAsync_CancelledByToken_RaisesException()
         {
-            var template = new XLTemplate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Waiter.Wait(100)}");
+            CancellationTokenSource tokenSource = new CancellationTokenSource();
+            var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"{FOR EACH X IN 0..99999999}{X}{END}");
 
-            using (var writer = new StringWriter())
+            using (var sw = new StringWriter())
             {
-                var result = template.Evaluate(writer, new Dictionary<string, object> { { "Waiter", new Waiter() } }, 200);
-                Assert.IsTrue(true);
-                Assert.AreEqual("100", writer.ToString());
+                tokenSource.CancelAfter(50);
+                await xlTemplate.EvaluateAsync(sw, new Dictionary<string, object>(), tokenSource.Token);
+            }
+        }
 
-                result = template.Evaluate(writer, new Dictionary<string, object> { { "Waiter", new Waiter() } }, 50);
-                Assert.IsFalse(result);
+        [Test]
+        public async void EvaluateAsync_WithAZeroToken_CompletesAsExpected()
+        {
+            var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text");
+
+            using (var sw = new StringWriter())
+            {
+                await xlTemplate.EvaluateAsync(sw, new Dictionary<string, object>(), CancellationToken.None);
+                Assert.AreEqual("text", sw.ToString());
+            }
+        }
+
+        [Test]
+        public async void EvaluateAsync_CompletesAsExpected()
+        {
+            var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text");
+
+            using (var sw = new StringWriter())
+            {
+                await xlTemplate.EvaluateAsync(sw, new Dictionary<string, object>());
+                Assert.AreEqual("text", sw.ToString());
             }
         }
     }

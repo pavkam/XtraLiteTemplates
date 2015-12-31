@@ -125,7 +125,6 @@ namespace XtraLiteTemplates.NUnit
 
             var result = CreateContext(e.Comparer);
 
-            result.OpenEvaluationFrame();
             foreach(var kvp in variables)
                 result.SetProperty(kvp.Key, kvp.Value);
 

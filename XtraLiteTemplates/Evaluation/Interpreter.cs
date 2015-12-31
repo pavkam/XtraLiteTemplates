@@ -156,12 +156,12 @@ namespace XtraLiteTemplates.Evaluation
 
         // TODO: TEST
         /// <summary>
-        /// Compiles the template prepated for the standard <see cref="StandardEvaluationContext"/>-based evaluator.
+        /// Compiles the template prepared for the standard <see cref="EvaluationContext"/>-based evaluator.
         /// </summary>
         /// <returns>A compiled template.</returns>
-        public CompiledTemplate<StandardEvaluationContext> Compile()
+        public CompiledTemplate<EvaluationContext> Compile()
         {
-            return Compile(new CompiledTemplateFactoryImpl());
+            return this.Compile(new CompiledTemplateFactory());
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
