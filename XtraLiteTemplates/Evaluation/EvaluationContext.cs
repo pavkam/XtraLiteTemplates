@@ -79,9 +79,9 @@ namespace XtraLiteTemplates.Evaluation
             object selfObject,
             Func<IExpressionEvaluationContext, string, string> unparsedTextHandler)
         {
-            Debug.Assert(identifierComparer != null, "identifierComparer cannot be null.");
-            Debug.Assert(objectFormatter != null, "objectFormatter cannot be null.");
-            Debug.Assert(unparsedTextHandler != null, "unparsedTextHandler cannot be null.");
+            Expect.NotNull("identifierComparer", identifierComparer);
+            Expect.NotNull("objectFormatter", objectFormatter);
+            Expect.NotNull("unparsedTextHandler", unparsedTextHandler);
 
             this.cancellationToken = cancellationToken;
             this.identifierComparer = identifierComparer;
