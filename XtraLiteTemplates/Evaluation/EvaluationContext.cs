@@ -61,7 +61,6 @@ namespace XtraLiteTemplates.Evaluation
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private Func<IExpressionEvaluationContext, string, string> unparsedTextHandler;
 
-        // TODO: TEST
         /// <summary>
         /// Initializes a new instance of the <see cref="EvaluationContext"/> class.
         /// </summary>
@@ -96,7 +95,6 @@ namespace XtraLiteTemplates.Evaluation
             this.OpenEvaluationFrame();
         }
 
-        // TODO: TEST
         /// <summary>
         /// Gets a value indicating whether evaluation exceptions are ignored.
         /// </summary>
@@ -111,7 +109,6 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        // TODO: TEST
         /// <summary>
         /// Gets the cancellation token.
         /// </summary>
@@ -136,7 +133,6 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        // TODO: TEST
         /// <summary>
         /// Processes the unparsed text blocks.
         /// </summary>
@@ -147,7 +143,6 @@ namespace XtraLiteTemplates.Evaluation
             return this.unparsedTextHandler(this, value);
         }
 
-        // TODO: TEST
         /// <summary>
         /// Sets the value of context property (variable).
         /// </summary>
@@ -157,6 +152,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
         public void SetProperty(string property, object value)
         {
+            Expect.Identifier("property", property);
+
             var topFrame = this.TopFrame;
             if (topFrame.Variables == null)
             {
@@ -166,7 +163,6 @@ namespace XtraLiteTemplates.Evaluation
             topFrame.Variables[property] = value;
         }
 
-        // TODO: TEST
         /// <summary>
         /// Gets the value of context property (variable).
         /// </summary>
@@ -178,21 +174,15 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
         public object GetProperty(string property)
         {
-            /* Obtain the propety from the list given to us. */
-            foreach (var frame in this.frames)
-            {
-                object result;
-                if (frame.Variables != null && frame.Variables.TryGetValue(property, out result))
-                {
-                    return result;
-                }
-            }
+            Expect.Identifier("property", property);
 
-            /* Not there. Let's go to the self object now. */
-            return this.GetProperty(this.selfObject, property);
+            object result;
+            if (!this.TryGetProperty(property, out result))
+                result = this.GetProperty(this.selfObject, property);
+
+            return result;
         }
 
-        // TODO: TEST
         /// <summary>
         /// Gets the value of an object's property.
         /// </summary>
@@ -218,7 +208,6 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        // TODO: TEST
         /// <summary>
         /// Invokes a context method (global).
         /// </summary>
@@ -231,11 +220,19 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
         public object Invoke(string method, object[] arguments)
         {
+            Expect.Identifier("method", method);
+            
+            if (arguments == null || arguments.Length == 0)
+            {
+                object result;
+                if (this.TryGetProperty(method, out result))
+                    return result;
+            }
+
             /* Go to self object. */
             return this.Invoke(this.selfObject, method, arguments);
         }
 
-        // TODO: TEST
         /// <summary>
         /// Invokes an object's method.
         /// </summary>
@@ -262,7 +259,6 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        // TODO: TEST
         /// <summary>
         /// Adds a state object.
         /// </summary>
@@ -274,6 +270,8 @@ namespace XtraLiteTemplates.Evaluation
         /// </remarks>
         public void AddStateObject(object state)
         {
+            Expect.NotNull("state", state);
+
             var topFrame = this.TopFrame;
             if (topFrame.StateObjects == null)
             {
@@ -283,7 +281,6 @@ namespace XtraLiteTemplates.Evaluation
             topFrame.StateObjects.Add(state);
         }
 
-        // TODO: TEST
         /// <summary>
         /// Removes a state object.
         /// </summary>
@@ -295,6 +292,8 @@ namespace XtraLiteTemplates.Evaluation
         /// </remarks>
         public void RemoveStateObject(object state)
         {
+            Expect.NotNull("state", state);
+
             var topFrame = this.TopFrame;
             if (topFrame.StateObjects != null)
             {
@@ -302,7 +301,6 @@ namespace XtraLiteTemplates.Evaluation
             }
         }
 
-        // TODO: TEST
         /// <summary>
         /// Determines whether a given state object was registered in this context.
         /// </summary>
@@ -313,6 +311,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
         public bool ContainsStateObject(object state)
         {
+            Expect.NotNull("state", state);
+
             var topFrame = this.TopFrame;
             return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
         }
@@ -328,6 +328,22 @@ namespace XtraLiteTemplates.Evaluation
         {
             Debug.Assert(this.frames.Count > 0, "No open frames remaining.");
             this.frames.Pop();
+        }
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
+        private bool TryGetProperty(string property, out object value)
+        {
+            /* Obtain the propety from the list given to us. */
+            foreach (var frame in this.frames)
+            {
+                if (frame.Variables != null && frame.Variables.TryGetValue(property, out value))
+                {
+                    return true;
+                }
+            }
+
+            value = null;
+            return false;
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
