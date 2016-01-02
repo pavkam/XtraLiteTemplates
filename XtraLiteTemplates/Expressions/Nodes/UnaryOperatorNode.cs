@@ -82,7 +82,13 @@ namespace XtraLiteTemplates.Expressions.Nodes
         protected override Func<IExpressionEvaluationContext, object> Build()
         {
             var childFunc = this.RightNode.GetEvaluationFunction();
-            return (context) => this.Operator.Evaluate(context, childFunc(context));
+            return (context) =>
+            {
+                /* Cooperative cancelling */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
+                return this.Operator.Evaluate(context, childFunc(context));
+            };
         }
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)

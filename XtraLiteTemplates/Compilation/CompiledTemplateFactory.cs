@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.Compilation
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Linq;
+    using System.Runtime.InteropServices;
     using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
@@ -44,9 +45,9 @@ namespace XtraLiteTemplates.Compilation
     /// Class that encapsulates <c>compilation</c> logic defined for the standard <see cref="EvaluationContext"/>. The sole purpose of <see cref="CompiledTemplateFactory{TContext}"/> is to
     /// transform the internal <c>lexed</c> representation of a template to its compiled form (form that can be evaluated).
     /// </summary>
+    [ComVisible(false)]
     public class CompiledTemplateFactory : CompiledTemplateFactory<EvaluationContext>
     {
-        // TODO: TEST
         /// <summary>
         /// Constructs a delegate used in evaluation of a given double-tag <paramref name="directive"/>.
         /// </summary>
@@ -104,7 +105,6 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        // TODO: TEST
         /// <summary>
         /// Constructs a delegate used in evaluation of a given multi-tag <paramref name="directive"/>.
         /// </summary>
@@ -158,7 +158,6 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        // TODO: TEST
         /// <summary>
         /// Constructs an unparsed text evaluation delegate.
         /// </summary>
@@ -188,7 +187,6 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        // TODO: TEST
         /// <summary>
         /// Constructs a delegate used in evaluation of a given single-tag <paramref name="directive"/>.
         /// </summary>
@@ -209,9 +207,9 @@ namespace XtraLiteTemplates.Compilation
                 {
                     EvaluateSingleTagDirective(writer, context, directive, components);
                 }
-                catch (OperationCanceledException cancelException)
+                catch (OperationCanceledException)
                 {
-                    throw cancelException;
+                    throw;
                 }
                 catch (Exception exception)
                 {

@@ -115,6 +115,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
             return (context) =>
             {
+                /* Cooperative cancelling */
+                context.CancellationToken.ThrowIfCancellationRequested();
+
                 var left = leftFunc(context);
                 object evaluatedByLeft;
 

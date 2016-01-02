@@ -51,6 +51,7 @@
     <Compile Include="Directives\StandardConditionalInterpolationDirectiveTests.cs" />
     <Compile Include="EvaluationContextTests.cs" />
     <Compile Include="ExpressionFlowSymbolsTests.cs" />
+    <Compile Include="Inside\Sleeper.cs" />
     <Compile Include="Inside\TestObjectFormater.cs" />
     <Compile Include="Operators\ArithmeticNeutralOperatorTests.cs" />
     <Compile Include="Operators\ArithmeticNegateOperatorTests.cs" />

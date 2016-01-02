@@ -36,8 +36,8 @@ namespace XtraLiteTemplates.Compilation
 
     /// <summary>
     /// Class that represents a compiled template. Instances of <see cref="CompiledTemplate{TContext}"/> created by a call to <see cref="Interpreter.Compile"/>.
-    /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
     /// </summary>
+    /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
     public sealed class CompiledTemplate<TContext> where TContext : IExpressionEvaluationContext
     {
         [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
@@ -69,7 +69,6 @@ namespace XtraLiteTemplates.Compilation
             this.evaluationDelegate(writer, context);
         }
 
-        // TODO: TEST
         /// <summary>
         /// Returns a <see cref="System.String" /> that represents this instance.
         /// </summary>

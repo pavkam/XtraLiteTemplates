@@ -118,8 +118,11 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 if (this.Object != null)
                 {
                     var objectFunc = this.Object.GetEvaluationFunction();
-                    return context =>
+                    return (context) =>
                     {
+                        /* Cooperative cancelling */
+                        context.CancellationToken.ThrowIfCancellationRequested();
+
                         var @object = objectFunc(context);
                         var arguments = argumentsFunc(context);
                         var argumentsArray = arguments as object[];
@@ -133,8 +136,11 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 }
                 else
                 {
-                    return context =>
+                    return (context) =>
                     {
+                        /* Cooperative cancelling */
+                        context.CancellationToken.ThrowIfCancellationRequested();
+
                         var arguments = argumentsFunc(context);
                         var argumentsArray = arguments as object[];
                         if (argumentsArray == null && arguments != null)
@@ -152,15 +158,24 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 if (this.Object != null)
                 {
                     var objectFunc = this.Object.GetEvaluationFunction();
-                    return context =>
+                    return (context) =>
                     {
+                        /* Cooperative cancelling */
+                        context.CancellationToken.ThrowIfCancellationRequested();
+
                         var variable = objectFunc(context);
                         return variable == null ? null : context.GetProperty(variable, this.Identifier);
                     };
                 }
                 else
                 {
-                    return context => context.GetProperty(this.Identifier);
+                    return (context) =>
+                    {
+                        /* Cooperative cancelling */
+                        context.CancellationToken.ThrowIfCancellationRequested();
+
+                        return context.GetProperty(this.Identifier);
+                    };
                 }
             }
         }

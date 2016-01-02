@@ -38,6 +38,8 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
     using XtraLiteTemplates.NUnit.Inside;
+    using XtraLiteTemplates.Evaluation;
+    using System.Threading;
 
     [TestFixture]
     public class ExpressionTests : TestBase
@@ -722,6 +724,20 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("@a( @b( ) )", arithmetic);
             Assert.AreEqual("@a(@b())", polish);
             Assert.AreEqual("@a(){@b(){}}", canonical);
+        }
+
+        [Test]
+        [ExpectedException(typeof(OperationCanceledException))]
+        public void Evaluate_WithACancellingToken_RaisesTheExpectedException()
+        {
+            var cancellationTokenSource = new CancellationTokenSource();
+            var evalutionContext = new EvaluationContext(true, cancellationTokenSource.Token, StringComparer.InvariantCulture,
+                ObjectFormatter, new Sleeper(), (context, text) => text);
+
+            var expression = CreateTestExpression("( Sleep ( 50 ) + Sleep ( 50 ) ) * Sleep ( 50 )");
+            cancellationTokenSource.CancelAfter(50);
+
+            expression.Evaluate(evalutionContext);
         }
     }
 }

@@ -46,10 +46,13 @@ namespace XtraLiteTemplates.Evaluation
     /// </summary>
     public sealed class Interpreter
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
+        private static CompiledTemplateFactory compiledTemplateFactory = new CompiledTemplateFactory();
+
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private List<Directive> registeredDirectives;
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private Lexer lexer;
 
         /// <summary>
@@ -154,14 +157,13 @@ namespace XtraLiteTemplates.Evaluation
             return new CompiledTemplate<TContext>(document, factory.CompileTemplate(document));
         }
 
-        // TODO: TEST
         /// <summary>
         /// Compiles the template prepared for the standard <see cref="EvaluationContext"/>-based evaluator.
         /// </summary>
         /// <returns>A compiled template.</returns>
         public CompiledTemplate<EvaluationContext> Compile()
         {
-            return this.Compile(new CompiledTemplateFactory());
+            return this.Compile(compiledTemplateFactory);
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]

@@ -197,6 +197,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
             {
                 return context =>
                 {
+                    /* Cooperative cancelling */
+                    context.CancellationToken.ThrowIfCancellationRequested();
+
                     object[] array = new object[childFuncs.Length];
                     for (var i = 0; i < childFuncs.Length; i++)
                     {

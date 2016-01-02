@@ -139,7 +139,6 @@ namespace XtraLiteTemplates
         /// </summary>
         /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
         /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
-        /// <returns><c>true</c> if the evaluation ended within the allocated time; <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
         public void Evaluate(TextWriter writer, IReadOnlyDictionary<string, object> variables)

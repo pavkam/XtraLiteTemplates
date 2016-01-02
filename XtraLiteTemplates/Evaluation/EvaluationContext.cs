@@ -178,7 +178,9 @@ namespace XtraLiteTemplates.Evaluation
 
             object result;
             if (!this.TryGetProperty(property, out result))
+            {
                 result = this.GetProperty(this.selfObject, property);
+            }
 
             return result;
         }
@@ -226,7 +228,9 @@ namespace XtraLiteTemplates.Evaluation
             {
                 object result;
                 if (this.TryGetProperty(method, out result))
+                {
                     return result;
+                }
             }
 
             /* Go to self object. */
