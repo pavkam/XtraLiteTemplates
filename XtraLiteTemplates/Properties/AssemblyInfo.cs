@@ -39,5 +39,6 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyCopyright("Alexandru Ciobanu (alex@ciobanu.org) 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("1.0.*")]
+[assembly: AssemblyVersion("1.1.*")]
 [assembly: GuidAttribute("111F6683-8ADE-47B3-955C-476E26ACD021")]
+[assembly: AssemblyFileVersionAttribute("1.1")]
