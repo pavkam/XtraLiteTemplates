@@ -49,6 +49,7 @@
     <Compile Include="Dialects\Standard\StandardSelfObject.cs" />
     <Compile Include="Compilation\GenericCompiledTemplateFactory.cs" />
     <Compile Include="Evaluation\EvaluationContext.cs" />
+    <Compile Include="Expressions\Nodes\LinqExpressionHelper.cs" />
     <Compile Include="Introspection\MemberValidationEventArgs.cs" />
     <Compile Include="Introspection\IObjectFormatter.cs" />
     <Compile Include="Dialects\Standard\Operators\FormatOperator.cs" />

@@ -30,7 +30,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
     using System.Diagnostics;
+    using System.Threading;
     using XtraLiteTemplates.Expressions.Operators;
+    using LinqExpression = System.Linq.Expressions.Expression;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class UnaryOperatorNode : OperatorNode
@@ -79,18 +81,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return result;
         }
 
-        protected override Func<IExpressionEvaluationContext, object> Build()
-        {
-            var childFunc = this.RightNode.GetEvaluationFunction();
-            return (context) =>
-            {
-                /* Cooperative cancelling */
-                context.CancellationToken.ThrowIfCancellationRequested();
-
-                return this.Operator.Evaluate(context, childFunc(context));
-            };
-        }
-
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
@@ -105,6 +95,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 value = null;
                 return false;
             }
+        }
+
+        protected override LinqExpression BuildLinqExpression()
+        {
+            var operandExpression = this.RightNode.GetEvaluationLinqExpression();
+
+            return LinqExpression.Block(
+                typeof(object),
+                LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                LinqExpression.Call(LinqExpression.Constant(this.Operator), LinqExpressionHelper.MethodInfoUnaryOperatorEvaluate, LinqExpressionHelper.ExpressionParameterContext, operandExpression));
         }
     }
 }

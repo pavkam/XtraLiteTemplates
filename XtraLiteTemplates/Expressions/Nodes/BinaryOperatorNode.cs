@@ -31,7 +31,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
+    using System.Threading;
     using XtraLiteTemplates.Expressions.Operators;
+    using LinqExpression = System.Linq.Expressions.Expression;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class BinaryOperatorNode : OperatorNode
@@ -108,28 +110,37 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        protected override Func<IExpressionEvaluationContext, object> Build()
+        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:ParameterMustNotSpanMultipleLines", Justification = "Readability is OK in this circumstances.")]
+        protected override LinqExpression BuildLinqExpression()
         {
-            var leftFunc = this.LeftNode.GetEvaluationFunction();
-            var rightFunc = this.RightNode.GetEvaluationFunction();
+            var leftOperandExpression = this.LeftNode.GetEvaluationLinqExpression();
+            var rightOperandExpression = this.RightNode.GetEvaluationLinqExpression();
 
-            return (context) =>
-            {
-                /* Cooperative cancelling */
-                context.CancellationToken.ThrowIfCancellationRequested();
+            var variableLeft = LinqExpression.Variable(typeof(object));
+            var variableEvaluatedResult = LinqExpression.Variable(typeof(object));
 
-                var left = leftFunc(context);
-                object evaluatedByLeft;
-
-                if (this.Operator.EvaluateLhs(context, left, out evaluatedByLeft))
-                {
-                    return evaluatedByLeft;
-                }
-                else
-                {
-                    return this.Operator.Evaluate(context, left, rightFunc(context));
-                }
-            };
+            return LinqExpression.Block(
+                typeof(object),
+                new[] { variableLeft, variableEvaluatedResult },
+                LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                LinqExpression.Assign(variableLeft, leftOperandExpression),
+                LinqExpression.IfThen(
+                    LinqExpression.Not(
+                        LinqExpression.Call(
+                            LinqExpression.Constant(this.Operator), 
+                            LinqExpressionHelper.MethodInfoBinaryOperatorEvaluateLhs,
+                            LinqExpressionHelper.ExpressionParameterContext, 
+                            variableLeft, 
+                            variableEvaluatedResult)),
+                    LinqExpression.Assign(
+                        variableEvaluatedResult, 
+                        LinqExpression.Call(
+                            LinqExpression.Constant(this.Operator), 
+                            LinqExpressionHelper.MethodInfoBinaryOperatorEvaluate, 
+                            LinqExpressionHelper.ExpressionParameterContext, 
+                            variableLeft, 
+                            rightOperandExpression))),
+                variableEvaluatedResult);
         }
     }
 }

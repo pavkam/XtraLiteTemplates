@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using XtraLiteTemplates.Expressions.Operators;
+    using LinqExpression = System.Linq.Expressions.Expression;
     
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class ReferenceNode : LeafNode
@@ -108,48 +109,55 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        protected override Func<IExpressionEvaluationContext, object> Build()
+        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:ParameterMustNotSpanMultipleLines", Justification = "Readability is OK in this circumstances.")]
+        protected override LinqExpression BuildLinqExpression()
         {
             if (this.Arguments != null)
             {
                 /* Method invokation. */
-                var argumentsFunc = this.Arguments.GetEvaluationFunction();
-                
+                var argumentsExpression = this.Arguments.GetEvaluationLinqExpression();
+                var evaluatedArgumentsVariable = LinqExpression.Variable(typeof(object));
+
                 if (this.Object != null)
                 {
-                    var objectFunc = this.Object.GetEvaluationFunction();
-                    return (context) =>
-                    {
-                        /* Cooperative cancelling */
-                        context.CancellationToken.ThrowIfCancellationRequested();
+                    var objectExpression = this.Object.GetEvaluationLinqExpression();
 
-                        var @object = objectFunc(context);
-                        var arguments = argumentsFunc(context);
-                        var argumentsArray = arguments as object[];
-                        if (argumentsArray == null && arguments != null)
-                        {
-                            argumentsArray = new object[] { arguments };
-                        }
-
-                        return context.Invoke(@object, this.Identifier, argumentsArray);
-                    };
+                    return LinqExpression.Block(
+                        typeof(object),
+                        new[] { evaluatedArgumentsVariable },
+                        LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                        LinqExpression.Assign(evaluatedArgumentsVariable, argumentsExpression),
+                        LinqExpression.IfThen(
+                            LinqExpression.AndAlso(
+                                LinqExpression.Not(
+                                    LinqExpression.TypeIs(evaluatedArgumentsVariable, typeof(object[]))),
+                                 LinqExpression.NotEqual(evaluatedArgumentsVariable, LinqExpression.Constant(null))),
+                            LinqExpression.Assign(evaluatedArgumentsVariable, LinqExpression.NewArrayInit(typeof(object), evaluatedArgumentsVariable))),
+                            LinqExpression.Call(
+                                LinqExpressionHelper.ExpressionParameterContext, 
+                                LinqExpressionHelper.MethodInfoExpressionEvaluationContextInvokeObject,
+                                objectExpression, 
+                                LinqExpression.Constant(this.Identifier), 
+                                LinqExpression.TypeAs(evaluatedArgumentsVariable, typeof(object[]))));
                 }
                 else
                 {
-                    return (context) =>
-                    {
-                        /* Cooperative cancelling */
-                        context.CancellationToken.ThrowIfCancellationRequested();
-
-                        var arguments = argumentsFunc(context);
-                        var argumentsArray = arguments as object[];
-                        if (argumentsArray == null && arguments != null)
-                        {
-                            argumentsArray = new object[] { arguments };
-                        }
-
-                        return context.Invoke(this.Identifier, argumentsArray);
-                    };
+                    return LinqExpression.Block(
+                        typeof(object),
+                        new[] { evaluatedArgumentsVariable },
+                        LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                        LinqExpression.Assign(evaluatedArgumentsVariable, argumentsExpression),
+                        LinqExpression.IfThen(
+                            LinqExpression.AndAlso(
+                                LinqExpression.Not(
+                                    LinqExpression.TypeIs(evaluatedArgumentsVariable, typeof(object[]))),
+                                LinqExpression.NotEqual(evaluatedArgumentsVariable, LinqExpression.Constant(null))),
+                                LinqExpression.Assign(evaluatedArgumentsVariable, LinqExpression.NewArrayInit(typeof(object), evaluatedArgumentsVariable))),
+                            LinqExpression.Call(
+                                LinqExpressionHelper.ExpressionParameterContext, 
+                                LinqExpressionHelper.MethodInfoExpressionEvaluationContextInvoke,
+                                LinqExpression.Constant(this.Identifier), 
+                                LinqExpression.TypeAs(evaluatedArgumentsVariable, typeof(object[]))));
                 }
             }
             else
@@ -157,25 +165,26 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 /* Property access. */
                 if (this.Object != null)
                 {
-                    var objectFunc = this.Object.GetEvaluationFunction();
-                    return (context) =>
-                    {
-                        /* Cooperative cancelling */
-                        context.CancellationToken.ThrowIfCancellationRequested();
+                    var objectExpression = this.Object.GetEvaluationLinqExpression();
 
-                        var variable = objectFunc(context);
-                        return variable == null ? null : context.GetProperty(variable, this.Identifier);
-                    };
+                    return LinqExpression.Block(
+                        typeof(object),
+                        LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                        LinqExpression.Call(
+                            LinqExpressionHelper.ExpressionParameterContext, 
+                            LinqExpressionHelper.MethodInfoExpressionEvaluationContextGetPropertyObject,
+                            objectExpression, 
+                            LinqExpression.Constant(this.Identifier)));
                 }
                 else
                 {
-                    return (context) =>
-                    {
-                        /* Cooperative cancelling */
-                        context.CancellationToken.ThrowIfCancellationRequested();
-
-                        return context.GetProperty(this.Identifier);
-                    };
+                    return LinqExpression.Block(
+                        typeof(object),
+                        LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                        LinqExpression.Call(
+                            LinqExpressionHelper.ExpressionParameterContext, 
+                            LinqExpressionHelper.MethodInfoExpressionEvaluationContextGetProperty,
+                            LinqExpression.Constant(this.Identifier)));
                 }
             }
         }

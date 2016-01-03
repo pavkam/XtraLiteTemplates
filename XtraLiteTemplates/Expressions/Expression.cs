@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.Expressions
     using System.Diagnostics.CodeAnalysis;
     using XtraLiteTemplates.Expressions.Nodes;
     using XtraLiteTemplates.Expressions.Operators;
+    using LinqExpression = System.Linq.Expressions.Expression;
 
     /// <summary>
     /// Provides core expression construction and evaluation functionality.
@@ -304,9 +305,13 @@ namespace XtraLiteTemplates.Expressions
                     ExceptionHelper.CannotConstructExpressionInvalidState();
                 }
 
-                /* Reduce the expression if so was desired. */
+                /* Reduce expression.*/
                 this.currentGroupRootNode.Reduce(ReduceExpressionEvaluationContext.Instance);
-                this.evaluationFunction = this.currentGroupRootNode.GetEvaluationFunction();
+
+                /* Onbtain the LINQ expression and generate a lambda out of it (for consumption). */
+                var linqExpression = this.currentGroupRootNode.GetEvaluationLinqExpression();
+                this.evaluationFunction = LinqExpression.Lambda<Func<IExpressionEvaluationContext, object>>(
+                    linqExpression, LinqExpressionHelper.ExpressionParameterContext).Compile();
             }
         }
 

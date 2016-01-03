@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.IO;
     using System.Linq;
     using System.Text;
+    using LinqExpression = System.Linq.Expressions.Expression;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class RootNode : ExpressionNode
@@ -179,35 +180,21 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        protected override Func<IExpressionEvaluationContext, object> Build()
+        protected override LinqExpression BuildLinqExpression()
         {
-            var childFuncs = this.groupChildrenNodes.Select(s => s.GetEvaluationFunction()).ToArray();
+            var childExpressions = this.groupChildrenNodes.Select(s => s.GetEvaluationLinqExpression()).ToArray();
 
-            if (childFuncs.Length == 0)
+            if (childExpressions.Length == 0)
             {
-                return context => null;
+                return LinqExpression.Constant(null);
             }
-            else if (childFuncs.Length == 1)
+            else if (childExpressions.Length == 1)
             {
-                /* We're transparent */
-                var childFunc = childFuncs[0];
-                return context => childFunc(context);
+                return childExpressions[0];
             }
             else
             {
-                return context =>
-                {
-                    /* Cooperative cancelling */
-                    context.CancellationToken.ThrowIfCancellationRequested();
-
-                    object[] array = new object[childFuncs.Length];
-                    for (var i = 0; i < childFuncs.Length; i++)
-                    {
-                        array[i] = childFuncs[i](context);
-                    }
-
-                    return array;
-                };
+                return LinqExpression.NewArrayInit(typeof(object), childExpressions);
             }
         }
     }

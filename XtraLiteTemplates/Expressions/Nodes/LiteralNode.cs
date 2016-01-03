@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using XtraLiteTemplates.Expressions.Operators;
+    using LinqExpression = System.Linq.Expressions.Expression;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class LiteralNode : LeafNode
@@ -74,9 +75,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return true;
         }
 
-        protected override Func<IExpressionEvaluationContext, object> Build()
+        protected override LinqExpression BuildLinqExpression()
         {
-            return context => this.Literal;
+            return LinqExpression.Constant(this.Literal, typeof(object));
         }
     }
 }

@@ -286,6 +286,17 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        public void TestCaseEvaluation_4()
+        {
+            var expression = CreateTestExpression("0 * ( 1 + ( 2 + c ) )");
+            Assert.AreEqual("0 * ( 1 + ( 2 + @c ) )", expression.ToString());
+
+            var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
+            Assert.AreEqual(0, result);
+        }
+
+
+        [Test]
         public void TestCaseFeedingErrors1()
         {
             var expression = CreateBloatedExpression();

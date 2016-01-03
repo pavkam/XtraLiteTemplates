@@ -33,6 +33,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using XtraLiteTemplates.Expressions.Operators;
+    using LinqExpression = System.Linq.Expressions.Expression;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class ExpressionNode
@@ -67,15 +68,15 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return this.IsReduced;
         }
 
-        public Func<IExpressionEvaluationContext, object> GetEvaluationFunction()
+        public LinqExpression GetEvaluationLinqExpression()
         {
             if (this.IsReduced)
             {
-                return context => this.ReducedValue;
+                return LinqExpression.Constant(this.ReducedValue, typeof(object));
             }
             else
             {
-                return this.Build();
+                return this.BuildLinqExpression();
             }
         }
 
@@ -94,6 +95,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        protected abstract Func<IExpressionEvaluationContext, object> Build();
+        protected abstract LinqExpression BuildLinqExpression();
     }
 }
