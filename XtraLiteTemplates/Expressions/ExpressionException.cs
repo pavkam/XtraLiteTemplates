@@ -33,8 +33,9 @@ namespace XtraLiteTemplates.Expressions
     using XtraLiteTemplates.Expressions.Operators;
 
     /// <summary>
-    /// Exception type throws for any errors encountered during exception construction.
+    /// Exception type thrown for any errors encountered during expression construction.
     /// </summary>
+    [Serializable]
     public class ExpressionException : InvalidOperationException
     {
         /// <summary>

@@ -35,7 +35,7 @@ namespace XtraLiteTemplates.Expressions
     using XtraLiteTemplates.Expressions.Operators;
 
     /// <summary>
-    /// Supplies a set of standard flow symbols used during the expression building process.
+    /// Supplies a set of standard flow symbols used during the expression construction phase.
     /// </summary>
     public sealed class ExpressionFlowSymbols
     {

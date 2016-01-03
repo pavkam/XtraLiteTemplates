@@ -33,7 +33,7 @@ namespace XtraLiteTemplates.Evaluation
     using XtraLiteTemplates.Expressions;
 
     /// <summary>
-    /// The exception type thrown for any errors encountered during the evaluation of a template.
+    /// The exception type thrown for any errors encountered during the evaluation (execution) of a compiled template.
     /// </summary>
     [Serializable]
     public class EvaluationException : InvalidOperationException

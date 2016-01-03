@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.Parsing
     /// <summary>
     /// The generic exception for all identified parsing errors. Instances of this class can only be created internally.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Justification = "Will never be serialized.")]
     public class ParseException : FormatException
     {
         /// <summary>

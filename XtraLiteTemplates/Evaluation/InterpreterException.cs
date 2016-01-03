@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.Evaluation
     /// <summary>
     /// Exception type thrown for any encountered interpretation error.
     /// </summary>
+    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Justification = "Will never be serialized.")]
     public class InterpreterException : FormatException
     {
         /// <summary>
