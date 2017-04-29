@@ -8,9 +8,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("XtraLiteTemplates Testing")]
 [assembly: AssemblyDescription("NUnit Testing Code for XtraLiteTemplates")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Alexandru Ciobanu (alex@ciobanu.org)")]
+[assembly: AssemblyCompany("Alexandru Ciobanu (alex+git@ciobanu.org)")]
 [assembly: AssemblyProduct("XtraLiteTemplates")]
-[assembly: AssemblyCopyright("Alexandru Ciobanu (alex@ciobanu.org) 2015")]
+[assembly: AssemblyCopyright("Alexandru Ciobanu (alex+git@ciobanu.org) 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

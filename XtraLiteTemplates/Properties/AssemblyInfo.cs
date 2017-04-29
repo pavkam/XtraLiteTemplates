@@ -1,7 +1,7 @@
 ﻿//  Author:
-//    Alexandru Ciobanu alex@ciobanu.org
+//    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex@ciobanu.org)
+//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -34,9 +34,9 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("XtraLiteTemplates")]
 [assembly: AssemblyDescription("Lightweight Templating Engine for .NET")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Alexandru Ciobanu (alex@ciobanu.org)")]
+[assembly: AssemblyCompany("Alexandru Ciobanu (alex+git@ciobanu.org)")]
 [assembly: AssemblyProduct("XtraLiteTemplates")]
-[assembly: AssemblyCopyright("Alexandru Ciobanu (alex@ciobanu.org) 2015")]
+[assembly: AssemblyCopyright("Alexandru Ciobanu (alex+git@ciobanu.org) 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 [assembly: AssemblyVersion("1.1.*")]

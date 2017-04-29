@@ -1,7 +1,7 @@
 ﻿//  Author:
-//    Alexandru Ciobanu alex@ciobanu.org
+//    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex@ciobanu.org)
+//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
