@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,29 +24,21 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Expressions;
+    using Introspection;
+    using Parsing;
 
     /// <summary>
     /// The IF - ELSE directive implementation.
     /// </summary>
     public sealed class IfElseDirective : StandardDirective
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int conditionalExpressionComponentIndex;
+        private readonly int _conditionalExpressionComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="IfElseDirective" /> class.
@@ -63,7 +55,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public IfElseDirective(string startTagMarkup, string midTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(midTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 3, "Expected a tag count of 3.");
+            Debug.Assert(Tags.Count == 3, "Expected a tag count of 3.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -72,7 +64,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
 
-            this.conditionalExpressionComponentIndex = expressionComponents[0];
+            _conditionalExpressionComponentIndex = expressionComponents[0];
         }
 
         /// <summary>
@@ -103,26 +95,27 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 2, "tagIndex must be between 0 and 2.");
             Debug.Assert(components != null, "components cannot be null.");
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount, "component length must match tag component length.");
             Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
-            if (tagIndex == 0)
+            switch (tagIndex)
             {
-                var conditionIsTrue = TypeConverter.ConvertToBoolean(components[this.conditionalExpressionComponentIndex]) == true;
-                state = conditionIsTrue;
+                case 0:
+                    var conditionIsTrue = TypeConverter.ConvertToBoolean(components[_conditionalExpressionComponentIndex]);
+                    state = conditionIsTrue;
 
-                return conditionIsTrue ? FlowDecision.Evaluate : FlowDecision.Skip;
-            }
-            else if (tagIndex == 1)
-            {
-                Debug.Assert(state is bool, "state object expected to be a boolean.");
-                var conditionWasTrue = (bool)state;
+                    return conditionIsTrue ? FlowDecision.Evaluate : FlowDecision.Skip;
+                case 1:
+                    Debug.Assert(state is bool, "state object expected to be a boolean.");
+                    var conditionWasTrue = (bool)state;
 
-                if (!conditionWasTrue)
-                {
-                    return FlowDecision.Evaluate;
-                }
+                    if (!conditionWasTrue)
+                    {
+                        return FlowDecision.Evaluate;
+                    }
+
+                    break;
             }
             
             return FlowDecision.Terminate;

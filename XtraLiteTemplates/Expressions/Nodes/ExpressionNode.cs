@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -28,11 +28,9 @@
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using XtraLiteTemplates.Expressions.Operators;
+
     using LinqExpression = System.Linq.Expressions.Expression;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
@@ -40,7 +38,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
     {
         protected ExpressionNode(ExpressionNode parent)
         {
-            this.Parent = parent;
+            Parent = parent;
         }
 
         public ExpressionNode Parent { get; set; }
@@ -55,36 +53,34 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
-            if (!this.IsReduced)
+            if (!IsReduced)
             {
                 object value;
-                if (this.TryReduce(reduceContext, out value))
+                if (TryReduce(reduceContext, out value))
                 {
-                    this.IsReduced = true;
-                    this.ReducedValue = value;
+                    IsReduced = true;
+                    ReducedValue = value;
                 }
             }
 
-            return this.IsReduced;
+            return IsReduced;
         }
 
         public LinqExpression GetEvaluationLinqExpression()
         {
-            if (this.IsReduced)
+            if (IsReduced)
             {
-                return LinqExpression.Constant(this.ReducedValue, typeof(object));
+                return LinqExpression.Constant(ReducedValue, typeof(object));
             }
-            else
-            {
-                return this.BuildLinqExpression();
-            }
+
+            return BuildLinqExpression();
         }
 
         public abstract string ToString(ExpressionFormatStyle style);
 
         public override string ToString()
         {
-            return this.ToString(ExpressionFormatStyle.Arithmetic);
+            return ToString(ExpressionFormatStyle.Arithmetic);
         }
 
         protected virtual bool TryReduce(IExpressionEvaluationContext reduceContext, out object reducedValue)

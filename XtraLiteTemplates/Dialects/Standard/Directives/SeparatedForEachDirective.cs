@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,32 +24,24 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Expressions;
+    using Introspection;
+    using Parsing;
 
     /// <summary>
     /// The FOR EACH directive implementation that includes a separator text.
     /// </summary>
     public sealed class SeparatedForEachDirective : StandardDirective
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int sequenceExpressionComponentIndex;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int identifierComponentIndex;
+        private readonly int _sequenceExpressionComponentIndex;
+        private readonly int _identifierComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SeparatedForEachDirective" /> class.
@@ -67,7 +59,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public SeparatedForEachDirective(string startTagMarkup, string separatorTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(separatorTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 3, "Expected a tag count of 3.");
+            Debug.Assert(Tags.Count == 3, "Expected a tag count of 3.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -79,8 +71,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
             Expect.IsTrue("one identifier component", identifierComponents.Length == 1);
 
-            this.sequenceExpressionComponentIndex = expressionComponents[0];
-            this.identifierComponentIndex = identifierComponents[0];
+            _sequenceExpressionComponentIndex = expressionComponents[0];
+            _identifierComponentIndex = identifierComponents[0];
         }
 
         /// <summary>
@@ -107,7 +99,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// If the expression is evaluated to <c>null</c>, the directive does not evaluate. It evaluates once for non-sequences and once for each element if the
         /// expression is a sequence. On each cycle the identifier is set to the value of the enumerated object.
         /// <para>
-        /// The contents between the middle tag and the end tag are inserted between the evaluated items, simulating the <see cref="String.Join(String,IEnumerable{String})" /> method.
+        /// The contents between the middle tag and the end tag are inserted between the evaluated items, simulating the <see cref="string.Join(string,IEnumerable{string})" /> method.
         /// </para>
         /// </remarks>
         protected internal override FlowDecision Execute(
@@ -119,68 +111,60 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 2, "tagIndex must be between 0 and 2.");
             Debug.Assert(components != null, "components cannot be null.");
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount, "component length must match tag component length.");
             Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
-            if (tagIndex == 0)
+            switch (tagIndex)
             {
-                if (state == null)
-                {
-                    var sequence = TypeConverter.ConvertToSequence(components[this.sequenceExpressionComponentIndex]);
-                    if (sequence == null)
+                case 0:
+                    if (state == null)
                     {
-                        return FlowDecision.Terminate;
+                        var sequence = TypeConverter.ConvertToSequence(components[_sequenceExpressionComponentIndex]);
+                        if (sequence == null)
+                        {
+                            return FlowDecision.Terminate;
+                        }
+
+                        var enumerator = sequence.GetEnumerator();
+                        if (!enumerator.MoveNext())
+                        {
+                            return FlowDecision.Terminate;
+                        }
+
+                        var propertyName = components[_identifierComponentIndex] as string;
+                        context.SetProperty(propertyName, enumerator.Current);
+
+                        state = new State { Enumerator = enumerator, IsLast = !enumerator.MoveNext(), };
+
+                        return FlowDecision.Evaluate;
                     }
-
-                    var enumerator = sequence.GetEnumerator();
-                    if (!enumerator.MoveNext())
+                    else
                     {
-                        return FlowDecision.Terminate;
+                        var asState1 = state as State;
+
+                        Debug.Assert(asState1 != null, "state should be a proper object.");
+                        Debug.Assert(asState1.Enumerator != null, "state enumerator cannot not be null.");
+                        Debug.Assert(!asState1.IsLast, "iteration cannot be the last.");
+
+                        var propertyName = components[_identifierComponentIndex] as string;
+                        context.SetProperty(propertyName, asState1.Enumerator.Current);
+                        asState1.IsLast = !asState1.Enumerator.MoveNext();
+
+                        return FlowDecision.Evaluate;
                     }
+                case 1:
+                    var asState2 = state as State;
 
-                    var propertyName = components[this.identifierComponentIndex] as string;
-                    context.SetProperty(propertyName, enumerator.Current);
+                    Debug.Assert(asState2 != null, "state should be a proper object.");
+                    Debug.Assert(asState2.Enumerator != null, "state enumerator cannot be null.");
 
-                    state = new State
-                    {
-                        Enumerator = enumerator,
-                        IsLast = !enumerator.MoveNext(),
-                    };
-
-                    return FlowDecision.Evaluate;
-                }
-                else
-                {
-                    var sstate = state as State;
-
-                    Debug.Assert(sstate != null, "state should be a proper object.");
-                    Debug.Assert(sstate.Enumerator != null, "state enumerator cannot not be null.");
-                    Debug.Assert(!sstate.IsLast, "iteration cannot be the last.");
-
-                    var propertyName = components[this.identifierComponentIndex] as string;
-                    context.SetProperty(propertyName, sstate.Enumerator.Current);
-                    sstate.IsLast = !sstate.Enumerator.MoveNext();
-
-                    return FlowDecision.Evaluate;
-                }
+                    return asState2.IsLast ? FlowDecision.Terminate : FlowDecision.Evaluate;
             }
-            else if (tagIndex == 1)
-            {
-                var sstate = state as State;
 
-                Debug.Assert(sstate != null, "state should be a proper object.");
-                Debug.Assert(sstate.Enumerator != null, "state enumerator cannot be null.");
-
-                return sstate.IsLast ? FlowDecision.Terminate : FlowDecision.Evaluate;
-            }
-            else
-            {
-                return FlowDecision.Restart;
-            }
+            return FlowDecision.Restart;
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private class State
         {
             public IEnumerator<object> Enumerator { get; set; }

@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,10 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
+
+    using Expressions.Operators;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class BitwiseXorOperatorTests : OperatorTestsBase
@@ -43,7 +42,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new BitwiseXorOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new BitwiseXorOperator(String.Empty, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new BitwiseXorOperator(string.Empty, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new BitwiseXorOperator("operator", null));
             ExpectArgumentNullException("typeConverter", () => new BitwiseXorOperator(null));
         }
@@ -71,7 +70,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new BitwiseXorOperator(TypeConverter);
 
-            Object dummy;
+            object dummy;
             ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
             ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
         }
@@ -81,10 +80,10 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new BitwiseXorOperator(TypeConverter);
 
-            AssertEvaluation<Int32>(@operator, 0xAA00CC, 0x00DD00, 0xAADDCC);
-            AssertEvaluation<Int32>(@operator, 0x7FFFFFFF, 0, 0x7FFFFFFF);
-            AssertEvaluation<Int32>(@operator, 1, 2, 3);
-            AssertEvaluation<Int32>(@operator, 0xCC, 5, 0xC9);
+            AssertEvaluation<int>(@operator, 0xAA00CC, 0x00DD00, 0xAADDCC);
+            AssertEvaluation<int>(@operator, 0x7FFFFFFF, 0, 0x7FFFFFFF);
+            AssertEvaluation<int>(@operator, 1, 2, 3);
+            AssertEvaluation<int>(@operator, 0xCC, 5, 0xC9);
         }
     }
 }

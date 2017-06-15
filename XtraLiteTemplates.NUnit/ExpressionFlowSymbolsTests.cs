@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,34 +30,27 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.NUnit.Inside;
+    using Expressions;
 
     [TestFixture]
     public class ExpressionFlowSymbolsTests : TestBase
     { 
         [Test]
-        public void TestCaseContruction_1()
+        public void TestCaseContruction1()
         {
             ExpectArgumentNullException("separatorSymbol", () => new ExpressionFlowSymbols(null, ".", "(", ")"));
             ExpectArgumentNullException("memberAccessSymbol", () => new ExpressionFlowSymbols(",", null, "(", ")"));
             ExpectArgumentNullException("groupOpenSymbol", () => new ExpressionFlowSymbols(",", ".", null, ")"));
             ExpectArgumentNullException("groupCloseSymbol", () => new ExpressionFlowSymbols(",", ".", "(", null));
 
-            ExpectArgumentEmptyException("separatorSymbol", () => new ExpressionFlowSymbols(String.Empty, ".", "(", ")"));
-            ExpectArgumentEmptyException("memberAccessSymbol", () => new ExpressionFlowSymbols(",", String.Empty, "(", ")"));
-            ExpectArgumentEmptyException("groupOpenSymbol", () => new ExpressionFlowSymbols(",", ".", String.Empty, ")"));
-            ExpectArgumentEmptyException("groupCloseSymbol", () => new ExpressionFlowSymbols(",", ".", "(", String.Empty));
+            ExpectArgumentEmptyException("separatorSymbol", () => new ExpressionFlowSymbols(string.Empty, ".", "(", ")"));
+            ExpectArgumentEmptyException("memberAccessSymbol", () => new ExpressionFlowSymbols(",", string.Empty, "(", ")"));
+            ExpectArgumentEmptyException("groupOpenSymbol", () => new ExpressionFlowSymbols(",", ".", string.Empty, ")"));
+            ExpectArgumentEmptyException("groupCloseSymbol", () => new ExpressionFlowSymbols(",", ".", "(", string.Empty));
         }
 
         [Test]
-        public void TestCaseContruction_2()
+        public void TestCaseContruction2()
         {
             ExpectArgumentsEqualException("separatorSymbol", "memberAccessSymbol", () => new ExpressionFlowSymbols("A", "A", "C", "D"));
             ExpectArgumentsEqualException("separatorSymbol", "groupOpenSymbol", () => new ExpressionFlowSymbols("A", "B", "A", "D"));
@@ -68,7 +61,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseContruction_3()
+        public void TestCaseContruction3()
         {
             var flowSymbols = new ExpressionFlowSymbols("A", "B", "C", "D");
 

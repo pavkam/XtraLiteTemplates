@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,18 +24,13 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Threading;
-    using XtraLiteTemplates.Expressions.Operators;
+
+    using Operators;
     using LinqExpression = System.Linq.Expressions.Expression;
 
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class BinaryOperatorNode : OperatorNode
     {
         internal BinaryOperatorNode(ExpressionNode parent, BinaryOperator @operator)
@@ -43,46 +38,34 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        public new BinaryOperator Operator
-        {
-            get
-            {
-                return base.Operator as BinaryOperator;
-            }
-        }
+        public new BinaryOperator Operator => base.Operator as BinaryOperator;
 
         public ExpressionNode LeftNode { get; internal set; }
 
-        public override PermittedContinuations Continuity 
-        { 
-            get
-            {
-                return
-                    PermittedContinuations.UnaryOperator |
-                    PermittedContinuations.Identifier |
-                    PermittedContinuations.Literal |
-                    PermittedContinuations.NewGroup;
-            }
-        }
+        public override PermittedContinuations Continuity => 
+            PermittedContinuations.UnaryOperator | 
+            PermittedContinuations.Identifier | 
+            PermittedContinuations.Literal | 
+            PermittedContinuations.NewGroup;
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            var leftAsString = this.LeftNode != null ? this.LeftNode.ToString(style) : "??";
-            var rightAsString = this.RightNode != null ? this.RightNode.ToString(style) : "??";
+            var leftAsString = LeftNode != null ? LeftNode.ToString(style) : "??";
+            var rightAsString = RightNode != null ? RightNode.ToString(style) : "??";
 
             string result = null;
 
             if (style == ExpressionFormatStyle.Arithmetic)
             {
-                result = string.Format("{0} {1} {2}", leftAsString, this.Operator, rightAsString);
+                result = $"{leftAsString} {Operator} {rightAsString}";
             }
             else if (style == ExpressionFormatStyle.Polish)
             {
-                result = string.Format("{0} {1} {2}", this.Operator, leftAsString, rightAsString);
+                result = $"{Operator} {leftAsString} {rightAsString}";
             }
             else if (style == ExpressionFormatStyle.Canonical)
             {
-                result = string.Format("{0}{{{1},{2}}}", this.Operator, leftAsString, rightAsString);
+                result = $"{Operator}{{{leftAsString},{rightAsString}}}";
             }
 
             Debug.Assert(result != null, "resulting string cannot be null.");
@@ -93,15 +76,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
-            if (this.LeftNode.Reduce(reduceContext))
+            if (LeftNode.Reduce(reduceContext))
             {
-                if (this.Operator.EvaluateLhs(reduceContext, this.LeftNode.ReducedValue, out reducedValue))
+                if (Operator.EvaluateLhs(reduceContext, LeftNode.ReducedValue, out reducedValue))
                 {
                     return true;
                 }
-                else if (this.RightNode.Reduce(reduceContext))
+
+                if (RightNode.Reduce(reduceContext))
                 {
-                    reducedValue = this.Operator.Evaluate(reduceContext, this.LeftNode.ReducedValue, this.RightNode.ReducedValue);
+                    reducedValue = Operator.Evaluate(reduceContext, LeftNode.ReducedValue, RightNode.ReducedValue);
                     return true;
                 }
             }
@@ -110,11 +94,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
             return false;
         }
 
-        [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:ParameterMustNotSpanMultipleLines", Justification = "Readability is OK in this circumstances.")]
         protected override LinqExpression BuildLinqExpression()
         {
-            var leftOperandExpression = this.LeftNode.GetEvaluationLinqExpression();
-            var rightOperandExpression = this.RightNode.GetEvaluationLinqExpression();
+            var leftOperandExpression = LeftNode.GetEvaluationLinqExpression();
+            var rightOperandExpression = RightNode.GetEvaluationLinqExpression();
 
             var variableLeft = LinqExpression.Variable(typeof(object));
             var variableEvaluatedResult = LinqExpression.Variable(typeof(object));
@@ -127,7 +110,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 LinqExpression.IfThen(
                     LinqExpression.Not(
                         LinqExpression.Call(
-                            LinqExpression.Constant(this.Operator), 
+                            LinqExpression.Constant(Operator), 
                             LinqExpressionHelper.MethodInfoBinaryOperatorEvaluateLhs,
                             LinqExpressionHelper.ExpressionParameterContext, 
                             variableLeft, 
@@ -135,7 +118,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
                     LinqExpression.Assign(
                         variableEvaluatedResult, 
                         LinqExpression.Call(
-                            LinqExpression.Constant(this.Operator), 
+                            LinqExpression.Constant(Operator), 
                             LinqExpressionHelper.MethodInfoBinaryOperatorEvaluate, 
                             LinqExpressionHelper.ExpressionParameterContext, 
                             variableLeft, 

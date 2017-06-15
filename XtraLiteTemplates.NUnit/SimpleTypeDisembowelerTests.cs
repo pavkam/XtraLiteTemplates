@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,14 +30,8 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.Dynamic;
     using System.Collections.Generic;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.Dialects.Standard;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
+    using Introspection;
 
     [TestFixture]
     public class SimpleTypeDisembowelerTests : TestBase
@@ -46,15 +40,15 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseConstruction()
         {
             ExpectArgumentNullException("type", () => new SimpleTypeDisemboweler(null, StringComparer.Ordinal, ObjectFormatter));
-            ExpectArgumentNullException("memberComparer", () => new SimpleTypeDisemboweler(typeof(String), null, ObjectFormatter));
-            ExpectArgumentNullException("objectFormatter", () => new SimpleTypeDisemboweler(typeof(String), StringComparer.Ordinal, null));
+            ExpectArgumentNullException("memberComparer", () => new SimpleTypeDisemboweler(typeof(string), null, ObjectFormatter));
+            ExpectArgumentNullException("objectFormatter", () => new SimpleTypeDisemboweler(typeof(string), StringComparer.Ordinal, null));
 
             var disemboweler = new SimpleTypeDisemboweler(
-                typeof(String),
+                typeof(string),
                 StringComparer.CurrentCultureIgnoreCase,
                 ObjectFormatter);
 
-            Assert.AreEqual(typeof(String), disemboweler.Type);
+            Assert.AreEqual(typeof(string), disemboweler.Type);
             Assert.AreEqual(StringComparer.CurrentCultureIgnoreCase, disemboweler.Comparer);
             Assert.AreEqual(ObjectFormatter, disemboweler.ObjectFormatter);
         }
@@ -63,7 +57,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseSensitive()
         {
             var disemboweler = new SimpleTypeDisemboweler(
-                typeof(String),
+                typeof(string),
                 StringComparer.Ordinal, 
                 ObjectFormatter);
 
@@ -80,7 +74,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseInsensitive()
         {
             var disemboweler = new SimpleTypeDisemboweler(
-                typeof(String),
+                typeof(string),
                 StringComparer.OrdinalIgnoreCase, 
                 ObjectFormatter);
 
@@ -135,89 +129,89 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseParamErrors()
         {
             var disemboweler = new SimpleTypeDisemboweler(
-                typeof(String), 
+                typeof(string), 
                 StringComparer.Ordinal, 
                 ObjectFormatter);
 
-            ExpectArgumentNullException("member", () => disemboweler.Invoke(String.Empty, null));
-            ExpectArgumentEmptyException("member", () => disemboweler.Invoke(String.Empty, ""));
-            ExpectArgumentNotIdentifierException("member", () => disemboweler.Invoke(String.Empty, "+Value"));
+            ExpectArgumentNullException("member", () => disemboweler.Invoke(string.Empty, null));
+            ExpectArgumentEmptyException("member", () => disemboweler.Invoke(string.Empty, string.Empty));
+            ExpectArgumentNotIdentifierException("member", () => disemboweler.Invoke(string.Empty, "+Value"));
         }
 
         private class SelectiveObject
         {
-            private List<string> journal = new List<string>();
+            private readonly List<string> _journal = new List<string>();
 
-            public void Function1(Object arg)
+            public void Function1(object arg)
             {
-                journal.Add(String.Format("Object({0})", arg));
+                _journal.Add($"Object({arg})");
             }
 
-            public void Function1(String arg)
+            public void Function1(string arg)
             {
-                journal.Add(String.Format("String({0})", arg));
+                _journal.Add($"String({arg})");
             }
 
-            public void Function1(Boolean arg)
+            public void Function1(bool arg)
             {
-                journal.Add(String.Format("Boolean({0})", arg));
+                _journal.Add($"Boolean({arg})");
             }
 
-            public void Function1(Int16 arg)
+            public void Function1(short arg)
             {
-                journal.Add(String.Format("Int16({0})", arg));
+                _journal.Add($"Int16({arg})");
             }
 
-            public void Function1(Int32 arg)
+            public void Function1(int arg)
             {
-                journal.Add(String.Format("Int32({0})", arg));
+                _journal.Add($"Int32({arg})");
             }
 
-            public void Function1(Double arg)
+            public void Function1(double arg)
             {
-                journal.Add(String.Format("Double({0})", arg));
+                _journal.Add($"Double({arg})");
             }
 
-            public void Function2(Object arg)
+            public void Function2(object arg)
             {
-                journal.Add(String.Format("Object({0})", arg));
+                _journal.Add($"Object({arg})");
             }
 
-            public void Function3(Object arg0, Int32 arg1)
+            public void Function3(object arg0, int arg1)
             {
-                journal.Add(String.Format("[Object({0}) Int32({1})]", arg0, arg1));
+                _journal.Add($"[Object({arg0}) Int32({arg1})]");
             }
 
-            public void Function3(Object arg0, Object arg1)
+            public void Function3(object arg0, object arg1)
             {
-                journal.Add(String.Format("[Object({0}) Object({1})]", arg0, arg1));
+                _journal.Add($"[Object({arg0}) Object({arg1})]");
             }
 
-            public void Function4(params String[] args)
+            public void Function4(params string[] args)
             {
-                journal.Add(String.Format("[...String({0})]", String.Join(",", args)));
+                _journal.Add($"[...String({string.Join(",", args)})]");
             }
 
-            public void Function5(params Int32[] args)
+            public void Function5(params int[] args)
             {
-                journal.Add(String.Format("[...Int32({0})]", String.Join(",", args)));
+                _journal.Add($"[...Int32({string.Join(",", args)})]");
             }
 
 
-            public void Function6(Object arg0, Object arg1)
+            public void Function6(object arg0, object arg1)
             {
-                journal.Add(String.Format("[Object({0}) Object({1})]", arg0, arg1));
+                _journal.Add($"[Object({arg0}) Object({arg1})]");
             }
 
-            public void Function6(Object arg0, params Object[] args)
+            public void Function6(object arg0, params object[] args)
             {
-                journal.Add(String.Format("[Object({0}) ...Object({1})]", arg0, String.Join(",", args)));
+                _journal.Add($"[Object({arg0}) ...Object({string.Join(",", args)})]");
             }
 
 
             public override string ToString()
             {
-                return String.Join(", ", journal);
+                return string.Join(", ", _journal);
             }
         }
 
@@ -232,12 +226,12 @@ namespace XtraLiteTemplates.NUnit
                 ObjectFormatter);
 
             disemboweler.Invoke(selectiveObject, "Function1", null);
-            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { "text" });
-            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { StringComparer.InvariantCulture } );
-            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { 100 } );
-            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { (Int16)99 });
-            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { 100.0 } );
-            disemboweler.Invoke(selectiveObject, "Function1", new Object[] { true });
+            disemboweler.Invoke(selectiveObject, "Function1", new object[] { "text" });
+            disemboweler.Invoke(selectiveObject, "Function1", new object[] { StringComparer.InvariantCulture } );
+            disemboweler.Invoke(selectiveObject, "Function1", new object[] { 100 } );
+            disemboweler.Invoke(selectiveObject, "Function1", new object[] { (Int16)99 });
+            disemboweler.Invoke(selectiveObject, "Function1", new object[] { 100.0 } );
+            disemboweler.Invoke(selectiveObject, "Function1", new object[] { true });
 
             Assert.AreEqual("Object(), String(text), Object(System.CultureAwareComparer), Int32(100), Int16(99), Double(100), Boolean(True)", selectiveObject.ToString());
         }
@@ -253,12 +247,12 @@ namespace XtraLiteTemplates.NUnit
                 ObjectFormatter);
 
             disemboweler.Invoke(selectiveObject, "Function2", null);
-            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { "text", 34, 78 });
-            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { StringComparer.InvariantCulture, 18 });
-            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { 100, this });
-            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { (Int16)99, String.Empty });
-            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { 100.0, true });
-            disemboweler.Invoke(selectiveObject, "Function2", new Object[] { true, 1, 2 });
+            disemboweler.Invoke(selectiveObject, "Function2", new object[] { "text", 34, 78 });
+            disemboweler.Invoke(selectiveObject, "Function2", new object[] { StringComparer.InvariantCulture, 18 });
+            disemboweler.Invoke(selectiveObject, "Function2", new object[] { 100, this });
+            disemboweler.Invoke(selectiveObject, "Function2", new object[] { (Int16)99, string.Empty });
+            disemboweler.Invoke(selectiveObject, "Function2", new object[] { 100.0, true });
+            disemboweler.Invoke(selectiveObject, "Function2", new object[] { true, 1, 2 });
 
             Assert.AreEqual("Object(), Object(text), Object(System.CultureAwareComparer), Object(100), Object(99), Object(100), Object(True)", selectiveObject.ToString());
         }
@@ -274,13 +268,13 @@ namespace XtraLiteTemplates.NUnit
                 ObjectFormatter);
 
             disemboweler.Invoke(selectiveObject, "Function3", null);
-            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { null, null } );
-            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { "text", 34, 78 });
-            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { StringComparer.InvariantCulture, (Byte)18 });
-            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { 100, null });
-            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { (Int16)99, String.Empty });
-            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { 100.0, true });
-            disemboweler.Invoke(selectiveObject, "Function3", new Object[] { true, 1.99, 2 });
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { null, null } );
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { "text", 34, 78 });
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { StringComparer.InvariantCulture, (Byte)18 });
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { 100, null });
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { (Int16)99, string.Empty });
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { 100.0, true });
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { true, 1.99, 2 });
 
             Assert.AreEqual("[Object() Object()], [Object() Object()], [Object(text) Int32(34)], [Object(System.CultureAwareComparer) Int32(18)], [Object(100) Object()], [Object(99) Object()], [Object(100) Object(True)], [Object(True) Int32(2)]", selectiveObject.ToString());
         }
@@ -296,8 +290,8 @@ namespace XtraLiteTemplates.NUnit
                 ObjectFormatter);
 
             disemboweler.Invoke(selectiveObject, "Function4", null);
-            disemboweler.Invoke(selectiveObject, "Function4", new Object[] { null, null });
-            disemboweler.Invoke(selectiveObject, "Function4", new Object[] { true, 1.99, 2 });
+            disemboweler.Invoke(selectiveObject, "Function4", new object[] { null, null });
+            disemboweler.Invoke(selectiveObject, "Function4", new object[] { true, 1.99, 2 });
 
             Assert.AreEqual("[...String()], [...String(!undefined!,!undefined!)], [...String(True,1.99,2)]", selectiveObject.ToString());
         }
@@ -313,8 +307,8 @@ namespace XtraLiteTemplates.NUnit
                 ObjectFormatter);
 
             disemboweler.Invoke(selectiveObject, "Function5", null);
-            disemboweler.Invoke(selectiveObject, "Function5", new Object[] { 1, 2 });
-            disemboweler.Invoke(selectiveObject, "Function5", new Object[] { (byte)1, (ushort)2, (uint)3, (long)4, 5.33, 6.23M });
+            disemboweler.Invoke(selectiveObject, "Function5", new object[] { 1, 2 });
+            disemboweler.Invoke(selectiveObject, "Function5", new object[] { (byte)1, (ushort)2, (uint)3, (long)4, 5.33, 6.23M });
 
             Assert.AreEqual("[...Int32()], [...Int32(1,2)], [...Int32(1,2,3,4,5,6)]", selectiveObject.ToString());
         }
@@ -330,12 +324,12 @@ namespace XtraLiteTemplates.NUnit
                 ObjectFormatter);
 
             disemboweler.Invoke(selectiveObject, "Function6", null);
-            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { null });
-            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { null, null });
-            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { null, null, null });
-            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { 1 });
-            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { 1, "a" });
-            disemboweler.Invoke(selectiveObject, "Function6", new Object[] { 1, "a", false });
+            disemboweler.Invoke(selectiveObject, "Function6", new object[] { null });
+            disemboweler.Invoke(selectiveObject, "Function6", new object[] { null, null });
+            disemboweler.Invoke(selectiveObject, "Function6", new object[] { null, null, null });
+            disemboweler.Invoke(selectiveObject, "Function6", new object[] { 1 });
+            disemboweler.Invoke(selectiveObject, "Function6", new object[] { 1, "a" });
+            disemboweler.Invoke(selectiveObject, "Function6", new object[] { 1, "a", false });
 
             Assert.AreEqual("[Object() ...Object()], [Object() ...Object()], [Object() Object()], [Object() ...Object()], [Object(1) ...Object()], [Object(1) Object(a)], [Object(1) ...Object(a,False)]", selectiveObject.ToString());
         }
@@ -343,8 +337,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStringFormat()
         {
-            var disemboweler = new SimpleTypeDisemboweler(typeof(String), StringComparer.Ordinal, ObjectFormatter);
-            var result = disemboweler.Invoke(String.Empty, "Format", new Object[] { "{0} {1} {2}!", "Hello", "weird", "world" } );
+            var disemboweler = new SimpleTypeDisemboweler(typeof(string), StringComparer.Ordinal, ObjectFormatter);
+            var result = disemboweler.Invoke(string.Empty, "Format", new object[] { "{0} {1} {2}!", "Hello", "weird", "world" } );
 
             Assert.AreEqual("Hello weird world!", result);
         }

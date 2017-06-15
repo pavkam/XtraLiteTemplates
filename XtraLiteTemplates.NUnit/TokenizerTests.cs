@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -31,12 +31,12 @@ namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.IO;
-    using XtraLiteTemplates.Parsing;
+    using Parsing;
 
     [TestFixture]
     public class TokenizerTests : TestBase
     {
-        private static void AssertToken(Token token, Token.TokenType type, Int32 charIndex, Int32 length, String value)
+        private static void AssertToken(Token token, Token.TokenType type, int charIndex, int length, string value)
         {
             Assert.IsNotNull(token);
             Assert.AreEqual(charIndex, token.CharacterIndex);
@@ -45,7 +45,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(value, token.Value);
         }
 
-        private static void AssertToken(Token token, Token.TokenType type, Int32 charIndex, String value)
+        private static void AssertToken(Token token, Token.TokenType type, int charIndex, string value)
         {
             Assert.IsNotNull(token);
             AssertToken(token, type, charIndex, value.Length, value);
@@ -59,15 +59,15 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentNullException("reader", () => new Tokenizer(null, '<', '>', '{', '}', '-', ','));
             ExpectArgumentNullException("reader", () => new Tokenizer((TextReader)null));
 
-            var tokenizer = new Tokenizer((String)null);
+            var tokenizer = new Tokenizer((string)null);
             Assert.IsNull(tokenizer.ReadNext());
         }
 
         [Test]
         public void TestCaseStandardConfiguration()
         {
-            const String test = "anything";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "anything";
+            var tokenizer = new Tokenizer(Test);
 
             Assert.AreEqual('{', tokenizer.TagStartCharacter);
             Assert.AreEqual('}', tokenizer.TagEndCharacter);
@@ -79,8 +79,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseCustomConfiguration()
         {
-            const String test = "<{hello-r-n-}}>";
-            var tokenizer = new Tokenizer(new StringReader(test), '<', '>', '{', '}', '-', ',');
+            const string Test = "<{hello-r-n-}}>";
+            var tokenizer = new Tokenizer(new StringReader(Test), '<', '>', '{', '}', '-', ',');
 
             Assert.AreEqual('<', tokenizer.TagStartCharacter);
             Assert.AreEqual('>', tokenizer.TagEndCharacter);
@@ -99,44 +99,44 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEmptyOrNullText()
         {
-            var tokenizer = new Tokenizer((String)null);
+            var tokenizer = new Tokenizer((string)null);
             Assert.IsNull(tokenizer.ReadNext());
 
-            tokenizer = new Tokenizer(String.Empty);
+            tokenizer = new Tokenizer(string.Empty);
             Assert.IsNull(tokenizer.ReadNext());
 
-            tokenizer = new Tokenizer(new StringReader(String.Empty));
+            tokenizer = new Tokenizer(new StringReader(string.Empty));
             Assert.IsNull(tokenizer.ReadNext());
         }
 
         [Test]
         public void TestCaseOneUnparsedCharacter()
         {
-            const String test = "T";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "T";
+            var tokenizer = new Tokenizer(Test);
 
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Unparsed, 0, 1, "T");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.UnParsed, 0, 1, "T");
             Assert.IsNull(tokenizer.ReadNext());
         }
 
         [Test]
         public void TestCaseEscapedDirectiveCharacters()
         {
-            const String test = "{{ {{ }} }}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{{ {{ }} }}";
+            var tokenizer = new Tokenizer(Test);
 
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Unparsed, 0, 2, "{");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Unparsed, 2, 1, " ");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Unparsed, 3, 2, "{");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Unparsed, 5, 6, " }} }}");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.UnParsed, 0, 2, "{");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.UnParsed, 2, 1, " ");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.UnParsed, 3, 2, "{");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.UnParsed, 5, 6, " }} }}");
             Assert.IsNull(tokenizer.ReadNext());
         }
 
         [Test]
         public void TestCaseSingleDirectiveWithOneIdentifier()
         {
-            const String test = "{identifier}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{identifier}";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Word, 1, "identifier");
@@ -148,10 +148,10 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEscapedDirectiveCharacterAndSingleDirectiveWithOneIdentifier()
         {
-            const String test = "{{{identifier}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{{{identifier}";
+            var tokenizer = new Tokenizer(Test);
 
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.Unparsed, 0, 2, "{");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.UnParsed, 0, 2, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 2, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Word, 3, "identifier");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.EndTag, 13, "}");
@@ -162,8 +162,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseDirectivesWithNumbers()
         {
-            const String test = "{0}{123}{1.11}{.22}{A.0.99.2B..C}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{0}{123}{1.11}{.22}{A.0.99.2B..C}";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 1, "0");
@@ -192,8 +192,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseNumberFormats()
         {
-            const String test = "{0 12 .3 .45 0.0 12.56 78..89 56.token token.56.5}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{0 12 .3 .45 0.0 12.56 78..89 56.token token.56.5}";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Number, 1, "0");
@@ -225,8 +225,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseLumpedSymbols()
         {
-            const String test = "{+-.56==+. ... .. 1.2 3..4 5...6 /// $?#!\\!33.1}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{+-.56==+. ... .. 1.2 3..4 5...6 /// $?#!\\!33.1}";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 1, "+-");
@@ -257,8 +257,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseDirectiveWithSymbolsAndWhiteSpaces()
         {
-            const String test = "{..  + /<200 ABC   }";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{..  + /<200 ABC   }";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 1, "..");
@@ -278,11 +278,11 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseDirectiveStringAndEscapeCharacters()
         {
-            const String test = "{\"\",\" \", \"\\\\\\\"\\a\\b\\f\\n\\r\\t\\v\\'\\?\"}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{\"\",\" \", \"\\\\\\\"\\a\\b\\f\\n\\r\\t\\v\\'\\?\"}";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
-            AssertToken(tokenizer.ReadNext(), Token.TokenType.String, 1, 2, "");
+            AssertToken(tokenizer.ReadNext(), Token.TokenType.String, 1, 2, string.Empty);
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 3, ",");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.String, 4, 3, " ");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Symbol, 7, ",");
@@ -295,8 +295,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseInvalidEscapeCharacter()
         {
-            const String test = "{\"\\i\"}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{\"\\i\"}";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectInvalidEscapeCharacterException(3, 'i', () => tokenizer.ReadNext());
@@ -305,8 +305,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseUnexpectedStartDirectiveCharacter()
         {
-            const String test = "{ {";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{ {";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.Whitespace, 1, " ");
@@ -316,8 +316,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEmptyDirective()
         {
-            const String test = "{}";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{}";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             AssertToken(tokenizer.ReadNext(), Token.TokenType.EndTag, 1, "}");
@@ -325,89 +325,89 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_1()
+        public void TestCaseUnexpectedEndOfStream1()
         {
-            const String test = "{";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{";
+            var tokenizer = new Tokenizer(Test);
 
             ExpectUnexpectedEndOfStreamException(1, () => tokenizer.ReadNext());
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_2()
+        public void TestCaseUnexpectedEndOfStream2()
         {
-            const String test = "{ ";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{ ";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(2, () => tokenizer.ReadNext());
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_3()
+        public void TestCaseUnexpectedEndOfStream3()
         {
-            const String test = "{0";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{0";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(2, () => tokenizer.ReadNext());
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_4()
+        public void TestCaseUnexpectedEndOfStream4()
         {
-            const String test = "{0.";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{0.";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(3, () => tokenizer.ReadNext());
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_5()
+        public void TestCaseUnexpectedEndOfStream5()
         {
-            const String test = "{0.0";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{0.0";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(4, () => tokenizer.ReadNext());
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_6()
+        public void TestCaseUnexpectedEndOfStream6()
         {
-            const String test = "{A";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{A";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(2, () => tokenizer.ReadNext());
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_7()
+        public void TestCaseUnexpectedEndOfStream7()
         {
-            const String test = "{\"-\"";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{\"-\"";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(4, () => tokenizer.ReadNext());
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_8()
+        public void TestCaseUnexpectedEndOfStream8()
         {
-            const String test = "{\"";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{\"";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(2, () => tokenizer.ReadNext());
         }
 
         [Test]
-        public void TestCaseUnexpectedEndOfStream_9()
+        public void TestCaseUnexpectedEndOfStream9()
         {
-            const String test = "{\"\\";
-            var tokenizer = new Tokenizer(test);
+            const string Test = "{\"\\";
+            var tokenizer = new Tokenizer(Test);
 
             AssertToken(tokenizer.ReadNext(), Token.TokenType.StartTag, 0, "{");
             ExpectUnexpectedEndOfStreamException(3, () => tokenizer.ReadNext());

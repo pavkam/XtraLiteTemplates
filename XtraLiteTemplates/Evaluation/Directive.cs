@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,25 +24,21 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Linq;
     using System.Text;    
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Parsing;
+    using Expressions;
+    using Parsing;
 
     /// <summary>
     /// Abstract base class for all supported directives.
     /// </summary>
     public abstract class Directive
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private readonly List<Tag> directiveComponentTags;
+        private readonly List<Tag> _directiveComponentTags;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Directive"/> class.
@@ -51,7 +47,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentNullException">Argument <paramref name="tags"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="tags"/> is empty.</exception>
         /// <exception cref="InvalidOperationException">One or more tags have no defined components.</exception>
-        public Directive(params Tag[] tags)
+        protected Directive(params Tag[] tags)
         {
             Expect.NotEmpty("tags", tags);
 
@@ -65,7 +61,7 @@ namespace XtraLiteTemplates.Evaluation
                 }
             }
 
-            this.directiveComponentTags = new List<Tag>(tags);
+            _directiveComponentTags = new List<Tag>(tags);
         }
 
         /// <summary>
@@ -84,7 +80,7 @@ namespace XtraLiteTemplates.Evaluation
             Restart = 1,
 
             /// <summary>
-            /// Evaluate the all child directives and unparsed text blocks between the current tag and the following one.
+            /// Evaluate the all child directives and un-parsed text blocks between the current tag and the following one.
             /// </summary>
             Evaluate = 2,
 
@@ -94,14 +90,7 @@ namespace XtraLiteTemplates.Evaluation
             Skip = 3,
         }
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        internal IReadOnlyList<Tag> Tags
-        {
-            get
-            {
-                return this.directiveComponentTags;
-            }
-        }
+        internal IReadOnlyList<Tag> Tags => _directiveComponentTags;
 
         /// <summary>
         /// Returns a human-readable representation of the current directive object.
@@ -111,24 +100,24 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (var tag in this.directiveComponentTags)
+            var sb = new StringBuilder();
+            foreach (var tag in _directiveComponentTags)
             {
                 if (sb.Length > 0)
                 {
                     sb.Append("...");
                 }
 
-                sb.AppendFormat("{{{0}}}", tag.ToString());
+                sb.AppendFormat("{{{0}}}", tag);
             }
 
             return sb.ToString();
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="Object" /> is equal to the current directive object using the provided comparer.
+        /// Determines whether the specified <see cref="object" /> is equal to the current directive object using the provided comparer.
         /// <remarks>
-        /// Two directives are equal is all their corresponding tags are equal and in the same order.
+        /// Two directives are equal if all their corresponding tags are equal and in the same order.
         /// </remarks>
         /// </summary>
         /// <param name="obj">The object to compare with the current directive object.</param>
@@ -140,29 +129,27 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.NotNull("comparer", comparer);
 
-            var directiveObj = obj as Directive;
-            if (directiveObj == null || directiveObj.directiveComponentTags.Count != this.directiveComponentTags.Count)
+            if (obj == null || obj.GetType() != GetType())
             {
                 return false;
             }
-            else if (directiveObj == this)
+
+            var directiveObj = (Directive)obj;
+            if (ReferenceEquals(directiveObj, this))
             {
                 return true;
             }
 
-            for (var i = 0; i < this.directiveComponentTags.Count; i++)
+            if (directiveObj._directiveComponentTags.Count != _directiveComponentTags.Count)
             {
-                if (!this.directiveComponentTags[i].Equals(directiveObj.directiveComponentTags[i], comparer))
-                {
-                    return false;
-                }
+                return false;
             }
 
-            return true;
+            return !_directiveComponentTags.Where((t, i) => !t.Equals(directiveObj._directiveComponentTags[i], comparer)).Any();
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="Object" /> is equal to the current directive object using current culture comparing rules.
+        /// Determines whether the specified <see cref="object" /> is equal to the current directive object using current culture comparing rules.
         /// <remarks>
         /// Two directives are equal is all their corresponding tags are equal and in the same order.
         /// </remarks>
@@ -173,7 +160,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         public override bool Equals(object obj)
         {
-            return this.Equals(obj, StringComparer.CurrentCulture);
+            return Equals(obj, StringComparer.CurrentCulture);
         }
 
         /// <summary>
@@ -190,10 +177,7 @@ namespace XtraLiteTemplates.Evaluation
             var hash = 73; /* Magic constant */
             unchecked
             {
-                foreach (var tag in this.Tags)
-                {
-                    hash = (hash * 51) + tag.GetHashCode(comparer);
-                }
+                hash = Tags.Aggregate(hash, (current, tag) => current * 51 + tag.GetHashCode(comparer));
             }
 
             return hash;
@@ -207,7 +191,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         public override int GetHashCode()
         {
-            return this.GetHashCode(StringComparer.CurrentCulture);
+            return GetHashCode(StringComparer.CurrentCulture);
         }
 
         /// <summary>

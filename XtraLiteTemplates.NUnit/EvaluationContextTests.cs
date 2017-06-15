@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,12 +30,9 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.Linq;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Globalization;
-    using XtraLiteTemplates.Evaluation;
     using System.Threading;
+
+    using Evaluation;
 
     [TestFixture]
     public class EvaluationContextTests : TestBase
@@ -52,14 +49,14 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Constructor_UsingNullIdentifierComparer_RaisesException()
+        public void ConstructorUsingNullIdentifierComparerRaisesException()
         {
             new EvaluationContext(false, CancellationToken.None, null, ObjectFormatter, this, (context, text) => text);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Constructor_UsingNullObjectFomatter_RaisesException()
+        public void ConstructorUsingNullObjectFomatterRaisesException()
         {
             new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCulture, null, this, (context, text) => text);
         }
@@ -72,30 +69,30 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void Constructor_PassingTrueForIgnoreEvaluationExceptions_StoresTheValue()
+        public void ConstructorPassingTrueForIgnoreEvaluationExceptionsStoresTheValue()
         {
             var evaluationContext = new EvaluationContext(true, CancellationToken.None, StringComparer.InvariantCulture, ObjectFormatter, this, (context, text) => text);
             Assert.AreEqual(true, evaluationContext.IgnoreEvaluationExceptions);
         }
 
         [Test]
-        public void Constructor_PassingFalseForIgnoreEvaluationExceptions_StoresTheValue()
+        public void ConstructorPassingFalseForIgnoreEvaluationExceptionsStoresTheValue()
         {
             var evaluationContext = new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCulture, ObjectFormatter, this, (context, text) => text);
             Assert.AreEqual(false, evaluationContext.IgnoreEvaluationExceptions);
         }
 
         [Test]
-        public void Constructor_ForCancellationToken_StoresTheValue()
+        public void ConstructorForCancellationTokenStoresTheValue()
         {
-            CancellationTokenSource source = new CancellationTokenSource();
+            var source = new CancellationTokenSource();
             var evaluationContext = new EvaluationContext(false, source.Token, StringComparer.InvariantCulture, ObjectFormatter, this, (context, text) => text);
 
             Assert.AreEqual(source.Token, evaluationContext.CancellationToken);
         }
 
         [Test]
-        public void Constructor_ForInvariantCultureStringComparer_StoresTheValue()
+        public void ConstructorForInvariantCultureStringComparerStoresTheValue()
         {
             _evaluationContext.SetProperty("caseMatters", 1);
 
@@ -103,7 +100,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void Constructor_ForSelfObject_StoresTheValue()
+        public void ConstructorForSelfObjectStoresTheValue()
         {
             Assert.AreEqual(GetType(), _evaluationContext.GetProperty("GetType"));
         }
@@ -113,11 +110,11 @@ namespace XtraLiteTemplates.NUnit
         {
             var evaluationContext = new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCultureIgnoreCase, ObjectFormatter, this, (context, text) => text.ToUpper());
 
-            Assert.AreEqual("LOWERCASE", evaluationContext.ProcessUnparsedText("lowercase"));
+            Assert.AreEqual("LOWERCASE", evaluationContext.ProcessUnParsedText("lowercase"));
         }
 
         [Test]
-        public void ProcessUnparsedText_UsingNullValue_ExecutesDelegate()
+        public void ProcessUnparsedTextUsingNullValueExecutesDelegate()
         {
             var evaluationContext = new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCultureIgnoreCase,
                 ObjectFormatter, this, (context, text) =>
@@ -128,7 +125,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void ProcessUnparsedText_UsingNonNullText_ExecutesDelegate()
+        public void ProcessUnparsedTextUsingNonNullTextExecutesDelegate()
         {
             var evaluationContext = new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCultureIgnoreCase,
                 ObjectFormatter, this, (context, text) =>
@@ -137,25 +134,25 @@ namespace XtraLiteTemplates.NUnit
                     return "EXECUTED";
                 });
 
-            Assert.AreEqual("EXECUTED", evaluationContext.ProcessUnparsedText("text"));
+            Assert.AreEqual("EXECUTED", evaluationContext.ProcessUnParsedText("text"));
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void SetProperty_UsingNullPropertyName_RaisesException()
+        public void SetPropertyUsingNullPropertyNameRaisesException()
         {
             _evaluationContext.SetProperty(null, 1);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
-        public void SetProperty_UsingInvalidPropertyName_RaisesException()
+        public void SetPropertyUsingInvalidPropertyNameRaisesException()
         {
             _evaluationContext.SetProperty("123", 1);
         }
 
         [Test]
-        public void SetProperty_ForCorrectPropertyName_BehavesAsExpected()
+        public void SetPropertyForCorrectPropertyNameBehavesAsExpected()
         {
             _evaluationContext.SetProperty("property", 1);
 
@@ -163,7 +160,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void SetProperty_ForCaseInsensitiveContext_BehavesAsExpected()
+        public void SetPropertyForCaseInsensitiveContextBehavesAsExpected()
         {
             _evaluationContextIgnoreCase.SetProperty("property", 1);
             _evaluationContextIgnoreCase.SetProperty("PROPERTY", 2);
@@ -172,7 +169,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void SetProperty_ForPropertyPartOfSelfObject_OverridesIt()
+        public void SetPropertyForPropertyPartOfSelfObjectOverridesIt()
         {
             _evaluationContext.SetProperty("ToString", "Override!");
 
@@ -180,7 +177,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void SetProperty_ForCaseInsensitiveContextAndPropertySimilarWithOneInSelfObject_OverridesIt()
+        public void SetPropertyForCaseInsensitiveContextAndPropertySimilarWithOneInSelfObjectOverridesIt()
         {
             _evaluationContextIgnoreCase.SetProperty("TOSTRING", "Override!");
 
@@ -189,20 +186,20 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void GetProperty_UsingNullPropertyName_RaisesException()
+        public void GetPropertyUsingNullPropertyNameRaisesException()
         {
             _evaluationContext.GetProperty(null);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
-        public void GetProperty_UsingInvalidPropertyName_RaisesException()
+        public void GetPropertyUsingInvalidPropertyNameRaisesException()
         {
             _evaluationContext.GetProperty("123");
         }
 
         [Test]
-        public void GetProperty_ForCaseInsensitiveContext_IgnoresCase()
+        public void GetPropertyForCaseInsensitiveContextIgnoresCase()
         {
             _evaluationContextIgnoreCase.SetProperty("property", 1);
 
@@ -210,65 +207,65 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void GetProperty_ForPropertyPartOfSelfObject_PassesTheControlToSelfObject()
+        public void GetPropertyForPropertyPartOfSelfObjectPassesTheControlToSelfObject()
         {
             Assert.AreEqual(ToString(), _evaluationContext.GetProperty("ToString"));
         }
 
         [Test]
-        public void GetProperty_ForUnknownProperty_ReturnsNull()
+        public void GetPropertyForUnknownPropertyReturnsNull()
         {
             Assert.IsNull(_evaluationContext.GetProperty("any_property"));
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void GetProperty_WithObject_UsingNullPropertyName_RaisesException()
+        public void GetPropertyWithObjectUsingNullPropertyNameRaisesException()
         {
             _evaluationContext.GetProperty(this, null);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
-        public void GetProperty_WithObject_UsingInvalidPropertyName_RaisesException()
+        public void GetPropertyWithObjectUsingInvalidPropertyNameRaisesException()
         {
             _evaluationContext.GetProperty(this, "123");
         }
 
         [Test]
-        public void GetProperty_WithObject_ForCaseInsensitiveContext_IgnoresCase()
+        public void GetPropertyWithObjectForCaseInsensitiveContextIgnoresCase()
         {
             Assert.AreEqual(ToString(), _evaluationContextIgnoreCase.GetProperty(this, "TOSTRING"));
         }
 
         [Test]
-        public void GetProperty_WithObject_ForNullObject_ReturnsNull()
+        public void GetPropertyWithObjectForNullObjectReturnsNull()
         {
             Assert.IsNull(_evaluationContext.GetProperty(null, "ToString"));
         }
 
         [Test]
-        public void GetProperty_WithObject_ForUnknownProperty_ReturnsNull()
+        public void GetPropertyWithObjectForUnknownPropertyReturnsNull()
         {
             Assert.IsNull(_evaluationContext.GetProperty(this, "any_property"));
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void AddStateObject_UsingNullStateObject_RaisesException()
+        public void AddStateObjectUsingNullStateObjectRaisesException()
         {
             _evaluationContext.AddStateObject(null);
         }
 
         [Test]
-        public void AddStateObject_InNormalCases_BehavesAsExpected()
+        public void AddStateObjectInNormalCasesBehavesAsExpected()
         {
             _evaluationContext.AddStateObject(this);
             Assert.IsTrue(_evaluationContext.ContainsStateObject(this));
         }
 
         [Test]
-        public void AddStateObject_ForTheSameObjectMultipleTimes_KeepsOnlyOneCopy()
+        public void AddStateObjectForTheSameObjectMultipleTimesKeepsOnlyOneCopy()
         {
             _evaluationContext.AddStateObject(this);
             _evaluationContext.AddStateObject(this);
@@ -279,13 +276,13 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void RemoveStateObject_UsingNullStateObject_RaisesException()
+        public void RemoveStateObjectUsingNullStateObjectRaisesException()
         {
             _evaluationContext.RemoveStateObject(null);
         }
 
         [Test]
-        public void RemoveStateObject_ForUnknownObject_DoesNothing()
+        public void RemoveStateObjectForUnknownObjectDoesNothing()
         {
             _evaluationContext.AddStateObject(1);
             _evaluationContext.RemoveStateObject(2);
@@ -295,19 +292,19 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ContainsStateObject_UsingNullStateObject_RaisesException()
+        public void ContainsStateObjectUsingNullStateObjectRaisesException()
         {
             _evaluationContext.ContainsStateObject(null);
         }
 
         [Test]
-        public void ContainsStateObject_ForUnknownObject_ReturnsFalse()
+        public void ContainsStateObjectForUnknownObjectReturnsFalse()
         {
             Assert.IsFalse(_evaluationContext.ContainsStateObject(1));
         }
 
         [Test]
-        public void ContainsStateObject_ForKnownObject_ReturnsTrue()
+        public void ContainsStateObjectForKnownObjectReturnsTrue()
         {
             _evaluationContext.AddStateObject(1);
             Assert.IsTrue(_evaluationContext.ContainsStateObject(1));
@@ -315,85 +312,85 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Invoke_UsingNullMethodName_RaisesException()
+        public void InvokeUsingNullMethodNameRaisesException()
         {
             _evaluationContext.Invoke(null, new object[] { });
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
-        public void Invoke_UsingInvalidMethodName_RaisesException()
+        public void InvokeUsingInvalidMethodNameRaisesException()
         {
             _evaluationContext.Invoke("123", new object[] { });
         }
 
         [Test]
-        public void Invoke_ForPropertyDefinedInContextAndNoArguments_ReturnsThePropertyValue()
+        public void InvokeForPropertyDefinedInContextAndNoArgumentsReturnsThePropertyValue()
         {
             _evaluationContext.SetProperty("property", 100);
             Assert.AreEqual(100, _evaluationContext.Invoke("property", null));
         }
 
         [Test]
-        public void Invoke_ForPropertyDefinedInContextAndArguments_ReturnsNull()
+        public void InvokeForPropertyDefinedInContextAndArgumentsReturnsNull()
         {
             _evaluationContext.SetProperty("property", 100);
             Assert.IsNull(_evaluationContext.Invoke("property", new object[] { 1 }));
         }
 
         [Test]
-        public void Invoke_ForMethodDefinedInSelfObject_ReturnsItsValue()
+        public void InvokeForMethodDefinedInSelfObjectReturnsItsValue()
         {
             Assert.AreEqual(ToString(), _evaluationContext.Invoke("ToString", null));
         }
 
         [Test]
-        public void Invoke_UsingNullArgumentsArray_IsSimilarToEmptyArray()
+        public void InvokeUsingNullArgumentsArrayIsSimilarToEmptyArray()
         {
             Assert.AreEqual(_evaluationContext.Invoke("ToString", new object[] { }), _evaluationContext.Invoke("ToString", null));
         }
 
         [Test]
-        public void Invoke_ForUnknownMethodOrProperty_ReturnsNull()
+        public void InvokeForUnknownMethodOrPropertyReturnsNull()
         {
             Assert.IsNull(_evaluationContext.Invoke("DoesNotExist", null));
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Invoke_WithObject_UsingNullMethodName_RaisesException()
+        public void InvokeWithObjectUsingNullMethodNameRaisesException()
         {
             _evaluationContext.Invoke(this, null, new object[] { });
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentException))]
-        public void Invoke_WithObject_UsingInvalidMethodName_RaisesException()
+        public void InvokeWithObjectUsingInvalidMethodNameRaisesException()
         {
             _evaluationContext.Invoke(this, "123", new object[] { });
         }
 
         [Test]
-        public void Invoke_WithObject_ForPropertyDefinedInContextAndNoArguments_ReturnsNull()
+        public void InvokeWithObjectForPropertyDefinedInContextAndNoArgumentsReturnsNull()
         {
             _evaluationContext.SetProperty("property", 100);
             Assert.IsNull(_evaluationContext.Invoke(this, "property", null));
         }
 
         [Test]
-        public void Invoke_WithObject_ForToStringForAnInteger_ReturnsItsValue()
+        public void InvokeWithObjectForToStringForAnIntegerReturnsItsValue()
         {
             Assert.AreEqual("100", _evaluationContext.Invoke(100, "ToString", null));
         }
 
         [Test]
-        public void Invoke_WithObject_UsingNullAgrumentsArray_IsSimilarToEmptyArray()
+        public void InvokeWithObjectUsingNullAgrumentsArrayIsSimilarToEmptyArray()
         {
             Assert.AreEqual(_evaluationContext.Invoke(this, "ToString", new object[] { }), _evaluationContext.Invoke(this, "ToString", null));
         }
 
         [Test]
-        public void Invoke_WithObject_ForUnknownMethodOrProperty_ReturnsNull()
+        public void InvokeWithObjectForUnknownMethodOrPropertyReturnsNull()
         {
             Assert.IsNull(_evaluationContext.Invoke(this, "DoesNotExist", null));
         }

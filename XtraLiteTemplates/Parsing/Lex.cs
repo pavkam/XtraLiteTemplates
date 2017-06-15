@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,8 +24,6 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Parsing
 {
     using System;
@@ -46,8 +44,8 @@ namespace XtraLiteTemplates.Parsing
             Expect.GreaterThanOrEqual("firstCharacterIndex", firstCharacterIndex, 0);
             Expect.GreaterThan("originalLength", originalLength, 0);
 
-            this.FirstCharacterIndex = firstCharacterIndex;
-            this.OriginalLength = originalLength;
+            FirstCharacterIndex = firstCharacterIndex;
+            OriginalLength = originalLength;
         }
 
         /// <summary>
@@ -59,7 +57,7 @@ namespace XtraLiteTemplates.Parsing
         /// <remarks>
         /// The value of this property is provided by the caller during the construction process.
         /// </remarks>
-        public int FirstCharacterIndex { get; private set; }
+        public int FirstCharacterIndex { get; }
 
         /// <summary>
         /// Gets original length of all tokens combined that make up this <c>lex</c> object.
@@ -70,6 +68,6 @@ namespace XtraLiteTemplates.Parsing
         /// <remarks>
         /// The value of this property is provided by the caller during the construction process.
         /// </remarks>
-        public int OriginalLength { get; private set; }
+        public int OriginalLength { get; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -29,13 +29,9 @@
 namespace XtraLiteTemplates.Introspection
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Reflection;
-    using System.Text;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Event arguments class used by <see cref="SimpleTypeDisemboweler"/> class to decide whether a type member is accepted or rejected.
@@ -47,8 +43,8 @@ namespace XtraLiteTemplates.Introspection
         {
             Debug.Assert(memberInfo != null, "Argument memberInfo cannot be null.");
 
-            this.Member = memberInfo;
-            this.Accepted = true;
+            Member = memberInfo;
+            Accepted = true;
         }
 
         /// <summary>
@@ -57,7 +53,7 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The type member.
         /// </value>
-        public MemberInfo Member { get; private set; }
+        public MemberInfo Member { get; }
 
         /// <summary>
         /// Gets or sets a value indicating whether type member is accepted as a suitable candidate.

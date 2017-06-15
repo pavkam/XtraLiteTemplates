@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,15 +24,13 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
+    using System.Diagnostics.CodeAnalysis;
+    using Expressions;
+    using Introspection;
 
     /// <summary>
     /// The abstract base class for all standard binary relational expression operators.
@@ -49,7 +47,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Arguments <paramref name="symbol" />, <paramref name="typeConverter" /> or <paramref name="stringComparer" /> are <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
-        public StandardRelationalOperator(
+        protected StandardRelationalOperator(
             string symbol, 
             int precedence, 
             IComparer<string> stringComparer, 
@@ -58,7 +56,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull("stringComparer", stringComparer);
 
-            this.StringComparer = stringComparer;
+            StringComparer = stringComparer;
         }
 
         /// <summary>
@@ -68,34 +66,34 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <value>
         /// The string literal comparer.
         /// </value>
-        public IComparer<string> StringComparer { get; private set; }
+        public IComparer<string> StringComparer { get; }
 
         /// <summary>
-        /// Evaluates the current operator for a given <paramref name="left" /> and <paramref name="right" /> operands. This method calls <see cref="Evaluate(Int32,Object,Object)"/>, which
+        /// Evaluates the current operator for a given <paramref name="left" /> and <paramref name="right" /> operands. This method calls <see cref="Evaluate(int,object,object)"/>, which
         /// is expected to be implemented in descendant classes.
         /// </summary>
         /// <param name="context">The evaluation context.</param>
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>
-        /// A <seealso cref="Boolean"/> value indicating the result of the comparison.
+        /// A <seealso cref="bool"/> value indicating the result of the comparison.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public sealed override object Evaluate(IExpressionEvaluationContext context, object left, object right)
+        public override sealed object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
             Expect.NotNull("context", context);
 
             int relation;
-            if (this.TypeConverter.TypeOf(left) == PrimitiveType.String || this.TypeConverter.TypeOf(right) == PrimitiveType.String)
+            if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)
             {
-                relation = this.StringComparer.Compare(this.TypeConverter.ConvertToString(left), this.TypeConverter.ConvertToString(right));
+                relation = StringComparer.Compare(TypeConverter.ConvertToString(left), TypeConverter.ConvertToString(right));
             }
             else
             {
-                relation = this.TypeConverter.ConvertToNumber(left).CompareTo(this.TypeConverter.ConvertToNumber(right));
+                relation = TypeConverter.ConvertToNumber(left).CompareTo(TypeConverter.ConvertToNumber(right));
             }
 
-            return this.Evaluate(relation, left, right);
+            return Evaluate(relation, left, right);
         }
 
         /// <summary>
@@ -105,8 +103,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="left">The left operand.</param>
         /// <param name="right">The right operand.</param>
         /// <returns>
-        /// A <see cref="Boolean"/> value indicating the result of the validation.
+        /// A <see cref="bool"/> value indicating the result of the validation.
         /// </returns>
-        public abstract bool Evaluate(int relation, object left, object right);
+        [SuppressMessage("ReSharper", "UnusedParameter.Global")]
+        protected abstract bool Evaluate(int relation, object left, object right);
     }
 }

@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,21 +30,26 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.Globalization;
-    using System.Linq;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Dialects.Standard;
     using System.Collections.Generic;
-    using XtraLiteTemplates.NUnit.Inside;
-    using System.IO;
     using System.Diagnostics;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Compilation;
+    using System.Globalization;
+    using System.IO;
+    using System.Linq;
     using System.Threading;
+
+    using Compilation;
+
+    using Evaluation;
+
+    using Expressions;
+
+    using Inside;
+
+    using Introspection;
+
+    using Parsing;
+
+    using XtraLiteTemplates.Dialects.Standard.Directives;
 
     public class TestBase
     {
@@ -56,13 +61,13 @@ namespace XtraLiteTemplates.NUnit
             return new EvaluationContext(true, CancellationToken.None, comparer, ObjectFormatter, null, (context, text) => text);
         }
 
-        protected String Evaluate(CompiledTemplate<EvaluationContext> compiledTemplate, StringComparer comparer, params KeyValuePair<String, Object>[] values)
+        protected string Evaluate(CompiledTemplate<EvaluationContext> compiledTemplate, StringComparer comparer, params KeyValuePair<string, object>[] values)
         {
             var context = CreateContext(comparer);
             foreach (var kvp in values)
                 context.SetProperty(kvp.Key, kvp.Value);
 
-            String result = null;
+            string result = null;
             using (var sw = new StringWriter())
             {
                 compiledTemplate.Evaluate(sw, context);
@@ -72,7 +77,7 @@ namespace XtraLiteTemplates.NUnit
             return result;
         }
 
-        protected String Evaluate(String template, Directive directive, params KeyValuePair<String, Object>[] values)
+        protected string Evaluate(string template, Directive directive, params KeyValuePair<string, object>[] values)
         {
             Debug.Assert(directive != null);
 
@@ -85,7 +90,7 @@ namespace XtraLiteTemplates.NUnit
             return Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, values);
         }
 
-        protected void ExpectArgumentNullException(String argument, Action action)
+        protected void ExpectArgumentNullException(string argument, Action action)
         {
             try
             {
@@ -95,7 +100,7 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ArgumentNullException), e);
                 Assert.IsTrue(e.Message.StartsWith(
-                        String.Format("Argument \"{0}\" cannot be null.", argument), 
+                    $"Argument \"{argument}\" cannot be null.", 
                         StringComparison.CurrentCulture));
                 return;
             }
@@ -103,7 +108,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected void ExpectArgumentEmptyException(String argument, Action action)
+        protected void ExpectArgumentEmptyException(string argument, Action action)
         {
             try
             {
@@ -113,7 +118,7 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ArgumentException), e);
                 Assert.IsTrue(e.Message.StartsWith(
-                        String.Format("Argument \"{0}\" cannot be empty.", argument),
+                    $"Argument \"{argument}\" cannot be empty.",
                         StringComparison.CurrentCulture));
                 return;
             }
@@ -121,7 +126,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected void ExpectArgumentNotIdentifierException(String argument, Action action)
+        protected void ExpectArgumentNotIdentifierException(string argument, Action action)
         {
             try
             {
@@ -130,7 +135,7 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ArgumentException), e);
-                Assert.IsTrue(e.Message.StartsWith(String.Format("Argument \"{0}\" does not represent a valid identifer.", argument), StringComparison.CurrentCulture));
+                Assert.IsTrue(e.Message.StartsWith($"Argument \"{argument}\" does not represent a valid identifier.", StringComparison.CurrentCulture));
                 return;
             }
 
@@ -138,97 +143,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
 
-        protected void ExpectArgumentsEqualException(String argument1, String argument2, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ArgumentException), e);
-                Assert.IsTrue(e.Message.StartsWith(
-                        String.Format("Arguments \"{0}\" and \"{1}\" cannot be equal.", argument1, argument2), 
-                        StringComparison.CurrentCulture));
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        protected void ExpectArgumentLessThanOrEqualException<T>(String argument, T than, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ArgumentOutOfRangeException), e);
-                Assert.IsTrue(e.Message.StartsWith(
-                        String.Format("Argument \"{0}\" is expected to be greater than {1}.", argument, than), 
-                        StringComparison.CurrentCulture));
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        protected void ExpectArgumentLessThanException<T>(String argument, T than, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ArgumentOutOfRangeException), e);
-                Assert.IsTrue(e.Message.StartsWith(
-                        String.Format("Argument \"{0}\" is expected to be greater than or equal to {1}.", argument, than), 
-                        StringComparison.CurrentCulture));
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        protected void ExpectArgumentGreaterThanOrEqualException<T>(String argument, T than, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ArgumentOutOfRangeException), e);
-                Assert.IsTrue(e.Message.StartsWith(
-                        String.Format("Argument \"{0}\" is expected to be less than {1}.", argument, than), 
-                        StringComparison.CurrentCulture));
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        protected void ExpectArgumentGreaterThanException<T>(String argument, T than, Action action)
-        {
-            try
-            {
-                action();
-            }
-            catch (Exception e)
-            {
-                Assert.IsInstanceOf(typeof(ArgumentOutOfRangeException), e);
-                Assert.IsTrue(e.Message.StartsWith(
-                        String.Format("Argument \"{0}\" is expected to be less than or equal to {1}.", argument, than), 
-                        StringComparison.CurrentCulture));
-                return;
-            }
-
-            Assert.Fail();
-        }
-
-        protected void ExpectArgumentConditionNotTrueException(String condition, Action action)
+        protected void ExpectArgumentsEqualException(string argument1, string argument2, Action action)
         {
             try
             {
@@ -238,7 +153,97 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ArgumentException), e);
                 Assert.IsTrue(e.Message.StartsWith(
-                        String.Format("Argument condition \"{0}\" failed to be validated as true.", condition), 
+                    $"Arguments \"{argument1}\" and \"{argument2}\" cannot be equal.", 
+                        StringComparison.CurrentCulture));
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected void ExpectArgumentLessThanOrEqualException<T>(string argument, T than, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ArgumentOutOfRangeException), e);
+                Assert.IsTrue(e.Message.StartsWith(
+                    $"Argument \"{argument}\" is expected to be greater than {than}.", 
+                        StringComparison.CurrentCulture));
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected void ExpectArgumentLessThanException<T>(string argument, T than, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ArgumentOutOfRangeException), e);
+                Assert.IsTrue(e.Message.StartsWith(
+                    $"Argument \"{argument}\" is expected to be greater than or equal to {than}.", 
+                        StringComparison.CurrentCulture));
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected void ExpectArgumentGreaterThanOrEqualException<T>(string argument, T than, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ArgumentOutOfRangeException), e);
+                Assert.IsTrue(e.Message.StartsWith(
+                    $"Argument \"{argument}\" is expected to be less than {than}.", 
+                        StringComparison.CurrentCulture));
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected void ExpectArgumentGreaterThanException<T>(string argument, T than, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ArgumentOutOfRangeException), e);
+                Assert.IsTrue(e.Message.StartsWith(
+                    $"Argument \"{argument}\" is expected to be less than or equal to {than}.", 
+                        StringComparison.CurrentCulture));
+                return;
+            }
+
+            Assert.Fail();
+        }
+
+        protected void ExpectArgumentConditionNotTrueException(string condition, Action action)
+        {
+            try
+            {
+                action();
+            }
+            catch (Exception e)
+            {
+                Assert.IsInstanceOf(typeof(ArgumentException), e);
+                Assert.IsTrue(e.Message.StartsWith(
+                    $"Argument condition \"{condition}\" failed to be validated as true.", 
                         StringComparison.CurrentCulture));
                 return;
             }
@@ -247,7 +252,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
 
-        protected static void ExpectUnexpectedCharacterException(Int32 index, Char character, Action action)
+        protected static void ExpectUnexpectedCharacterException(int index, char character, Action action)
         {
             try
             {
@@ -256,18 +261,19 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ParseException), e);
-                Assert.AreEqual(String.Format("Unexpected character '{0}' found at position {1}.", character, index), e.Message);
+                Assert.AreEqual($"Unexpected character '{character}' found at position {index}.", e.Message);
                 if (e is ParseException)
                 {
                     Assert.AreEqual(index, (e as ParseException).CharacterIndex);
                 }
+
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectInvalidEscapeCharacterException(Int32 index, Char character, Action action)
+        protected static void ExpectInvalidEscapeCharacterException(int index, char character, Action action)
         {
             try
             {
@@ -276,18 +282,19 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ParseException), e);
-                Assert.AreEqual(String.Format("Invalid escape character '{0}' at position {1}.", character, index), e.Message);
+                Assert.AreEqual($"Invalid escape character '{character}' at position {index}.", e.Message);
                 if (e is ParseException)
                 {
                     Assert.AreEqual(index, (e as ParseException).CharacterIndex);
                 }
+
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectUnexpectedEndOfStreamException(Int32 index, Action action)
+        protected static void ExpectUnexpectedEndOfStreamException(int index, Action action)
         {
             try
             {
@@ -296,11 +303,12 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ParseException), e);
-                Assert.AreEqual(String.Format("Unexpected end of stream detected at position {0}.", index), e.Message);
+                Assert.AreEqual($"Unexpected end of stream detected at position {index}.", e.Message);
                 if (e is ParseException)
                 {
                     Assert.AreEqual(index, (e as ParseException).CharacterIndex);
                 }
+
                 return;
             }
 
@@ -309,7 +317,7 @@ namespace XtraLiteTemplates.NUnit
 
 
 
-        protected static void ExpectUnexpectedTokenException(Int32 index, Int32 originalLength, String token, Token.TokenType type, Action action)
+        protected static void ExpectUnexpectedTokenException(int index, int originalLength, string token, Token.TokenType type, Action action)
         {
             try
             {
@@ -318,7 +326,7 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(LexingException), e);
-                Assert.AreEqual(String.Format("Unexpected token '{0}' (type: {1}) found at position {2}.", token, type, index), e.Message);
+                Assert.AreEqual($"Unexpected token '{token}' (type: {type}) found at position {index}.", e.Message);
 
                 Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
                 Assert.AreEqual(originalLength, (e as LexingException).Token.OriginalLength);
@@ -331,7 +339,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected static void ExpectNoMatchingTagsLeftException(Object[] components, Int32 index, Int32 originalLength, String token, Token.TokenType type, Action action)
+        protected static void ExpectNoMatchingTagsLeftException(object[] components, int index, int originalLength, string token, Token.TokenType type, Action action)
         {
             try
             {
@@ -343,13 +351,13 @@ namespace XtraLiteTemplates.NUnit
 
                 if (components != null && components.Length > 0)
                 {
-                    Assert.AreEqual(String.Format("No matching tags composed of {{{3}}} found that can be continued with the token '{0}' (type: {1}) found at position {2}.", 
-                        token, type, index, String.Join(" ", components)), e.Message);
+                    Assert.AreEqual(string.Format("No matching tags composed of {{{3}}} found that can be continued with the token '{0}' (type: {1}) found at position {2}.", 
+                        token, type, index, string.Join(" ", components)), e.Message);
                 }
                 else
                 {
-                    Assert.AreEqual(String.Format("No matching tags found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
-                        token, type, index), e.Message);
+                    Assert.AreEqual(
+                        $"No matching tags found that can be continued with the token '{token}' (type: {type}) found at position {index}.", e.Message);
                 }
 
                 Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
@@ -363,7 +371,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected static void ExpectUnexpectedOrInvalidExpressionTokenException(Int32 index, Int32 originalLength, String token, Token.TokenType type, Action action)
+        protected static void ExpectUnexpectedOrInvalidExpressionTokenException(int index, int originalLength, string token, Token.TokenType type, Action action)
         {
             try
             {
@@ -372,7 +380,7 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(LexingException), e);
-                Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Invalid expression term: '{0}'.",
+                Assert.AreEqual(string.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Invalid expression term: '{0}'.",
                     token, type, index), e.Message);
 
                 Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
@@ -403,7 +411,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected static void ExpectOperatorAlreadyRegisteredException(String @operator, Action action)
+        protected static void ExpectOperatorAlreadyRegisteredException(string @operator, Action action)
         {
             try
             {
@@ -412,7 +420,7 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(InvalidOperationException), e);
-                Assert.AreEqual(String.Format("Operator '{0}' (or one of its identifying symbols) already registered.", @operator), e.Message);
+                Assert.AreEqual($"Operator '{@operator}' (or one of its identifying symbols) already registered.", e.Message);
 
                 return;
             }
@@ -421,7 +429,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
 
-        protected static void ExpectSpecialCannotBeRegisteredException(String keyword, Action action)
+        protected static void ExpectSpecialCannotBeRegisteredException(string keyword, Action action)
         {
             try
             {
@@ -430,7 +438,8 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(InvalidOperationException), e);
-                Assert.AreEqual(String.Format("Special keyword '{0}' cannot be registered as it is currently in use by an operator.", keyword), e.Message);
+                Assert.AreEqual(
+                    $"Special keyword '{keyword}' cannot be registered as it is currently in use by an operator.", e.Message);
 
                 return;
             }
@@ -438,7 +447,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected static void ExpectUnbalancedExpressionCannotBeFinalizedException(Int32 index, String token, Token.TokenType type, Action action)
+        protected static void ExpectUnbalancedExpressionCannotBeFinalizedException(int index, string token, Token.TokenType type, Action action)
         {
             try
             {
@@ -447,8 +456,8 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ParseException), e);
-                Assert.AreEqual(String.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Unbalanced expressions cannot be finalized.",
-                    token, type, index), e.Message);
+                Assert.AreEqual(
+                    $"Unexpected or invalid expression token '{token}' (type: {type}) found at position {index}. Error: Unbalanced expressions cannot be finalized.", e.Message);
 
                 return;
             }
@@ -466,7 +475,7 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(InvalidOperationException), e);
-                Assert.AreEqual("Indentifier tag component cannot follow an expression.", e.Message);
+                Assert.AreEqual("Identifier tag component cannot follow an expression.", e.Message);
                 return;
             }
 
@@ -489,7 +498,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected static void ExpectInvalidTagMarkupException(String markup, Action action)
+        protected static void ExpectInvalidTagMarkupException(string markup, Action action)
         {
             try
             {
@@ -498,7 +507,7 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(FormatException), e);
-                Assert.AreEqual(String.Format("Invalid tag markup: '{0}'", markup), e.Message);
+                Assert.AreEqual($"Invalid tag markup: '{markup}'", e.Message);
                 return;
             }
 
@@ -554,7 +563,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected static void ExpectInvalidExpressionTermException(Object term, Action action)
+        protected static void ExpectInvalidExpressionTermException(object term, Action action)
         {
             try
             {
@@ -563,14 +572,14 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
-                Assert.AreEqual(String.Format("Invalid expression term: '{0}'.", term), e.Message);
+                Assert.AreEqual($"Invalid expression term: '{term}'.", e.Message);
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectUnexpectedExpressionTermException(Object term, Action action)
+        protected static void ExpectUnexpectedExpressionTermException(object term, Action action)
         {
             try
             {
@@ -579,14 +588,14 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
-                Assert.AreEqual(String.Format("Unexpected expression term: '{0}'.", term), e.Message);
+                Assert.AreEqual($"Unexpected expression term: '{term}'.", e.Message);
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectUnexpectedLiteralRequiresOperatorException(Object literal, Action action)
+        protected static void ExpectUnexpectedLiteralRequiresOperatorException(object literal, Action action)
         {
             try
             {
@@ -595,14 +604,14 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
-                Assert.AreEqual(String.Format("Unexpected expression literal value: '{0}'. Expected operator.", literal), e.Message);
+                Assert.AreEqual($"Unexpected expression literal value: '{literal}'. Expected operator.", e.Message);
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectUnexpectedExpressionOperatorException(String @operator, Action action)
+        protected static void ExpectUnexpectedExpressionOperatorException(string @operator, Action action)
         {
             try
             {
@@ -611,14 +620,14 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
-                Assert.AreEqual(String.Format("Unexpected expression operator: '{0}'.", @operator), e.Message);
+                Assert.AreEqual($"Unexpected expression operator: '{@operator}'.", e.Message);
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectUnexpectedLiteralRequiresIdentifierException(String @operator, Object literal, Action action)
+        protected static void ExpectUnexpectedLiteralRequiresIdentifierException(string @operator, object literal, Action action)
         {
             try
             {
@@ -627,7 +636,8 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(ExpressionException), e);
-                Assert.AreEqual(String.Format("Operator '{0}' cannot be applied to literal value: '{1}'. Expected identifier.", @operator, literal), e.Message);
+                Assert.AreEqual(
+                    $"Operator '{@operator}' cannot be applied to literal value: '{literal}'. Expected identifier.", e.Message);
 
                 return;
             }
@@ -652,7 +662,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
 
-        protected static void ExpectUnmatchedDirectiveTagException(Directive[] directives, Int32 index, Action action)
+        protected static void ExpectUnmatchedDirectiveTagException(Directive[] directives, int index, Action action)
         {
             try
             {
@@ -661,15 +671,15 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(InterpreterException), e);
-                Assert.AreEqual(String.Format("Directive(s) {0} encountered at position {1}, could not be finalized by matching all component tags.", 
-                    String.Join(" or ", directives.AsEnumerable()), index), e.Message);
+                Assert.AreEqual(
+                    $"Directive(s) {string.Join(" or ", directives.AsEnumerable())} encountered at position {index}, could not be finalized by matching all component tags.", e.Message);
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectUnexpectedTagException(String actualTag, Int32 index, Action action)
+        protected static void ExpectUnexpectedTagException(string actualTag, int index, Action action)
         {
             try
             {
@@ -678,14 +688,14 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(InterpreterException), e);
-                Assert.AreEqual(String.Format("Unexpected tag {{{0}}} encountered at position {1}.", actualTag, index), e.Message);    
+                Assert.AreEqual($"Unexpected tag {{{actualTag}}} encountered at position {index}.", e.Message);    
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectInvalidObjectMemberNameException(String memberName, Action action)
+        protected static void ExpectInvalidObjectMemberNameException(string memberName, Action action)
         {
             try
             {
@@ -694,14 +704,14 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(EvaluationException), e);
-                Assert.AreEqual(String.Format("Property or method '{0}' could not be located in the provided object.", memberName), e.Message);
+                Assert.AreEqual($"Property or method '{memberName}' could not be located in the provided object.", e.Message);
                 return;
             }
 
             Assert.Fail();
         }
 
-        protected static void ExpectObjectMemberEvaluationErrorException(String memberName, Action action)
+        protected static void ExpectObjectMemberEvaluationErrorException(string memberName, Action action)
         {
             try
             {
@@ -710,7 +720,8 @@ namespace XtraLiteTemplates.NUnit
             catch (Exception e)
             {
                 Assert.IsInstanceOf(typeof(EvaluationException), e);
-                Assert.IsTrue(e.Message.StartsWith(String.Format("Evaluation of property or method '{0}' failed. An exception was raised:", memberName)));
+                Assert.IsTrue(e.Message.StartsWith(
+                    $"Evaluation of property or method '{memberName}' failed. An exception was raised:"));
                 return;
             }
 

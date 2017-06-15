@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,13 +24,10 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Compilation
 {
     using System.IO;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
+    using Expressions;
 
     /// <summary>
     /// Delegate type used by <see cref="CompiledTemplateFactory{TContext}"/> when compiling a template.
@@ -38,5 +35,5 @@ namespace XtraLiteTemplates.Compilation
     /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
     /// <param name="writer">The <see cref="TextWriter"/> that will be written to.</param>
     /// <param name="context">The evaluation context.</param>
-    public delegate void CompiledEvaluationDelegate<TContext>(TextWriter writer, TContext context) where TContext : IExpressionEvaluationContext;
+    public delegate void CompiledEvaluationDelegate<in TContext>(TextWriter writer, TContext context) where TContext : IExpressionEvaluationContext;
 }

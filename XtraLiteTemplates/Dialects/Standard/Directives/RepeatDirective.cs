@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,29 +24,21 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Expressions;
+    using Introspection;
+    using Parsing;
 
     /// <summary>
-    /// The REAPEAT directive implementation.
+    /// The REPEAT directive implementation.
     /// </summary>
     public sealed class RepeatDirective : StandardDirective
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int iterationCountExpressionComponentIndex;
+        private readonly int _iterationCountExpressionComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="RepeatDirective" /> class.
@@ -62,7 +54,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public RepeatDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 2, "Expected a tag count of 2.");
+            Debug.Assert(Tags.Count == 2, "Expected a tag count of 2.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -71,7 +63,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
 
-            this.iterationCountExpressionComponentIndex = expressionComponents[0];
+            _iterationCountExpressionComponentIndex = expressionComponents[0];
         }
 
         /// <summary>
@@ -107,7 +99,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1, "tagIndex must be between 0 and 1.");
             Debug.Assert(components != null, "components cannot be null.");
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount, "component length must match tag component length.");
             Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
@@ -116,7 +108,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             {
                 /* Starting up. */
                 Debug.Assert(tagIndex == 0, "tagIndex expected to be 0.");
-                remainingIterations = TypeConverter.ConvertToInteger(components[this.iterationCountExpressionComponentIndex]);
+                remainingIterations = TypeConverter.ConvertToInteger(components[_iterationCountExpressionComponentIndex]);
             }
             else if (tagIndex == 0)
             {
@@ -134,10 +126,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 state = remainingIterations;
                 return FlowDecision.Evaluate;
             }
-            else
-            {
-                return FlowDecision.Terminate;
-            }
+
+            return FlowDecision.Terminate;
         }
     }
 }

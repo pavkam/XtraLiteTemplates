@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,65 +24,40 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Parsing
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
     using System.Text;
 
     /// <summary>
-    /// The basic building block of <see cref="XtraLiteTemplates.Evaluation.Directive"/> classes. The tag defines a set of keywords, identifier and expression
+    /// The basic building block of <see cref="Evaluation.Directive"/> classes. The tag defines a set of keywords, identifier and expression
     /// match rules that need to be satisfied during the lexical analysis.
     /// </summary>
     public sealed class Tag
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private const string MarkupExpressionWord = "$";
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private const string MarkupAnyIdentifierWord = "?";
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private const char MarkupIdentifierGroupStartCharacter = '(';
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private const char MarkupIdentifierGroupEndCharacter = ')';
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private readonly IList<object> components;
+        private readonly IList<object> _components;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Tag"/> class.
         /// </summary>
         public Tag()
         {
-            this.components = new List<object>();
+            _components = new List<object>();
         }
 
         /// <summary>
         /// <value>Gets the number of components this tag has defined.</value>
         /// </summary>
-        public int ComponentCount
-        {
-            get
-            {
-                return this.components.Count;
-            }
-        }
+        public int ComponentCount => _components.Count;
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private bool LastComponentIsExpression
-        {
-            get
-            {
-                return this.components.Count > 0 && this.components[this.components.Count - 1] == null;
-            }
-        }
+        private bool LastComponentIsExpression => _components.Count > 0 && _components[_components.Count - 1] == null;
 
         /// <summary>
         /// Tries to parse a given tag markup string. This is an easy way to defined tags without needing to resort to calling individual component methods.
@@ -103,9 +78,10 @@ namespace XtraLiteTemplates.Parsing
             var identifierGroupBeingParsed = false;
             var currentParsedWord = new StringBuilder();
             var currentIdentifierGroup = new HashSet<string>();
-            for (var i = 0; i < markup.Length; i++)
+
+            foreach (var t in markup)
             {
-                if (char.IsWhiteSpace(markup[i]) || markup[i] == MarkupIdentifierGroupStartCharacter || markup[i] == MarkupIdentifierGroupEndCharacter)
+                if (char.IsWhiteSpace(t) || t == MarkupIdentifierGroupStartCharacter || t == MarkupIdentifierGroupEndCharacter)
                 {
                     /* A term has ended (maybe) */
                     if (currentParsedWord.Length > 0)
@@ -113,83 +89,78 @@ namespace XtraLiteTemplates.Parsing
                         var word = currentParsedWord.ToString();
                         currentParsedWord.Clear();
 
-                        if (word == MarkupExpressionWord)
+                        switch (word)
                         {
-                            /* This signifies an expression. */
-                            if (beingBuilt.LastComponentIsExpression || identifierGroupBeingParsed)
-                            {
-                                return false;
-                            }
-                            else
-                            {
+                            case MarkupExpressionWord:
+                                /* This signifies an expression. */
+                                if (beingBuilt.LastComponentIsExpression || identifierGroupBeingParsed)
+                                {
+                                    return false;
+                                }
+
                                 beingBuilt.Expression();
-                            }
-                        }
-                        else if (word == MarkupAnyIdentifierWord)
-                        {
-                            /* This signifies an expression. */
-                            if (beingBuilt.LastComponentIsExpression || identifierGroupBeingParsed)
-                            {
-                                return false;
-                            }
-                            else
-                            {
+                                break;
+                            case MarkupAnyIdentifierWord:
+                                /* This signifies an expression. */
+                                if (beingBuilt.LastComponentIsExpression || identifierGroupBeingParsed)
+                                {
+                                    return false;
+                                }
+
                                 beingBuilt.Identifier();
-                            }
+                                break;
+                            default:
+                                var identifier = AsIdentifier(word);
+
+                                if (identifier == null)
+                                {
+                                    return false;
+                                }
+
+                                if (identifierGroupBeingParsed)
+                                {
+                                    currentIdentifierGroup.Add(identifier);
+                                }
+                                else
+                                {
+                                    /* Standalone keyword */
+                                    beingBuilt.Keyword(identifier);
+                                }
+                                break;
                         }
-                        else
+                    }
+                }
+
+                switch (t)
+                {
+                    case MarkupIdentifierGroupStartCharacter:
+                        /* This signifies an identifier group being specified. */
+                        if (identifierGroupBeingParsed)
                         {
-                            var identifier = AsIdentifier(word);
-
-                            if (identifier == null)
-                            {
-                                return false;
-                            }
-
-                            if (identifierGroupBeingParsed)
-                            {
-                                currentIdentifierGroup.Add(identifier);
-                            }
-                            else
-                            {
-                                /* Standalone keyword */
-                                beingBuilt.Keyword(identifier);
-                            }
+                            return false;
                         }
-                    }
-                }
 
-                if (markup[i] == MarkupIdentifierGroupStartCharacter)
-                {
-                    /* This signifies an identifier group being specified. */
-                    if (identifierGroupBeingParsed)
-                    {
-                        return false;
-                    }
-                    else
-                    {
                         identifierGroupBeingParsed = true;
-                    }
-                }
-                else if (markup[i] == MarkupIdentifierGroupEndCharacter)
-                {
-                    /* This signifies an identifier group being ended. */
-                    if (!identifierGroupBeingParsed || currentIdentifierGroup.Count == 0)
-                    {
-                        return false;
-                    }
-                    else
-                    {
+                        break;
+                    case MarkupIdentifierGroupEndCharacter:
+                        /* This signifies an identifier group being ended. */
+                        if (!identifierGroupBeingParsed || currentIdentifierGroup.Count == 0)
+                        {
+                            return false;
+                        }
+
                         beingBuilt.Identifier(currentIdentifierGroup.ToArray());
                         currentIdentifierGroup.Clear();
 
                         identifierGroupBeingParsed = false;
-                    }
-                }
-                else if (!char.IsWhiteSpace(markup[i]))
-                {
-                    /* Just put the character in the box-ah */
-                    currentParsedWord.Append(markup[i]);
+                        break;
+                    default:
+                        if (!char.IsWhiteSpace(t))
+                        {
+                            /* Just put the character in the box-ah */
+                            currentParsedWord.Append(t);
+                        }
+                        break;
                 }
             }
 
@@ -202,43 +173,39 @@ namespace XtraLiteTemplates.Parsing
             if (currentParsedWord.Length > 0)
             {
                 var word = currentParsedWord.ToString();
-                if (word == MarkupExpressionWord)
+                switch (word)
                 {
-                    /* This signifies an expression. */
-                    if (beingBuilt.LastComponentIsExpression)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        beingBuilt.Expression();
-                    }
-                }
-                else if (word == MarkupAnyIdentifierWord)
-                {
-                    /* This signifies an expression. */
-                    if (beingBuilt.LastComponentIsExpression)
-                    {
-                        return false;
-                    }
-                    else
-                    {
-                        beingBuilt.Identifier();
-                    }
-                }
-                else
-                {
-                    var identifier = AsIdentifier(word);
-                    if (identifier == null)
-                    {
-                        return false;
-                    }
+                    case MarkupExpressionWord:
+                        /* This signifies an expression. */
+                        if (beingBuilt.LastComponentIsExpression)
+                        {
+                            return false;
+                        }
 
-                    beingBuilt.Keyword(identifier);
+                        beingBuilt.Expression();
+                        break;
+                    case MarkupAnyIdentifierWord:
+                        /* This signifies an expression. */
+                        if (beingBuilt.LastComponentIsExpression)
+                        {
+                            return false;
+                        }
+
+                        beingBuilt.Identifier();
+                        break;
+                    default:
+                        var identifier = AsIdentifier(word);
+                        if (identifier == null)
+                        {
+                            return false;
+                        }
+
+                        beingBuilt.Keyword(identifier);
+                        break;
                 }
             }
 
-            if (beingBuilt.components.Count > 0)
+            if (beingBuilt._components.Count > 0)
             {
                 result = beingBuilt;
             }
@@ -274,7 +241,7 @@ namespace XtraLiteTemplates.Parsing
         {
             Expect.Identifier("keyword", keyword);
 
-            this.components.Add(keyword);
+            _components.Add(keyword);
             return this;
         }
 
@@ -285,12 +252,12 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="System.InvalidOperationException">If the previous requirement component was an expression.</exception>
         public Tag Identifier()
         {
-            if (this.components.Count > 0 && this.components[this.components.Count - 1] == null)
+            if (_components.Count > 0 && _components[_components.Count - 1] == null)
             {
-                ExceptionHelper.TagAnyIndentifierCannotFollowExpression();
+                ExceptionHelper.TagAnyIdentifierCannotFollowExpression();
             }
 
-            this.components.Add(string.Empty);
+            _components.Add(string.Empty);
             return this;
         }
 
@@ -312,7 +279,7 @@ namespace XtraLiteTemplates.Parsing
                 Expect.Identifier("candidate", arg);
             }
 
-            this.components.Add(candidates);
+            _components.Add(candidates);
             return this;
         }
 
@@ -325,12 +292,12 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="System.InvalidOperationException">If the previous requirement component was another expression.</exception>
         public Tag Expression()
         {
-            if (this.components.Count > 0 && this.components[this.components.Count - 1] == null)
+            if (_components.Count > 0 && _components[_components.Count - 1] == null)
             {
                 ExceptionHelper.TagExpressionCannotFollowExpression();
             }
 
-            this.components.Add(null);
+            _components.Add(null);
 
             return this;
         }
@@ -343,44 +310,44 @@ namespace XtraLiteTemplates.Parsing
         /// </returns>
         public override string ToString()
         {
-            if (this.components.Count == 0)
+            if (_components.Count == 0)
             {
                 return string.Empty;
             }
-            else
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var component in this.components)
-                {
-                    if (sb.Length > 0)
-                    {
-                        sb.Append(" ");
-                    }
 
-                    if (component == null)
-                    {
-                        sb.Append(MarkupExpressionWord);
-                    }
-                    else if (component == (object)string.Empty)
-                    {
-                        sb.Append(MarkupAnyIdentifierWord);
-                    }
-                    else if (component is string)
-                    {
-                        sb.Append(component);
-                    }
-                    else
-                    {
-                        sb.AppendFormat(
-                            "{0}{1}{2}",
-                            MarkupIdentifierGroupStartCharacter,
-                            string.Join(" ", component as string[]),
-                            MarkupIdentifierGroupEndCharacter);
-                    }
+            var sb = new StringBuilder();
+            foreach (var component in _components)
+            {
+                if (sb.Length > 0)
+                {
+                    sb.Append(" ");
                 }
 
-                return sb.ToString();
+                if (component == null)
+                {
+                    sb.Append(MarkupExpressionWord);
+                }
+                else if (component.Equals(string.Empty))
+                {
+                    sb.Append(MarkupAnyIdentifierWord);
+                }
+                else if (component is string)
+                {
+                    sb.Append(component);
+                }
+                else
+                {
+                    Debug.Assert(component is string[], "invalid type of component");
+
+                    sb.AppendFormat(
+                        "{0}{1}{2}",
+                        MarkupIdentifierGroupStartCharacter,
+                        string.Join(" ", component as string[]),
+                        MarkupIdentifierGroupEndCharacter);
+                }
             }
+
+            return sb.ToString();
         }
 
         /// <summary>
@@ -396,66 +363,67 @@ namespace XtraLiteTemplates.Parsing
             Expect.NotNull("comparer", comparer);
 
             var tag = obj as Tag;
-            if (tag == null || tag.components.Count != this.components.Count)
+            if (tag == null || tag._components.Count != _components.Count)
             {
                 return false;
             }
-            else
+
+            for (var i = 0; i < _components.Count; i++)
             {
-                for (var i = 0; i < this.components.Count; i++)
+                /* Compare as expressions. */
+                if (_components[i] == null && tag._components[i] != null)
                 {
-                    /* Compare as expressions. */
-                    if (this.components[i] == null && tag.components[i] != null)
-                    {
-                        return false;
-                    }
-                    else if (this.components[i] == null && tag.components[i] != null)
-                    {
-                        return false;
-                    }
+                    return false;
+                }
 
-                    /* Compare as keywords or "any identifiers" */
-                    var otherKeyword = tag.components[i] as string;
-                    var mineKeyword = this.components[i] as string;
+                if (_components[i] == null && tag._components[i] != null)
+                {
+                    return false;
+                }
 
-                    if (otherKeyword != null && mineKeyword == null)
+                /* Compare as keywords or "any identifiers" */
+                var otherKeyword = tag._components[i] as string;
+                var mineKeyword = _components[i] as string;
+
+                if (otherKeyword != null && mineKeyword == null)
+                {
+                    return false;
+                }
+                if (otherKeyword == null && mineKeyword != null)
+                {
+                    return false;
+                }
+                if (otherKeyword != null)
+                {
+                    if (!comparer.Equals(otherKeyword, mineKeyword))
                     {
                         return false;
                     }
-                    else if (otherKeyword == null && mineKeyword != null)
+                }
+
+                /* Compare as identifier options. */
+                var otherIdentifiers = tag._components[i] as string[];
+                var mineIdentifiers = _components[i] as string[];
+
+                if (otherIdentifiers != null && mineIdentifiers == null)
+                {
+                    return false;
+                }
+
+                if (otherIdentifiers == null && mineIdentifiers != null)
+                {
+                    return false;
+                }
+
+                if (otherIdentifiers != null)
+                {
+                    Debug.Assert(otherIdentifiers.Length > 0, "other is expected to have more one or more identifiers.");
+                    Debug.Assert(mineIdentifiers.Length > 0, "this is expected to have more one or more identifiers.");
+
+                    var areEqualSets = new HashSet<string>(otherIdentifiers, comparer).SetEquals(mineIdentifiers);
+                    if (!areEqualSets)
                     {
                         return false;
-                    }
-                    else if (otherKeyword != null && mineKeyword != null)
-                    {
-                        if (!comparer.Equals(otherKeyword, mineKeyword))
-                        {
-                            return false;
-                        }
-                    }
-
-                    /* Compare as identifier options. */
-                    var otherIdents = tag.components[i] as string[];
-                    var mineIdents = this.components[i] as string[];
-
-                    if (otherIdents != null && mineIdents == null)
-                    {
-                        return false;
-                    }
-                    else if (otherIdents == null && mineIdents != null)
-                    {
-                        return false;
-                    }
-                    else if (otherIdents != null && mineIdents != null)
-                    {
-                        Debug.Assert(otherIdents.Length > 0, "other is expected to heve more one or more identifiers.");
-                        Debug.Assert(mineIdents.Length > 0, "this is expected to heve more one or more identifiers.");
-
-                        var areEqualSets = new HashSet<string>(otherIdents, comparer).SetEquals(mineIdents);
-                        if (!areEqualSets)
-                        {
-                            return false;
-                        }
                     }
                 }
             }
@@ -470,7 +438,7 @@ namespace XtraLiteTemplates.Parsing
         /// <returns><c>true</c> if the tags are equal; <c>false</c> otherwise.</returns>
         public override bool Equals(object obj)
         {
-            return this.Equals(obj, StringComparer.CurrentCulture);
+            return Equals(obj, StringComparer.CurrentCulture);
         }
 
         /// <summary>
@@ -486,7 +454,7 @@ namespace XtraLiteTemplates.Parsing
             var hash = 17; /* Just a magic constant */
             unchecked
             {
-                foreach (var component in this.components)
+                foreach (var component in _components)
                 {
                     hash = hash * 23;
 
@@ -499,16 +467,12 @@ namespace XtraLiteTemplates.Parsing
                         }
                         else
                         {
-                            var identArray = component as string[];
-                            Debug.Assert(identArray != null, "identifier set component cannot be null.");
+                            var identifierArray = component as string[];
+                            Debug.Assert(identifierArray != null, "identifier set component cannot be null.");
 
-                            var identsHash = 0;
-                            foreach (var ident in identArray)
-                            {
-                                identsHash = identsHash ^ comparer.GetHashCode(ident);
-                            }
+                            var identifierHash = identifierArray.Aggregate(0, (current, identifier) => current ^ comparer.GetHashCode(identifier));
 
-                            hash += identsHash;
+                            hash += identifierHash;
                         }
                     }
                 }
@@ -523,70 +487,63 @@ namespace XtraLiteTemplates.Parsing
         /// <returns>A <see cref="System.Int32"/> value representing the hash code.</returns>
         public override int GetHashCode()
         {
-            return this.GetHashCode(StringComparer.CurrentCulture);
+            return GetHashCode(StringComparer.CurrentCulture);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         internal bool MatchesKeyword(int index, IEqualityComparer<string> comparer, string keyword)
         {
             Debug.Assert(comparer != null, "comparer cannot be null.");
             Debug.Assert(!string.IsNullOrEmpty(keyword), "keyword cannot be empty.");
 
-            if (index < 0 || index >= this.components.Count || this.components[index] == null)
+            if (index < 0 || index >= _components.Count || _components[index] == null)
             {
                 return false;
             }
 
-            var stringComponent = this.components[index] as string;
+            var stringComponent = _components[index] as string;
             return comparer.Equals(stringComponent, keyword);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         internal bool MatchesIdentifier(int index, IEqualityComparer<string> comparer, string identifier)
         {
             Debug.Assert(comparer != null, "comparer cannot be null.");
             Debug.Assert(!string.IsNullOrEmpty(identifier), "identifier cannot be empty.");
 
-            if (index < 0 || index >= this.components.Count || this.components[index] == null)
+            if (index < 0 || index >= _components.Count || _components[index] == null)
             {
                 return false;
             }
 
-            var stringComponent = this.components[index] as string;
+            var stringComponent = _components[index] as string;
             if (stringComponent != null)
             {
                 return stringComponent == string.Empty;
             }
 
-            var anyIdentifierComponent = this.components[index] as string[];
+            var anyIdentifierComponent = _components[index] as string[];
+            Debug.Assert(anyIdentifierComponent != null, "invalid component type.");
             return anyIdentifierComponent.Any(i => comparer.Equals(i, identifier));
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         internal bool MatchesAnyIdentifier(int index)
         {
-            if (index < 0 || index >= this.components.Count || this.components[index] == null)
+            if (index < 0 || index >= _components.Count || _components[index] == null)
             {
                 return false;
             }
 
-            var stringComponent = this.components[index] as string;
+            var stringComponent = _components[index] as string;
             return stringComponent == string.Empty;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         internal bool MatchesExpression(int index)
         {
-            return index >= 0 && index < this.components.Count && this.components[index] == null;
+            return index >= 0 && index < _components.Count && _components[index] == null;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private static string AsIdentifier(string candidate)
         {
-            if (candidate != null)
-            {
-                candidate = candidate.Trim();
-            }
+            candidate = candidate?.Trim();
 
             var validIdentifier =
                 !string.IsNullOrEmpty(candidate) &&

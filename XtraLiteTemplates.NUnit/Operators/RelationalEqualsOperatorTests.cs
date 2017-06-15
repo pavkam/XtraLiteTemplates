@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,10 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
+
+    using Expressions.Operators;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class RelationalEqualsOperatorTests : OperatorTestsBase
@@ -43,7 +42,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new RelationalEqualsOperator(null, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new RelationalEqualsOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new RelationalEqualsOperator(string.Empty, StringComparer.Ordinal, TypeConverter));
             ExpectArgumentNullException("stringComparer", () => new RelationalEqualsOperator("operator", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new RelationalEqualsOperator("operator", StringComparer.Ordinal, null));
             ExpectArgumentNullException("typeConverter", () => new RelationalEqualsOperator(null));
@@ -75,7 +74,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new RelationalEqualsOperator(TypeConverter);
 
-            Object dummy;
+            object dummy;
             ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
             ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
         }
@@ -85,14 +84,14 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new RelationalEqualsOperator(StringComparer.Ordinal, TypeConverter);
 
-            AssertEvaluation<Int64, Boolean>(@operator, Int64.MaxValue, Int64.MaxValue, true);
-            AssertEvaluation<Int64, Boolean>(@operator, Int64.MinValue, 0, false);
-            AssertEvaluation<Double, Boolean>(@operator, -0.5, -0.5, true);
-            AssertEvaluation<Double, Boolean>(@operator, 3.33, 3.34, false);
-            AssertEvaluation<String, Boolean>(@operator, "Hello", "Hello", true);
-            AssertEvaluation<String, Boolean>(@operator, "world", "WORLD", false);
-            AssertEvaluation<Boolean, Boolean>(@operator, false, false, true);
-            AssertEvaluation<Boolean, Boolean>(@operator, true, false, false);
+            AssertEvaluation(@operator, long.MaxValue, long.MaxValue, true);
+            AssertEvaluation(@operator, long.MinValue, 0, false);
+            AssertEvaluation(@operator, -0.5, -0.5, true);
+            AssertEvaluation(@operator, 3.33, 3.34, false);
+            AssertEvaluation(@operator, "Hello", "Hello", true);
+            AssertEvaluation(@operator, "world", "WORLD", false);
+            AssertEvaluation<bool, bool>(@operator, false, false, true);
+            AssertEvaluation<bool, bool>(@operator, true, false, false);
         }
     }
 }

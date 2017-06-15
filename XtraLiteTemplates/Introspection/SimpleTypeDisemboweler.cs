@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,8 +24,6 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Introspection
 {
     using System;
@@ -33,10 +31,8 @@ namespace XtraLiteTemplates.Introspection
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
     using System.Reflection;
     using System.Text;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Utility class that allows for easy access to a type's properties and methods.
@@ -44,8 +40,7 @@ namespace XtraLiteTemplates.Introspection
     /// </summary>
     public sealed class SimpleTypeDisemboweler
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IDictionary<string, Func<object, object[], object>> cachedMemberMap;
+        private readonly IDictionary<string, Func<object, object[], object>> _cachedMemberMap;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="SimpleTypeDisemboweler" /> class.
@@ -63,11 +58,11 @@ namespace XtraLiteTemplates.Introspection
             Expect.NotNull("memberComparer", memberComparer);
             Expect.NotNull("objectFormatter", objectFormatter);
 
-            this.Type = type;
-            this.Comparer = memberComparer;
-            this.ObjectFormatter = objectFormatter;
+            Type = type;
+            Comparer = memberComparer;
+            ObjectFormatter = objectFormatter;
 
-            this.cachedMemberMap = new Dictionary<string, Func<object, object[], object>>();
+            _cachedMemberMap = new Dictionary<string, Func<object, object[], object>>();
         }
 
         /// <summary>
@@ -85,7 +80,7 @@ namespace XtraLiteTemplates.Introspection
         /// <remarks>
         /// Value provided by the caller during construction.
         /// </remarks>
-        public Type Type { get; private set; }
+        public Type Type { get; }
 
         /// <summary>
         /// Gets the <see cref="IEqualityComparer{String}" /> used by <see cref="SimpleTypeDisemboweler" /> to compare the
@@ -95,7 +90,7 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The equality comparer.
         /// </value>
-        public IEqualityComparer<string> Comparer { get; private set; }
+        public IEqualityComparer<string> Comparer { get; }
 
         /// <summary>
         /// Gets the <see cref="IObjectFormatter" /> used by <see cref="SimpleTypeDisemboweler" /> to convert object instances to their string representation.
@@ -104,20 +99,7 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The object formatter.
         /// </value>
-        public IObjectFormatter ObjectFormatter { get; private set; }
-
-        /// <summary>
-        /// Invokes the <paramref name="member" /> of <paramref name="object" /> and returns its value.
-        /// </summary>
-        /// <param name="object">The object whose member is being invoked.</param>
-        /// <param name="member">The member name.</param>
-        /// <returns>The result of member invoke.</returns>
-        /// <exception cref="ArgumentNullException"><paramref name="member" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="member" /> is not a valid identifier.</exception>
-        public object Invoke(object @object, string member)
-        {
-            return this.Invoke(@object, member, null);
-        }
+        public IObjectFormatter ObjectFormatter { get; }
 
         /// <summary>
         /// Invokes the <paramref name="member" /> of <paramref name="object" /> and returns its value.
@@ -130,7 +112,7 @@ namespace XtraLiteTemplates.Introspection
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="member" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="member" /> is not a valid identifier.</exception>
-        public object Invoke(object @object, string member, object[] arguments)
+        public object Invoke(object @object, string member, object[] arguments = null)
         {
             Expect.Identifier("member", member);
 
@@ -140,7 +122,7 @@ namespace XtraLiteTemplates.Introspection
             }
 
             /* Create the signature of the member. */
-            StringBuilder signature = new StringBuilder();
+            var signature = new StringBuilder();
             signature.Append(member);
 
             if (arguments != null && arguments.Length > 0)
@@ -161,34 +143,26 @@ namespace XtraLiteTemplates.Introspection
 
             /* Find a cached member from a previous lookup. */
             Func<object, object[], object> getterMethod;
-            if (!this.cachedMemberMap.TryGetValue(signature.ToString(), out getterMethod))
+            if (!_cachedMemberMap.TryGetValue(signature.ToString(), out getterMethod))
             {
                 /* No cache made for this call structure. Do it now and cache the invoke candidate. */
-                getterMethod = this.LocateSuitableInvokeCandidate(@object, member, arguments);
-                this.cachedMemberMap[signature.ToString()] = getterMethod;
+                getterMethod = LocateSuitableInvokeCandidate(@object, member, arguments);
+                _cachedMemberMap[signature.ToString()] = getterMethod;
             }
 
             /* Invoke the member if getter was created. */
-            if (getterMethod != null)
-            {
-                return getterMethod(@object, arguments);
-            }
-            else
-            { 
-                return null;
-            }
+            return getterMethod?.Invoke(@object, arguments);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private bool ValidateCandidate(MemberInfo memberInfo)
         {
             Debug.Assert(memberInfo != null, "Argument memberInfo cannot be null.");
 
             var candidateAccepted = true;
-            if (this.ValidateMember != null)
+            if (ValidateMember != null)
             {
                 var eventArgs = new MemberValidationEventArgs(memberInfo);
-                this.ValidateMember(this, eventArgs);
+                ValidateMember(this, eventArgs);
 
                 candidateAccepted = eventArgs.Accepted;
             }
@@ -196,7 +170,6 @@ namespace XtraLiteTemplates.Introspection
             return candidateAccepted;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private Func<object, object[], object> LocateSuitableInvokeCandidate(object @object, string member, object[] arguments)
         {
             if (arguments == null || arguments.Length == 0)
@@ -204,10 +177,10 @@ namespace XtraLiteTemplates.Introspection
                 /* Scan the type for properties. */
                 foreach (var property in Type.GetProperties())
                 {
-                    if (!this.Comparer.Equals(property.Name, member) || 
+                    if (!Comparer.Equals(property.Name, member) || 
                         !property.CanRead || 
                         property.GetIndexParameters().Length > 0 ||
-                        !this.ValidateCandidate(property))
+                        !ValidateCandidate(property))
                     {
                         continue;
                     }
@@ -217,11 +190,11 @@ namespace XtraLiteTemplates.Introspection
                 }
 
                 /* Now scan for fields. */
-                foreach (var field in this.Type.GetFields())
+                foreach (var field in Type.GetFields())
                 {
-                    if (!this.Comparer.Equals(field.Name, member) || 
+                    if (!Comparer.Equals(field.Name, member) || 
                         field.IsPrivate ||
-                        !this.ValidateCandidate(field))
+                        !ValidateCandidate(field))
                     {
                         continue;
                     }
@@ -232,11 +205,10 @@ namespace XtraLiteTemplates.Introspection
             }
 
             /* Try to find a suitable method candidate. */
-            return this.LocateSuitableMethodCandidate(@object, member, arguments);
+            return LocateSuitableMethodCandidate(@object, member, arguments);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private Func<object, object[], object> LocateSuitableMethodCandidate(object @object, string member, object[] arguments)
+        private Func<object, object[], object> LocateSuitableMethodCandidate(object @object, string member, IReadOnlyList<object> arguments)
         {
             Debug.Assert(@object != null, "object cannot be null.");
             Debug.Assert(!string.IsNullOrEmpty(member), "member cannot be null or empty.");
@@ -250,11 +222,8 @@ namespace XtraLiteTemplates.Introspection
             /* Scan for methods! */
             foreach (var method in Type.GetMethods())
             {
-                if (!this.Comparer.Equals(method.Name, member) || 
-                    method.IsAbstract || 
-                    method.IsConstructor || 
-                    method.IsPrivate ||
-                    !this.ValidateCandidate(method))
+                if (!Comparer.Equals(method.Name, member) || method.IsAbstract || method.IsConstructor
+                    || method.IsPrivate || !ValidateCandidate(method))
                 {
                     continue;
                 }
@@ -273,30 +242,34 @@ namespace XtraLiteTemplates.Introspection
                 var methodScore = .0;
                 var indexOfParamsArray = -1;
 
-                List<Func<object, object>> argumentAdapterFuncs = new List<Func<object, object>>();
+                var argumentAdapterFuncs = new List<Func<object, object>>();
                 for (var parameterIndex = 0; parameterIndex < methodParameters.Length; parameterIndex++)
                 {
                     var parameter = methodParameters[parameterIndex];
 
                     Func<object, object> adapterFunc = null;
 
-                    if (arguments == null || arguments.Length <= parameterIndex)
+                    if (arguments == null || arguments.Count <= parameterIndex)
                     {
-                        adapterFunc = this.ReconcileMissingArgument(parameter, ref methodScore);
+                        adapterFunc = ReconcileMissingArgument(parameter, ref methodScore);
                     }
                     else
                     {
                         var parameterType = parameter.ParameterType;
-                        if (parameterIndex == methodParameters.Length - 1 && parameter.GetCustomAttribute<ParamArrayAttribute>() != null)
+                        if (parameterIndex == methodParameters.Length - 1
+                            && parameter.GetCustomAttribute<ParamArrayAttribute>() != null)
                         {
                             /* This is the last parameter and it is also a params array[]. Treat it differently. 
                              */
                             Debug.Assert(parameterType.IsArray, "parameterType must be an array.");
                             var elementType = parameterType.GetElementType();
                             indexOfParamsArray = parameterIndex;
-                            for (var argsIndex = parameterIndex; argsIndex < arguments.Length; argsIndex++)
+                            for (var argsIndex = parameterIndex; argsIndex < arguments.Count; argsIndex++)
                             {
-                                adapterFunc = this.ReconcileArgument(elementType, arguments[argsIndex], ref methodScore);
+                                adapterFunc = ReconcileArgument(
+                                    elementType,
+                                    arguments[argsIndex],
+                                    ref methodScore);
                                 if (adapterFunc != null)
                                 {
                                     methodScore -= 0.05; /* Remove a bit of score since it's in a params array. */
@@ -318,7 +291,10 @@ namespace XtraLiteTemplates.Introspection
                         }
                         else
                         {
-                            adapterFunc = this.ReconcileArgument(parameterType, arguments[parameterIndex], ref methodScore);
+                            adapterFunc = ReconcileArgument(
+                                parameterType,
+                                arguments[parameterIndex],
+                                ref methodScore);
                         }
                     }
 
@@ -327,10 +303,8 @@ namespace XtraLiteTemplates.Introspection
                     {
                         break;
                     }
-                    else
-                    {
-                        argumentAdapterFuncs.Add(adapterFunc);
-                    }
+
+                    argumentAdapterFuncs.Add(adapterFunc);
                 }
 
                 /* Skip incomplete adaptations. */
@@ -340,7 +314,7 @@ namespace XtraLiteTemplates.Introspection
                 }
 
                 /* Decide on the matching. */
-                var argumentCount = arguments != null ? arguments.Length : 0;
+                var argumentCount = arguments?.Count ?? 0;
                 if (methodParameters.Length > argumentCount)
                 {
                     methodScore /= methodParameters.Length;
@@ -350,14 +324,15 @@ namespace XtraLiteTemplates.Introspection
                     methodScore /= argumentCount;
                 }
 
-                if (double.IsNaN(methodScore) || methodScore == 1.00)
+                if (double.IsNaN(methodScore) || methodScore > 0.999999999)
                 {
                     indexOfParamsArrayInMethod = indexOfParamsArray;
                     argumentAdapters = argumentAdapterFuncs.ToArray();
                     bestMatchingMethod = method;
                     break;
                 }
-                else if (methodScore >= bestMatchingScore)
+
+                if (methodScore >= bestMatchingScore)
                 {
                     indexOfParamsArrayInMethod = indexOfParamsArray;
                     argumentAdapters = argumentAdapterFuncs.ToArray();
@@ -372,33 +347,36 @@ namespace XtraLiteTemplates.Introspection
                 if (indexOfParamsArrayInMethod >= 0)
                 {
                     /* We have a params array at the end. Special treatment is a must here. */
-                    Debug.Assert(indexOfParamsArrayInMethod < argumentAdapters.Length, "params argument is never out of the index bounds.");
+                    Debug.Assert(
+                        indexOfParamsArrayInMethod < argumentAdapters.Length,
+                        "params argument is never out of the index bounds.");
 
                     return (i, a) =>
-                    {
-                        /* Normal argument [0...params) */
-                        var adaptedArguments = new object[indexOfParamsArrayInMethod + 1];
-                        for (var x = 0; x < indexOfParamsArrayInMethod; x++)
                         {
-                            adaptedArguments[x] = argumentAdapters[x](a[x]);
-                        }
+                            /* Normal argument [0...params) */
+                            var adaptedArguments = new object[indexOfParamsArrayInMethod + 1];
+                            for (var x = 0; x < indexOfParamsArrayInMethod; x++)
+                            {
+                                adaptedArguments[x] = argumentAdapters[x](a[x]);
+                            }
 
-                        /* Params argument [params...end] */
-                        IList paramsArgument = (IList)Array.CreateInstance(argsArrayElementType, argumentAdapters.Length - indexOfParamsArrayInMethod);
-                        for (var x = indexOfParamsArrayInMethod; x < argumentAdapters.Length; x++)
-                        {
-                            paramsArgument[x - indexOfParamsArrayInMethod] = argumentAdapters[x](a[x]);
-                        }
+                            /* Params argument [params...end] */
+                            var paramsArgument = (IList)Array.CreateInstance(
+                                argsArrayElementType,
+                                argumentAdapters.Length - indexOfParamsArrayInMethod);
+                            for (var x = indexOfParamsArrayInMethod; x < argumentAdapters.Length; x++)
+                            {
+                                paramsArgument[x - indexOfParamsArrayInMethod] = argumentAdapters[x](a[x]);
+                            }
 
-                        adaptedArguments[indexOfParamsArrayInMethod] = paramsArgument;
+                            adaptedArguments[indexOfParamsArrayInMethod] = paramsArgument;
 
-                        return bestMatchingMethod.Invoke(i, adaptedArguments);
-                    };
+                            return bestMatchingMethod.Invoke(i, adaptedArguments);
+                        };
                 }
-                else
-                {
-                    /* Standard function mapping. */
-                    return (i, a) =>
+
+                /* Standard function mapping. */
+                return (i, a) =>
                     {
                         var adaptedArguments = new object[argumentAdapters.Length];
                         for (var x = 0; x < argumentAdapters.Length; x++)
@@ -415,13 +393,10 @@ namespace XtraLiteTemplates.Introspection
 
                         return bestMatchingMethod.Invoke(i, adaptedArguments);
                     };
-                }
             }
-            else
-            {
-                /* Found nothing :( return a big fat NULL. */
-                return null;
-            }
+
+            /* Found nothing :( return a big fat NULL. */
+            return null;
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
@@ -440,7 +415,7 @@ namespace XtraLiteTemplates.Introspection
             }
             else if (parameter.GetCustomAttribute<ParamArrayAttribute>() != null)
             {
-                /* It's a "param" array. Use a default elementless one. */
+                /* It's a "param" array. Use a default element-less one. */
                 reconciliationScore += 1.00;
                 defaultValue = Array.CreateInstance(parameter.ParameterType.GetElementType(), 0);
             }
@@ -475,7 +450,7 @@ namespace XtraLiteTemplates.Introspection
             Debug.Assert(parameterType != null, "parameterType cannot be null.");
 
             /* Now the real work begins. Trying to reconcile the passed-in argument type with the expected parameter type. */
-            var argumentType = argument != null ? argument.GetType() : null;
+            var argumentType = argument?.GetType();
 
             if (parameterType == argumentType)
             {
@@ -483,38 +458,38 @@ namespace XtraLiteTemplates.Introspection
                 reconciliationScore += 1.00;
                 return a => a;
             }
-            else if (parameterType == typeof(string))
+
+            if (parameterType == typeof(string))
             {
                 /* Expected is string. We'll convert. */
                 reconciliationScore += 0.60;
-                return a => this.ObjectFormatter.ToString(a);
+                return a => ObjectFormatter.ToString(a);
             }
-            else if (parameterType == typeof(object))
+
+            if (parameterType == typeof(object))
             {
                 /* Expected is an untyped object. Anything can be accepted in this case. */
                 reconciliationScore += 0.70;
                 return a => a;
             }
-            else
+
+            var parameterTypeCode = Type.GetTypeCode(parameterType);
+            var argumentTypeCode = Type.GetTypeCode(argumentType);
+
+            if (argumentTypeCode >= TypeCode.SByte && argumentTypeCode <= TypeCode.Decimal &&
+                parameterTypeCode >= TypeCode.SByte && parameterTypeCode <= TypeCode.Decimal)
             {
-                var parameterTypeCode = Type.GetTypeCode(parameterType);
-                var argumentTypeCode = Type.GetTypeCode(argumentType);
-
-                if (argumentTypeCode >= TypeCode.SByte && argumentTypeCode <= TypeCode.Decimal &&
-                    parameterTypeCode >= TypeCode.SByte && parameterTypeCode <= TypeCode.Decimal)
+                /* Number to number */
+                if (parameterTypeCode >= argumentTypeCode)
                 {
-                    /* Number to number */
-                    if (parameterTypeCode >= argumentTypeCode)
-                    {
-                        reconciliationScore += 1.00;
-                    }
-                    else
-                    {
-                        reconciliationScore += 0.80;
-                    }
-
-                    return a => Convert.ChangeType(a, parameterType);
+                    reconciliationScore += 1.00;
                 }
+                else
+                {
+                    reconciliationScore += 0.80;
+                }
+
+                return a => Convert.ChangeType(a, parameterType);
             }
 
             /* Impossible case. Bail! */

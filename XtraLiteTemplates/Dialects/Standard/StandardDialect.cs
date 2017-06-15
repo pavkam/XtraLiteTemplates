@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,25 +24,19 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using System.Threading.Tasks;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Introspection;
-    
+    using Directives;
+    using Evaluation;
+    using Expressions;
+    using Expressions.Operators;
+    using Introspection;
+    using Operators;
+
     /// <summary>
     /// The standard dialect. Contains the full set of supported expression operators, directives and special constants.
     /// This is the default, medium-verbosity dialect exposed by this library.
@@ -89,7 +83,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         protected StandardDialect(string name, CultureInfo culture, DialectCasing casing)
             : base(name, culture, casing)
         {
-            this.PreformattedStateObject = new object();
+            PreformattedStateObject = new object();
         }
 
         /// <summary>
@@ -98,7 +92,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture-invariant, case-insensitive instance of <see cref="StandardDialect"/> class.
         /// </value>
-        public static IDialect DefaultIgnoreCase { get; private set; }
+        public static IDialect DefaultIgnoreCase { get; }
 
         /// <summary>
         /// Gets a culture-invariant, case-sensitive (upper cased) instance of <see cref="StandardDialect"/> class.
@@ -106,7 +100,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
         /// </value>
-        public static IDialect Default { get; private set; }
+        public static IDialect Default { get; }
 
         /// <summary>
         /// Specifies the tag start character (used by the tokenization process).
@@ -114,13 +108,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The tag start character.
         /// </value>
-        public override char StartTagCharacter
-        {
-            get
-            {
-                return '{';
-            }
-        }
+        public override char StartTagCharacter => '{';
 
         /// <summary>
         /// Specifies the tag end character (used by the tokenization process).
@@ -128,13 +116,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The tag end character.
         /// </value>
-        public override char EndTagCharacter
-        {
-            get 
-            {
-                return '}';
-            }
-        }
+        public override char EndTagCharacter => '}';
 
         /// <summary>
         /// Specifies the string literal start character (used by the tokenization process).
@@ -142,13 +124,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal start character.
         /// </value>
-        public override char StartStringLiteralCharacter
-        {
-            get
-            {
-                return '"';
-            }
-        }
+        public override char StartStringLiteralCharacter => '"';
 
         /// <summary>
         /// Specifies the string literal end character (used by the tokenization process).
@@ -156,13 +132,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal end character.
         /// </value>
-        public override char EndStringLiteralCharacter
-        {
-            get
-            {
-                return '"';
-            }
-        }
+        public override char EndStringLiteralCharacter => '"';
 
         /// <summary>
         /// Specifies the string literal escape character (used by the tokenization process).
@@ -170,13 +140,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal escape character.
         /// </value>
-        public override char StringLiteralEscapeCharacter
-        {
-            get
-            {
-                return '\\';
-            }
-        }
+        public override char StringLiteralEscapeCharacter => '\\';
 
         /// <summary>
         /// Specifies the number literal decimal separator character (used by the tokenization process).
@@ -184,20 +148,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The number literal decimal separator character.
         /// </value>
-        public override char NumberDecimalSeparatorCharacter
-        {
-            get
-            {
-                if (Culture.NumberFormat.NumberDecimalSeparator.Length != 1)
-                {
-                    return '.';
-                }
-                else
-                {
-                    return Culture.NumberFormat.NumberDecimalSeparator[0];
-                }
-            }
-        }
+        public override char NumberDecimalSeparatorCharacter => 
+            Culture.NumberFormat.NumberDecimalSeparator.Length != 1 ? '.' : Culture.NumberFormat.NumberDecimalSeparator[0];
 
         /// <summary>
         /// Gets the state object that can be used by directive to disable the unhandled text trimming behavior.
@@ -205,35 +157,33 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The preformatted state object.
         /// </value>
-        protected object PreformattedStateObject { get; private set; }
+        protected object PreformattedStateObject { get; }
 
         /// <summary>
-        /// Processes all unparsed text blocks read from the original template. The method current implementation
+        /// Processes all un-parsed text blocks read from the original template. The method current implementation
         /// trims all white-spaces and new line characters and replaces them with a single white-space character (emulates how HTML trimming works).
         /// A preformatted directive is available to allow disabling this default behavior and preserving all original formatting.
         /// </summary>
         /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
-        /// <param name="unparsedText">The text block being processed.</param>
+        /// <param name="unParsedText">The text block being processed.</param>
         /// <returns>
         /// The processed text value.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public override string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText)
+        public override string DecorateUnParsedText(IExpressionEvaluationContext context, string unParsedText)
         {
             Expect.NotNull("context", context);
 
-            if (this.PreformattedStateObject != null && context.ContainsStateObject(this.PreformattedStateObject))
+            if (PreformattedStateObject != null && context.ContainsStateObject(PreformattedStateObject))
             {
-                return unparsedText;
+                return unParsedText;
             }
-            else
-            {
-                return base.DecorateUnparsedText(context, unparsedText);
-            }
+
+            return base.DecorateUnParsedText(context, unParsedText);
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="Object" /> is equal to the current <see cref="StandardDialect" />.
+        /// Determines whether the specified <see cref="object" /> is equal to the current <see cref="StandardDialect" />.
         /// </summary>
         /// <param name="obj">The object to compare with the current dialect class instance.</param>
         /// <returns>
@@ -263,7 +213,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported operators.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override Operator[] CreateOperators(IPrimitiveTypeConverter typeConverter)
+        protected override IEnumerable<Operator> CreateOperators(IPrimitiveTypeConverter typeConverter)
         {
             return new Operator[]
             {
@@ -302,7 +252,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported directives.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter)
+        protected override IEnumerable<Directive> CreateDirectives(IPrimitiveTypeConverter typeConverter)
         {
             return new Directive[]
             {
@@ -312,7 +262,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new IfElseDirective(AdjustCasing("IF $ THEN"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
                 new InterpolationDirective(typeConverter),
                 new RepeatDirective(AdjustCasing("REPEAT $ TIMES"), AdjustCasing("END"), typeConverter),
-                new PreFormattedUnparsedTextDirective(AdjustCasing("PREFORMATTED"), AdjustCasing("END"), this.PreformattedStateObject, typeConverter),
+                new PreFormattedUnParsedTextDirective(AdjustCasing("PREFORMATTED"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
             };
         }
 
@@ -322,9 +272,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// An array of all supported special constants.
         /// </returns>
-        protected override KeyValuePair<string, object>[] CreateSpecials()
+        protected override IEnumerable<KeyValuePair<string, object>> CreateSpecials()
         {
-            return new KeyValuePair<string, object>[]
+            return new[]
             {
                 new KeyValuePair<string, object>(AdjustCasing("True"), true),
                 new KeyValuePair<string, object>(AdjustCasing("False"), false),

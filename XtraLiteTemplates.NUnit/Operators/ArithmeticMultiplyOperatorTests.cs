@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,10 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
+
+    using Expressions.Operators;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class ArithmeticMultiplyOperatorTests : OperatorTestsBase
@@ -43,7 +42,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticMultiplyOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticMultiplyOperator(String.Empty, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticMultiplyOperator(string.Empty, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ArithmeticMultiplyOperator("operator", null));
             ExpectArgumentNullException("typeConverter", () => new ArithmeticMultiplyOperator(null));
         }
@@ -71,7 +70,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new ArithmeticMultiplyOperator(TypeConverter);
 
-            Object dummy;
+            object dummy;
             ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
             ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
         }
@@ -81,11 +80,11 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new ArithmeticMultiplyOperator(TypeConverter);
 
-            AssertEvaluation<Double>(@operator, 1, Int64.MaxValue, Int64.MaxValue);
-            AssertEvaluation<Double>(@operator, Int64.MinValue, 0, 0);
-            AssertEvaluation<Double>(@operator, 1.5, 2, 1.50 * 2.00);
-            AssertEvaluation<Double>(@operator, 0.33, 0, 0.33 * 0);
-            AssertEvaluation<Double>(@operator, -100, 0.5, -100 * 0.5);
+            AssertEvaluation<double>(@operator, 1, long.MaxValue, long.MaxValue);
+            AssertEvaluation<double>(@operator, long.MinValue, 0, 0);
+            AssertEvaluation<double>(@operator, 1.5, 2, 1.50 * 2.00);
+            AssertEvaluation<double>(@operator, 0.33, 0, 0.33 * 0);
+            AssertEvaluation<double>(@operator, -100, 0.5, -100 * 0.5);
         }
     }
 }

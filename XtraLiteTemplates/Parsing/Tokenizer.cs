@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,38 +24,25 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Parsing
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Text;
-    
+
     /// <summary>
     /// Provides the standard tokenization services.
     /// </summary>
     public sealed class Tokenizer : ITokenizer, IDisposable
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private bool parsingTag;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private TextReader inputTextReader;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int currentCharacterIndex;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private bool endOfStream;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private char currentCharacter;
+        private readonly TextReader _inputTextReader;
+        private bool _parsingTag;
+        private int _currentCharacterIndex;
+        private bool _endOfStream;
+        private char _currentCharacter;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Tokenizer"/> class.
@@ -72,12 +59,12 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="InvalidOperationException">One or more control characters is not allowed.</exception>
         public Tokenizer(
             TextReader reader, 
-            char tagStartCharacter, 
-            char tagEndCharacter, 
-            char stringStartCharacter,
-            char stringEndCharacter, 
-            char stringEscapeCharacter, 
-            char numberDecimalSeparatorCharacter)
+            char tagStartCharacter = '{', 
+            char tagEndCharacter = '}', 
+            char stringStartCharacter = '"',
+            char stringEndCharacter = '"', 
+            char stringEscapeCharacter = '\\', 
+            char numberDecimalSeparatorCharacter = '.')
         {
             Expect.NotNull("reader", reader);
             Expect.NotEqual("tagStartCharacter", "tagEndCharacter", tagStartCharacter, tagEndCharacter);
@@ -93,7 +80,7 @@ namespace XtraLiteTemplates.Parsing
             Expect.NotEqual("stringEndCharacter", "numberDecimalSeparatorCharacter", stringEndCharacter, numberDecimalSeparatorCharacter);
 
             /* Validate allow character set. */
-            char[] all = new char[]
+            var all = new[]
             { 
                 tagStartCharacter, tagEndCharacter, stringStartCharacter,
                 stringEndCharacter, stringEscapeCharacter, numberDecimalSeparatorCharacter
@@ -102,32 +89,18 @@ namespace XtraLiteTemplates.Parsing
             var allowedCharacterSet = !all.Any(c => char.IsWhiteSpace(c) || char.IsLetterOrDigit(c) || c == '_');
             Expect.IsTrue("allowed set of characters", allowedCharacterSet);
 
-            this.inputTextReader = reader;
-            this.TagStartCharacter = tagStartCharacter;
-            this.TagEndCharacter = tagEndCharacter;
+            _inputTextReader = reader;
+            TagStartCharacter = tagStartCharacter;
+            TagEndCharacter = tagEndCharacter;
 
-            this.StringLiteralStartCharacter = stringStartCharacter;
-            this.StringLiteralEndCharacter = stringEndCharacter;
-            this.StringLiteralEscapeCharacter = stringEscapeCharacter;
+            StringLiteralStartCharacter = stringStartCharacter;
+            StringLiteralEndCharacter = stringEndCharacter;
+            StringLiteralEscapeCharacter = stringEscapeCharacter;
 
-            this.NumberLiteralDecimalSeparatorCharacter = numberDecimalSeparatorCharacter;
+            NumberLiteralDecimalSeparatorCharacter = numberDecimalSeparatorCharacter;
 
-            this.parsingTag = false;
-            this.currentCharacterIndex = -1;
-        }
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Tokenizer"/> class.
-        /// <remarks>
-        /// <para>
-        /// Standard character set is used for control characters: '{', '}', '"' and '.'.
-        /// </para>
-        /// </remarks>
-        /// </summary>
-        /// <param name="reader">The input template reader.</param>
-        public Tokenizer(TextReader reader)
-            : this(reader, '{', '}', '"', '"', '\\', '.')         
-        {
+            _parsingTag = false;
+            _currentCharacterIndex = -1;
         }
 
         /// <summary>
@@ -149,7 +122,7 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         ~Tokenizer()
         {
-            this.Dispose();
+            Dispose();
         }
 
         /// <summary>
@@ -159,7 +132,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The tag start character.
         /// </value>
-        public char TagStartCharacter { get; private set; }
+        public char TagStartCharacter { get; }
 
         /// <summary>
         /// Gets the tag end character.
@@ -168,7 +141,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The tag end character.
         /// </value>
-        public char TagEndCharacter { get; private set; }
+        public char TagEndCharacter { get; }
 
         /// <summary>
         /// Gets the string literal start character.
@@ -177,7 +150,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The string literal start character.
         /// </value>
-        public char StringLiteralStartCharacter { get; private set; }
+        public char StringLiteralStartCharacter { get; }
 
         /// <summary>
         /// Gets the string literal end character.
@@ -186,7 +159,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The string literal end character.
         /// </value>
-        public char StringLiteralEndCharacter { get; private set; }
+        public char StringLiteralEndCharacter { get; }
 
         /// <summary>
         /// Gets the string literal escape character.
@@ -195,7 +168,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The string literal escape character.
         /// </value>
-        public char StringLiteralEscapeCharacter { get; private set; }
+        public char StringLiteralEscapeCharacter { get; }
 
         /// <summary>
         /// Gets the number literal decimal separator character.
@@ -204,7 +177,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The number literal decimal separator character.
         /// </value>
-        public char NumberLiteralDecimalSeparatorCharacter { get; private set; }
+        public char NumberLiteralDecimalSeparatorCharacter { get; }
 
         /// <summary>
         /// Reads the next <see cref="Token" /> object from the input template.
@@ -214,7 +187,7 @@ namespace XtraLiteTemplates.Parsing
         /// </returns>
         public Token ReadNext()
         {
-            return this.ReadNextInternal();
+            return ReadNextInternal();
         }
 
         /// <summary>
@@ -222,27 +195,23 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         public void Dispose()
         {
-            if (this.inputTextReader != null)
-            {
-                this.inputTextReader.Dispose();
-            }
+            _inputTextReader?.Dispose();
 
             GC.SuppressFinalize(this);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private char PeekCharacter()
         {
-            if (this.endOfStream)
+            if (_endOfStream)
             {
-                ExceptionHelper.UnexpectedEndOfStream(this.currentCharacterIndex);
+                ExceptionHelper.UnexpectedEndOfStream(_currentCharacterIndex);
             }
 
-            var peekedCharacter = this.inputTextReader.Peek();
+            var peekedCharacter = _inputTextReader.Peek();
             if (peekedCharacter == -1)
             {
-                this.endOfStream = true;
-                ExceptionHelper.UnexpectedEndOfStream(this.currentCharacterIndex + 1);
+                _endOfStream = true;
+                ExceptionHelper.UnexpectedEndOfStream(_currentCharacterIndex + 1);
             }
             else
             {
@@ -253,174 +222,162 @@ namespace XtraLiteTemplates.Parsing
             return '\0';
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private bool NextCharacter(bool required)
+        private void NextCharacter(bool required)
         {
-            if (this.endOfStream)
+            if (_endOfStream)
             {
-                ExceptionHelper.UnexpectedEndOfStream(this.currentCharacterIndex);
+                ExceptionHelper.UnexpectedEndOfStream(_currentCharacterIndex);
             }
 
-            var readCharacter = this.inputTextReader.Read();
-            this.currentCharacterIndex++;
+            var readCharacter = _inputTextReader.Read();
+            _currentCharacterIndex++;
             if (readCharacter == -1)
             {
-                this.endOfStream = true;
+                _endOfStream = true;
                 if (required)
                 {
-                    ExceptionHelper.UnexpectedEndOfStream(this.currentCharacterIndex);
+                    ExceptionHelper.UnexpectedEndOfStream(_currentCharacterIndex);
                 }
             }
             else
             {
-                this.currentCharacter = (char)readCharacter;
+                _currentCharacter = (char)readCharacter;
             }
-
-            return !this.endOfStream;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private bool IsTagSpecialCharacter(char c)
         {
             return
-                c == this.TagStartCharacter || c == this.TagEndCharacter ||
-                c == this.StringLiteralStartCharacter || c == this.StringLiteralEndCharacter;
+                c == TagStartCharacter || c == TagEndCharacter ||
+                c == StringLiteralStartCharacter || c == StringLiteralEndCharacter;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private bool IsStandardSymbol(char c)
         {
-            if (this.IsTagSpecialCharacter(c))
+            if (IsTagSpecialCharacter(c))
             {
                 return false;
             }
-            else
-            {
-                var unicodeCategory = char.GetUnicodeCategory(c);
-                return
-                    unicodeCategory == UnicodeCategory.OtherPunctuation ||
-                    unicodeCategory == UnicodeCategory.CurrencySymbol ||
-                    unicodeCategory == UnicodeCategory.DashPunctuation ||
-                    unicodeCategory == UnicodeCategory.ModifierSymbol ||
-                    unicodeCategory == UnicodeCategory.MathSymbol;
-            }
+
+            var unicodeCategory = char.GetUnicodeCategory(c);
+            return
+                unicodeCategory == UnicodeCategory.OtherPunctuation ||
+                unicodeCategory == UnicodeCategory.CurrencySymbol ||
+                unicodeCategory == UnicodeCategory.DashPunctuation ||
+                unicodeCategory == UnicodeCategory.ModifierSymbol ||
+                unicodeCategory == UnicodeCategory.MathSymbol;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private Token ReadNextInternal()
         {
-            if (this.currentCharacterIndex == -1)
+            if (_currentCharacterIndex == -1)
             {
-                this.NextCharacter(false);
+                NextCharacter(false);
             }
 
-            if (this.endOfStream && !this.parsingTag)
+            if (_endOfStream && !_parsingTag)
             {
                 return null;
             }
 
             var tokenValue = new StringBuilder();
-            var tokenStartIndex = this.currentCharacterIndex;
+            var tokenStartIndex = _currentCharacterIndex;
 
-            if (this.parsingTag && this.currentCharacter == this.TagEndCharacter)
+            if (_parsingTag && _currentCharacter == TagEndCharacter)
             {
                 /* Tag end character. Need to switch to text mode. */
-                this.parsingTag = false;
+                _parsingTag = false;
 
-                var endTagToken = new Token(Token.TokenType.EndTag, this.currentCharacter.ToString(), this.currentCharacterIndex, 1);
+                var endTagToken = new Token(Token.TokenType.EndTag, _currentCharacter.ToString(), _currentCharacterIndex, 1);
 
-                this.NextCharacter(false);
+                NextCharacter(false);
                 return endTagToken;
             }
-            else if (this.parsingTag && this.currentCharacter == this.TagStartCharacter)
+
+            if (_parsingTag && _currentCharacter == TagStartCharacter)
             {
-                ExceptionHelper.UnexpectedCharacter(this.currentCharacterIndex, this.TagStartCharacter);
+                ExceptionHelper.UnexpectedCharacter(_currentCharacterIndex, TagStartCharacter);
             }
 
-            if (!this.parsingTag)
+            if (!_parsingTag)
             {
-                tokenValue.Append(this.currentCharacter);
+                tokenValue.Append(_currentCharacter);
 
-                if (this.currentCharacter == this.TagStartCharacter)
+                if (_currentCharacter == TagStartCharacter)
                 {
                     /* Found { character. This might actually be an escape sequence. */
-                    this.NextCharacter(true);
-                    if (this.currentCharacter == this.TagStartCharacter)
+                    NextCharacter(true);
+                    if (_currentCharacter == TagStartCharacter)
                     {
-                        this.NextCharacter(false);
+                        NextCharacter(false);
 
                         return new Token(
-                            Token.TokenType.Unparsed,
+                            Token.TokenType.UnParsed,
                             tokenValue.ToString(),
                             tokenStartIndex,
-                            this.currentCharacterIndex - tokenStartIndex);
+                            _currentCharacterIndex - tokenStartIndex);
                     }
-                    else
-                    {
-                        this.parsingTag = true;
 
-                        return new Token(
-                            Token.TokenType.StartTag,
-                            tokenValue.ToString(),
-                            tokenStartIndex,
-                            this.currentCharacterIndex - tokenStartIndex);
-                    }
-                }
-                else
-                {
-                    /* Parsing free-form text until the start directive character is found. */
-                    this.NextCharacter(false);
-
-                    while (!this.endOfStream && this.currentCharacter != this.TagStartCharacter)
-                    {
-                        tokenValue.Append(this.currentCharacter);
-                        this.NextCharacter(false);
-                    }
+                    _parsingTag = true;
 
                     return new Token(
-                        Token.TokenType.Unparsed,
+                        Token.TokenType.StartTag,
                         tokenValue.ToString(),
                         tokenStartIndex,
-                        this.currentCharacterIndex - tokenStartIndex);
+                        _currentCharacterIndex - tokenStartIndex);
                 }
+
+                /* Parsing free-form text until the start directive character is found. */
+                NextCharacter(false);
+
+                while (!_endOfStream && _currentCharacter != TagStartCharacter)
+                {
+                    tokenValue.Append(_currentCharacter);
+                    NextCharacter(false);
+                }
+
+                return new Token(
+                    Token.TokenType.UnParsed,
+                    tokenValue.ToString(),
+                    tokenStartIndex,
+                    _currentCharacterIndex - tokenStartIndex);
             }
 
-            if (this.parsingTag)
+            if (_parsingTag)
             {
-                /* Directive parsing is a diffent beast... */
+                /* Directive parsing is a different beast... */
+                Debug.Assert(!_endOfStream, "Must not be end-of-stream.");
 
-                Debug.Assert(!this.endOfStream, "Must not be end-of-stream.");
-
-                if (this.currentCharacter == this.StringLiteralStartCharacter)
+                if (_currentCharacter == StringLiteralStartCharacter)
                 {
                     /* String constant start character. Read all the way until the matching one is found (or escape!) */
                     while (true)
                     {
-                        this.NextCharacter(true);
+                        NextCharacter(true);
 
-                        if (this.currentCharacter == this.StringLiteralEndCharacter)
+                        if (_currentCharacter == StringLiteralEndCharacter)
                         {
                             /* End of string. */
-                            this.NextCharacter(true);
+                            NextCharacter(true);
                             break;
                         }
 
-                        if (this.currentCharacter == this.StringLiteralEscapeCharacter)
+                        if (_currentCharacter == StringLiteralEscapeCharacter)
                         {
                             /* Escape character. */
-                            this.NextCharacter(true);
+                            NextCharacter(true);
 
-                            if (this.currentCharacter == this.StringLiteralEscapeCharacter)
+                            if (_currentCharacter == StringLiteralEscapeCharacter)
                             {
-                                tokenValue.Append(this.StringLiteralEscapeCharacter);
+                                tokenValue.Append(StringLiteralEscapeCharacter);
                             }
-                            else if (this.currentCharacter == this.StringLiteralEndCharacter)
+                            else if (_currentCharacter == StringLiteralEndCharacter)
                             {
-                                tokenValue.Append(this.StringLiteralEndCharacter);
+                                tokenValue.Append(StringLiteralEndCharacter);
                             }
                             else
                             {
-                                switch (this.currentCharacter)
+                                switch (_currentCharacter)
                                 {
                                     case 'a':
                                         tokenValue.Append('\a');
@@ -450,14 +407,14 @@ namespace XtraLiteTemplates.Parsing
                                         tokenValue.Append('?');
                                         break;
                                     default:
-                                        ExceptionHelper.InvalidEscapeCharacter(this.currentCharacterIndex, this.currentCharacter);
+                                        ExceptionHelper.InvalidEscapeCharacter(_currentCharacterIndex, _currentCharacter);
                                         break;
                                 }
                             }
                         }
                         else
                         {
-                            tokenValue.Append(this.currentCharacter);
+                            tokenValue.Append(_currentCharacter);
                         }
                     }
 
@@ -465,16 +422,16 @@ namespace XtraLiteTemplates.Parsing
                         Token.TokenType.String,
                         tokenValue.ToString(),
                         tokenStartIndex,
-                        this.currentCharacterIndex - tokenStartIndex);
+                        _currentCharacterIndex - tokenStartIndex);
                 }
-                else if (char.IsLetter(this.currentCharacter) || this.currentCharacter == '_')
+
+                if (char.IsLetter(_currentCharacter) || _currentCharacter == '_')
                 {
                     /* Identifier/keyword token has started. */
-
-                    while (char.IsLetterOrDigit(this.currentCharacter) || this.currentCharacter == '_')
+                    while (char.IsLetterOrDigit(_currentCharacter) || _currentCharacter == '_')
                     {
-                        tokenValue.Append(this.currentCharacter);
-                        this.NextCharacter(true);
+                        tokenValue.Append(_currentCharacter);
+                        NextCharacter(true);
                     }
 
                     Debug.Assert(tokenValue.Length > 0, "Expected non-empty token value.");
@@ -482,27 +439,28 @@ namespace XtraLiteTemplates.Parsing
                         Token.TokenType.Word,
                         tokenValue.ToString(),
                         tokenStartIndex,
-                        this.currentCharacterIndex - tokenStartIndex);
+                        _currentCharacterIndex - tokenStartIndex);
                 }
-                else if (char.IsDigit(this.currentCharacter))
+
+                if (char.IsDigit(_currentCharacter))
                 {
                     /* Number has started. */
-                    while (char.IsDigit(this.currentCharacter))
+                    while (char.IsDigit(_currentCharacter))
                     {
-                        tokenValue.Append(this.currentCharacter);
-                        this.NextCharacter(true);
+                        tokenValue.Append(_currentCharacter);
+                        NextCharacter(true);
                     }
 
-                    if (this.currentCharacter == this.NumberLiteralDecimalSeparatorCharacter && char.IsDigit(this.PeekCharacter()))
+                    if (_currentCharacter == NumberLiteralDecimalSeparatorCharacter && char.IsDigit(PeekCharacter()))
                     {
                         /* This is a Decimal point. Read the remaining bits. */
                         tokenValue.Append(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
-                        this.NextCharacter(true);
+                        NextCharacter(true);
 
-                        while (char.IsDigit(this.currentCharacter))
+                        while (char.IsDigit(_currentCharacter))
                         {
-                            tokenValue.Append(this.currentCharacter);
-                            this.NextCharacter(true);
+                            tokenValue.Append(_currentCharacter);
+                            NextCharacter(true);
                         }
                     }
 
@@ -511,56 +469,56 @@ namespace XtraLiteTemplates.Parsing
                         Token.TokenType.Number,
                         tokenValue.ToString(),
                         tokenStartIndex,
-                        this.currentCharacterIndex - tokenStartIndex);
+                        _currentCharacterIndex - tokenStartIndex);
                 }
-                else if (this.currentCharacter == this.NumberLiteralDecimalSeparatorCharacter)
+
+                if (_currentCharacter == NumberLiteralDecimalSeparatorCharacter)
                 {
                     /* Dot-prefixed number may have started. */
-                    var dot = this.currentCharacter;
-                    this.NextCharacter(true);
+                    var dot = _currentCharacter;
+                    NextCharacter(true);
 
-                    if (char.IsDigit(this.currentCharacter))
+                    if (char.IsDigit(_currentCharacter))
                     {
                         tokenValue.Append(CultureInfo.InvariantCulture.NumberFormat.NumberDecimalSeparator);
 
                         /* Yes, this is a number! */
-                        while (char.IsDigit(this.currentCharacter))
+                        while (char.IsDigit(_currentCharacter))
                         {
-                            tokenValue.Append(this.currentCharacter);
-                            this.NextCharacter(true);
+                            tokenValue.Append(_currentCharacter);
+                            NextCharacter(true);
                         }
 
                         return new Token(
                             Token.TokenType.Number,
                             tokenValue.ToString(),
                             tokenStartIndex,
-                            this.currentCharacterIndex - tokenStartIndex);
+                            _currentCharacterIndex - tokenStartIndex);
                     }
-                    else
+
+                    tokenValue.Append(dot);
+
+                    /* Lump together all "standard symbols" (if this one was a standard one). */
+                    while (IsStandardSymbol(_currentCharacter))
                     {
-                        tokenValue.Append(dot);
-
-                        /* Lump toghether all "standard symbols" (if this one was a standard one). */
-                        while (this.IsStandardSymbol(this.currentCharacter))
-                        {
-                            tokenValue.Append(this.currentCharacter);
-                            this.NextCharacter(true);
-                        }
-
-                        return new Token(
-                            Token.TokenType.Symbol,
-                            tokenValue.ToString(),
-                            tokenStartIndex,
-                            this.currentCharacterIndex - tokenStartIndex);
+                        tokenValue.Append(_currentCharacter);
+                        NextCharacter(true);
                     }
+
+                    return new Token(
+                        Token.TokenType.Symbol,
+                        tokenValue.ToString(),
+                        tokenStartIndex,
+                        _currentCharacterIndex - tokenStartIndex);
                 }
-                else if (char.IsWhiteSpace(this.currentCharacter))
+
+                if (char.IsWhiteSpace(_currentCharacter))
                 {
                     /* Whitespace... */
-                    while (char.IsWhiteSpace(this.currentCharacter))
+                    while (char.IsWhiteSpace(_currentCharacter))
                     {
-                        tokenValue.Append(this.currentCharacter);
-                        this.NextCharacter(true);
+                        tokenValue.Append(_currentCharacter);
+                        NextCharacter(true);
                     }
 
                     Debug.Assert(tokenValue.Length > 0, "Expected non-empty token value.");
@@ -569,33 +527,34 @@ namespace XtraLiteTemplates.Parsing
                         Token.TokenType.Whitespace,
                         tokenValue.ToString(),
                         tokenStartIndex,
-                        this.currentCharacterIndex - tokenStartIndex);
+                        _currentCharacterIndex - tokenStartIndex);
                 }
-                else if (!this.IsTagSpecialCharacter(this.currentCharacter))
+
+                if (!IsTagSpecialCharacter(_currentCharacter))
                 {
                     /* Check if this is a "standard symbol" */
-                    var validStandardSymbol = this.IsStandardSymbol(this.currentCharacter);
+                    var validStandardSymbol = IsStandardSymbol(_currentCharacter);
 
                     /* Add the symbol to the token value. */
-                    tokenValue.Append(this.currentCharacter);
-                    this.NextCharacter(true);
+                    tokenValue.Append(_currentCharacter);
+                    NextCharacter(true);
 
                     if (validStandardSymbol)
                     {
-                        /* Lump toghether all "standard symbols" (if this one was a standard one). */
-                        while (this.IsStandardSymbol(this.currentCharacter))
+                        /* Lump together all "standard symbols" (if this one was a standard one). */
+                        while (IsStandardSymbol(_currentCharacter))
                         {
-                            if (this.currentCharacter == this.NumberLiteralDecimalSeparatorCharacter)
+                            if (_currentCharacter == NumberLiteralDecimalSeparatorCharacter)
                             {
                                 /* Decimal separator. Special case. Peek the next char to see if its a digit. */
-                                if (char.IsDigit(this.PeekCharacter()))
+                                if (char.IsDigit(PeekCharacter()))
                                 {
                                     break;
                                 }
                             }
 
-                            tokenValue.Append(this.currentCharacter);
-                            this.NextCharacter(true);
+                            tokenValue.Append(_currentCharacter);
+                            NextCharacter(true);
                         }
                     }
 
@@ -605,7 +564,7 @@ namespace XtraLiteTemplates.Parsing
                         Token.TokenType.Symbol,
                         tokenValue.ToString(),
                         tokenStartIndex,
-                        this.currentCharacterIndex - tokenStartIndex);
+                        _currentCharacterIndex - tokenStartIndex);
                 }
             }
 

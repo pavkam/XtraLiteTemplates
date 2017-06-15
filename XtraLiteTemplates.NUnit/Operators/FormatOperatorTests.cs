@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,11 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
     using System.Globalization;
+
+    using Expressions.Operators;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class FormatOperatorTests : OperatorTestsBase
@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new FormatOperator(null, CultureInfo.CurrentCulture, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new FormatOperator(String.Empty, CultureInfo.CurrentCulture, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new FormatOperator(string.Empty, CultureInfo.CurrentCulture, TypeConverter));
             ExpectArgumentNullException("formatProvider", () => new FormatOperator("operator", null, TypeConverter));
             ExpectArgumentNullException("formatProvider", () => new FormatOperator(null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new FormatOperator("operator", CultureInfo.CurrentCulture, null));
@@ -74,7 +74,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new FormatOperator(CultureInfo.InvariantCulture, TypeConverter);
 
-            Object dummy;
+            object dummy;
             ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
             ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
         }

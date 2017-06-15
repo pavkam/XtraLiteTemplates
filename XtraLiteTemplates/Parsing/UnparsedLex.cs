@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,41 +24,39 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Parsing
 {
     using System;
 
     /// <summary>
-    /// A <see cref="Lex"/> object representing an unparsed text block.
+    /// A <see cref="Lex"/> object representing an un-parsed text block.
     /// </summary>
-    public sealed class UnparsedLex : Lex
+    public sealed class UnParsedLex : Lex
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UnparsedLex"/> class.
+        /// Initializes a new instance of the <see cref="UnParsedLex"/> class.
         /// </summary>
-        /// <param name="unparsedText">The unparsed text.</param>
+        /// <param name="unParsedText">The un-parsed text.</param>
         /// <param name="firstCharacterIndex">Index of the first character in the input template.</param>
-        /// <param name="originalLength">Original length of the unparsed text.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="unparsedText"/> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="unparsedText"/> is empty.</exception>
+        /// <param name="originalLength">Original length of the un-parsed text.</param>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="unParsedText"/> is <c>null</c>.</exception>
+        /// <exception cref="ArgumentException">Argument <paramref name="unParsedText"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        public UnparsedLex(string unparsedText, int firstCharacterIndex, int originalLength)
+        public UnParsedLex(string unParsedText, int firstCharacterIndex, int originalLength)
             : base(firstCharacterIndex, originalLength)
         {
-            Expect.NotEmpty("unparsedText", unparsedText);
+            Expect.NotEmpty("unParsedText", unParsedText);
 
-            this.UnparsedText = unparsedText;
+            UnParsedText = unParsedText;
         }
 
         /// <summary>
-        /// Gets the unparsed text (as read from the input template).
+        /// Gets the un-parsed text (as read from the input template).
         /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
         /// </summary>
         /// <value>
-        /// The unparsed text.
+        /// The un-parsed text.
         /// </value>
-        public string UnparsedText { get; private set; }
+        public string UnParsedText { get; }
     }
 }

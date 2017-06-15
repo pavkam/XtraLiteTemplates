@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -29,14 +29,7 @@ using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit.Directives
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Directives;
-    using System.Globalization;
 
     [TestFixture]
     public class StandardConditionalInterpolationDirectiveTests : TestBase
@@ -72,7 +65,7 @@ namespace XtraLiteTemplates.NUnit.Directives
             var directive = new ConditionalInterpolationDirective("$ IF $", false, TypeConverter);
 
             Assert.AreEqual("100", Evaluate("{100 IF 1}", directive));
-            Assert.AreEqual("", Evaluate("{100 IF 0}", directive));
+            Assert.AreEqual(string.Empty, Evaluate("{100 IF 0}", directive));
         }
 
         [Test]
@@ -81,7 +74,7 @@ namespace XtraLiteTemplates.NUnit.Directives
             var directive = new ConditionalInterpolationDirective("$ THEN $", true, TypeConverter);
 
             Assert.AreEqual("100", Evaluate("{1 THEN 100}", directive));
-            Assert.AreEqual("", Evaluate("{0 THEN 100}", directive));
+            Assert.AreEqual(string.Empty, Evaluate("{0 THEN 100}", directive));
         }
     }
 }

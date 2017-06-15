@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,23 +30,18 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.NUnit.Inside;
+    using Expressions;
+    using Expressions.Operators;
 
     [TestFixture]
     public class OperatorTestsBase : TestBase
     {
         protected readonly IExpressionEvaluationContext EmptyEvaluationContext = CreateContext(StringComparer.OrdinalIgnoreCase);
 
-        protected void AssertEvaluation<T, R>(UnaryOperator @operator, T arg, R expected)
+        protected void AssertEvaluation<T, TR>(UnaryOperator @operator, T arg, TR expected)
         {
-            Object result = @operator.Evaluate(EmptyEvaluationContext, arg);
-            Assert.IsInstanceOf<R>(result);
+            var result = @operator.Evaluate(EmptyEvaluationContext, arg);
+            Assert.IsInstanceOf<TR>(result);
             Assert.AreEqual(expected, result);
         }
 
@@ -55,10 +50,10 @@ namespace XtraLiteTemplates.NUnit.Operators
             AssertEvaluation<T, T>(@operator, arg, expected);
         }
 
-        protected void AssertEvaluation<T, R>(BinaryOperator @operator, T left, T right, R expected)
+        protected void AssertEvaluation<T, TR>(BinaryOperator @operator, T left, T right, TR expected)
         {
-            Object result = @operator.Evaluate(EmptyEvaluationContext, left, right);
-            Assert.IsInstanceOf<R>(result);
+            var result = @operator.Evaluate(EmptyEvaluationContext, left, right);
+            Assert.IsInstanceOf<TR>(result);
             Assert.AreEqual(expected, result);
         }
 

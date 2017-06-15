@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,19 +24,15 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
-    using System.Runtime.Serialization;
-    using XtraLiteTemplates.Expressions;
+    using System.Diagnostics.CodeAnalysis;
 
     /// <summary>
     /// Exception type thrown for any encountered interpretation error.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Justification = "Will never be serialized.")]
     public class InterpreterException : FormatException
     {
         /// <summary>
@@ -47,6 +43,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="firstCharacterIndex">Index of the first character.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">Format arguments.</param>
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         internal InterpreterException(
             Exception innerException, 
             Directive[] candidateDirectives, 
@@ -57,8 +54,8 @@ namespace XtraLiteTemplates.Evaluation
         {
             Debug.Assert(firstCharacterIndex >= 0, "firstCharacterIndex cannot be less than zero.");
 
-            this.FirstCharacterIndex = firstCharacterIndex;
-            this.CandidateDirectives = candidateDirectives;
+            FirstCharacterIndex = firstCharacterIndex;
+            CandidateDirectives = candidateDirectives;
         }
 
         /// <summary>
@@ -79,7 +76,9 @@ namespace XtraLiteTemplates.Evaluation
         /// <value>
         /// The candidate directives.
         /// </value>
-        public Directive[] CandidateDirectives { get; private set; }
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+        public Directive[] CandidateDirectives { get; }
 
         /// <summary>
         /// Gets the index of the first character in the input template that matches the candidate directives.
@@ -87,6 +86,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <value>
         /// The index of the first character.
         /// </value>
-        public int FirstCharacterIndex { get; private set; }
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+        public int FirstCharacterIndex { get; }
     }
 }

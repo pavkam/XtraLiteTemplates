@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,14 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Directives;
-    using System.Globalization;
-    using System.Collections.Generic;
 
     [TestFixture]
     public class StandardPreFormattedUnparsedTextDirectiveTests : TestBase
@@ -45,31 +38,31 @@ namespace XtraLiteTemplates.NUnit.Directives
         [Test]
         public void TestCaseConstructor1()
         {
-            ExpectInvalidTagMarkupException(null, () => new PreFormattedUnparsedTextDirective(null, "END", String.Empty, TypeConverter));
-            ExpectInvalidTagMarkupException(null, () => new PreFormattedUnparsedTextDirective("PREF", null, String.Empty, TypeConverter));
+            ExpectInvalidTagMarkupException(null, () => new PreFormattedUnParsedTextDirective(null, "END", string.Empty, TypeConverter));
+            ExpectInvalidTagMarkupException(null, () => new PreFormattedUnParsedTextDirective("PREF", null, string.Empty, TypeConverter));
 
-            ExpectArgumentNullException("stateObject", () => new PreFormattedUnparsedTextDirective("PREF", "END", null, TypeConverter));
-            ExpectArgumentNullException("typeConverter", () => new PreFormattedUnparsedTextDirective("PREF", "END", String.Empty, null));
+            ExpectArgumentNullException("stateObject", () => new PreFormattedUnParsedTextDirective("PREF", "END", null, TypeConverter));
+            ExpectArgumentNullException("typeConverter", () => new PreFormattedUnParsedTextDirective("PREF", "END", string.Empty, null));
         }
 
         [Test]
         public void TestCaseConstructor2()
         {
-            var directive = new PreFormattedUnparsedTextDirective(String.Empty, TypeConverter);
+            var directive = new PreFormattedUnParsedTextDirective(string.Empty, TypeConverter);
             Assert.AreEqual("{PREFORMATTED}...{END}", directive.ToString());
         }
 
         [Test]
         public void TestCaseConstructor3()
         {
-            var directive = new PreFormattedUnparsedTextDirective("PREPRE", "SUPPAPRE", String.Empty, TypeConverter);
+            var directive = new PreFormattedUnParsedTextDirective("PREPRE", "SUPPAPRE", string.Empty, TypeConverter);
             Assert.AreEqual("{PREPRE}...{SUPPAPRE}", directive.ToString());
         }
 
         [Test]
         public void TestCaseEvaluation1()
         {
-            var directive = new PreFormattedUnparsedTextDirective("P", "E", String.Empty, TypeConverter);
+            var directive = new PreFormattedUnParsedTextDirective("P", "E", string.Empty, TypeConverter);
 
             Assert.AreEqual("   1   ", Evaluate("{P}   1   {E}", directive));
             Assert.AreEqual("\n\r1   ", Evaluate("{P}\n\r1   {E}", directive));

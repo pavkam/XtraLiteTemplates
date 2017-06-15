@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,11 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
     using System.Collections.Generic;
-    using System.Globalization;
+
+    using Expressions.Operators;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class SequenceOperatorTests : OperatorTestsBase
@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new SequenceOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new SequenceOperator(String.Empty, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new SequenceOperator(string.Empty, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new SequenceOperator("operator", null));
             ExpectArgumentNullException("typeConverter", () => new SequenceOperator(null));
         }
@@ -71,7 +71,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new SequenceOperator(TypeConverter);
 
-            Object dummy;
+            object dummy;
             ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
             ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
         }
@@ -81,15 +81,15 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new SequenceOperator(TypeConverter);
 
-            var enumerable = @operator.Evaluate(EmptyEvaluationContext, 1.8, 2.1) as IEnumerable<Int32>;
+            var enumerable = @operator.Evaluate(EmptyEvaluationContext, 1.8, 2.1) as IEnumerable<int>;
             Assert.IsNotNull(enumerable);
-            Assert.AreEqual("1,2", String.Join(",", enumerable));
+            Assert.AreEqual("1,2", string.Join(",", enumerable));
 
-            enumerable = @operator.Evaluate(EmptyEvaluationContext, 1.1, 1.8) as IEnumerable<Int32>;
+            enumerable = @operator.Evaluate(EmptyEvaluationContext, 1.1, 1.8) as IEnumerable<int>;
             Assert.IsNotNull(enumerable);
-            Assert.AreEqual("1", String.Join(",", enumerable));
+            Assert.AreEqual("1", string.Join(",", enumerable));
 
-            enumerable = @operator.Evaluate(EmptyEvaluationContext, 2, 1) as IEnumerable<Int32>;
+            enumerable = @operator.Evaluate(EmptyEvaluationContext, 2, 1) as IEnumerable<int>;
             Assert.IsNull(enumerable);
         }
     }

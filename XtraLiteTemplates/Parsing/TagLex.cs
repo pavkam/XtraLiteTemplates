@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,12 +24,9 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Parsing
 {
     using System;
-    using System.Text;
 
     /// <summary>
     /// A <see cref="Lex"/> object representing a matched <see cref="Tag"/>.
@@ -52,8 +49,8 @@ namespace XtraLiteTemplates.Parsing
             Expect.NotEmpty("components", components);
             Expect.NotNull("tag", tag);
 
-            this.Components = components;
-            this.Tag = tag;
+            Components = components;
+            Tag = tag;
         }
 
         /// <summary>
@@ -63,17 +60,17 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The tag object
         /// </value>
-        public Tag Tag { get; private set; }
+        public Tag Tag { get; }
 
         /// <summary>
-        /// Gets all the components of the matched tag. The number of items in this property matches the <see cref="XtraLiteTemplates.Parsing.Tag.ComponentCount"/> property.
-        /// Each item can either be a <see cref="String"/> or an <see cref="XtraLiteTemplates.Expressions.Expression"/>, depending on which of the tag's component was matched.
+        /// Gets all the components of the matched tag. The number of items in this property matches the <see cref="Parsing.Tag.ComponentCount"/> property.
+        /// Each item can either be a <see cref="string"/> or an <see cref="Expressions.Expression"/>, depending on which of the tag's component was matched.
         /// <remarks>The value of this property is provided by the caller during the construction process.</remarks>
         /// </summary>
         /// <value>
         /// The matched tag's components.
         /// </value>
-        public object[] Components { get; private set; }
+        public object[] Components { get; }
 
         /// <summary>
         /// Returns a human-readable representation of this <c>lex</c> object.
@@ -83,7 +80,7 @@ namespace XtraLiteTemplates.Parsing
         /// </returns>
         public override string ToString()
         {
-            return string.Join(" ", this.Components);
+            return string.Join(" ", Components);
         }
     }
 }

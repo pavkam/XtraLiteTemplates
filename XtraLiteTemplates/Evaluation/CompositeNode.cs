@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,56 +24,45 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
 namespace XtraLiteTemplates.Evaluation
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using System.Text;
-    using XtraLiteTemplates.Expressions;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class CompositeNode : TemplateNode
     {
-        private readonly List<TemplateNode> childNodes;
+        private readonly List<TemplateNode> _childNodes;
 
         protected CompositeNode(TemplateNode parent)
             : base(parent)
         {
-            this.childNodes = new List<TemplateNode>();
+            _childNodes = new List<TemplateNode>();
         }
 
-        public IReadOnlyList<TemplateNode> Children
-        {
-            get
-            {
-                return this.childNodes;
-            }
-        }
+        public IReadOnlyList<TemplateNode> Children => _childNodes;
 
         public void AddChild(TemplateNode child)
         {
             Debug.Assert(child != null, "child cannot be null.");
             Debug.Assert(child.Parent == this, "child's Parent must be this.");
 
-            if (!this.childNodes.Contains(child))
+            if (!_childNodes.Contains(child))
             {
-                this.childNodes.Add(child);
+                _childNodes.Add(child);
             }
         }
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (var child in this.Children)
+            var sb = new StringBuilder();
+            foreach (var child in Children)
             {
-                sb.Append(child.ToString());
+                sb.Append(child);
             }
 
-            return string.Format("({0})", sb.ToString());
+            return $"({sb})";
         }
     }
 }

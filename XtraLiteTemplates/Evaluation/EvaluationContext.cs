@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,42 +24,27 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
-    using System.IO;
     using System.Threading;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
+    using Expressions;
+    using Introspection;
 
     /// <summary>
     /// Provides a standard implementation of an evaluation context.
     /// </summary>
     public class EvaluationContext : IExpressionEvaluationContext
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private Stack<Frame> frames;
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private Dictionary<Type, SimpleTypeDisemboweler> disembowelers;
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private IEqualityComparer<string> identifierComparer;
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private IObjectFormatter objectFormatter;
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private bool ignoreEvaluationExceptions;
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private CancellationToken cancellationToken;
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private object selfObject;
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private Func<IExpressionEvaluationContext, string, string> unparsedTextHandler;
+        private readonly Stack<Frame> _frames;
+        private readonly Dictionary<Type, SimpleTypeDisemboweler> _disembowelers;
+        private readonly IEqualityComparer<string> _identifierComparer;
+        private readonly IObjectFormatter _objectFormatter;
+
+        private readonly object _selfObject;
+        private readonly Func<IExpressionEvaluationContext, string, string> _unParsedTextHandler;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="EvaluationContext"/> class.
@@ -69,30 +54,30 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="identifierComparer">The identifier comparer.</param>
         /// <param name="objectFormatter">The object formatter.</param>
         /// <param name="selfObject">The <c>self</c> object that exposes all global identifiers.</param>
-        /// <param name="unparsedTextHandler">The unparsed text handler delegate.</param>
+        /// <param name="unParsedTextHandler">The un-parsed text handler delegate.</param>
         public EvaluationContext(
             bool ignoreEvaluationExceptions,
             CancellationToken cancellationToken,
             IEqualityComparer<string> identifierComparer,
             IObjectFormatter objectFormatter,
             object selfObject,
-            Func<IExpressionEvaluationContext, string, string> unparsedTextHandler)
+            Func<IExpressionEvaluationContext, string, string> unParsedTextHandler)
         {
             Expect.NotNull("identifierComparer", identifierComparer);
             Expect.NotNull("objectFormatter", objectFormatter);
-            Expect.NotNull("unparsedTextHandler", unparsedTextHandler);
+            Expect.NotNull("unParsedTextHandler", unParsedTextHandler);
 
-            this.cancellationToken = cancellationToken;
-            this.identifierComparer = identifierComparer;
-            this.objectFormatter = objectFormatter;
-            this.ignoreEvaluationExceptions = ignoreEvaluationExceptions;
-            this.unparsedTextHandler = unparsedTextHandler;
-            this.selfObject = selfObject;
+            CancellationToken = cancellationToken;
+            _identifierComparer = identifierComparer;
+            _objectFormatter = objectFormatter;
+            IgnoreEvaluationExceptions = ignoreEvaluationExceptions;
+            _unParsedTextHandler = unParsedTextHandler;
+            _selfObject = selfObject;
 
-            this.disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
-            this.frames = new Stack<Frame>();
+            _disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
+            _frames = new Stack<Frame>();
 
-            this.OpenEvaluationFrame();
+            OpenEvaluationFrame();
         }
 
         /// <summary>
@@ -101,13 +86,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <value>
         /// <c>true</c> if evaluation exceptions are ignored; otherwise, <c>false</c>.
         /// </value>
-        public bool IgnoreEvaluationExceptions
-        {
-            get
-            {
-                return this.ignoreEvaluationExceptions;
-            }
-        }
+        public bool IgnoreEvaluationExceptions { get; }
 
         /// <summary>
         /// Gets the cancellation token.
@@ -115,32 +94,25 @@ namespace XtraLiteTemplates.Evaluation
         /// <value>
         /// The cancellation token that was supplied during construction.
         /// </value>
-        public CancellationToken CancellationToken
-        {
-            get
-            {
-                return this.cancellationToken;
-            }
-        }
+        public CancellationToken CancellationToken { get; }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private Frame TopFrame
         {
             get
             {
-                Debug.Assert(this.frames.Count > 0, "No open frames remaining.");
-                return this.frames.Peek();
+                Debug.Assert(_frames.Count > 0, "No open frames remaining.");
+                return _frames.Peek();
             }
         }
 
         /// <summary>
-        /// Processes the unparsed text blocks.
+        /// Processes the un-parsed text blocks.
         /// </summary>
-        /// <param name="value">The unparsed text value.</param>
-        /// <returns>The processed unparsed text.</returns>
-        public string ProcessUnparsedText(string value)
+        /// <param name="value">The un-parsed text value.</param>
+        /// <returns>The processed un-parsed text.</returns>
+        public string ProcessUnParsedText(string value)
         {
-            return this.unparsedTextHandler(this, value);
+            return _unParsedTextHandler(this, value);
         }
 
         /// <summary>
@@ -154,10 +126,10 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.Identifier("property", property);
 
-            var topFrame = this.TopFrame;
+            var topFrame = TopFrame;
             if (topFrame.Variables == null)
             {
-                topFrame.Variables = new Dictionary<string, object>(this.identifierComparer);
+                topFrame.Variables = new Dictionary<string, object>(_identifierComparer);
             }
 
             topFrame.Variables[property] = value;
@@ -177,9 +149,9 @@ namespace XtraLiteTemplates.Evaluation
             Expect.Identifier("property", property);
 
             object result;
-            if (!this.TryGetProperty(property, out result))
+            if (!TryGetProperty(property, out result))
             {
-                result = this.GetProperty(this.selfObject, property);
+                result = GetProperty(_selfObject, property);
             }
 
             return result;
@@ -202,12 +174,10 @@ namespace XtraLiteTemplates.Evaluation
             if (@object != null)
             {
                 var type = @object.GetType();
-                return this.GetDisembowelerForType(type).Invoke(@object, property);
+                return GetDisembowelerForType(type).Invoke(@object, property);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -227,14 +197,14 @@ namespace XtraLiteTemplates.Evaluation
             if (arguments == null || arguments.Length == 0)
             {
                 object result;
-                if (this.TryGetProperty(method, out result))
+                if (TryGetProperty(method, out result))
                 {
                     return result;
                 }
             }
 
             /* Go to self object. */
-            return this.Invoke(this.selfObject, method, arguments);
+            return Invoke(_selfObject, method, arguments);
         }
 
         /// <summary>
@@ -255,12 +225,10 @@ namespace XtraLiteTemplates.Evaluation
             if (@object != null)
             {
                 var type = @object.GetType();
-                return this.GetDisembowelerForType(type).Invoke(@object, method, arguments);
+                return GetDisembowelerForType(type).Invoke(@object, method, arguments);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
 
         /// <summary>
@@ -276,7 +244,7 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.NotNull("state", state);
 
-            var topFrame = this.TopFrame;
+            var topFrame = TopFrame;
             if (topFrame.StateObjects == null)
             {
                 topFrame.StateObjects = new HashSet<object>();
@@ -298,11 +266,8 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.NotNull("state", state);
 
-            var topFrame = this.TopFrame;
-            if (topFrame.StateObjects != null)
-            {
-                topFrame.StateObjects.Remove(state);
-            }
+            var topFrame = TopFrame;
+            topFrame.StateObjects?.Remove(state);
         }
 
         /// <summary>
@@ -317,28 +282,25 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.NotNull("state", state);
 
-            var topFrame = this.TopFrame;
+            var topFrame = TopFrame;
             return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         internal void OpenEvaluationFrame()
         {
-            this.frames.Push(new Frame());
+            _frames.Push(new Frame());
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         internal void CloseEvaluationFrame()
         {
-            Debug.Assert(this.frames.Count > 0, "No open frames remaining.");
-            this.frames.Pop();
+            Debug.Assert(_frames.Count > 0, "No open frames remaining.");
+            _frames.Pop();
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private bool TryGetProperty(string property, out object value)
         {
-            /* Obtain the propety from the list given to us. */
-            foreach (var frame in this.frames)
+            /* Obtain the property from the list given to us. */
+            foreach (var frame in _frames)
             {
                 if (frame.Variables != null && frame.Variables.TryGetValue(property, out value))
                 {
@@ -350,23 +312,21 @@ namespace XtraLiteTemplates.Evaluation
             return false;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private SimpleTypeDisemboweler GetDisembowelerForType(Type type)
         {
             Debug.Assert(type != null, "type cannot be null.");
 
             SimpleTypeDisemboweler disemboweler;
-            if (!this.disembowelers.TryGetValue(type, out disemboweler))
+            if (!_disembowelers.TryGetValue(type, out disemboweler))
             {
-                disemboweler = new SimpleTypeDisemboweler(type, this.identifierComparer, this.objectFormatter);
+                disemboweler = new SimpleTypeDisemboweler(type, _identifierComparer, _objectFormatter);
 
-                this.disembowelers.Add(type, disemboweler);
+                _disembowelers.Add(type, disemboweler);
             }
 
             return disemboweler;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private sealed class Frame
         {
             public Dictionary<string, object> Variables { get; set; }

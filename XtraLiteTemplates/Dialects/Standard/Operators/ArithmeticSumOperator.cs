@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,17 +24,14 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
-    using System.Diagnostics;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
+    using Expressions;
+    using Introspection;
 
     /// <summary>
-    /// Implements the standard floating point sum ('+') operation, with an extension for <see cref="String"/> and <see cref="Boolean"/> types.
+    /// Implements the standard floating point sum ('+') operation, with an extension for <see cref="string"/> and <see cref="bool"/> types.
     /// </summary>
     public sealed class ArithmeticSumOperator : StandardBinaryOperator
     {
@@ -81,18 +78,18 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             {
                 return TypeConverter.ConvertToString(left) + TypeConverter.ConvertToString(right);
             }
-            else if (leftType == PrimitiveType.Number || rightType == PrimitiveType.Number)
+
+            if (leftType == PrimitiveType.Number || rightType == PrimitiveType.Number)
             {
                 return TypeConverter.ConvertToNumber(left) + TypeConverter.ConvertToNumber(right);
             }
-            else if (leftType == PrimitiveType.Boolean || rightType == PrimitiveType.Boolean)
+
+            if (leftType == PrimitiveType.Boolean || rightType == PrimitiveType.Boolean)
             {
                 return TypeConverter.ConvertToNumber(left) + TypeConverter.ConvertToNumber(right);
             }
-            else
-            {
-                return null;
-            }
+
+            return null;
         }
     }
 }

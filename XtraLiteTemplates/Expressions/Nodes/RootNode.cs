@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -28,27 +28,23 @@
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System;
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using System.Linq;
-    using System.Text;
+
     using LinqExpression = System.Linq.Expressions.Expression;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class RootNode : ExpressionNode
     {
-        private List<ExpressionNode> groupChildrenNodes;
-        private bool allowEmptyGroup;
+        private readonly List<ExpressionNode> _groupChildrenNodes;
+        private readonly bool _allowEmptyGroup;
 
         public RootNode(ExpressionNode parent, bool allowEmptyGroup)
             : base(parent)
         {
-            this.groupChildrenNodes = new List<ExpressionNode>();
-            this.allowEmptyGroup = allowEmptyGroup;
+            _groupChildrenNodes = new List<ExpressionNode>();
+            _allowEmptyGroup = allowEmptyGroup;
         }
 
         public IReadOnlyList<ExpressionNode> Children { get; private set; }
@@ -57,16 +53,16 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             get
             {
-                Debug.Assert(this.groupChildrenNodes.Count > 0, "Must have at least one child node.");
-                return this.groupChildrenNodes[this.groupChildrenNodes.Count - 1];
+                Debug.Assert(_groupChildrenNodes.Count > 0, "Must have at least one child node.");
+                return _groupChildrenNodes[_groupChildrenNodes.Count - 1];
             }
 
             set
             {
-                Debug.Assert(this.groupChildrenNodes.Count > 0, "Must have at least one child node.");
+                Debug.Assert(_groupChildrenNodes.Count > 0, "Must have at least one child node.");
                 Debug.Assert(value != null, "value cannot be null.");
 
-                this.groupChildrenNodes[this.groupChildrenNodes.Count - 1] = value;
+                _groupChildrenNodes[_groupChildrenNodes.Count - 1] = value;
             }
         }
 
@@ -76,64 +72,60 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             get
             {
-                if (this.Closed)
+                if (Closed)
                 {
                     return
                         PermittedContinuations.BinaryOperator |
                         PermittedContinuations.ContinueGroup |
                         PermittedContinuations.CloseGroup;
                 }
-                else
+
+                if (_groupChildrenNodes.Count == 0 && _allowEmptyGroup)
                 {
-                    if (this.groupChildrenNodes.Count == 0 && this.allowEmptyGroup)
-                    {
-                        return
-                            PermittedContinuations.UnaryOperator |
-                            PermittedContinuations.Literal |
-                            PermittedContinuations.Identifier |
-                            PermittedContinuations.CloseGroup |
-                            PermittedContinuations.NewGroup;
-                    }
-                    else
-                    {
-                        return
-                            PermittedContinuations.UnaryOperator |
-                            PermittedContinuations.Literal |
-                            PermittedContinuations.Identifier |
-                            PermittedContinuations.NewGroup;
-                    }
+                    return
+                        PermittedContinuations.UnaryOperator |
+                        PermittedContinuations.Literal |
+                        PermittedContinuations.Identifier |
+                        PermittedContinuations.CloseGroup |
+                        PermittedContinuations.NewGroup;
                 }
+
+                return
+                    PermittedContinuations.UnaryOperator |
+                    PermittedContinuations.Literal |
+                    PermittedContinuations.Identifier |
+                    PermittedContinuations.NewGroup;
             }
         }
 
         public void AddChild(ExpressionNode child)
         {
-            this.groupChildrenNodes.Add(child);
+            _groupChildrenNodes.Add(child);
         }
 
         public void Close()
         {
-            Debug.Assert(!this.Closed, "Cannot be closed.");
-            Debug.Assert(this.groupChildrenNodes.Count > 0 || this.allowEmptyGroup, "Children must be defined for [mandatory children] groups.");
+            Debug.Assert(!Closed, "Cannot be closed.");
+            Debug.Assert(_groupChildrenNodes.Count > 0 || _allowEmptyGroup, "Children must be defined for [mandatory children] groups.");
 
-            this.Closed = true;
+            Closed = true;
         }
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            var result = string.Join(" , ", this.groupChildrenNodes.Select(s => s.ToString(style)));
+            var result = string.Join(" , ", _groupChildrenNodes.Select(s => s.ToString(style)));
 
-            if (this.Parent != null)
+            if (Parent != null)
             {
                 if (style == ExpressionFormatStyle.Canonical)
                 {
-                    result = string.Format("(){{{0}}}", result);
+                    result = $"(){{{result}}}";
                 }
                 else if (style == ExpressionFormatStyle.Arithmetic)
                 {
                     if (!string.IsNullOrEmpty(result))
                     {
-                        result = string.Format("( {0} )", result);
+                        result = $"( {result} )";
                     }
                     else
                     {
@@ -142,7 +134,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 }
                 else if (style == ExpressionFormatStyle.Polish)
                 {
-                    result = string.Format("({0})", result);
+                    result = $"({result})";
                 }
             }
 
@@ -153,25 +145,25 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
-            if (this.groupChildrenNodes.Count == 1)
+            if (_groupChildrenNodes.Count == 1)
             {
-                if (this.groupChildrenNodes[0].Reduce(reduceContext))
+                if (_groupChildrenNodes[0].Reduce(reduceContext))
                 {
-                    reducedValue = this.groupChildrenNodes[0].ReducedValue;
+                    reducedValue = _groupChildrenNodes[0].ReducedValue;
                     return true;
                 }
             }
-            else if (this.groupChildrenNodes.Count > 1)
+            else if (_groupChildrenNodes.Count > 1)
             {
                 var allReduced = true;
-                foreach (var child in this.groupChildrenNodes)
+                foreach (var child in _groupChildrenNodes)
                 {
                     allReduced &= child.Reduce(reduceContext);
                 }
 
                 if (allReduced)
                 {
-                    reducedValue = this.groupChildrenNodes.Select(s => s.ReducedValue).ToArray();
+                    reducedValue = _groupChildrenNodes.Select(s => s.ReducedValue).ToArray();
                     return true;
                 }
             }
@@ -182,20 +174,19 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         protected override LinqExpression BuildLinqExpression()
         {
-            var childExpressions = this.groupChildrenNodes.Select(s => s.GetEvaluationLinqExpression()).ToArray();
+            var childExpressions = _groupChildrenNodes.Select(s => s.GetEvaluationLinqExpression()).ToArray();
 
             if (childExpressions.Length == 0)
             {
                 return LinqExpression.Constant(null);
             }
-            else if (childExpressions.Length == 1)
+
+            if (childExpressions.Length == 1)
             {
                 return childExpressions[0];
             }
-            else
-            {
-                return LinqExpression.NewArrayInit(typeof(object), childExpressions);
-            }
+
+            return LinqExpression.NewArrayInit(typeof(object), childExpressions);
         }
     }
 }

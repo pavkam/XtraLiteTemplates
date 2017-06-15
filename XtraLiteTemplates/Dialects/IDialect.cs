@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,20 +24,16 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Introspection;
+    using Evaluation;
+    using Expressions;
+    using Expressions.Operators;
+    using Introspection;
 
     /// <summary>
     /// Defines all the common properties and behaviors specific to a template language dialect.
@@ -53,6 +49,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The culture-specific properties.
         /// </value>
+        [SuppressMessage("ReSharper", "UnusedMemberInSuper.Global")]
         CultureInfo Culture { get; }
 
         /// <summary>
@@ -161,14 +158,14 @@ namespace XtraLiteTemplates.Dialects
         object Self { get; }
 
         /// <summary>
-        /// Processes all unparsed text blocks read from the original template.
+        /// Processes all un-parsed text blocks read from the original template.
         /// </summary>
         /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
-        /// <param name="unparsedText">The text block being processed.</param>
+        /// <param name="unParsedText">The text block being processed.</param>
         /// <returns>
         /// The processed text value.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText);
+        string DecorateUnParsedText(IExpressionEvaluationContext context, string unParsedText);
     }
 }

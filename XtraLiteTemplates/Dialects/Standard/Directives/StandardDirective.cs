@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,21 +24,12 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Evaluation;
+    using Introspection;
+    using Parsing;
 
     /// <summary>
     /// Abstract base class for all standard directives.
@@ -53,11 +44,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <exception cref="ArgumentNullException">Argument <paramref name="tags"/> or <paramref name="typeConverter"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="tags"/> is empty.</exception>
         /// <exception cref="InvalidOperationException">One or more tags have no defined components.</exception>
-        public StandardDirective(IPrimitiveTypeConverter typeConverter, params Tag[] tags)
+        protected StandardDirective(IPrimitiveTypeConverter typeConverter, params Tag[] tags)
             : base(tags)
         {
             Expect.NotNull("typeConverter", typeConverter);
-            this.TypeConverter = typeConverter;
+            TypeConverter = typeConverter;
         }
 
         /// <summary>
@@ -67,6 +58,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <value>
         /// The type converter.
         /// </value>
-        public IPrimitiveTypeConverter TypeConverter { get; private set; }
+        protected IPrimitiveTypeConverter TypeConverter { get; }
     }
 }

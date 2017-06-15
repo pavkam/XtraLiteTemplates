@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,13 +24,9 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard
 {
-    using System;
-    using System.Collections.Generic;
-    using XtraLiteTemplates.Introspection;
+    using Introspection;
 
     /// <summary>
     /// The standard <c>self</c> object implementation. Provides a set of standard methods and properties exposed globally to
@@ -46,7 +42,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             Expect.NotNull("typeConverter", typeConverter);
 
-            this.TypeConverter = typeConverter;
+            TypeConverter = typeConverter;
         }
 
         /// <summary>
@@ -56,36 +52,36 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The type converter.
         /// </value>
         /// <remarks>The value of this property is supplied by the caller during instance initialization.</remarks>
-        public IPrimitiveTypeConverter TypeConverter { get; private set; }
+        public IPrimitiveTypeConverter TypeConverter { get; }
 
         /// <summary>
-        /// Converts an <see cref="System.Object"/> to a <see cref="System.String"/> using the specified <see cref="TypeConverter"/>.
+        /// Converts an <see cref="object"/> to a <see cref="string"/> using the specified <see cref="TypeConverter"/>.
         /// </summary>
         /// <param name="argument">The argument to convert.</param>
         /// <returns>The <c>string</c> representation of the <paramref name="argument"/>.</returns>
         public string String(object argument)
         {
-            return this.TypeConverter.ConvertToString(argument);
+            return TypeConverter.ConvertToString(argument);
         }
 
         /// <summary>
-        /// Converts an <see cref="System.Object"/> to a <see cref="System.Double"/> using the specified <see cref="TypeConverter"/>.
+        /// Converts an <see cref="object"/> to a <see cref="double"/> using the specified <see cref="TypeConverter"/>.
         /// </summary>
         /// <param name="argument">The argument to convert.</param>
         /// <returns>The <c>numerical</c> representation of the <paramref name="argument"/>.</returns>
         public double Number(object argument)
         {
-            return this.TypeConverter.ConvertToNumber(argument);
+            return TypeConverter.ConvertToNumber(argument);
         }
 
         /// <summary>
-        /// Converts an <see cref="System.Object"/> to a <see cref="System.Boolean"/> using the specified <see cref="TypeConverter"/>.
+        /// Converts an <see cref="object"/> to a <see cref="System.Boolean"/> using the specified <see cref="TypeConverter"/>.
         /// </summary>
         /// <param name="argument">The argument to convert.</param>
         /// <returns>The <c>boolean</c> representation of the <paramref name="argument"/>.</returns>
         public bool Boolean(object argument)
         {
-            return this.TypeConverter.ConvertToBoolean(argument);
+            return TypeConverter.ConvertToBoolean(argument);
         }
     }
 }

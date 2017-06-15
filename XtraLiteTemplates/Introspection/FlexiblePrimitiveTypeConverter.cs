@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -34,9 +34,7 @@ namespace XtraLiteTemplates.Introspection
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.IO;
     using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
 
     /// <summary>
     /// An implementation of <see cref="IPrimitiveTypeConverter"/> interface. This class offers
@@ -56,8 +54,8 @@ namespace XtraLiteTemplates.Introspection
             Expect.NotNull("formatProvider", formatProvider);
             Expect.NotNull("objectFormatter", objectFormatter);
 
-            this.FormatProvider = formatProvider;
-            this.ObjectFormatter = objectFormatter;
+            FormatProvider = formatProvider;
+            ObjectFormatter = objectFormatter;
         }
 
         /// <summary>
@@ -67,7 +65,7 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The format provider.
         /// </value>
-        public IFormatProvider FormatProvider { get; private set; }
+        public IFormatProvider FormatProvider { get; }
 
         /// <summary>
         /// Gets the object formatter used to transform objects to their string representations.
@@ -76,25 +74,23 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The object formatter.
         /// </value>
-        public IObjectFormatter ObjectFormatter { get; private set; }
+        public IObjectFormatter ObjectFormatter { get; }
 
         /// <summary>
         /// Tries to convert the value of <paramref name="obj"/> argument to a 32-bit integer.
         /// <remarks>A value of <c>0</c> is returned if <paramref name="obj"/> is not directly convertible to an <c>int</c>.</remarks>
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="Int32"/> value.</returns>
+        /// <returns>A <see cref="int"/> value.</returns>
         public virtual int ConvertToInteger(object obj)
         {
-            var number = this.ConvertToNumber(obj);
+            var number = ConvertToNumber(obj);
             if (double.IsNaN(number) || double.IsInfinity(number))
             {
                 return 0;
             }
-            else
-            {
-                return (int)number;
-            }
+
+            return (int)number;
         }
 
         /// <summary>
@@ -107,11 +103,11 @@ namespace XtraLiteTemplates.Introspection
         {
             if (obj is IEnumerable)
             {
-                obj = this.ConvertToString(obj);
+                obj = ConvertToString(obj);
             }
             else
             {
-                obj = this.ReduceObject(obj);
+                obj = ReduceObject(obj);
             }
 
             double result;
@@ -137,7 +133,7 @@ namespace XtraLiteTemplates.Introspection
                     {
                         result = 0;
                     }
-                    else if (!double.TryParse(str, System.Globalization.NumberStyles.Float, this.FormatProvider, out result))
+                    else if (!double.TryParse(str, NumberStyles.Float, FormatProvider, out result))
                     {
                         result = double.NaN;
                     }
@@ -156,33 +152,33 @@ namespace XtraLiteTemplates.Introspection
         /// <remarks>A value of <c>null</c> is returned if <paramref name="obj"/> is null; otherwise the object is formatted accordingly.</remarks>
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="String"/> value.</returns>
+        /// <returns>A <see cref="string"/> value.</returns>
         public virtual string ConvertToString(object obj)
         {
-            if (obj is string)
+            var str = obj as string;
+            if (str != null)
             {
-                return (string)obj;
+                return str;
             }
-            else if (obj is IEnumerable)
+
+            var enumerable = obj as IEnumerable;
+            if (enumerable != null)
             {
-                var enumerable = (IEnumerable)obj;
                 var builder = new StringBuilder();
-                foreach (object item in enumerable)
+                foreach (var item in enumerable)
                 {
                     if (builder.Length > 0)
                     {
                         builder.Append(',');
                     }
 
-                    builder.Append(this.ConvertToString(item));
+                    builder.Append(ConvertToString(item));
                 }
 
                 return builder.ToString();
             }
-            else
-            {
-                return this.ObjectFormatter.ToString(this.ReduceObject(obj), this.FormatProvider);
-            }
+
+            return ObjectFormatter.ToString(ReduceObject(obj), FormatProvider);
         }
 
         /// <summary>
@@ -190,10 +186,10 @@ namespace XtraLiteTemplates.Introspection
         /// <remarks>A value of <c>false</c> is returned if <paramref name="obj"/> is not directly convertible to a <c>bool</c>.</remarks>
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="Boolean"/> value.</returns>
+        /// <returns>A <see cref="bool"/> value.</returns>
         public virtual bool ConvertToBoolean(object obj)
         {
-            obj = this.ReduceObject(obj);
+            obj = ReduceObject(obj);
 
             bool result;
             if (obj == null)
@@ -206,7 +202,7 @@ namespace XtraLiteTemplates.Introspection
             }
             else if (obj is double)
             {
-                result = (double)obj != 0;
+                result = Math.Abs((double)obj) > 0.000000001;
             }
             else if (obj is string)
             {
@@ -233,18 +229,15 @@ namespace XtraLiteTemplates.Introspection
             {
                 return null;
             }
-            else if (obj is IEnumerable<object>)
+
+            var objEnumerable = obj as IEnumerable<object>;
+            if (objEnumerable != null)
             {
-                return (IEnumerable<object>)obj;
+                return objEnumerable;
             }
-            else if (obj is IEnumerable)
-            {
-                return this.UpgradeEnumerable((IEnumerable)obj);
-            }
-            else
-            {
-                return this.ObjectToSequence(obj);
-            }
+
+            var enumerable = obj as IEnumerable;
+            return enumerable != null ? UpgradeEnumerable(enumerable) : ObjectToSequence(obj);
         }
 
         /// <summary>
@@ -259,28 +252,29 @@ namespace XtraLiteTemplates.Introspection
                 return PrimitiveType.Undefined;
             }
 
-            obj = this.ReduceObject(obj);
+            obj = ReduceObject(obj);
 
             if (obj is double)
             {
                 return PrimitiveType.Number;
             }
-            else if (obj is bool)
+
+            if (obj is bool)
             {
                 return PrimitiveType.Boolean;
             }
-            else if (obj is string)
+
+            if (obj is string)
             {
                 return PrimitiveType.String;
             }
-            else if (obj is IEnumerable)
+
+            if (obj is IEnumerable)
             {
                 return PrimitiveType.Sequence;
             }
-            else
-            {
-                return PrimitiveType.Object;
-            }
+
+            return PrimitiveType.Object;
         }
 
         [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]

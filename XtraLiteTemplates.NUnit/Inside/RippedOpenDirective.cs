@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -31,57 +31,57 @@ namespace XtraLiteTemplates.NUnit.Inside
 {
     using System;
     using System.Linq;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using System.Text;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
+
+    using Evaluation;
+
+    using Expressions;
+
+    using Parsing;
 
     public sealed class RippedOpenDirective : Directive
     {
         private class FlowState
         {
             public FlowDecision PreviousDecision;
-            public Int32 Mode;
+            public int Mode;
             public Tag PreviousTag;
             public Tag ExpectedTag;
         }
 
-        private Tag[] m_myTags;
+        private readonly Tag[] _mMyTags;
 
         public RippedOpenDirective(params Tag[] tags)
             : base(tags)
         {
-            m_myTags = tags;
+            _mMyTags = tags;
         }
 
-        protected override FlowDecision Execute(Int32 tagIndex, Object[] components,
-            ref Object state, IExpressionEvaluationContext context, out String text)
+        protected override FlowDecision Execute(int tagIndex, object[] components,
+            ref object state, IExpressionEvaluationContext context, out string text)
         {
             Assert.GreaterOrEqual(tagIndex, 0);
-            Assert.Less(tagIndex, m_myTags.Length);
+            Assert.Less(tagIndex, _mMyTags.Length);
             Assert.IsNotNull(components);
             Assert.IsNotNull(context);
 
-            var tag = m_myTags[tagIndex];
+            var tag = _mMyTags[tagIndex];
             Assert.AreEqual(tag.ComponentCount, components.Length);
 
 
             if (state == null)
             {
                 text = "-> ";
-                text += String.Format("{{{0}}}", tag);
+                text += $"{{{tag}}}";
 
                 /* Assuming first execution. */
-                Assert.AreEqual(m_myTags[0], tag);
+                Assert.AreEqual(_mMyTags[0], tag);
 
-                if (m_myTags.Length > 1)
+                if (_mMyTags.Length > 1)
                 {
                     state = new FlowState
                     {
                         Mode = 0,
-                        ExpectedTag = m_myTags[1],
+                        ExpectedTag = _mMyTags[1],
                         PreviousDecision = FlowDecision.Evaluate,
                         PreviousTag = tag,
                     };
@@ -91,75 +91,73 @@ namespace XtraLiteTemplates.NUnit.Inside
                     state = new FlowState
                     {
                         Mode = 1,
-                        ExpectedTag = m_myTags[0],
+                        ExpectedTag = _mMyTags[0],
                         PreviousDecision = FlowDecision.Restart,
                         PreviousTag = tag,
                     };
                 }
 
-                text += String.Format(" -> {0} -> (", (state as FlowState).PreviousDecision);
+                text += $" -> {(state as FlowState).PreviousDecision} -> (";
                 return (state as FlowState).PreviousDecision;
-            } 
-            else
+            }
+
+            text = $") -> {{{tag}}}";
+
+            var stateAsFlow = state as FlowState;
+
+            Assert.NotNull(stateAsFlow);
+            Assert.AreSame(tag, stateAsFlow.ExpectedTag);
+            Assert.AreNotEqual(FlowDecision.Terminate, stateAsFlow.PreviousDecision);
+
+            if (stateAsFlow.PreviousDecision == FlowDecision.Evaluate || stateAsFlow.PreviousDecision == FlowDecision.Skip)
             {
-                text = String.Format(") -> {{{0}}}", tag);
+                Assert.AreEqual(_mMyTags[tagIndex - 1], stateAsFlow.PreviousTag);
+            }
+            else if (stateAsFlow.PreviousDecision == FlowDecision.Restart)
+            {
+                Assert.AreEqual(_mMyTags[0], stateAsFlow.ExpectedTag);
+            }
 
-                var stateAsFlow = state as FlowState;
-
-                Assert.NotNull(stateAsFlow);
-                Assert.AreSame(tag, stateAsFlow.ExpectedTag);
-                Assert.AreNotEqual(FlowDecision.Terminate, stateAsFlow.PreviousDecision);
-
-                if (stateAsFlow.PreviousDecision == FlowDecision.Evaluate || stateAsFlow.PreviousDecision == FlowDecision.Skip)
+            if (_mMyTags.Last() == tag)
+            {
+                /* This is the last tag. */
+                if (stateAsFlow.Mode == 0)
                 {
-                    Assert.AreEqual(m_myTags[tagIndex - 1], stateAsFlow.PreviousTag);
+                    stateAsFlow.Mode = 1;
+                    stateAsFlow.PreviousDecision = FlowDecision.Restart;
+                    stateAsFlow.PreviousTag = tag;
+                    stateAsFlow.ExpectedTag = _mMyTags[0];
+                } 
+                else
+                {
+                    stateAsFlow.PreviousDecision = FlowDecision.Terminate;
                 }
-                else if (stateAsFlow.PreviousDecision == FlowDecision.Restart)
+            }
+            else if (_mMyTags.First() == tag)
+            {
+                /* This is the last tag. */
+                if (stateAsFlow.Mode == 1)
                 {
-                    Assert.AreEqual(m_myTags[0], stateAsFlow.ExpectedTag);
-                }
-
-                if (m_myTags.Last() == tag)
-                {
-                    /* This is the last tag. */
-                    if (stateAsFlow.Mode == 0)
-                    {
-                        stateAsFlow.Mode = 1;
-                        stateAsFlow.PreviousDecision = FlowDecision.Restart;
-                        stateAsFlow.PreviousTag = tag;
-                        stateAsFlow.ExpectedTag = m_myTags[0];
-                    } 
-                    else
-                    {
-                        stateAsFlow.PreviousDecision = FlowDecision.Terminate;
-                    }
-                }
-                else if (m_myTags.First() == tag)
-                {
-                    /* This is the last tag. */
-                    if (stateAsFlow.Mode == 1)
-                    {
-                        stateAsFlow.PreviousDecision = FlowDecision.Skip;
-                        stateAsFlow.PreviousTag = tag;
-                        stateAsFlow.ExpectedTag = m_myTags[1];
-                    }
-                    else
-                    {
-                        stateAsFlow.PreviousDecision = FlowDecision.Terminate;
-                    }
+                    stateAsFlow.PreviousDecision = FlowDecision.Skip;
+                    stateAsFlow.PreviousTag = tag;
+                    stateAsFlow.ExpectedTag = _mMyTags[1];
                 }
                 else
                 {
-                    stateAsFlow.PreviousTag = tag;
-                    stateAsFlow.ExpectedTag = m_myTags[tagIndex + 1];
+                    stateAsFlow.PreviousDecision = FlowDecision.Terminate;
                 }
-
-                text += String.Format(" -> {0} ->", stateAsFlow.PreviousDecision);
-                if (stateAsFlow.PreviousDecision != FlowDecision.Terminate)
-                    text += " (";
-
-                return stateAsFlow.PreviousDecision;
             }
+            else
+            {
+                stateAsFlow.PreviousTag = tag;
+                stateAsFlow.ExpectedTag = _mMyTags[tagIndex + 1];
+            }
+
+            text += $" -> {stateAsFlow.PreviousDecision} ->";
+            if (stateAsFlow.PreviousDecision != FlowDecision.Terminate)
+                text += " (";
+
+            return stateAsFlow.PreviousDecision;
         }
     }
 }

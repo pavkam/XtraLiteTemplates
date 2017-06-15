@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -28,13 +28,7 @@
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System;
-    using System.CodeDom;
-    using System.CodeDom.Compiler;    
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.IO;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class LeafNode : ExpressionNode
@@ -44,15 +38,8 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        public override PermittedContinuations Continuity
-        {
-            get
-            {
-                return
-                    PermittedContinuations.BinaryOperator |
-                    PermittedContinuations.ContinueGroup |
-                    PermittedContinuations.CloseGroup;
-            }
-        }
+        public override PermittedContinuations Continuity => PermittedContinuations.BinaryOperator |
+                                                             PermittedContinuations.ContinueGroup |
+                                                             PermittedContinuations.CloseGroup;
     }
 }

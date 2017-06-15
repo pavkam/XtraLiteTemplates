@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,14 +24,9 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
 
     /// <summary>
     /// The abstract base class for all expression operators.
@@ -51,8 +46,8 @@ namespace XtraLiteTemplates.Expressions.Operators
             Expect.NotEmpty("symbol", symbol);
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
 
-            this.Symbol = symbol;
-            this.Precedence = precedence;
+            Symbol = symbol;
+            Precedence = precedence;
         }
 
         /// <summary>
@@ -62,7 +57,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <value>
         /// The operator's symbol.
         /// </value>
-        public string Symbol { get; private set; }
+        public string Symbol { get; }
 
         /// <summary>
         /// Gets the operator's precedence, used in the expression building process.
@@ -71,7 +66,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <value>
         /// The operator's precedence.
         /// </value>
-        public int Precedence { get; private set; }
+        public int Precedence { get; }
 
         /// <summary>
         /// Returns a human-readable representation of the operator. This implementation returns the value of <see cref="Symbol"/> property.
@@ -81,7 +76,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// </returns>
         public override string ToString()
         {
-            return this.Symbol;
+            return Symbol;
         }
     }
 }

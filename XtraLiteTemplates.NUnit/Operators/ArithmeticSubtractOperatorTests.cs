@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,10 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
+
+    using Expressions.Operators;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class ArithmeticSubtractOperatorTests : OperatorTestsBase
@@ -43,7 +42,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticSubtractOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticSubtractOperator(String.Empty, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticSubtractOperator(string.Empty, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ArithmeticSubtractOperator("operator", null));
             ExpectArgumentNullException("typeConverter", () => new ArithmeticSubtractOperator(null));
         }
@@ -71,7 +70,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new ArithmeticSubtractOperator(TypeConverter);
 
-            Object dummy;
+            object dummy;
             ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
             ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
         }
@@ -81,9 +80,9 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new ArithmeticSubtractOperator(TypeConverter);
 
-            AssertEvaluation<Double>(@operator, 0, 100, -100);
-            AssertEvaluation<Double>(@operator, 0, 0, 0);
-            AssertEvaluation<Double>(@operator, -1, -2, 1);
+            AssertEvaluation<double>(@operator, 0, 100, -100);
+            AssertEvaluation<double>(@operator, 0, 0, 0);
+            AssertEvaluation<double>(@operator, -1, -2, 1);
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,56 +24,48 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Evaluation
 {
-    using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Text;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Parsing;
+    using Expressions;
+    using Parsing;
 
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
+    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     internal sealed class TagNode : TemplateNode
     {
-        public TagNode(DirectiveNode parent, TagLex lex)
+        public TagNode(TemplateNode parent, TagLex lex)
             : base(parent)
         {
             Debug.Assert(parent != null, "parent cannot be null.");
             Debug.Assert(lex != null, "lex cannot be null.");
 
-            this.FirstCharacterIndex = lex.FirstCharacterIndex;
-            this.OriginalLength = lex.OriginalLength;
-            this.Components = lex.Components;
-            this.Tag = lex.Tag;
+            FirstCharacterIndex = lex.FirstCharacterIndex;
+            OriginalLength = lex.OriginalLength;
+            Components = lex.Components;
+            Tag = lex.Tag;
         }
 
-        public new DirectiveNode Parent
-        {
-            get
-            {
-                return (DirectiveNode)base.Parent;
-            }
-        }
+        public new DirectiveNode Parent => (DirectiveNode)base.Parent;
 
-        public Tag Tag { get; private set; }
+        public Tag Tag { get; }
 
-        public int FirstCharacterIndex { get; private set; }
+        public int FirstCharacterIndex { get; }
 
-        public int OriginalLength { get; private set; }
+        public int OriginalLength { get; }
 
-        public object[] Components { get; private set; }
+        public object[] Components { get; }
 
         public object[] Evaluate(IExpressionEvaluationContext context)
         {
             Debug.Assert(context != null, "context cannot be null.");
 
-            object[] result = new object[this.Components.Length];
-            for (var i = 0; i < this.Components.Length; i++)
+            var result = new object[Components.Length];
+            for (var i = 0; i < Components.Length; i++)
             {
-                var expression = this.Components[i] as Expression;
+                var expression = Components[i] as Expression;
                 if (expression != null)
                 {
                     /* Evaluate the expression. */
@@ -81,7 +73,7 @@ namespace XtraLiteTemplates.Evaluation
                 }
                 else
                 {
-                    result[i] = this.Components[i];
+                    result[i] = Components[i];
                 }
             }
 
@@ -90,18 +82,18 @@ namespace XtraLiteTemplates.Evaluation
 
         public override string ToString()
         {
-            StringBuilder sb = new StringBuilder();
-            foreach (var component in this.Components)
+            var sb = new StringBuilder();
+            foreach (var component in Components)
             {
                 if (sb.Length > 0)
                 {
                     sb.Append(" ");
                 }
 
-                sb.Append(component.ToString());
+                sb.Append(component);
             }
 
-            return string.Format("{{{0}}}", sb.ToString());
+            return $"{{{sb}}}";
         }
     }
 }

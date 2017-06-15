@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,14 +24,11 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
-    using System.Diagnostics;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
+    using Expressions;
+    using Introspection;
 
     /// <summary>
     /// Implements the standard object formatting (':') operation.
@@ -51,7 +48,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull("formatProvider", formatProvider);
 
-            this.FormatProvider = formatProvider;
+            FormatProvider = formatProvider;
         }
 
         /// <summary>
@@ -72,7 +69,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <value>
         /// The culture-specific formatting options.
         /// </value>
-        public IFormatProvider FormatProvider { get; private set; }
+        public IFormatProvider FormatProvider { get; }
 
         /// <summary>
         /// Evaluates the result of formatting operation for <paramref name="left" /> and <paramref name="right" /> operands.
@@ -94,10 +91,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             {
                 try
                 {
-                    return formattable.ToString(this.TypeConverter.ConvertToString(right), this.FormatProvider);
+                    return formattable.ToString(TypeConverter.ConvertToString(right), FormatProvider);
                 }
                 catch
                 {
+                    // ignored
                 }
             }
 

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,13 +24,11 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Introspection;
+    using Expressions.Operators;
+    using Introspection;
 
     /// <summary>
     /// The abstract base class for all standard unary expression operators.
@@ -50,7 +48,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull("typeConverter", typeConverter);
 
-            this.TypeConverter = typeConverter;
+            TypeConverter = typeConverter;
         }
 
         /// <summary>
@@ -60,6 +58,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <value>
         /// The type converter.
         /// </value>
-        protected IPrimitiveTypeConverter TypeConverter { get; private set; }
+        protected IPrimitiveTypeConverter TypeConverter { get; }
     }
 }

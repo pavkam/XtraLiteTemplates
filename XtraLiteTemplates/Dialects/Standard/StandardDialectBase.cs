@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,25 +24,17 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
     using System.Text;
-    using System.Threading.Tasks;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Introspection;
+    using Evaluation;
+    using Expressions;
+    using Expressions.Operators;
+    using Introspection;
 
     /// <summary>
     /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviors that concrete
@@ -50,29 +42,14 @@ namespace XtraLiteTemplates.Dialects.Standard
     /// </summary>
     public abstract class StandardDialectBase : IDialect, IObjectFormatter
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IPrimitiveTypeConverter typeConverter;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private DialectCasing dialectCasing;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private List<Operator> dialectOperators;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private List<Directive> dialectDirectives;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private Dictionary<string, object> dialectSpecialConstants;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private Dictionary<object, string> dialectSpecialConstantIdentifiers;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private string dialectUndefinedSpecialIdentifier;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private object selfObject;
+        private readonly IPrimitiveTypeConverter _typeConverter;
+        private readonly DialectCasing _dialectCasing;
+        private List<Operator> _dialectOperators;
+        private List<Directive> _dialectDirectives;
+        private Dictionary<string, object> _dialectSpecialConstants;
+        private Dictionary<object, string> _dialectSpecialConstantIdentifiers;
+        private string _dialectUndefinedSpecialIdentifier;
+        private object _selfObject;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="StandardDialectBase" /> class.
@@ -91,16 +68,16 @@ namespace XtraLiteTemplates.Dialects.Standard
             Expect.NotNull("culture", culture);
 
             /* Build culture-aware values.*/
-            this.Name = name;
-            this.Culture = culture;
-            this.typeConverter = new FlexiblePrimitiveTypeConverter(this.Culture, this);
-            this.dialectCasing = casing;
-            this.dialectUndefinedSpecialIdentifier = this.AdjustCasing("Undefined");
+            Name = name;
+            Culture = culture;
+            _typeConverter = new FlexiblePrimitiveTypeConverter(Culture, this);
+            _dialectCasing = casing;
+            _dialectUndefinedSpecialIdentifier = AdjustCasing("Undefined");
 
             var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
 
-            this.IdentifierComparer = comparer;
-            this.StringLiteralComparer = comparer;
+            IdentifierComparer = comparer;
+            StringLiteralComparer = comparer;
         }
 
         /// <summary>
@@ -110,7 +87,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture.
         /// </value>
-        public CultureInfo Culture { get; private set;  }
+        public CultureInfo Culture { get; }
 
         /// <summary>
         /// Gets the <see cref="IEqualityComparer{String}" /> object used to compare keywords and identifiers.
@@ -120,7 +97,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The identifier comparer.
         /// </value>
-        public IEqualityComparer<string> IdentifierComparer { get; private set; }
+        public IEqualityComparer<string> IdentifierComparer { get; }
 
         /// <summary>
         /// Gets the <see cref="IObjectFormatter" /> object used obtain string representation of objects.
@@ -128,13 +105,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The object formatter.
         /// </value>
-        public IObjectFormatter ObjectFormatter
-        {
-            get
-            {
-                return this;
-            }
-        }
+        public IObjectFormatter ObjectFormatter => this;
 
         /// <summary>
         /// Gets the <see cref="IComparer{String}" /> object used to compare string literals when evaluating expressions.
@@ -143,7 +114,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal comparer.
         /// </value>
-        public IComparer<string> StringLiteralComparer { get; private set; }
+        public IComparer<string> StringLiteralComparer { get; }
 
         /// <summary>
         /// Gets the dialect's human-readable name.
@@ -152,7 +123,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The name of the dialect.
         /// </value>
-        public string Name { get; private set; }
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        public string Name { get; }
 
         /// <summary>
         /// Gets the expression flow symbols used in expressions of this dialect.
@@ -161,13 +133,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The flow symbols.
         /// </value>
-        public ExpressionFlowSymbols FlowSymbols
-        {
-            get 
-            {
-                return ExpressionFlowSymbols.Default;
-            }
-        }
+        public ExpressionFlowSymbols FlowSymbols => ExpressionFlowSymbols.Default;
 
         /// <summary>
         /// Gets all dialect supported expression operators.
@@ -175,18 +141,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The operators.
         /// </value>
-        public IReadOnlyCollection<Operator> Operators
-        { 
-            get
-            {
-                if (this.dialectOperators == null)
-                {
-                    this.dialectOperators = new List<Operator>(this.CreateOperators(this.typeConverter));
-                }
-
-                return this.dialectOperators;
-            }
-        }
+        public IReadOnlyCollection<Operator> Operators =>
+            _dialectOperators ?? (_dialectOperators = new List<Operator>(CreateOperators(_typeConverter)));
 
         /// <summary>
         /// Gets all dialect supported directives.
@@ -194,18 +150,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The directives.
         /// </value>
-        public IReadOnlyCollection<Directive> Directives
-        { 
-            get
-            {
-                if (this.dialectDirectives == null)
-                {
-                    this.dialectDirectives = new List<Directive>(this.CreateDirectives(this.typeConverter));
-                }
-
-                return this.dialectDirectives;
-            }
-        }
+        public IReadOnlyCollection<Directive> Directives => 
+            _dialectDirectives ?? (_dialectDirectives = new List<Directive>(CreateDirectives(_typeConverter)));
 
         /// <summary>
         /// Gets all dialect supported special constants.
@@ -217,26 +163,26 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             get
             {
-                if (this.dialectSpecialConstants == null)
+                if (_dialectSpecialConstants == null)
                 {
-                    this.dialectSpecialConstants = new Dictionary<string, object>(this.IdentifierComparer);
-                    this.dialectSpecialConstantIdentifiers = new Dictionary<object, string>();
+                    _dialectSpecialConstants = new Dictionary<string, object>(IdentifierComparer);
+                    _dialectSpecialConstantIdentifiers = new Dictionary<object, string>();
 
-                    foreach (var kvp in this.CreateSpecials())
+                    foreach (var kvp in CreateSpecials())
                     {
-                        this.dialectSpecialConstants.Add(kvp.Key, kvp.Value);
+                        _dialectSpecialConstants.Add(kvp.Key, kvp.Value);
                         if (kvp.Value == null)
                         {
-                            this.dialectUndefinedSpecialIdentifier = kvp.Key;
+                            _dialectUndefinedSpecialIdentifier = kvp.Key;
                         }
                         else
                         {
-                            this.dialectSpecialConstantIdentifiers[kvp.Value] = kvp.Key;
+                            _dialectSpecialConstantIdentifiers[kvp.Value] = kvp.Key;
                         }
                     }
                 }
 
-                return this.dialectSpecialConstants;
+                return _dialectSpecialConstants;
             }
         }
 
@@ -295,67 +241,54 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The self object.
         /// </value>
-        public virtual object Self
-        {
-            get
-            {
-                if (this.selfObject == null)
-                {
-                    this.selfObject = this.CreateSelfObject(this.typeConverter);
-                }
-
-                return this.selfObject;
-            }
-        }
+        public virtual object Self => _selfObject ?? (_selfObject = CreateSelfObject(_typeConverter));
 
         /// <summary>
-        /// Processes all unparsed text blocks read from the original template. The method current implementation
+        /// Processes all un-parsed text blocks read from the original template. The method current implementation
         /// trims all white-spaces and new line characters and replaces them with a single white-space character (emulates how HTML trimming works).
         /// <remarks>Descendant classes can override this method and modify this behavior.</remarks>
         /// </summary>
         /// <param name="context">The <see cref="IExpressionEvaluationContext" /> instance containing the current evaluation state.</param>
-        /// <param name="unparsedText">The text block being processed.</param>
+        /// <param name="unParsedText">The text block being processed.</param>
         /// <returns>
         /// The processed text value.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        public virtual string DecorateUnparsedText(IExpressionEvaluationContext context, string unparsedText)
+        public virtual string DecorateUnParsedText(IExpressionEvaluationContext context, string unParsedText)
         {
             Expect.NotNull("context", context);
 
-            if (string.IsNullOrEmpty(unparsedText))
+            if (string.IsNullOrEmpty(unParsedText))
             {
                 return string.Empty;
             }
-            else
+
+            /* Trim all 1+ white spaces to one space character. */
+            var result = new StringBuilder();
+            var putSpace = false;
+            foreach (var c in unParsedText)
             {
-                /* Trim all 1+ white spaces to one space character. */
-                StringBuilder result = new StringBuilder();
-                bool putSpace = false;
-                foreach (var c in unparsedText)
+                if (char.IsWhiteSpace(c))
                 {
-                    if (char.IsWhiteSpace(c))
+                    if (putSpace)
                     {
-                        if (putSpace)
-                        {
-                            putSpace = false;
-                            result.Append(' ');
-                        }
-                    }
-                    else
-                    {
-                        result.Append(c);
-                        putSpace = true;
+                        putSpace = false;
+                        result.Append(' ');
                     }
                 }
-
-                if (result.Length > 0 && char.IsWhiteSpace(result[result.Length - 1]))
+                else
                 {
-                    result.Length -= 1;
+                    result.Append(c);
+                    putSpace = true;
                 }
-
-                return result.ToString();
             }
+
+            if (result.Length > 0 && char.IsWhiteSpace(result[result.Length - 1]))
+            {
+                result.Length -= 1;
+            }
+
+            return result.ToString();
         }
 
         /// <summary>
@@ -366,32 +299,27 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </returns>
         public override string ToString()
         {
-            string caseDescr = null;
-            switch (this.dialectCasing)
+            string caseDescription = null;
+            switch (_dialectCasing)
             {
                 case DialectCasing.IgnoreCase:
-                    caseDescr = "Ignore Case";
+                    caseDescription = "Ignore Case";
                     break;
                 case DialectCasing.LowerCase:
-                    caseDescr = "Lower Case";
+                    caseDescription = "Lower Case";
                     break;
                 case DialectCasing.UpperCase:
-                    caseDescr = "Upper Case";
+                    caseDescription = "Upper Case";
                     break;
             }
 
-            if (string.IsNullOrEmpty(this.Culture.Name))
-            {
-                return string.Format("{0} ({1})", this.Name, caseDescr);
-            }
-            else
-            {
-                return string.Format("{0} ({1}, {2})", this.Name, this.Culture.Name, caseDescr);
-            }
+            return string.IsNullOrEmpty(Culture.Name) ? 
+                $"{Name} ({caseDescription})" : 
+                $"{Name} ({Culture.Name}, {caseDescription})";
         }
 
         /// <summary>
-        /// Determines whether the specified <see cref="Object" /> is equal to the current <see cref="StandardDialectBase" />.
+        /// Determines whether the specified <see cref="object" /> is equal to the current <see cref="StandardDialectBase" />.
         /// </summary>
         /// <param name="obj">The object to compare with the current dialect class instance.</param>
         /// <returns>
@@ -402,9 +330,9 @@ namespace XtraLiteTemplates.Dialects.Standard
             var other = obj as StandardDialect;
             return
                 other != null &&
-                other.Name.Equals(this.Name) &&
-                other.dialectCasing.Equals(this.dialectCasing) &&
-                other.Culture.Equals(this.Culture);
+                other.Name.Equals(Name) &&
+                other._dialectCasing.Equals(_dialectCasing) &&
+                other.Culture.Equals(Culture);
         }
 
         /// <summary>
@@ -415,14 +343,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </returns>
         public override int GetHashCode()
         {
-            return
-                this.Name.GetHashCode() ^
-                this.dialectCasing.GetHashCode() ^
-                this.Culture.GetHashCode();
+            return Name.GetHashCode() ^ _dialectCasing.GetHashCode() ^ Culture.GetHashCode();
         }
 
         /// <summary>
-        /// Gets the string representation of an <see cref="Object" /> using the given <paramref name="formatProvider"/>.
+        /// Gets the string representation of an <see cref="object" /> using the given <paramref name="formatProvider"/>.
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <param name="formatProvider">The format provider.</param>
@@ -436,17 +361,19 @@ namespace XtraLiteTemplates.Dialects.Standard
 
             if (obj == null)
             {
-                return this.dialectUndefinedSpecialIdentifier;
+                return _dialectUndefinedSpecialIdentifier;
             }
-            else if (!this.dialectSpecialConstantIdentifiers.TryGetValue(obj, out result))
+
+            if (!_dialectSpecialConstantIdentifiers.TryGetValue(obj, out result))
             {
-                if (obj is string)
+                var s = obj as string;
+                if (s != null)
                 {
-                    result = (string)obj;
+                    result = s;
                 }
                 else if (obj is IFormattable)
                 {
-                    result = (obj as IFormattable).ToString(null, formatProvider);
+                    result = ((IFormattable) obj).ToString(null, formatProvider);
                 }
                 else
                 {
@@ -458,13 +385,13 @@ namespace XtraLiteTemplates.Dialects.Standard
         }
 
         /// <summary>
-        /// Gets the string representation of an <see cref="Object"/>.
+        /// Gets the string representation of an <see cref="object"/>.
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <returns>The string representation.</returns>
         string IObjectFormatter.ToString(object obj)
         {
-            return ((IObjectFormatter)this).ToString(obj, this.Culture);
+            return ((IObjectFormatter)this).ToString(obj, Culture);
         }
 
         /// <summary>
@@ -475,6 +402,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An instance of the self object.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
         protected virtual StandardSelfObject CreateSelfObject(IPrimitiveTypeConverter typeConverter)
         {
             Expect.NotNull("typeConverter", typeConverter);
@@ -490,7 +418,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported operators.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected abstract Operator[] CreateOperators(IPrimitiveTypeConverter typeConverter);
+        protected abstract IEnumerable<Operator> CreateOperators(IPrimitiveTypeConverter typeConverter);
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported directives.
@@ -500,7 +428,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported directives.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected abstract Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter);
+        protected abstract IEnumerable<Directive> CreateDirectives(IPrimitiveTypeConverter typeConverter);
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported special constants.
@@ -508,7 +436,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// An array of all supported special constants.
         /// </returns>
-        protected abstract KeyValuePair<string, object>[] CreateSpecials();
+        protected abstract IEnumerable<KeyValuePair<string, object>> CreateSpecials();
 
         /// <summary>
         /// Adjusts the case of a string based on the <see cref="DialectCasing" /> supplied during construction.
@@ -527,17 +455,14 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return markup;
             }
 
-            if (this.dialectCasing == DialectCasing.LowerCase)
+            switch (_dialectCasing)
             {
-                return markup.ToLower(this.Culture);
-            }
-            else if (this.dialectCasing == DialectCasing.UpperCase)
-            {
-                return markup.ToUpper(this.Culture);
-            }
-            else
-            {
-                return markup;
+                case DialectCasing.LowerCase:
+                    return markup.ToLower(Culture);
+                case DialectCasing.UpperCase:
+                    return markup.ToUpper(Culture);
+                default:
+                    return markup;
             }
         }
     }

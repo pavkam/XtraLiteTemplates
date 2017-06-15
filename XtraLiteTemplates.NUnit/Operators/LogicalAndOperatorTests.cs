@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,10 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
+
+    using Expressions.Operators;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class LogicalAndOperatorTests : OperatorTestsBase
@@ -43,7 +42,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new LogicalAndOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalAndOperator(String.Empty, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new LogicalAndOperator(string.Empty, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new LogicalAndOperator("operator", null));
             ExpectArgumentNullException("typeConverter", () => new LogicalAndOperator(null));
         }
@@ -71,7 +70,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new LogicalAndOperator(TypeConverter);
 
-            Object dummy;
+            object dummy;
             ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
             ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
         }
@@ -81,10 +80,10 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new LogicalAndOperator(TypeConverter);
 
-            AssertEvaluation<Boolean>(@operator, true, true, true);
-            AssertEvaluation<Boolean>(@operator, true, false, false);
-            AssertEvaluation<Boolean>(@operator, false, true, false);
-            AssertEvaluation<Boolean>(@operator, false, false, false);
+            AssertEvaluation<bool>(@operator, true, true, true);
+            AssertEvaluation<bool>(@operator, true, false, false);
+            AssertEvaluation<bool>(@operator, false, true, false);
+            AssertEvaluation<bool>(@operator, false, false, false);
         }
 
         [Test]
@@ -92,7 +91,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new LogicalAndOperator(TypeConverter);
 
-            Object result;
+            object result;
             Assert.IsFalse(@operator.EvaluateLhs(EmptyEvaluationContext, true, out result));
             Assert.IsTrue(@operator.EvaluateLhs(EmptyEvaluationContext, false, out result) && result.Equals(false));
         }

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,29 +24,22 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Evaluation;
+    using Expressions;
+    using Introspection;
+    using Parsing;
 
     /// <summary>
     /// The simple interpolation directive implementation.
     /// </summary>
     public sealed class InterpolationDirective : StandardDirective
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int interpolatedExpressionComponentIndex;
+        private readonly int _interpolatedExpressionComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="InterpolationDirective"/> class.
@@ -61,7 +54,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         public InterpolationDirective(string tagMarkup, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(tagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 1, "Expected a tag count of 1.");
+            Debug.Assert(Tags.Count == 1, "Expected a tag count of 1.");
 
             /* Find all expressions. */
             var tag = Tags[0];
@@ -70,7 +63,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
 
-            this.interpolatedExpressionComponentIndex = expressionComponents[0];
+            _interpolatedExpressionComponentIndex = expressionComponents[0];
         }
 
         /// <summary>
@@ -103,10 +96,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0, "tagIndex must be 0.");
             Debug.Assert(components != null, "components cannot be null.");
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount, "component length must match tag component length.");
             Debug.Assert(context != null, "context cannot be null.");
 
-            text = TypeConverter.ConvertToString(components[this.interpolatedExpressionComponentIndex]);
+            text = TypeConverter.ConvertToString(components[_interpolatedExpressionComponentIndex]);
             return FlowDecision.Terminate;
         }
     }

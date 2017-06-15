@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -29,15 +29,7 @@ using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit.Directives
 {
-    using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
     using XtraLiteTemplates.Dialects.Standard.Directives;
-    using System.Globalization;
-    using System.Collections.Generic;
 
     [TestFixture]
     public class StandardInterpolationDirectiveTests : TestBase

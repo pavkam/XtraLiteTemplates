@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,22 +24,15 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Compilation
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using System.Linq;
     using System.Runtime.InteropServices;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
+    using Evaluation;
+    using Expressions;
 
     /// <summary>
     /// Class that encapsulates <c>compilation</c> logic defined for the standard <see cref="EvaluationContext"/>. The sole purpose of <see cref="CompiledTemplateFactory{TContext}"/> is to
@@ -159,13 +152,13 @@ namespace XtraLiteTemplates.Compilation
         }
 
         /// <summary>
-        /// Constructs an unparsed text evaluation delegate.
+        /// Constructs an un-parsed text evaluation delegate.
         /// </summary>
-        /// <param name="unparsedText">The unparsed text.</param>
+        /// <param name="unParsedText">The un-parsed text.</param>
         /// <returns>A new delegate that handles the given text.</returns>
-        protected override CompiledEvaluationDelegate<EvaluationContext> BuildUnparsedTextEvaluationDelegate(string unparsedText)
+        protected override CompiledEvaluationDelegate<EvaluationContext> BuildUnParsedTextEvaluationDelegate(string unParsedText)
         {
-            Debug.Assert(!string.IsNullOrEmpty(unparsedText), "Argument unparsedText cannot be empty.");
+            Debug.Assert(!string.IsNullOrEmpty(unParsedText), "Argument unParsedText cannot be empty.");
 
             return (writer, context) =>
             {
@@ -175,7 +168,7 @@ namespace XtraLiteTemplates.Compilation
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();
 
-                var text = context.ProcessUnparsedText(unparsedText);
+                var text = context.ProcessUnParsedText(unParsedText);
 
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();
@@ -221,11 +214,10 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
-        private static object[] EvaluateTag(EvaluationContext context, object[] components)
+        private static object[] EvaluateTag(IExpressionEvaluationContext context, IReadOnlyList<object> components)
         {
-            object[] result = new object[components.Length];
-            for (var i = 0; i < components.Length; i++)
+            var result = new object[components.Count];
+            for (var i = 0; i < components.Count; i++)
             {
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();
@@ -246,12 +238,11 @@ namespace XtraLiteTemplates.Compilation
             return result;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private static void EvaluateSingleTagDirective(
             TextWriter writer,
-            EvaluationContext context,
+            IExpressionEvaluationContext context,
             Directive directive,
-            object[] components)
+            IReadOnlyList<object> components)
         {
             /* Pre-evaluate the tag's components, as these  */
             var tagEvaluatedComponents = EvaluateTag(context, components);
@@ -277,17 +268,16 @@ namespace XtraLiteTemplates.Compilation
             }
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private static void EvaluateDoubleTagDirective(
             TextWriter writer,
             EvaluationContext context,
             Directive directive,
-            object[] beginComponents,
-            object[] closeComponents,
+            IReadOnlyList<object> beginComponents,
+            IReadOnlyList<object> closeComponents,
             CompiledEvaluationDelegate<EvaluationContext> beginToCloseEvaluateProc)
         {
             /* Get tag components. */
-            object[] beginTagEvaluatedComponents = EvaluateTag(context, beginComponents);
+            var beginTagEvaluatedComponents = EvaluateTag(context, beginComponents);
             object[] closeTagEvaluatedComponents = null;
 
             /* Evaluate tag. */
@@ -312,13 +302,20 @@ namespace XtraLiteTemplates.Compilation
                 {
                     break;
                 }
-                else if (flowDecision == Directive.FlowDecision.Restart)
+
+                switch (flowDecision)
                 {
-                    continue;
-                }
-                else if (flowDecision == Directive.FlowDecision.Evaluate && beginToCloseEvaluateProc != null)
-                {
-                    beginToCloseEvaluateProc(writer, context);
+                    case Directive.FlowDecision.Restart:
+                        continue;
+                    case Directive.FlowDecision.Evaluate:
+                        beginToCloseEvaluateProc?.Invoke(writer, context);
+                        break;
+                    case Directive.FlowDecision.Terminate:
+                        break;
+                    case Directive.FlowDecision.Skip:
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException(nameof(flowDecision));
                 }
 
                 if (closeTagEvaluatedComponents == null)
@@ -343,16 +340,15 @@ namespace XtraLiteTemplates.Compilation
             }
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private static void EvaluateTagDirective(
             TextWriter writer,
             EvaluationContext context,
             Directive directive,
-            object[][] components,
-            CompiledEvaluationDelegate<EvaluationContext>[] evaluationProcs)
+            IReadOnlyList<object[]> components,
+            IReadOnlyList<CompiledEvaluationDelegate<EvaluationContext>> evaluationProcs)
         {
             /* Get tag components. */
-            object[][] evaluatedComponents = new object[components.Length][];
+            var evaluatedComponents = new object[components.Count][];
 
             /* Evaluate tag. */
             object state = null;
@@ -378,30 +374,25 @@ namespace XtraLiteTemplates.Compilation
                     writer.Write(directiveText);
                 }
 
-                if (flowDecision == Directive.FlowDecision.Terminate)
+                switch (flowDecision)
                 {
-                    currentTagIndex = -1;
-                }
-                else if (flowDecision == Directive.FlowDecision.Restart)
-                {
-                    currentTagIndex = 0;
-                }
-                else
-                {
-                    currentTagIndex++;
-                    if (currentTagIndex == components.Length)
-                    {
+                    case Directive.FlowDecision.Terminate:
+                        currentTagIndex = -1;
+                        break;
+                    case Directive.FlowDecision.Restart:
                         currentTagIndex = 0;
-                    }
-                    else if (flowDecision == Directive.FlowDecision.Evaluate)
-                    {
-                        var evaluationProc = evaluationProcs[currentTagIndex - 1];
-
-                        if (evaluationProc != null)
+                        break;
+                    default:
+                        currentTagIndex++;
+                        if (currentTagIndex == components.Count)
                         {
-                            evaluationProc(writer, context);
+                            currentTagIndex = 0;
                         }
-                    }
+                        else if (flowDecision == Directive.FlowDecision.Evaluate)
+                        {
+                            evaluationProcs[currentTagIndex - 1]?.Invoke(writer, context);
+                        }
+                        break;
                 }
             }
         }

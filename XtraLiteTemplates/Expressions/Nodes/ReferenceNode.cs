@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -28,13 +28,9 @@
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System;
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.IO;
-    using XtraLiteTemplates.Expressions.Operators;
+
     using LinqExpression = System.Linq.Expressions.Expression;
     
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
@@ -45,7 +41,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(@object != null, "object cannot be null.");
 
-            this.Object = @object;
+            Object = @object;
         }
 
         public ReferenceNode(ExpressionNode parent, string identifier)
@@ -53,10 +49,10 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(!string.IsNullOrEmpty(identifier), "identifier cannot be empty.");
 
-            this.Identifier = identifier;
+            Identifier = identifier;
         }
 
-        public ExpressionNode Object { get; private set; }
+        public ExpressionNode Object { get; }
 
         public string Identifier { get; set; }
 
@@ -66,43 +62,39 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             get
             {
-                if (this.Identifier == null)
+                if (Identifier == null)
                 {
                     return PermittedContinuations.Identifier;
                 }
-                else
-                {
-                    return base.Continuity | PermittedContinuations.NewGroup;
-                }
+
+                return base.Continuity | PermittedContinuations.NewGroup;
             }
         }
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            string arguments = this.Arguments != null ? this.Arguments.ToString(style) : string.Empty;
+            var arguments = Arguments != null ? Arguments.ToString(style) : string.Empty;
 
-            if (this.Object != null)
+            if (Object != null)
             {
-                return string.Format("{0}.{1}{2}", this.Object.ToString(style), this.Identifier, arguments);
+                return $"{Object.ToString(style)}.{Identifier}{arguments}";
             }
-            else
-            {
-                return string.Format("@{0}{1}", this.Identifier, arguments);
-            }
+
+            return $"@{Identifier}{arguments}";
         }
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
-            if (this.Object != null)
+            if (Object != null)
             {
-                this.Object.Reduce(reduceContext);
+                Object.Reduce(reduceContext);
             }
 
-            if (this.Arguments != null)
+            if (Arguments != null)
             {
-                this.Arguments.Reduce(reduceContext);
+                Arguments.Reduce(reduceContext);
             }
 
             value = null;
@@ -112,15 +104,15 @@ namespace XtraLiteTemplates.Expressions.Nodes
         [SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1118:ParameterMustNotSpanMultipleLines", Justification = "Readability is OK in this circumstances.")]
         protected override LinqExpression BuildLinqExpression()
         {
-            if (this.Arguments != null)
+            if (Arguments != null)
             {
                 /* Method invokation. */
-                var argumentsExpression = this.Arguments.GetEvaluationLinqExpression();
+                var argumentsExpression = Arguments.GetEvaluationLinqExpression();
                 var evaluatedArgumentsVariable = LinqExpression.Variable(typeof(object));
 
-                if (this.Object != null)
+                if (Object != null)
                 {
-                    var objectExpression = this.Object.GetEvaluationLinqExpression();
+                    var objectExpression = Object.GetEvaluationLinqExpression();
 
                     return LinqExpression.Block(
                         typeof(object),
@@ -129,64 +121,60 @@ namespace XtraLiteTemplates.Expressions.Nodes
                         LinqExpression.Assign(evaluatedArgumentsVariable, argumentsExpression),
                         LinqExpression.IfThen(
                             LinqExpression.AndAlso(
-                                LinqExpression.Not(
-                                    LinqExpression.TypeIs(evaluatedArgumentsVariable, typeof(object[]))),
-                                 LinqExpression.NotEqual(evaluatedArgumentsVariable, LinqExpression.Constant(null))),
-                            LinqExpression.Assign(evaluatedArgumentsVariable, LinqExpression.NewArrayInit(typeof(object), evaluatedArgumentsVariable))),
-                            LinqExpression.Call(
-                                LinqExpressionHelper.ExpressionParameterContext, 
-                                LinqExpressionHelper.MethodInfoExpressionEvaluationContextInvokeObject,
-                                objectExpression, 
-                                LinqExpression.Constant(this.Identifier), 
-                                LinqExpression.TypeAs(evaluatedArgumentsVariable, typeof(object[]))));
-                }
-                else
-                {
-                    return LinqExpression.Block(
-                        typeof(object),
-                        new[] { evaluatedArgumentsVariable },
-                        LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
-                        LinqExpression.Assign(evaluatedArgumentsVariable, argumentsExpression),
-                        LinqExpression.IfThen(
-                            LinqExpression.AndAlso(
-                                LinqExpression.Not(
-                                    LinqExpression.TypeIs(evaluatedArgumentsVariable, typeof(object[]))),
+                                LinqExpression.Not(LinqExpression.TypeIs(evaluatedArgumentsVariable, typeof(object[]))),
                                 LinqExpression.NotEqual(evaluatedArgumentsVariable, LinqExpression.Constant(null))),
-                                LinqExpression.Assign(evaluatedArgumentsVariable, LinqExpression.NewArrayInit(typeof(object), evaluatedArgumentsVariable))),
-                            LinqExpression.Call(
-                                LinqExpressionHelper.ExpressionParameterContext, 
-                                LinqExpressionHelper.MethodInfoExpressionEvaluationContextInvoke,
-                                LinqExpression.Constant(this.Identifier), 
-                                LinqExpression.TypeAs(evaluatedArgumentsVariable, typeof(object[]))));
+                            LinqExpression.Assign(
+                                evaluatedArgumentsVariable,
+                                LinqExpression.NewArrayInit(typeof(object), evaluatedArgumentsVariable))),
+                        LinqExpression.Call(
+                            LinqExpressionHelper.ExpressionParameterContext,
+                            LinqExpressionHelper.MethodInfoExpressionEvaluationContextInvokeObject,
+                            objectExpression,
+                            LinqExpression.Constant(Identifier),
+                            LinqExpression.TypeAs(evaluatedArgumentsVariable, typeof(object[]))));
                 }
-            }
-            else
-            {
-                /* Property access. */
-                if (this.Object != null)
-                {
-                    var objectExpression = this.Object.GetEvaluationLinqExpression();
 
-                    return LinqExpression.Block(
-                        typeof(object),
-                        LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
-                        LinqExpression.Call(
-                            LinqExpressionHelper.ExpressionParameterContext, 
-                            LinqExpressionHelper.MethodInfoExpressionEvaluationContextGetPropertyObject,
-                            objectExpression, 
-                            LinqExpression.Constant(this.Identifier)));
-                }
-                else
-                {
-                    return LinqExpression.Block(
-                        typeof(object),
-                        LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
-                        LinqExpression.Call(
-                            LinqExpressionHelper.ExpressionParameterContext, 
-                            LinqExpressionHelper.MethodInfoExpressionEvaluationContextGetProperty,
-                            LinqExpression.Constant(this.Identifier)));
-                }
+                return LinqExpression.Block(
+                    typeof(object),
+                    new[] { evaluatedArgumentsVariable },
+                    LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                    LinqExpression.Assign(evaluatedArgumentsVariable, argumentsExpression),
+                    LinqExpression.IfThen(
+                        LinqExpression.AndAlso(
+                            LinqExpression.Not(LinqExpression.TypeIs(evaluatedArgumentsVariable, typeof(object[]))),
+                            LinqExpression.NotEqual(evaluatedArgumentsVariable, LinqExpression.Constant(null))),
+                        LinqExpression.Assign(
+                            evaluatedArgumentsVariable,
+                            LinqExpression.NewArrayInit(typeof(object), evaluatedArgumentsVariable))),
+                    LinqExpression.Call(
+                        LinqExpressionHelper.ExpressionParameterContext,
+                        LinqExpressionHelper.MethodInfoExpressionEvaluationContextInvoke,
+                        LinqExpression.Constant(Identifier),
+                        LinqExpression.TypeAs(evaluatedArgumentsVariable, typeof(object[]))));
             }
+
+            /* Property access. */
+            if (Object != null)
+            {
+                var objectExpression = Object.GetEvaluationLinqExpression();
+
+                return LinqExpression.Block(
+                    typeof(object),
+                    LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                    LinqExpression.Call(
+                        LinqExpressionHelper.ExpressionParameterContext,
+                        LinqExpressionHelper.MethodInfoExpressionEvaluationContextGetPropertyObject,
+                        objectExpression,
+                        LinqExpression.Constant(Identifier)));
+            }
+
+            return LinqExpression.Block(
+                typeof(object),
+                LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
+                LinqExpression.Call(
+                    LinqExpressionHelper.ExpressionParameterContext,
+                    LinqExpressionHelper.MethodInfoExpressionEvaluationContextGetProperty,
+                    LinqExpression.Constant(Identifier)));
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -28,10 +28,9 @@
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System;
     using System.Diagnostics;
-    using System.Threading;
-    using XtraLiteTemplates.Expressions.Operators;
+
+    using Operators;
     using LinqExpression = System.Linq.Expressions.Expression;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
@@ -42,39 +41,26 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        public new UnaryOperator Operator
-        {
-            get
-            {
-                return base.Operator as UnaryOperator;
-            }
-        }
+        public new UnaryOperator Operator => base.Operator as UnaryOperator;
 
-        public override PermittedContinuations Continuity
-        {
-            get
-            {
-                return
-                    PermittedContinuations.UnaryOperator |
-                    PermittedContinuations.Literal |
-                    PermittedContinuations.Identifier |
-                    PermittedContinuations.NewGroup;
-            }
-        }
+        public override PermittedContinuations Continuity => PermittedContinuations.UnaryOperator |
+                                                             PermittedContinuations.Literal |
+                                                             PermittedContinuations.Identifier |
+                                                             PermittedContinuations.NewGroup;
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            var childAsString = this.RightNode != null ? this.RightNode.ToString(style) : "??";
+            var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
 
             string result = null;
 
             if (style == ExpressionFormatStyle.Canonical)
             {
-                result = string.Format("{0}{{{1}}}", this.Operator, childAsString);
+                result = $"{Operator}{{{childAsString}}}";
             }
             else
             {
-                result = string.Format("{0}{1}", this.Operator, childAsString);
+                result = $"{Operator}{childAsString}";
             }
 
             Debug.Assert(result != null, "resulting string cannot be null.");
@@ -85,26 +71,24 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
-            if (this.RightNode.Reduce(reduceContext))
+            if (RightNode.Reduce(reduceContext))
             {
-                value = this.Operator.Evaluate(reduceContext, this.RightNode.ReducedValue);
+                value = Operator.Evaluate(reduceContext, RightNode.ReducedValue);
                 return true;
             }
-            else
-            {
-                value = null;
-                return false;
-            }
+
+            value = null;
+            return false;
         }
 
         protected override LinqExpression BuildLinqExpression()
         {
-            var operandExpression = this.RightNode.GetEvaluationLinqExpression();
+            var operandExpression = RightNode.GetEvaluationLinqExpression();
 
             return LinqExpression.Block(
                 typeof(object),
                 LinqExpressionHelper.ExpressionCallThrowIfCancellationRequested,
-                LinqExpression.Call(LinqExpression.Constant(this.Operator), LinqExpressionHelper.MethodInfoUnaryOperatorEvaluate, LinqExpressionHelper.ExpressionParameterContext, operandExpression));
+                LinqExpression.Call(LinqExpression.Constant(Operator), LinqExpressionHelper.MethodInfoUnaryOperatorEvaluate, LinqExpressionHelper.ExpressionParameterContext, operandExpression));
         }
     }
 }

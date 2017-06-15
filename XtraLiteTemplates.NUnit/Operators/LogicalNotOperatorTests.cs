@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class LogicalNotOperatorTests : OperatorTestsBase
@@ -43,7 +39,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new LogicalNotOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new LogicalNotOperator(String.Empty, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new LogicalNotOperator(string.Empty, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new LogicalNotOperator("operator", null));
             ExpectArgumentNullException("typeConverter", () => new LogicalNotOperator(null));
         }
@@ -78,8 +74,8 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new LogicalNotOperator(TypeConverter);
 
-            AssertEvaluation<Boolean>(@operator, true, false);
-            AssertEvaluation<Boolean>(@operator, false, true);
+            AssertEvaluation<bool>(@operator, true, false);
+            AssertEvaluation<bool>(@operator, false, true);
         }
     }
 }

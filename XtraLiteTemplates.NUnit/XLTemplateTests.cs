@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -32,14 +32,9 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.Collections.Generic;
     using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using System.Globalization;
-    using XtraLiteTemplates.Dialects.Standard;
     using System.Threading;
-    using System.Threading.Tasks;
+
+    using XtraLiteTemplates.Dialects.Standard;
 
     [TestFixture]
     public class XLTemplateTests : TestBase
@@ -47,7 +42,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConstruction1()
         {
-            ExpectArgumentNullException("dialect", () => new XLTemplate(null, ""));
+            ExpectArgumentNullException("dialect", () => new XLTemplate(null, string.Empty));
             ExpectArgumentNullException("template", () => new XLTemplate(StandardDialect.Default, null));
         }
 
@@ -67,10 +62,10 @@ namespace XtraLiteTemplates.NUnit
             var text = "contents are irrelevant";
             var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
 
-            var variables = new Dictionary<String, Object>()
+            var variables = new Dictionary<string, object>()
             {
             };
-  
+
             ExpectArgumentNullException("variables", () => template.Evaluate(null));
             ExpectArgumentNullException("writer", () => template.Evaluate(null, variables));
         }
@@ -81,7 +76,7 @@ namespace XtraLiteTemplates.NUnit
             var text = "V = {variable}";
             var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
 
-            var variables = new Dictionary<String, Object>()
+            var variables = new Dictionary<string, object>()
             {
                 { "Variable", 1 }
             };
@@ -101,15 +96,15 @@ namespace XtraLiteTemplates.NUnit
             var text = "V = {variable}";
             var template = new XLTemplate(StandardDialect.Default, text);
 
-            var variables1 = new Dictionary<String, Object>()
+            var variables1 = new Dictionary<string, object>()
             {
                 { "Variable", 1 }
             };
-            var variables2 = new Dictionary<String, Object>()
+            var variables2 = new Dictionary<string, object>()
             {
                 { "variable", 1 }
             };
-            var variables3 = new Dictionary<String, Object>()
+            var variables3 = new Dictionary<string, object>()
             {
                 { "Variable", 1 },
                 { "variable", 2 }
@@ -121,7 +116,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void ToString_ForAComplexTemplate_ReturnsTheExpectedRepresentation()
+        public void ToStringForAComplexTemplateReturnsTheExpectedRepresentation()
         {
             var text = "{if true then}eat a cookie!{else}{variable}{end}";
             var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
@@ -130,7 +125,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void ToString_ForAnEmptyTemplate_ReturnsEmptyRepresentation()
+        public void ToStringForAnEmptyTemplateReturnsEmptyRepresentation()
         {
             var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, string.Empty);
 
@@ -139,43 +134,43 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Evaluate_UsingNullDialect_RaisesException()
+        public void EvaluateUsingNullDialectRaisesException()
         {
             XLTemplate.Evaluate(null, string.Empty);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Evaluate_UsingNullTemplate_RaisesException()
+        public void EvaluateUsingNullTemplateRaisesException()
         {
             XLTemplate.Evaluate(StandardDialect.Default, null);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Evaluate_UsingNullArguments_RaisesException()
+        public void EvaluateUsingNullArgumentsRaisesException()
         {
-            XLTemplate.Evaluate(StandardDialect.Default, string.Empty, (Object[])null);
+            XLTemplate.Evaluate(StandardDialect.Default, string.Empty, (object[])null);
         }
 
         [Test]
-        public void Evaluate_WithoutPreformattedDirectove_RemovesExtraWhitespaces()
+        public void EvaluateWithoutPreformattedDirectoveRemovesExtraWhitespaces()
         {
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{_0} -> {_1}", "string", 100.33);
             Assert.AreEqual("string->100.33", result);
         }
 
         [Test]
-        public void Evaluate_UsingPreformattedDirective_ProducesUnformattedResult()
+        public void EvaluateUsingPreformattedDirectiveProducesUnformattedResult()
         {
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{preformatted}{_0} -> {_1}{end}", "string", 100.33);
             Assert.AreEqual("string -> 100.33", result);
         }
 
         [Test]
-        public void Evaluate_ForTwoNestedLoops_ProducesTheExpectedResult()
+        public void EvaluateForTwoNestedLoopsProducesTheExpectedResult()
         {
-            String template = @"
+            var template = @"
             {_0} /
             {FOR EACH _0 IN 1..2}
                 {_0} /
@@ -191,21 +186,21 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void Evaluate_InvokingObjectGetTypeMethod_ProducesTheExpectedResult()
+        public void EvaluateInvokingObjectGetTypeMethodProducesTheExpectedResult()
         {
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, @"{_0.GetType().Name}", this);
-            Assert.AreEqual(this.GetType().Name, result);
+            Assert.AreEqual(GetType().Name, result);
         }
 
         [Test]
-        public void Evaluate_InvokingStringReplaceMethod_ProducesTheExpectedResult()
+        public void EvaluateInvokingStringReplaceMethodProducesTheExpectedResult()
         {
             var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{_0.Replace('Hello', _1)}", "Hello World", "Funky");
             Assert.AreEqual("Funky World", result);
         }
 
         [Test]
-        public void Evaluate_UsingSdandardSelfMethods_CompletesAsExpected()
+        public void EvaluateUsingSdandardSelfMethodsCompletesAsExpected()
         {
             var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Number('199') + Number(true)}");
             Assert.AreEqual("200", result);
@@ -223,14 +218,14 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async void EvaluateAsync_ForNullTextWriter_RaisesException()
+        public async void EvaluateAsyncForNullTextWriterRaisesException()
         {
             await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(null, new Dictionary<string, object>());
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public async void EvaluateAsync_ForNullVariablesDictionary_RaisesException()
+        public async void EvaluateAsyncForNullVariablesDictionaryRaisesException()
         {
             using (var sw = new StringWriter())
             {
@@ -240,9 +235,9 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(OperationCanceledException))]
-        public async void EvaluateAsync_CancelledByToken_RaisesException()
+        public async void EvaluateAsyncCancelledByTokenRaisesException()
         {
-            CancellationTokenSource tokenSource = new CancellationTokenSource();
+            var tokenSource = new CancellationTokenSource();
             var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"{FOR EACH X IN 0..99999999}{X}{END}");
 
             using (var sw = new StringWriter())
@@ -253,7 +248,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public async void EvaluateAsync_WithAZeroToken_CompletesAsExpected()
+        public async void EvaluateAsyncWithAZeroTokenCompletesAsExpected()
         {
             var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text");
 
@@ -265,7 +260,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public async void EvaluateAsync_CompletesAsExpected()
+        public async void EvaluateAsyncCompletesAsExpected()
         {
             var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text");
 

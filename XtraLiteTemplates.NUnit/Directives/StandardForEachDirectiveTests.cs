@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,14 +30,9 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
-    using System.Globalization;
     using System.Collections.Generic;
+
+    using XtraLiteTemplates.Dialects.Standard.Directives;
 
     [TestFixture]
     public class StandardForEachDirectiveTests : TestBase
@@ -82,7 +77,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new ForEachDirective("BOO ? OF $", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{BOO I OF undefined}{I}{BEER}", directive, new KeyValuePair<String, Object>("undefined", null)));
+            Assert.AreEqual(string.Empty, Evaluate("{BOO I OF undefined}{I}{BEER}", directive, new KeyValuePair<string, object>("undefined", null)));
         }
 
         [Test]
@@ -98,7 +93,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new ForEachDirective("BOO ? OF $", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{BOO I OF \"\"}{I}{BEER}", directive));
+            Assert.AreEqual(string.Empty, Evaluate("{BOO I OF \"\"}{I}{BEER}", directive));
         }
 
         [Test]
@@ -106,7 +101,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new ForEachDirective("BOO ? OF $", "BEER", TypeConverter);
 
-            Assert.AreEqual("102030", Evaluate("{BOO I OF list}{I}{BEER}", directive, new KeyValuePair<String, Object>("list", new Int32[] { 10, 20, 30 })));
+            Assert.AreEqual("102030", Evaluate("{BOO I OF list}{I}{BEER}", directive, new KeyValuePair<string, object>("list", new[] { 10, 20, 30 })));
         }
     }
 }

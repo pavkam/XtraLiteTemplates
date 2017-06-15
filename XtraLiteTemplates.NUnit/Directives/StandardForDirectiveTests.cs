@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,14 +30,9 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
-    using System.Globalization;
     using System.Collections.Generic;
+
+    using XtraLiteTemplates.Dialects.Standard.Directives;
 
     [TestFixture]
     public class StandardForDirectiveTests : TestBase
@@ -80,7 +75,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new ForDirective("BOO $", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{BOO undefined}.{BEER}", directive, new KeyValuePair<String, Object>("undefined", null)));
+            Assert.AreEqual(string.Empty, Evaluate("{BOO undefined}.{BEER}", directive, new KeyValuePair<string, object>("undefined", null)));
         }
 
         [Test]
@@ -96,7 +91,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new ForDirective("BOO $", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{BOO \"\"}.{BEER}", directive));
+            Assert.AreEqual(string.Empty, Evaluate("{BOO \"\"}.{BEER}", directive));
         }
 
         [Test]
@@ -104,7 +99,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new ForDirective("BOO $", "BEER", TypeConverter);
 
-            Assert.AreEqual("...", Evaluate("{BOO list}.{BEER}", directive, new KeyValuePair<String, Object>("list", new Int32[] { 1,2,3 })));
+            Assert.AreEqual("...", Evaluate("{BOO list}.{BEER}", directive, new KeyValuePair<string, object>("list", new[] { 1, 2, 3 })));
         }
     }
 }

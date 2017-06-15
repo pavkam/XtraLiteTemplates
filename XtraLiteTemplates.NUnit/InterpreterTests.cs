@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,14 +30,16 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.IO;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using System.Globalization;
+
+    using Evaluation;
+
+    using Expressions;
+
+    using Inside;
+
+    using Parsing;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions;
 
     [TestFixture]
     public class InterpreterTests : TestBase

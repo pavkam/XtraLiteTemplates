@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,14 +30,9 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
-    using System.Globalization;
     using System.Collections.Generic;
+
+    using XtraLiteTemplates.Dialects.Standard.Directives;
 
     [TestFixture]
     public class StandardIfElseDirectiveTests : TestBase
@@ -105,7 +100,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new IfElseDirective("MAYBE $", "OTHERWISE", "DONE", TypeConverter);
 
-            Assert.AreEqual("no", Evaluate("{MAYBE undefined}yes{OTHERWISE}no{DONE}", directive, new KeyValuePair<String, Object>("undefined", null)));
+            Assert.AreEqual("no", Evaluate("{MAYBE undefined}yes{OTHERWISE}no{DONE}", directive, new KeyValuePair<string, object>("undefined", null)));
         }
 
         [Test]
@@ -113,7 +108,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new IfElseDirective("MAYBE $", "OTHERWISE", "DONE", TypeConverter);
 
-            Assert.AreEqual("yes", Evaluate("{MAYBE defined}yes{OTHERWISE}no{DONE}", directive, new KeyValuePair<String, Object>("defined", this)));
+            Assert.AreEqual("yes", Evaluate("{MAYBE defined}yes{OTHERWISE}no{DONE}", directive, new KeyValuePair<string, object>("defined", this)));
         }
     }
 }

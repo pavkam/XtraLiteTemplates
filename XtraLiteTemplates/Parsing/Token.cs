@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -23,8 +23,6 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
 namespace XtraLiteTemplates.Parsing
 {
@@ -53,10 +51,10 @@ namespace XtraLiteTemplates.Parsing
                 Expect.NotEmpty("value", value);
             }
 
-            this.Type = type;
-            this.Value = value ?? string.Empty;
-            this.CharacterIndex = characterIndex;
-            this.OriginalLength = originalLength;
+            Type = type;
+            Value = value ?? string.Empty;
+            CharacterIndex = characterIndex;
+            OriginalLength = originalLength;
         }
 
         /// <summary>
@@ -65,9 +63,9 @@ namespace XtraLiteTemplates.Parsing
         public enum TokenType
         {
             /// <summary>
-            /// An unparsed text block.
+            /// An un-parsed text block.
             /// </summary>
-            Unparsed,
+            UnParsed,
 
             /// <summary>
             /// Tag start symbol encountered.
@@ -112,7 +110,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The type of the token.
         /// </value>
-        public TokenType Type { get; private set; }
+        public TokenType Type { get; }
 
         /// <summary>
         /// Gets the value of the token.
@@ -121,7 +119,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The value of the token.
         /// </value>
-        public string Value { get; private set; }
+        public string Value { get; }
 
         /// <summary>
         /// Gets the index of the token's first character 
@@ -130,7 +128,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The index the first character.
         /// </value>
-        public int CharacterIndex { get; private set; }
+        public int CharacterIndex { get; }
 
         /// <summary>
         /// Gets the original length of the token (as seen in the input template).
@@ -140,6 +138,6 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The original length of the token.
         /// </value>
-        public int OriginalLength { get; private set; }
+        public int OriginalLength { get; }
     }
 }

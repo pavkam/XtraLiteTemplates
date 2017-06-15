@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,9 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.Parsing;
+    using Parsing;
 
     [TestFixture]
     public class TagTests : TestBase
@@ -43,7 +41,7 @@ namespace XtraLiteTemplates.NUnit
             var tag = new Tag();
 
             Assert.AreEqual(0, tag.ComponentCount);
-            Assert.AreEqual(String.Empty, tag.ToString());
+            Assert.AreEqual(string.Empty, tag.ToString());
         }
 
         [Test]
@@ -93,7 +91,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var tag = new Tag();
 
-            ExpectArgumentEmptyException("candidates", () => tag.Identifier(new String[0]));
+            ExpectArgumentEmptyException("candidates", () => tag.Identifier(new string[0]));
 
             ExpectArgumentNotIdentifierException("candidate", () => tag.Identifier("__good0ne", "0number"));
             ExpectArgumentNotIdentifierException("candidate", () => tag.Identifier("__good0ne", "-sign"));
@@ -127,7 +125,7 @@ namespace XtraLiteTemplates.NUnit
             Tag tag;
 
             Assert.IsFalse(Tag.TryParse(null, out tag));
-            Assert.IsFalse(Tag.TryParse(String.Empty, out tag));
+            Assert.IsFalse(Tag.TryParse(string.Empty, out tag));
             Assert.IsFalse(Tag.TryParse(" ", out tag));
             Assert.IsFalse(Tag.TryParse("{", out tag));
             Assert.IsFalse(Tag.TryParse("9", out tag));
@@ -162,7 +160,7 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseParse()
         {
             ExpectInvalidTagMarkupException("IF $ $", () => Tag.Parse("IF $ $"));
-            ExpectInvalidTagMarkupException("", () => Tag.Parse(""));
+            ExpectInvalidTagMarkupException(string.Empty, () => Tag.Parse(string.Empty));
 
             var tag = Tag.Parse("HELLO ? WORLD $ (A1 A2 A3)");
             Assert.AreEqual("HELLO ? WORLD $ (A1 A2 A3)", tag.ToString());

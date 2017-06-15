@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,40 +24,34 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Evaluation
 {
-    using System;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.IO;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Parsing;
+    using Parsing;
 
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-    internal sealed class UnparsedNode : TemplateNode
+    internal sealed class UnParsedNode : TemplateNode
     {
-        public UnparsedNode(TemplateNode parent, UnparsedLex lex)
+        public UnParsedNode(TemplateNode parent, UnParsedLex lex)
             : base(parent)
         {
             Debug.Assert(parent != null, "parent cannot be null.");
             Debug.Assert(lex != null, "lex cannot be null.");
 
-            this.FirstCharacterIndex = lex.FirstCharacterIndex;
-            this.OriginalLength = lex.OriginalLength;
-            this.UnparsedText = lex.UnparsedText;
+            FirstCharacterIndex = lex.FirstCharacterIndex;
+            OriginalLength = lex.OriginalLength;
+            UnParsedText = lex.UnParsedText;
         }
 
-        public int FirstCharacterIndex { get; private set; }
+        public int FirstCharacterIndex { get; }
 
-        public int OriginalLength { get; private set; }
+        public int OriginalLength { get; }
 
-        public string UnparsedText { get; private set; }
+        public string UnParsedText { get; }
 
         public override string ToString()
         {
-            return this.UnparsedText;
+            return UnParsedText;
         }
     }
 }

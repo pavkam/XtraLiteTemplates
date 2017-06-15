@@ -1,4 +1,4 @@
-﻿//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+﻿//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -21,27 +21,19 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Globalization;
     using System.IO;
-    using System.Linq;
-    using System.Text;
     using System.Threading;
     using System.Threading.Tasks;
-    using XtraLiteTemplates.Compilation;
-    using XtraLiteTemplates.Dialects;
-    using XtraLiteTemplates.Dialects.Standard;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Compilation;
+    using Dialects;
+    using Evaluation;
+    using Expressions;
+    using Parsing;
 
     /// <summary>
     /// Facade class that uses all components exposed by the <c>XtraLiteTemplates library</c>. XLTemplate class uses an instance of <see cref="IDialect" /> interface
@@ -49,14 +41,13 @@ namespace XtraLiteTemplates
     /// </summary>
     public sealed class XLTemplate
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledTemplate<EvaluationContext> compiledTemplate;
+        private readonly CompiledTemplate<EvaluationContext> _compiledTemplate;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XLTemplate"/> class.
         /// </summary>
         /// <param name="dialect">An instance <see cref="IDialect" /> used to define the domain-specific language properties.</param>
-        /// <param name="template">A <see cref="String" /> value that is compiled and used for evaluation.</param>
+        /// <param name="template">A <see cref="string" /> value that is compiled and used for evaluation.</param>
         /// <exception cref="ArgumentNullException">Either <paramref name="dialect" /> or <paramref name="template" /> parameters are <c>null</c>.</exception>
         /// <exception cref="ParseException">Parsing error during template compilation.</exception>
         /// <exception cref="ExpressionException">Expression parsing error during template compilation.</exception>
@@ -70,11 +61,11 @@ namespace XtraLiteTemplates
             Expect.NotNull("dialect", dialect);
             Expect.NotNull("template", template);
 
-            this.Dialect = dialect;
-            this.Template = template;
+            Dialect = dialect;
+            Template = template;
 
             /* Compile template */
-            this.compiledTemplate = this.Compile();
+            _compiledTemplate = Compile();
         }
 
         /// <summary>
@@ -85,17 +76,17 @@ namespace XtraLiteTemplates
         /// This property is provided by the caller at construction time.
         /// </remarks>
         /// </summary>
-        public IDialect Dialect { get; private set; }
+        public IDialect Dialect { get; }
 
         /// <summary>
         /// <value>
-        /// Gets the original template <see cref="String"/> that was compiled.
+        /// Gets the original template <see cref="string"/> that was compiled.
         /// </value>
         /// <remarks>
         /// This property is provided by the caller at construction time.
         /// </remarks>
         /// </summary>
-        public string Template { get; private set; }
+        public string Template { get; }
 
         /// <summary>
         /// An easy-to-use facade method that compiles a template and immediately evaluates it.
@@ -103,11 +94,11 @@ namespace XtraLiteTemplates
         /// An optional set of <paramref name="arguments"/> can be provided to the template. These objects will be exposed to the compiled template at evaluation time as follows:
         /// <para>
         /// The first object in <paramref name="arguments"/> can be referenced as <c>_0</c> inside the template. The second object can be referenced as <c>_1</c> and so on. In a sense,
-        /// it tries to mimic the behavior of <see cref="String.Format(IFormatProvider,String,Object[])"/> method.</para>
+        /// it tries to mimic the behavior of <see cref="string.Format(IFormatProvider,string,object[])"/> method.</para>
         /// </remarks>
         /// </summary>
-        /// <param name="dialect">An instance <see cref="XtraLiteTemplates.Dialects.IDialect"/> used to define the domain-specific language properties.</param>
-        /// <param name="template">A <see cref="System.String"/> value that is compiled and used for evaluation.</param>
+        /// <param name="dialect">An instance <see cref="IDialect"/> used to define the domain-specific language properties.</param>
+        /// <param name="template">A <see cref="string"/> value that is compiled and used for evaluation.</param>
         /// <param name="arguments">A <see cref="IReadOnlyDictionary{String, Object}"/> storing all variables exposed to the template at evaluation time.</param>
         /// <returns>The result of evaluating the template.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="dialect"/>, <paramref name="template"/> or <paramref name="arguments"/> parameters are <c>null</c>.</exception>
@@ -123,11 +114,11 @@ namespace XtraLiteTemplates
 
             var instance = new XLTemplate(dialect, template);
 
-            /* Instatiate the variables */
+            /* Instantiate the variables */
             var variables = new Dictionary<string, object>();
             for (var i = 0; i < arguments.Length; i++)
             {
-                variables.Add(string.Format("_{0}", i), arguments[i]);
+                variables.Add($"_{i}", arguments[i]);
             }
 
             return instance.Evaluate(variables);
@@ -147,7 +138,7 @@ namespace XtraLiteTemplates
             Expect.NotNull("variables", variables);
 
             /* No thread scheduling. */
-            this.EvaluateInternal(writer, variables, CancellationToken.None);
+            EvaluateInternal(writer, variables, CancellationToken.None);
         }
 
         /// <summary>
@@ -211,16 +202,15 @@ namespace XtraLiteTemplates
         }
 
         /// <summary>
-        /// Returns a human-readable <see cref="System.String"/> representation of the compiled template.
+        /// Returns a human-readable <see cref="string"/> representation of the compiled template.
         /// </summary>
-        /// <returns>The <see cref="System.String"/> value.</returns>
+        /// <returns>The <see cref="string"/> value.</returns>
         public override string ToString()
         {
-            Debug.Assert(this.compiledTemplate != null, "compiledTemplate cannot be null.");
-            return this.compiledTemplate.ToString();
+            Debug.Assert(_compiledTemplate != null, "compiledTemplate cannot be null.");
+            return _compiledTemplate.ToString();
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private void EvaluateInternal(TextWriter writer, IReadOnlyDictionary<string, object> variables, CancellationToken cancellationToken)
         {
             Debug.Assert(writer != null, "Argument writer cannot be null.");
@@ -230,10 +220,10 @@ namespace XtraLiteTemplates
             var context = new EvaluationContext(
                 true,
                 cancellationToken,
-                this.Dialect.IdentifierComparer,
-                this.Dialect.ObjectFormatter,
-                this.Dialect.Self,
-                this.Dialect.DecorateUnparsedText);
+                Dialect.IdentifierComparer,
+                Dialect.ObjectFormatter,
+                Dialect.Self,
+                Dialect.DecorateUnParsedText);
 
             /* Load in the variables. */
             foreach (var variable in variables)
@@ -242,37 +232,36 @@ namespace XtraLiteTemplates
             }
 
             /* Evaluate. */
-            this.compiledTemplate.Evaluate(writer, context);
+            _compiledTemplate.Evaluate(writer, context);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private CompiledTemplate<EvaluationContext> Compile()
         {
-            using (var reader = new StringReader(this.Template))
+            using (var reader = new StringReader(Template))
             {
                 var tokenizer = new Tokenizer(
                     reader,
-                    this.Dialect.StartTagCharacter,
-                    this.Dialect.EndTagCharacter,
-                    this.Dialect.StartStringLiteralCharacter,
-                    this.Dialect.EndStringLiteralCharacter,
-                    this.Dialect.StringLiteralEscapeCharacter,
-                    this.Dialect.NumberDecimalSeparatorCharacter);
+                    Dialect.StartTagCharacter,
+                    Dialect.EndTagCharacter,
+                    Dialect.StartStringLiteralCharacter,
+                    Dialect.EndStringLiteralCharacter,
+                    Dialect.StringLiteralEscapeCharacter,
+                    Dialect.NumberDecimalSeparatorCharacter);
 
-                var interpreter = new Interpreter(tokenizer, this.Dialect.FlowSymbols, this.Dialect.IdentifierComparer);
+                var interpreter = new Interpreter(tokenizer, Dialect.FlowSymbols, Dialect.IdentifierComparer);
 
                 /* Register all directives and operators into the interpreter. */
-                foreach (var directive in this.Dialect.Directives)
+                foreach (var directive in Dialect.Directives)
                 {
                     interpreter.RegisterDirective(directive);
                 }
 
-                foreach (var @operator in this.Dialect.Operators)
+                foreach (var @operator in Dialect.Operators)
                 {
                     interpreter.RegisterOperator(@operator);
                 }
 
-                foreach (var keyword in this.Dialect.SpecialKeywords)
+                foreach (var keyword in Dialect.SpecialKeywords)
                 {
                     interpreter.RegisterSpecial(keyword.Key, keyword.Value);
                 }

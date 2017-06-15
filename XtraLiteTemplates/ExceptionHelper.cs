@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,42 +24,38 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Parsing;
+    using Evaluation;
+    using Expressions;
+    using Expressions.Operators;
+    using Parsing;
 
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal static class ExceptionHelper
     {
         internal static void ArgumentIsNull(string argumentName)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
-            throw new ArgumentNullException(argumentName, string.Format("Argument \"{0}\" cannot be null.", argumentName));
+            throw new ArgumentNullException(argumentName, $"Argument \"{argumentName}\" cannot be null.");
         }
 
         internal static void ArgumentIsEmpty(string argumentName)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
-            throw new ArgumentException(string.Format("Argument \"{0}\" cannot be empty.", argumentName), argumentName);
+            throw new ArgumentException($"Argument \"{argumentName}\" cannot be empty.", argumentName);
         }
 
         internal static void ArgumentIsNotValidIdentifier(string argumentName)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
-            throw new ArgumentException(string.Format("Argument \"{0}\" does not represent a valid identifer.", argumentName), argumentName);
+            throw new ArgumentException($"Argument \"{argumentName}\" does not represent a valid identifier.", argumentName);
         }
 
         internal static void ArgumentsAreEqual(string argumentName1, string argumentName2)
@@ -67,7 +63,7 @@ namespace XtraLiteTemplates
             Debug.Assert(!string.IsNullOrEmpty(argumentName1), "argumentName1 cannot be empty.");
             Debug.Assert(!string.IsNullOrEmpty(argumentName2), "argumentName2 cannot be empty.");
 
-            throw new ArgumentException(string.Format("Arguments \"{0}\" and \"{1}\" cannot be equal.", argumentName1, argumentName2), argumentName1);
+            throw new ArgumentException($"Arguments \"{argumentName1}\" and \"{argumentName2}\" cannot be equal.", argumentName1);
         }
 
         internal static void ArgumentNotGreaterThan(string argumentName, string comparand)
@@ -75,7 +71,9 @@ namespace XtraLiteTemplates
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
             Debug.Assert(!string.IsNullOrEmpty(comparand), "comparand cannot be empty.");
 
-            throw new ArgumentOutOfRangeException(argumentName, string.Format("Argument \"{0}\" is expected to be greater than {1}.", argumentName, comparand));
+            throw new ArgumentOutOfRangeException(
+                argumentName,
+                $"Argument \"{argumentName}\" is expected to be greater than {comparand}.");
         }
 
         internal static void ArgumentNotGreaterThanOrEqual(string argumentName, string comparand)
@@ -83,7 +81,9 @@ namespace XtraLiteTemplates
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
             Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
 
-            throw new ArgumentOutOfRangeException(argumentName, string.Format("Argument \"{0}\" is expected to be greater than or equal to {1}.", argumentName, comparand));
+            throw new ArgumentOutOfRangeException(
+                argumentName,
+                $"Argument \"{argumentName}\" is expected to be greater than or equal to {comparand}.");
         }
 
         internal static void ArgumentNotLessThan(string argumentName, string comparand)
@@ -91,7 +91,9 @@ namespace XtraLiteTemplates
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
             Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
 
-            throw new ArgumentOutOfRangeException(argumentName, string.Format("Argument \"{0}\" is expected to be less than {1}.", argumentName, comparand));
+            throw new ArgumentOutOfRangeException(
+                argumentName,
+                $"Argument \"{argumentName}\" is expected to be less than {comparand}.");
         }
 
         internal static void ArgumentNotLessThanOrEqual(string argumentName, string comparand)
@@ -99,14 +101,16 @@ namespace XtraLiteTemplates
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
             Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
 
-            throw new ArgumentOutOfRangeException(argumentName, string.Format("Argument \"{0}\" is expected to be less than or equal to {1}.", argumentName, comparand));
+            throw new ArgumentOutOfRangeException(
+                argumentName,
+                $"Argument \"{argumentName}\" is expected to be less than or equal to {comparand}.");
         }
 
         internal static void ConditionFailed(string conditionName)
         {
             Debug.Assert(!string.IsNullOrEmpty(conditionName), "conditionName cannot be empty.");
 
-            throw new ArgumentException(string.Format("Argument condition \"{0}\" failed to be validated as true.", conditionName), conditionName);
+            throw new ArgumentException($"Argument condition \"{conditionName}\" failed to be validated as true.", conditionName);
         }
 
         internal static void UnexpectedCharacter(int characterIndex, char character)
@@ -153,16 +157,14 @@ namespace XtraLiteTemplates
                     token.CharacterIndex,
                     string.Join(" ", components));
             }
-            else
-            {
-                throw new LexingException(
-                    null, 
-                    token, 
-                    "No matching tags found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
-                    token.Value, 
-                    token.Type, 
-                    token.CharacterIndex);
-            }
+
+            throw new LexingException(
+                null, 
+                token, 
+                "No matching tags found that can be continued with the token '{0}' (type: {1}) found at position {2}.",
+                token.Value, 
+                token.Type, 
+                token.CharacterIndex);
         }
 
         internal static void UnexpectedOrInvalidExpressionToken(ExpressionException innerException, Token token)
@@ -192,16 +194,16 @@ namespace XtraLiteTemplates
                 tagLex.FirstCharacterIndex);
         }
 
-        internal static void UnmatchedDirectiveTag(Directive[] candidateDirectives, int firstCharaterIndex)
+        internal static void UnmatchedDirectiveTag(Directive[] candidateDirectives, int firstCharacterIndex)
         {
             Debug.Assert(candidateDirectives != null, "candidateDirectives cannot be null.");
 
             throw new InterpreterException(
                 candidateDirectives, 
-                firstCharaterIndex,
+                firstCharacterIndex,
                 "Directive(s) {0} encountered at position {1}, could not be finalized by matching all component tags.",
                 string.Join(" or ", candidateDirectives.AsEnumerable()), 
-                firstCharaterIndex);
+                firstCharacterIndex);
         }
 
         internal static void CannotEvaluateOperator(Operator @operator, object constant)
@@ -243,14 +245,16 @@ namespace XtraLiteTemplates
         {
             Debug.Assert(@operator != null, "operator cannot be null.");
 
-            throw new InvalidOperationException(string.Format("Operator '{0}' (or one of its identifying symbols) already registered.", @operator));
+            throw new InvalidOperationException(
+                $"Operator '{@operator}' (or one of its identifying symbols) already registered.");
         }
 
         internal static void SpecialCannotBeRegistered(string keyword)
         {
             Debug.Assert(!string.IsNullOrEmpty(keyword), "keyword cannot be empty.");
 
-            throw new InvalidOperationException(string.Format("Special keyword '{0}' cannot be registered as it is currently in use by an operator.", keyword));
+            throw new InvalidOperationException(
+                $"Special keyword '{keyword}' cannot be registered as it is currently in use by an operator.");
         }
 
         internal static void CannotRegisterOperatorsForStartedExpression()
@@ -268,14 +272,14 @@ namespace XtraLiteTemplates
             throw new ExpressionException("Unbalanced expressions cannot be finalized.");
         }
 
-        internal static void CannotEvaluateUnconstructedExpression()
+        internal static void CannotEvaluateUnConstructedExpression()
         {
             throw new InvalidOperationException("Expression has not been finalized.");
         }
 
-        internal static void TagAnyIndentifierCannotFollowExpression()
+        internal static void TagAnyIdentifierCannotFollowExpression()
         {
-            throw new InvalidOperationException("Indentifier tag component cannot follow an expression.");
+            throw new InvalidOperationException("Identifier tag component cannot follow an expression.");
         }
 
         internal static void TagExpressionCannotFollowExpression()
@@ -290,7 +294,7 @@ namespace XtraLiteTemplates
 
         internal static void InvalidTagMarkup(string markup)
         {
-            throw new FormatException(string.Format("Invalid tag markup: '{0}'", markup));
+            throw new FormatException($"Invalid tag markup: '{markup}'");
         }
 
         internal static void DirectiveEvaluationError(Exception innerException, Directive directive)

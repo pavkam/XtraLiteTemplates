@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class ArithmeticNegateOperatorTests : OperatorTestsBase
@@ -43,7 +39,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticNegateOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticNegateOperator(String.Empty, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticNegateOperator(string.Empty, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ArithmeticNegateOperator("operator", null));
             ExpectArgumentNullException("typeConverter", () => new ArithmeticNegateOperator(null));
         }
@@ -78,8 +74,8 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new ArithmeticNegateOperator(TypeConverter);
 
-            AssertEvaluation<Double>(@operator, 1.33, -1.33);
-            AssertEvaluation<Double>(@operator, 0, 0);
+            AssertEvaluation<double>(@operator, 1.33, -1.33);
+            AssertEvaluation<double>(@operator, 0, 0);
         }
     }
 }

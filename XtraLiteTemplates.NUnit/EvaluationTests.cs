@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -31,22 +31,25 @@ namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.Collections.Generic;
-    using System.IO;
     using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using System.Globalization;
+
+    using Evaluation;
+
+    using Expressions;
+
+    using Inside;
+
+    using Parsing;
+
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions;
 
     [TestFixture]
     public class EvaluationTests : TestBase
     {
-        private KeyValuePair<String, Object> kw(String key, Object value)
+        private KeyValuePair<string, object> Kw(string key, object value)
         {
-            return new KeyValuePair<String, Object>(key, value);
+            return new KeyValuePair<string, object>(key, value);
         }
 
         [Test]
@@ -102,12 +105,12 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .Compile();
 
-            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, 
-                kw("var_string", "some string"), 
-                kw("var_integer", 123), 
-                kw("var_float", 1.33), 
-                kw("var_boolean", false),
-                kw("var_object", new Tuple<String>("inner item"))
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase,
+                Kw("var_string", "some string"),
+                Kw("var_integer", 123),
+                Kw("var_float", 1.33),
+                Kw("var_boolean", false),
+                Kw("var_object", new Tuple<string>("inner item"))
             );
 
             Assert.AreEqual("1, some string, 123, 1.33, False, inner item", exo);
@@ -130,20 +133,18 @@ namespace XtraLiteTemplates.NUnit
                 LastName = "O'Peters",
             };
 
-            var dear_dude = new
+            var dearDude = new
             {
                 IsDear = true,
                 FirstName = "John",
                 LastName = "McDude",
             };
 
-            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase,
-                kw("Dude", dude));
-            var dear_exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase,
-                kw("Dude", dear_dude));
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, Kw("Dude", dude));
+            var dearExo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, Kw("Dude", dearDude));
 
             Assert.AreEqual("Jenny O'Peters", exo);
-            Assert.AreEqual("DEAR John McDude", dear_exo);
+            Assert.AreEqual("DEAR John McDude", dearExo);
         }
 
         [Test]
@@ -169,8 +170,8 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterDirective(new ForEachDirective(TypeConverter))
                 .Compile();
 
-            String[] name = new String[] { "Mary", "Joe", "Peter" };
-            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("names", name));
+            var name = new[] { "Mary", "Joe", "Peter" };
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, Kw("names", name));
 
             Assert.AreEqual("Mary,Joe,Peter,", exo);
         }
@@ -200,7 +201,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Compile();
 
-            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("true", true), kw("false", false));
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, Kw("true", true), Kw("false", false));
 
             Assert.AreEqual("this_will_evaluate", exo);
         }
@@ -214,7 +215,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterOperator(new ArithmeticSumOperator(TypeConverter))
                 .Compile();
 
-            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("true", true), kw("false", false));
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, Kw("true", true), Kw("false", false));
 
             Assert.AreEqual("14", exo);
         }
@@ -241,7 +242,7 @@ namespace XtraLiteTemplates.NUnit
                 .RegisterDirective(new InterpolationDirective(TypeConverter))
                 .Compile();
 
-            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, kw("a", new { b = new { c = "exists" } }));
+            var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, Kw("a", new { b = new { c = "exists" } }));
 
             Assert.AreEqual("{ b = { c = exists } } { b = { c = exists } } { c = exists } { c = exists } { c = exists } exists exists exists exists", exo);
         }
@@ -264,7 +265,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluationComplex1()
         {
-            const String template = @"
+            const string Template = @"
             {IF 1 THEN}
                 _unparsed1_
                 {1}
@@ -292,7 +293,7 @@ namespace XtraLiteTemplates.NUnit
             {END}
 ";
 
-            var evaluable = new Interpreter(new Tokenizer(template),
+            var evaluable = new Interpreter(new Tokenizer(Template),
                 ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
                 .RegisterDirective(new IfDirective(TypeConverter))
                 .RegisterDirective(new IfElseDirective(TypeConverter))
@@ -300,7 +301,7 @@ namespace XtraLiteTemplates.NUnit
                 .Compile();
 
             var originalResult = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase);
-            var result = new String(originalResult.Where(c => !char.IsWhiteSpace(c)).ToArray());
+            var result = new string(originalResult.Where(c => !char.IsWhiteSpace(c)).ToArray());
 
             Assert.AreEqual("_unparsed1_1_unparsed2_23_unparsed3_456100100200_unparsed21_11_unparsed22_1213_unparsed23_141516", result);
         }

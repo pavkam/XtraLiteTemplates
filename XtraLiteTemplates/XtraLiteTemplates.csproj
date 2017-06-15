@@ -43,7 +43,7 @@
     <Compile Include="Dialects\Standard\Directives\ForDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\UsingDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\SeparatedForEachDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\PreFormattedUnparsedTextDirective.cs" />
+    <Compile Include="Dialects\Standard\Directives\PreFormattedUnParsedTextDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
     <Compile Include="Dialects\Standard\StandardSelfObject.cs" />
@@ -103,7 +103,7 @@
     <Compile Include="Evaluation\TemplateDocument.cs" />
     <Compile Include="Evaluation\CompositeNode.cs" />
     <Compile Include="Evaluation\DirectiveNode.cs" />
-    <Compile Include="Evaluation\UnparsedNode.cs" />
+    <Compile Include="Evaluation\UnParsedNode.cs" />
     <Compile Include="Evaluation\TemplateNode.cs" />
     <Compile Include="Evaluation\Directive.cs" />
     <Compile Include="Evaluation\Interpreter.cs" />
@@ -111,7 +111,7 @@
     <Compile Include="Dialects\Standard\StandardDialect.cs" />
     <Compile Include="Dialects\IDialect.cs" />
     <Compile Include="Parsing\TagLex.cs" />
-    <Compile Include="Parsing\UnparsedLex.cs" />
+    <Compile Include="Parsing\UnParsedLex.cs" />
     <Compile Include="Parsing\Lex.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Expect.cs" />

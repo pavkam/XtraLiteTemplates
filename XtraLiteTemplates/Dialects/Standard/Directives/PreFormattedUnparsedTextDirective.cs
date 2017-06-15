@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,33 +24,24 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Expressions;
+    using Introspection;
+    using Parsing;
 
     /// <summary>
     /// The "keep formatting" directive implementation. This is a special directive that simply
     /// registers a given state object that can be later queried for.
     /// </summary>
-    public sealed class PreFormattedUnparsedTextDirective : StandardDirective    
+    public sealed class PreFormattedUnParsedTextDirective : StandardDirective    
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private object stateObject;
+        private readonly object _stateObject;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PreFormattedUnparsedTextDirective" /> class.
+        /// Initializes a new instance of the <see cref="PreFormattedUnParsedTextDirective" /> class.
         /// </summary>
         /// <param name="startTagMarkup">The start tag markup.</param>
         /// <param name="endTagMarkup">The end tag markup.</param>
@@ -58,23 +49,23 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="FormatException">Argument <paramref name="startTagMarkup" /> or <paramref name="endTagMarkup" /> cannot be parsed.</exception>
         /// <exception cref="ArgumentNullException">Argument <paramref name="stateObject" /> is <c>null</c>.</exception>
-        public PreFormattedUnparsedTextDirective(string startTagMarkup, string endTagMarkup, object stateObject, IPrimitiveTypeConverter typeConverter)
+        public PreFormattedUnParsedTextDirective(string startTagMarkup, string endTagMarkup, object stateObject, IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
-            Debug.Assert(this.Tags.Count == 2, "Expected a tag count of 2.");
+            Debug.Assert(Tags.Count == 2, "Expected a tag count of 2.");
 
             Expect.NotNull("stateObject", stateObject);
 
-            this.stateObject = stateObject;
+            _stateObject = stateObject;
         }
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="PreFormattedUnparsedTextDirective" /> class using the standard markup {PREFORMATTED}...{END}.
+        /// Initializes a new instance of the <see cref="PreFormattedUnParsedTextDirective" /> class using the standard markup {PREFORMATTED}...{END}.
         /// </summary>
         /// <param name="stateObject">The state object to register.</param>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="stateObject" /> is <c>null</c>.</exception>
-        public PreFormattedUnparsedTextDirective(object stateObject, IPrimitiveTypeConverter typeConverter)
+        public PreFormattedUnParsedTextDirective(object stateObject, IPrimitiveTypeConverter typeConverter)
             : this("PREFORMATTED", "END", stateObject, typeConverter)
         {
         }
@@ -102,20 +93,18 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1, "tagIndex must be between 0 and 1.");
             Debug.Assert(components != null, "components cannot be null.");
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount, "component length must match tag component length.");
             Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
             if (tagIndex == 0)
             {
-                context.AddStateObject(this.stateObject);
+                context.AddStateObject(_stateObject);
                 return FlowDecision.Evaluate;
             }
-            else
-            {
-                context.RemoveStateObject(this.stateObject);
-                return FlowDecision.Terminate;
-            }
+
+            context.RemoveStateObject(_stateObject);
+            return FlowDecision.Terminate;
         }
     }
 }

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -28,13 +28,12 @@
 
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System;
     using System.CodeDom;
     using System.CodeDom.Compiler;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
-    using XtraLiteTemplates.Expressions.Operators;
+
     using LinqExpression = System.Linq.Expressions.Expression;
 
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
@@ -43,41 +42,39 @@ namespace XtraLiteTemplates.Expressions.Nodes
         public LiteralNode(ExpressionNode parent, object literal)
             : base(parent)
         {
-            this.Literal = literal;
+            Literal = literal;
         }
 
-        public object Literal { get; private set; }
+        public object Literal { get; }
 
         public override string ToString(ExpressionFormatStyle style)
         {
-            if (this.Literal is string)
+            if (Literal is string)
             {
                 using (var writer = new StringWriter())
                 {
                     using (var provider = CodeDomProvider.CreateProvider("CSharp"))
                     {
-                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(this.Literal), writer, null);
+                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Literal), writer, null);
                         return writer.ToString();
                     }
                 }
             }
-            else
-            {
-                return this.Literal.ToString();
-            }
+
+            return Literal.ToString();
         }
 
         protected override bool TryReduce(IExpressionEvaluationContext reduceContext, out object value)
         {
             Debug.Assert(reduceContext != null, "reduceContext cannot be null.");
 
-            value = this.Literal;
+            value = Literal;
             return true;
         }
 
         protected override LinqExpression BuildLinqExpression()
         {
-            return LinqExpression.Constant(this.Literal, typeof(object));
+            return LinqExpression.Constant(Literal, typeof(object));
         }
     }
 }

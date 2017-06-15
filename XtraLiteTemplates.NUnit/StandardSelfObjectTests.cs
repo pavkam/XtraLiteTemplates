@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,12 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.Globalization;
-    using System.IO;
-    using System.Linq;
     using XtraLiteTemplates.Dialects.Standard;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
 
     [TestFixture]
     public class StandardSelfObjectTests : TestBase
@@ -62,8 +57,8 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(true, selfObject.Boolean((Int16)10));
             Assert.AreEqual(false, selfObject.Boolean(default(UInt16)));
             Assert.AreEqual(true, selfObject.Boolean((UInt16)10));
-            Assert.AreEqual(false, selfObject.Boolean(default(Int32)));
-            Assert.AreEqual(true, selfObject.Boolean((Int32)10));
+            Assert.AreEqual(false, selfObject.Boolean(default(int)));
+            Assert.AreEqual(true, selfObject.Boolean((int)10));
             Assert.AreEqual(false, selfObject.Boolean(default(UInt32)));
             Assert.AreEqual(true, selfObject.Boolean((UInt32)10));
             Assert.AreEqual(false, selfObject.Boolean(default(Int64)));
@@ -78,7 +73,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(true, selfObject.Boolean((Decimal)0.1));
             Assert.AreEqual(false, selfObject.Boolean(false));
             Assert.AreEqual(true, selfObject.Boolean(true));
-            Assert.AreEqual(false, selfObject.Boolean(String.Empty));
+            Assert.AreEqual(false, selfObject.Boolean(string.Empty));
             Assert.AreEqual(true, selfObject.Boolean("anything"));
             Assert.AreEqual(false, selfObject.Boolean(null));
             Assert.AreEqual(true, selfObject.Boolean(this));
@@ -93,7 +88,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("10", selfObject.String((SByte)10));
             Assert.AreEqual("10", selfObject.String((Int16)10));
             Assert.AreEqual("10", selfObject.String((UInt16)10));
-            Assert.AreEqual("10", selfObject.String((Int32)10));
+            Assert.AreEqual("10", selfObject.String((int)10));
             Assert.AreEqual("10", selfObject.String((UInt32)10));
             Assert.AreEqual("10", selfObject.String((Int64)10));
             Assert.AreEqual("10", selfObject.String((UInt64)10));
@@ -102,10 +97,10 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("10.33", selfObject.String((Decimal)10.33));
             Assert.AreEqual("False", selfObject.String(false));
             Assert.AreEqual("True", selfObject.String(true));
-            Assert.AreEqual(String.Empty, selfObject.String(String.Empty));
+            Assert.AreEqual(string.Empty, selfObject.String(string.Empty));
             Assert.AreEqual("anything", selfObject.String("anything"));
             Assert.AreEqual("!undefined!", selfObject.String(null));
-            Assert.AreEqual(this.ToString(), selfObject.String(this));
+            Assert.AreEqual(ToString(), selfObject.String(this));
         }
 
         [Test]
@@ -117,7 +112,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(-10, selfObject.Number((SByte)(-10)));
             Assert.AreEqual(-10, selfObject.Number((Int16)(-10)));
             Assert.AreEqual(10, selfObject.Number((UInt16)10));
-            Assert.AreEqual(-10, selfObject.Number((Int32)(-10)));
+            Assert.AreEqual(-10, selfObject.Number((int)(-10)));
             Assert.AreEqual(10, selfObject.Number((UInt32)10));
             Assert.AreEqual(-10, selfObject.Number((Int64)(-10)));
             Assert.AreEqual(10, selfObject.Number((UInt64)10));
@@ -126,11 +121,11 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual(10.33, selfObject.Number((Decimal)10.33));
             Assert.AreEqual(0, selfObject.Number(false));
             Assert.AreEqual(1, selfObject.Number(true));
-            Assert.AreEqual(0, selfObject.Number(String.Empty));
-            Assert.AreEqual(Double.NaN, selfObject.Number("anything"));
+            Assert.AreEqual(0, selfObject.Number(string.Empty));
+            Assert.AreEqual(double.NaN, selfObject.Number("anything"));
             Assert.AreEqual(-10.33, selfObject.Number("-10.33"));
-            Assert.AreEqual(Double.NaN, selfObject.Number(null));
-            Assert.AreEqual(Double.NaN, selfObject.Number(this));
+            Assert.AreEqual(double.NaN, selfObject.Number(null));
+            Assert.AreEqual(double.NaN, selfObject.Number(this));
         }
     }
 }

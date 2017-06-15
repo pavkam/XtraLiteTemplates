@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,10 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
+
+    using Expressions.Operators;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class RelationalLowerThanOperatorTests : OperatorTestsBase
@@ -43,7 +42,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new RelationalLowerThanOperator(null, StringComparer.Ordinal, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new RelationalLowerThanOperator(String.Empty, StringComparer.Ordinal, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new RelationalLowerThanOperator(string.Empty, StringComparer.Ordinal, TypeConverter));
             ExpectArgumentNullException("stringComparer", () => new RelationalLowerThanOperator("operator", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new RelationalLowerThanOperator("operator", StringComparer.Ordinal, null));
             ExpectArgumentNullException("typeConverter", () => new RelationalLowerThanOperator(null));
@@ -75,7 +74,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new RelationalLowerThanOperator(TypeConverter);
 
-            Object dummy;
+            object dummy;
             ExpectArgumentNullException("context", () => @operator.Evaluate(null, 1, 2));
             ExpectArgumentNullException("context", () => @operator.EvaluateLhs(null, 1, out dummy));
         }
@@ -85,10 +84,10 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new RelationalLowerThanOperator(StringComparer.Ordinal, TypeConverter);
 
-            AssertEvaluation<Int64, Boolean>(@operator, Int64.MaxValue, Int64.MaxValue, false);
-            AssertEvaluation<Int64, Boolean>(@operator, Int64.MinValue, 0, true);
-            AssertEvaluation<Double, Boolean>(@operator, -0.5, -0.5, false);
-            AssertEvaluation<Double, Boolean>(@operator, 3.33, 3.34, true);
+            AssertEvaluation(@operator, long.MaxValue, long.MaxValue, false);
+            AssertEvaluation(@operator, long.MinValue, 0, true);
+            AssertEvaluation(@operator, -0.5, -0.5, false);
+            AssertEvaluation(@operator, 3.33, 3.34, true);
         }
     }
 }

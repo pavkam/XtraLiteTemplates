@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,21 +30,21 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Inside
 {
     using System;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
+    using Expressions;
+    using Expressions.Operators;
 
     public sealed class RtlAssocTestOperator : BinaryOperator
     {
-        public RtlAssocTestOperator(String symbol)
+        public RtlAssocTestOperator(string symbol)
             : base(symbol, 5, Associativity.RightToLeft)
         {
         }
 
-        public override Object Evaluate(IExpressionEvaluationContext context, Object left, Object right)
+        public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
             Assert.NotNull(context);
 
-            return String.Format("{0},{1}", left, right);
+            return $"{left},{right}";
         }
     }
 }

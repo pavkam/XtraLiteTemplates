@@ -1,6 +1,6 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -23,16 +23,13 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Compilation
 {
     using System;
     using System.Diagnostics;
     using System.IO;
-    using System.Threading;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
+    using Evaluation;
+    using Expressions;
 
     /// <summary>
     /// Class that represents a compiled template. Instances of <see cref="CompiledTemplate{TContext}"/> created by a call to <see cref="Interpreter.Compile"/>.
@@ -40,19 +37,16 @@ namespace XtraLiteTemplates.Compilation
     /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
     public sealed class CompiledTemplate<TContext> where TContext : IExpressionEvaluationContext
     {
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private TemplateDocument document;
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledEvaluationDelegate<TContext> evaluationDelegate;
+        private readonly TemplateDocument _document;
+        private readonly CompiledEvaluationDelegate<TContext> _evaluationDelegate;
 
-        [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         internal CompiledTemplate(TemplateDocument document, CompiledEvaluationDelegate<TContext> evaluationDelegate)
         {
             Debug.Assert(document != null, "Argument document cannot be null.");
             Debug.Assert(evaluationDelegate != null, "Argument evaluationDelegate cannot be null.");
 
-            this.document = document;
-            this.evaluationDelegate = evaluationDelegate;
+            _document = document;
+            _evaluationDelegate = evaluationDelegate;
         }
 
         /// <summary>
@@ -66,18 +60,18 @@ namespace XtraLiteTemplates.Compilation
             Expect.NotNull("writer", writer);
             Expect.NotNull("context", context);
 
-            this.evaluationDelegate(writer, context);
+            _evaluationDelegate(writer, context);
         }
 
         /// <summary>
-        /// Returns a <see cref="System.String" /> that represents this instance.
+        /// Returns a <see cref="string" /> that represents this instance.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String" /> that represents the initial form of the template.
+        /// A <see cref="string" /> that represents the initial form of the template.
         /// </returns>
         public override string ToString()
         {
-            return this.document.ToString();
+            return _document.ToString();
         }
     }
 }

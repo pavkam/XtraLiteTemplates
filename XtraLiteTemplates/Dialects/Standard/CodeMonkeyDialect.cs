@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,24 +24,15 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
+using System.Collections.Generic;
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
     using System.Globalization;
-    using System.Linq;
-    using System.Reflection;
-    using System.Text;
-    using System.Threading.Tasks;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.Introspection;
+    using Directives;
+    using Evaluation;
+    using Introspection;
     
     /// <summary>
     /// A minimalistic, programmer-oriented standard dialect. Contains the full set of supported expression operators, directives and special constants.
@@ -81,7 +72,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture-invariant, case-insensitive instance of <see cref="CodeMonkeyDialect"/> class.
         /// </value>
-        public static new IDialect DefaultIgnoreCase { get; private set; }
+        public static new IDialect DefaultIgnoreCase { get; }
 
         /// <summary>
         /// Gets a culture-invariant, case-sensitive (upper cased) instance of <see cref="StandardDialect"/> class.
@@ -89,7 +80,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
         /// </value>
-        public static new IDialect Default { get; private set; }
+        public static new IDialect Default { get; }
 
         /// <summary>
         /// Specifies the string literal start character (used by the tokenization process).
@@ -97,13 +88,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal start character.
         /// </value>
-        public override char StartStringLiteralCharacter
-        {
-            get
-            {
-                return '\'';
-            }
-        }
+        public override char StartStringLiteralCharacter => '\'';
 
         /// <summary>
         /// Specifies the string literal end character (used by the tokenization process).
@@ -111,16 +96,10 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal end character.
         /// </value>
-        public override char EndStringLiteralCharacter
-        {
-            get
-            {
-                return '\'';
-            }
-        }
+        public override char EndStringLiteralCharacter => '\'';
 
         /// <summary>
-        /// Determines whether the specified <see cref="Object" /> is equal to the current <see cref="CodeMonkeyDialect" />.
+        /// Determines whether the specified <see cref="object" /> is equal to the current <see cref="CodeMonkeyDialect" />.
         /// </summary>
         /// <param name="obj">The object to compare with the current dialect class instance.</param>
         /// <returns>
@@ -150,7 +129,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported directives.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override Directive[] CreateDirectives(IPrimitiveTypeConverter typeConverter)
+        protected override IEnumerable<Directive> CreateDirectives(IPrimitiveTypeConverter typeConverter)
         {
             return new Directive[]
             {
@@ -162,7 +141,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new IfDirective(AdjustCasing("IF $"), AdjustCasing("END"), typeConverter),
                 new IfElseDirective(AdjustCasing("IF $"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
                 new InterpolationDirective(typeConverter),
-                new PreFormattedUnparsedTextDirective(AdjustCasing("PRE"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
+                new PreFormattedUnParsedTextDirective(AdjustCasing("PRE"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
             };
         }
     }

@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,31 +30,31 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using XtraLiteTemplates.Parsing;
+    using Parsing;
 
     [TestFixture]
     public class TokenTests : TestBase
     {
         [Test]
-        public void TestCaseContruction_1()
+        public void TestCaseContruction1()
         {
-            var token = new Token(Token.TokenType.Unparsed, "some_value", 100, 999);
+            var token = new Token(Token.TokenType.UnParsed, "some_value", 100, 999);
 
             Assert.AreEqual(100, token.CharacterIndex);
             Assert.AreEqual(999, token.OriginalLength);
-            Assert.AreEqual(Token.TokenType.Unparsed, token.Type);
+            Assert.AreEqual(Token.TokenType.UnParsed, token.Type);
             Assert.AreEqual("some_value", token.Value);
         }
 
         [Test]
-        public void TestCaseContruction_2()
+        public void TestCaseContruction2()
         {
             var token = new Token(Token.TokenType.String, null, 0, 1);
 
             Assert.AreEqual(0, token.CharacterIndex);
             Assert.AreEqual(1, token.OriginalLength);
             Assert.AreEqual(Token.TokenType.String, token.Type);
-            Assert.AreEqual(String.Empty, token.Value);
+            Assert.AreEqual(string.Empty, token.Value);
         }
 
         [Test]
@@ -64,7 +64,7 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new Token(Token.TokenType.Number, "100", 1, 0));
 
             ExpectArgumentNullException("value", () => new Token(Token.TokenType.Word, null, 0, 1));
-            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Word, String.Empty, 0, 1));
+            ExpectArgumentEmptyException("value", () => new Token(Token.TokenType.Word, string.Empty, 0, 1));
         }
     }
 }

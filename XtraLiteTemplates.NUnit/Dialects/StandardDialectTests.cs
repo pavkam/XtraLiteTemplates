@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,16 +30,11 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Dialects
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
     using System.Globalization;
+
     using XtraLiteTemplates.Dialects.Standard;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class StandardDialectTests : TestBase
@@ -68,7 +63,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.AreEqual(dialect.IdentifierComparer, expectedComparer);
             Assert.AreEqual(dialect.StringLiteralComparer, expectedComparer);
 
-            Func<String, String> transformer = input => input;
+            Func<string, string> transformer = input => input;
             if (casing == DialectCasing.LowerCase)
                 transformer = input => input.ToLower(culture);
             else if (casing == DialectCasing.UpperCase)
@@ -78,8 +73,8 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("True")) && dialect.SpecialKeywords[transformer("True")].Equals(true));
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("False")) && dialect.SpecialKeywords[transformer("False")].Equals(false));
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("Undefined")) && dialect.SpecialKeywords[transformer("Undefined")] == null);
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("NaN")) && dialect.SpecialKeywords[transformer("NaN")].Equals(Double.NaN));
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("Infinity")) && dialect.SpecialKeywords[transformer("Infinity")].Equals(Double.PositiveInfinity));
+            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("NaN")) && dialect.SpecialKeywords[transformer("NaN")].Equals(double.NaN));
+            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("Infinity")) && dialect.SpecialKeywords[transformer("Infinity")].Equals(double.PositiveInfinity));
 
             Assert.AreEqual(7, dialect.Directives.Count);
             foreach (var directive in dialect.Directives)
@@ -96,7 +91,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.AreEqual("{$}", directive.ToString());
                 else if (directive is RepeatDirective)
                     Assert.AreEqual(transformer("{REPEAT $ TIMES}...{END}"), directive.ToString());
-                else if (directive is PreFormattedUnparsedTextDirective)
+                else if (directive is PreFormattedUnParsedTextDirective)
                     Assert.AreEqual(transformer("{PREFORMATTED}...{END}"), directive.ToString());
                 else
                     Assert.Fail();
@@ -192,21 +187,21 @@ namespace XtraLiteTemplates.NUnit.Dialects
         public void TestCaseNewCurrentIgnoreCase()
         {
             var dialect = TestDialect(CultureInfo.CurrentCulture, DialectCasing.IgnoreCase);
-            Assert.AreEqual(String.Format("Standard ({0}, Ignore Case)", CultureInfo.CurrentCulture.Name), dialect.ToString());
+            Assert.AreEqual($"Standard ({CultureInfo.CurrentCulture.Name}, Ignore Case)", dialect.ToString());
         }
 
         [Test]
         public void TestCaseNewCurrentLowerCase()
         {
             var dialect = TestDialect(CultureInfo.CurrentCulture, DialectCasing.LowerCase);
-            Assert.AreEqual(String.Format("Standard ({0}, Lower Case)", CultureInfo.CurrentCulture.Name), dialect.ToString());
+            Assert.AreEqual($"Standard ({CultureInfo.CurrentCulture.Name}, Lower Case)", dialect.ToString());
         }
 
         [Test]
         public void TestCaseNewCurrentUpperCase()
         {
             var dialect = TestDialect(CultureInfo.CurrentCulture, DialectCasing.UpperCase);
-            Assert.AreEqual(String.Format("Standard ({0}, Upper Case)", CultureInfo.CurrentCulture.Name), dialect.ToString());
+            Assert.AreEqual($"Standard ({CultureInfo.CurrentCulture.Name}, Upper Case)", dialect.ToString());
         }
 
         [Test]
@@ -308,11 +303,11 @@ namespace XtraLiteTemplates.NUnit.Dialects
             var dialect = new StandardDialect();
             var context = CreateContext(StringComparer.OrdinalIgnoreCase);
 
-            ExpectArgumentNullException("context", () => dialect.DecorateUnparsedText(null, String.Empty));
+            ExpectArgumentNullException("context", () => dialect.DecorateUnParsedText(null, string.Empty));
 
-            Assert.AreEqual("", dialect.DecorateUnparsedText(context, null));
-            Assert.AreEqual("", dialect.DecorateUnparsedText(context, String.Empty));
-            Assert.AreEqual("", dialect.DecorateUnparsedText(context, "    \r\n"));
+            Assert.AreEqual(string.Empty, dialect.DecorateUnParsedText(context, null));
+            Assert.AreEqual(string.Empty, dialect.DecorateUnParsedText(context, string.Empty));
+            Assert.AreEqual(string.Empty, dialect.DecorateUnParsedText(context, "    \r\n"));
         }
 
         [Test]
@@ -320,17 +315,17 @@ namespace XtraLiteTemplates.NUnit.Dialects
         {
             var dialect = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.UpperCase);
 
-            var _undefined = XLTemplate.Evaluate(dialect, "{UNDEFINED}");
+            var undefined = XLTemplate.Evaluate(dialect, "{UNDEFINED}");
             var _true = XLTemplate.Evaluate(dialect, "{TRUE}");
             var _false = XLTemplate.Evaluate(dialect, "{FALSE}");
-            var _nan = XLTemplate.Evaluate(dialect, "{NAN}");
-            var _infinity = XLTemplate.Evaluate(dialect, "{INFINITY}");
+            var nan = XLTemplate.Evaluate(dialect, "{NAN}");
+            var infinity = XLTemplate.Evaluate(dialect, "{INFINITY}");
 
-            Assert.AreEqual("UNDEFINED", _undefined);
+            Assert.AreEqual("UNDEFINED", undefined);
             Assert.AreEqual("TRUE", _true);
             Assert.AreEqual("FALSE", _false);
-            Assert.AreEqual("NAN", _nan);
-            Assert.AreEqual("INFINITY", _infinity);
+            Assert.AreEqual("NAN", nan);
+            Assert.AreEqual("INFINITY", infinity);
         }
 
         [Test]
@@ -338,17 +333,17 @@ namespace XtraLiteTemplates.NUnit.Dialects
         {
             var dialect = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.LowerCase);
 
-            var _undefined = XLTemplate.Evaluate(dialect, "{undefined}");
+            var undefined = XLTemplate.Evaluate(dialect, "{undefined}");
             var _true = XLTemplate.Evaluate(dialect, "{true}");
             var _false = XLTemplate.Evaluate(dialect, "{false}");
-            var _nan = XLTemplate.Evaluate(dialect, "{nan}");
-            var _infinity = XLTemplate.Evaluate(dialect, "{infinity}");
+            var nan = XLTemplate.Evaluate(dialect, "{nan}");
+            var infinity = XLTemplate.Evaluate(dialect, "{infinity}");
 
-            Assert.AreEqual("undefined", _undefined);
+            Assert.AreEqual("undefined", undefined);
             Assert.AreEqual("true", _true);
             Assert.AreEqual("false", _false);
-            Assert.AreEqual("nan", _nan);
-            Assert.AreEqual("infinity", _infinity);
+            Assert.AreEqual("nan", nan);
+            Assert.AreEqual("infinity", infinity);
         }
 
         [Test]
@@ -356,17 +351,17 @@ namespace XtraLiteTemplates.NUnit.Dialects
         {
             var dialect = new StandardDialect(CultureInfo.InvariantCulture, DialectCasing.IgnoreCase);
 
-            var _undefined = XLTemplate.Evaluate(dialect, "{undeFIned}");
+            var undefined = XLTemplate.Evaluate(dialect, "{undeFIned}");
             var _true = XLTemplate.Evaluate(dialect, "{tRUe}");
             var _false = XLTemplate.Evaluate(dialect, "{faLSe}");
-            var _nan = XLTemplate.Evaluate(dialect, "{nAn}");
-            var _infinity = XLTemplate.Evaluate(dialect, "{infinitY}");
+            var nan = XLTemplate.Evaluate(dialect, "{nAn}");
+            var infinity = XLTemplate.Evaluate(dialect, "{infinitY}");
 
-            Assert.AreEqual("Undefined", _undefined);
+            Assert.AreEqual("Undefined", undefined);
             Assert.AreEqual("True", _true);
             Assert.AreEqual("False", _false);
-            Assert.AreEqual("NaN", _nan);
-            Assert.AreEqual("Infinity", _infinity);
+            Assert.AreEqual("NaN", nan);
+            Assert.AreEqual("Infinity", infinity);
         }
     }
 }

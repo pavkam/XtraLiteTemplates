@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,24 +24,15 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Evaluation
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.IO;
     using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Parsing;
+    using Parsing;
 
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal sealed class DirectiveNode : CompositeNode
     {
-        private Directive[] candidateOrSelectedDirectives;
-
         public DirectiveNode(TemplateNode parent, Directive[] candidateDirectives)
             : base(parent)
         {
@@ -49,16 +40,10 @@ namespace XtraLiteTemplates.Evaluation
             Debug.Assert(candidateDirectives != null, "candidateDirectives cannot be null.");
             Debug.Assert(candidateDirectives.Length > 0, "candidateDirectives cannot be empty");
 
-            this.candidateOrSelectedDirectives = candidateDirectives;
+            CandidateDirectives = candidateDirectives;
         }
 
-        public Directive[] CandidateDirectives
-        {
-            get
-            {
-                return this.candidateOrSelectedDirectives;
-            }
-        }
+        public Directive[] CandidateDirectives { get; private set; }
 
         public bool CandidateDirectiveLockedIn { get; private set; }
 
@@ -67,21 +52,21 @@ namespace XtraLiteTemplates.Evaluation
             Debug.Assert(presenceIndex >= 0, "presenceIndex cannot be less than zero.");
             Debug.Assert(tag != null, "tag cannot be null.");
             Debug.Assert(comparer != null, "comparer cannot be null.");
-            Debug.Assert(!this.CandidateDirectiveLockedIn, "Must not have locked in the candidate directive.");
+            Debug.Assert(!CandidateDirectiveLockedIn, "Must not have locked in the candidate directive.");
 
-            var options = this.candidateOrSelectedDirectives.Where(d => d.Tags.Count > presenceIndex && d.Tags[presenceIndex].Equals(tag, comparer)).ToArray();
+            var options = CandidateDirectives.Where(d => d.Tags.Count > presenceIndex && d.Tags[presenceIndex].Equals(tag, comparer)).ToArray();
             if (options.Length > 0)
             {
                 var firstFullySelected = options.FirstOrDefault(o => o.Tags.Count == presenceIndex + 1);
 
                 if (firstFullySelected != null)
                 {
-                    this.candidateOrSelectedDirectives = new Directive[] { firstFullySelected };
-                    this.CandidateDirectiveLockedIn = true;
+                    CandidateDirectives = new[] { firstFullySelected };
+                    CandidateDirectiveLockedIn = true;
                 }
                 else
                 {
-                    this.candidateOrSelectedDirectives = options;
+                    CandidateDirectives = options;
                 }
             }
 

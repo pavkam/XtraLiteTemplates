@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,32 +24,23 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Evaluation;
+    using Expressions;
+    using Introspection;
+    using Parsing;
 
     /// <summary>
     /// The conditional interpolation directive implementation.
     /// </summary>
     public sealed class ConditionalInterpolationDirective : StandardDirective
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int interpolatedExpressionComponentIndex;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int conditionalExpressionComponentIndex;
+        private readonly int _interpolatedExpressionComponentIndex;
+        private readonly int _conditionalExpressionComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ConditionalInterpolationDirective" /> class.
@@ -77,13 +68,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
             if (invertExpressionOrder)
             {
-                this.interpolatedExpressionComponentIndex = expressionComponents[1];
-                this.conditionalExpressionComponentIndex = expressionComponents[0];
+                _interpolatedExpressionComponentIndex = expressionComponents[1];
+                _conditionalExpressionComponentIndex = expressionComponents[0];
             }
             else
             {
-                this.interpolatedExpressionComponentIndex = expressionComponents[0];
-                this.conditionalExpressionComponentIndex = expressionComponents[1];
+                _interpolatedExpressionComponentIndex = expressionComponents[0];
+                _conditionalExpressionComponentIndex = expressionComponents[1];
             }
         }
 
@@ -118,17 +109,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             /* It is a simple directive. Expecting just one tag here. */
             Debug.Assert(tagIndex == 0, "Expected a single known tag.");
             Debug.Assert(components != null, "components cannot be null.");
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount, "component length must match tag component length.");
             Debug.Assert(context != null, "context cannot be null.");
 
-            if (this.TypeConverter.ConvertToBoolean(components[this.conditionalExpressionComponentIndex]))
-            {
-                text = this.TypeConverter.ConvertToString(components[this.interpolatedExpressionComponentIndex]);
-            }
-            else
-            {
-                text = null;
-            }
+            text = TypeConverter.ConvertToBoolean(components[_conditionalExpressionComponentIndex]) ? TypeConverter.ConvertToString(components[_interpolatedExpressionComponentIndex]) : null;
 
             return FlowDecision.Terminate;
         }

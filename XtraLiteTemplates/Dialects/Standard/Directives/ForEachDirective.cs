@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,32 +24,24 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using System.Text;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Introspection;
-    using XtraLiteTemplates.Parsing;
+    using Expressions;
+    using Introspection;
+    using Parsing;
 
     /// <summary>
     /// The FOR EACH directive implementation.
     /// </summary>
     public sealed class ForEachDirective : StandardDirective
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int expressionComponentIndex;
-
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private int identifierComponentIndex;
+        private readonly int _expressionComponentIndex;
+        private readonly int _identifierComponentIndex;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ForEachDirective"/> class.
@@ -78,8 +70,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Expect.IsTrue("one expression component", expressionComponents.Length == 1);
             Expect.IsTrue("one identifier component", identifierComponents.Length == 1);
 
-            this.expressionComponentIndex = expressionComponents[0];
-            this.identifierComponentIndex = identifierComponents[0];
+            _expressionComponentIndex = expressionComponents[0];
+            _identifierComponentIndex = identifierComponents[0];
         }
 
         /// <summary>
@@ -115,7 +107,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1, "tagIndex must be between 0 and 1.");
             Debug.Assert(components != null, "components cannot be null.");
-            Debug.Assert(components.Length == this.Tags[tagIndex].ComponentCount, "component length musst match tag component length.");
+            Debug.Assert(components.Length == Tags[tagIndex].ComponentCount, "component length must match tag component length.");
             Debug.Assert(context != null, "context cannot be null.");
 
             text = null;
@@ -126,7 +118,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 /* Starting up. */
                 Debug.Assert(tagIndex == 0, "tagIndex expected to be 0.");
 
-                var sequence = this.TypeConverter.ConvertToSequence(components[this.expressionComponentIndex]);
+                var sequence = TypeConverter.ConvertToSequence(components[_expressionComponentIndex]);
                 if (sequence == null)
                 {
                     return FlowDecision.Terminate;
@@ -149,13 +141,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             {
                 return FlowDecision.Terminate;
             }
-            else
-            {
-                var propertyName = components[this.identifierComponentIndex] as string;
-                Debug.Assert(propertyName != null, "variable name expected to be set.");
-                context.SetProperty(propertyName, enumerator.Current);
-                return FlowDecision.Evaluate;
-            }
+
+            var propertyName = components[_identifierComponentIndex] as string;
+            Debug.Assert(propertyName != null, "variable name expected to be set.");
+            context.SetProperty(propertyName, enumerator.Current);
+            return FlowDecision.Evaluate;
         }
     }
 }

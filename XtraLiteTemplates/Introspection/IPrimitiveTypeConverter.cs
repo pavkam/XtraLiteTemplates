@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,9 +30,6 @@ namespace XtraLiteTemplates.Introspection
 {
     using System;
     using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
     /// <summary>
     /// Common interface used by the standard dialects to facilitate type-conversion. Standard operators and directives
@@ -58,7 +55,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The object to convert.</param>
         /// <returns>
-        /// A <see cref="Int32" /> value.
+        /// A <see cref="int" /> value.
         /// </returns>
         int ConvertToInteger(object obj);
 
@@ -82,7 +79,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The object to convert.</param>
         /// <returns>
-        /// A <see cref="String" /> value.
+        /// A <see cref="string" /> value.
         /// </returns>
         string ConvertToString(object obj);
 
@@ -94,7 +91,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The object to convert.</param>
         /// <returns>
-        /// A <see cref="Boolean" /> value.
+        /// A <see cref="bool" /> value.
         /// </returns>
         bool ConvertToBoolean(object obj);
 

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,18 +24,14 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Parsing
 {
     using System;
     using System.Diagnostics;
-    using XtraLiteTemplates.Expressions;
 
     /// <summary>
     /// The generic exception for all identified parsing errors. Instances of this class can only be created internally.
     /// </summary>
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("Microsoft.Usage", "CA2237:MarkISerializableTypesWithSerializable", Justification = "Will never be serialized.")]
     public class ParseException : FormatException
     {
         /// <summary>
@@ -49,12 +45,12 @@ namespace XtraLiteTemplates.Parsing
             : base(string.Format(format, args), innerException)
         {
             Debug.Assert(characterIndex >= 0, "characterIndex cannot be less than zero.");
-            this.CharacterIndex = characterIndex;
+            CharacterIndex = characterIndex;
         }
 
         /// <summary>
         /// <value>Gets the index of the character where the parsing error occurred.</value>
         /// </summary>
-        public int CharacterIndex { get; private set; }
+        public int CharacterIndex { get; }
     }
 }

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -29,9 +29,6 @@
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System;
-    using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
-    using XtraLiteTemplates.Expressions.Operators;
 
     /// <summary>
     /// Defines a set of permitted continuations that each expression node can expose to the expression builder.

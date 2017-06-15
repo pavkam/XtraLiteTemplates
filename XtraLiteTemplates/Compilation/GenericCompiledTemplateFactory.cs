@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,40 +24,32 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Compilation
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
-    using System.IO;
     using System.Linq;
-    using System.Text;
-    using System.Threading;
-    using System.Threading.Tasks;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
+    using Evaluation;
+    using Expressions;
 
     /// <summary>
     /// Class that encapsulates <c>compilation</c> logic. The sole purpose of <see cref="CompiledTemplateFactory{TContext}"/> is to
     /// transform the internal <c>lexed</c> representation of a template to its compiled form (form that can be evaluated).
     /// </summary>
     /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
+    [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
     public abstract class CompiledTemplateFactory<TContext> 
         where TContext : IExpressionEvaluationContext
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting private entities.")]
         private static readonly CompiledEvaluationDelegate<TContext> EmptyCompiledEvaluationDelegate = (writer, context) => { };
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         internal CompiledEvaluationDelegate<TContext> CompileTemplate(TemplateDocument document)
         {
             Debug.Assert(document != null, "Argument document cannot be null.");
 
             /* Construct the combined node for all the children. */
-            return this.CompileTemplateNodes(document.Children);
+            return CompileTemplateNodes(document.Children);
         }
 
         /// <summary>
@@ -100,11 +92,11 @@ namespace XtraLiteTemplates.Compilation
             object[][] components);
 
         /// <summary>
-        /// Constructs an unparsed text evaluation delegate.
+        /// Constructs an un-parsed text evaluation delegate.
         /// </summary>
-        /// <param name="unparsedText">The unparsed text.</param>
+        /// <param name="unParsedText">The un-parsed text.</param>
         /// <returns>A new delegate that handles the given text.</returns>
-        protected abstract CompiledEvaluationDelegate<TContext> BuildUnparsedTextEvaluationDelegate(string unparsedText);
+        protected abstract CompiledEvaluationDelegate<TContext> BuildUnParsedTextEvaluationDelegate(string unParsedText);
 
         /// <summary>
         /// Combines a sequence of <see cref="CompiledEvaluationDelegate{TContext}"/> delegates into a single evaluation delegate.
@@ -142,12 +134,12 @@ namespace XtraLiteTemplates.Compilation
                     };
                     break;
                 default:
-                    var arrayOfEvalutionProcs = delegates.ToArray();
+                    var arrayOfEvaluationMethods = delegates.ToArray();
                     resultingDelegate = (writer, context) =>
                     {
-                        foreach (var proc in arrayOfEvalutionProcs)
+                        foreach (var method in arrayOfEvaluationMethods)
                         {
-                            proc(writer, context);
+                            method(writer, context);
                         }
                     };
                     break;
@@ -183,15 +175,13 @@ namespace XtraLiteTemplates.Compilation
             return finalDelegate;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledEvaluationDelegate<TContext> CompileUnparsedNode(UnparsedNode unparsedNode)
+        private CompiledEvaluationDelegate<TContext> CompileUnParsedNode(UnParsedNode unParsedNode)
         {
-            Debug.Assert(unparsedNode != null, "Argument unparsedNode cannot be null.");
+            Debug.Assert(unParsedNode != null, "Argument unParsedNode cannot be null.");
 
-            return this.BuildUnparsedTextEvaluationDelegate(unparsedNode.UnparsedText);
+            return BuildUnParsedTextEvaluationDelegate(unParsedNode.UnParsedText);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private CompiledEvaluationDelegate<TContext> CompileDirectiveNode(DirectiveNode directiveNode)
         {
             Debug.Assert(directiveNode != null, "Argument directiveNode cannot be null.");
@@ -199,7 +189,7 @@ namespace XtraLiteTemplates.Compilation
 
             var directive = directiveNode.CandidateDirectives[0];
 
-            /* Build inter-tag evaluables. */
+            /* Build inter-tag evaluable parts. */
             var innerDelegates = new List<CompiledEvaluationDelegate<TContext>>();
             var innerTagNodes = new List<TemplateNode>();
             for (var index = 0; index < directiveNode.Children.Count; index++)
@@ -208,7 +198,7 @@ namespace XtraLiteTemplates.Compilation
                 {
                     if (innerTagNodes.Count > 0)
                     {
-                        innerDelegates.Add(this.CompileTemplateNodes(innerTagNodes));
+                        innerDelegates.Add(CompileTemplateNodes(innerTagNodes));
                         innerTagNodes.Clear();
                     }
                     else if (index > 0)
@@ -224,33 +214,29 @@ namespace XtraLiteTemplates.Compilation
 
             Debug.Assert(innerTagNodes.Count == 0, "No post-tag node can exist in directive node.");
 
-            if (directive.Tags.Count == 1)
+            switch (directive.Tags.Count)
             {
-                var tagNode = directiveNode.Children[0] as TagNode;
-                Debug.Assert(tagNode != null, "The single directive node expected to be a tag node.");
+                case 1:
+                    var tagNode = directiveNode.Children[0] as TagNode;
+                    Debug.Assert(tagNode != null, "The single directive node expected to be a tag node.");
 
-                return this.BuildSingleTagDirectiveEvaluationDelegate(directive, tagNode.Components);
+                    return BuildSingleTagDirectiveEvaluationDelegate(directive, tagNode.Components);
+                case 2:
+                    var beginTagNode = directiveNode.Children[0] as TagNode;
+                    var endTagNode = directiveNode.Children[directiveNode.Children.Count - 1] as TagNode;
+
+                    Debug.Assert(beginTagNode != null, "The first directive node expected to be a tag node.");
+                    Debug.Assert(endTagNode != null, "The last directive node expected to be a tag node.");
+
+                    return BuildDoubleTagDirectiveEvaluationDelegate(directive, innerDelegates[0], beginTagNode.Components, endTagNode.Components);
             }
-            else if (directive.Tags.Count == 2)
-            {
-                var beginTagNode = directiveNode.Children[0] as TagNode;
-                var endTagNode = directiveNode.Children[directiveNode.Children.Count - 1] as TagNode;
 
-                Debug.Assert(beginTagNode != null, "The first directive node expected to be a tag node.");
-                Debug.Assert(endTagNode != null, "The last directive node expected to be a tag node.");
+            var componentArray = directiveNode.Children.Where(p => p is TagNode).Select(s => ((TagNode)s).Components).ToArray();
 
-                return this.BuildDoubleTagDirectiveEvaluationDelegate(directive, innerDelegates[0], beginTagNode.Components, endTagNode.Components);
-            }
-            else
-            {
-                var componentArray = directiveNode.Children.Where(p => p is TagNode).Select(s => ((TagNode)s).Components).ToArray();
-
-                return this.BuildMultipleTagDirectiveEvaluationDelegate(directive, innerDelegates.ToArray(), componentArray);
-            }
+            return BuildMultipleTagDirectiveEvaluationDelegate(directive, innerDelegates.ToArray(), componentArray);
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private CompiledEvaluationDelegate<TContext> CompileTemplateNodes(IReadOnlyList<TemplateNode> nodes)
+        private CompiledEvaluationDelegate<TContext> CompileTemplateNodes(IReadOnlyCollection<TemplateNode> nodes)
         {
             Debug.Assert(nodes != null, "Argument nodes cannot be null.");
 
@@ -266,21 +252,21 @@ namespace XtraLiteTemplates.Compilation
                 var directiveNode = node as DirectiveNode;
                 if (directiveNode != null)
                 {
-                    delegates.Add(this.CompileDirectiveNode(directiveNode));
+                    delegates.Add(CompileDirectiveNode(directiveNode));
                 }
                 else
                 {
-                    var unparsedNode = node as UnparsedNode;
+                    var unParsedNode = node as UnParsedNode;
 
-                    Debug.Assert(unparsedNode != null, "Node can only be unparsed at this stage.");
-                    delegates.Add(this.CompileUnparsedNode(unparsedNode));
+                    Debug.Assert(unParsedNode != null, "Node can only be un-parsed at this stage.");
+                    delegates.Add(CompileUnParsedNode(unParsedNode));
                 }
             }
 
             Debug.Assert(delegates.Count > 0, "The list of compiled delegates must contain at least one item.");
 
             /* Merge */
-            return this.BuildMergedEvaluationDelegate(delegates.ToArray());
+            return BuildMergedEvaluationDelegate(delegates.ToArray());
         }
     }
 }

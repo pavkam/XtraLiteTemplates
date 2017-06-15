@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,15 +24,9 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Expressions
 {
     using System;
-    using System.Collections.Generic;
-    using System.Diagnostics;
-    using XtraLiteTemplates.Expressions.Nodes;
-    using XtraLiteTemplates.Expressions.Operators;
 
     /// <summary>
     /// Supplies a set of standard flow symbols used during the expression construction phase.
@@ -74,10 +68,10 @@ namespace XtraLiteTemplates.Expressions
             Expect.NotEqual("memberAccessSymbol", "groupCloseSymbol", memberAccessSymbol, groupCloseSymbol);
             Expect.NotEqual("groupOpenSymbol", "groupCloseSymbol", groupOpenSymbol, groupCloseSymbol);
 
-            this.Separator = separatorSymbol;
-            this.MemberAccess = memberAccessSymbol;
-            this.GroupOpen = groupOpenSymbol;
-            this.GroupClose = groupCloseSymbol;
+            Separator = separatorSymbol;
+            MemberAccess = memberAccessSymbol;
+            GroupOpen = groupOpenSymbol;
+            GroupClose = groupCloseSymbol;
         }
 
         /// <summary>
@@ -86,7 +80,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The default set of symbols.
         /// </value>
-        public static ExpressionFlowSymbols Default { get; private set; }
+        public static ExpressionFlowSymbols Default { get; }
 
         /// <summary>
         /// Gets the group separator symbol.
@@ -94,7 +88,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The group separator symbol.
         /// </value>
-        public string Separator { get; private set; }
+        public string Separator { get; }
 
         /// <summary>
         /// Gets the member access symbol.
@@ -102,7 +96,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The member access symbol.
         /// </value>
-        public string MemberAccess { get; private set; }
+        public string MemberAccess { get; }
 
         /// <summary>
         /// Gets the group open symbol.
@@ -110,7 +104,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The group open symbol.
         /// </value>
-        public string GroupOpen { get; private set; }
+        public string GroupOpen { get; }
 
         /// <summary>
         /// Gets the group close symbol.
@@ -118,6 +112,6 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The group close symbol.
         /// </value>
-        public string GroupClose { get; private set; }
+        public string GroupClose { get; }
     }
 }

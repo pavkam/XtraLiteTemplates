@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -29,25 +29,21 @@
 namespace XtraLiteTemplates.Introspection
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
-    using System.Threading.Tasks;
 
     /// <summary>
-    /// Defines a method that allows obtaining the string representation of an un-typed <see cref="Object"/>.
+    /// Defines a method that allows obtaining the string representation of an un-typed <see cref="object"/>.
     /// </summary>
     public interface IObjectFormatter
     {
         /// <summary>
-        /// Gets the string representation of an <see cref="Object"/>.
+        /// Gets the string representation of an <see cref="object"/>.
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <returns>The string representation.</returns>
         string ToString(object obj);
 
         /// <summary>
-        /// Gets the string representation of an <see cref="Object" /> using the given <paramref name="formatProvider"/>.
+        /// Gets the string representation of an <see cref="object" /> using the given <paramref name="formatProvider"/>.
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <param name="formatProvider">The format provider.</param>

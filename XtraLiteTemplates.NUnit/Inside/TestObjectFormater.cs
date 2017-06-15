@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -31,27 +31,26 @@ namespace XtraLiteTemplates.NUnit.Inside
     using System;
     using System.Diagnostics;
     using System.Globalization;
-    using XtraLiteTemplates.Dialects.Standard;
-    using XtraLiteTemplates.Introspection;
+    using Introspection;
 
     public sealed class TestObjectFormatter : IObjectFormatter
     {
-        private CultureInfo m_culture;
+        private readonly CultureInfo _mCulture;
 
         public TestObjectFormatter(CultureInfo culture)
         {
             Debug.Assert(culture != null);
-            m_culture = culture;
+            _mCulture = culture;
         }
 
-        public String ToString(Object obj, IFormatProvider formatProvider)
+        public string ToString(object obj, IFormatProvider formatProvider)
         {
-            String result;
+            string result;
 
             if (obj == null)
                 return "!undefined!";
-            else if (obj is String)
-                result = (String)obj;
+            if (obj is string)
+                result = (string)obj;
             else if (obj is IFormattable)
                 result = (obj as IFormattable).ToString(null, formatProvider);
             else
@@ -60,9 +59,9 @@ namespace XtraLiteTemplates.NUnit.Inside
             return result;
         }
 
-        public String ToString(Object obj)
+        public string ToString(object obj)
         {
-            return ((IObjectFormatter)this).ToString(obj, m_culture);
+            return ((IObjectFormatter)this).ToString(obj, _mCulture);
         }
     }
 }

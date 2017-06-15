@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,7 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using XtraLiteTemplates.Parsing;
+    using Parsing;
 
     [TestFixture]
     public class LexTests : TestBase
@@ -38,28 +38,28 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseUnparsedLexContruction1()
         {
-            var lex = new UnparsedLex("some_value", 100, 999);
+            var lex = new UnParsedLex("some_value", 100, 999);
 
             Assert.AreEqual(100, lex.FirstCharacterIndex);
             Assert.AreEqual(999, lex.OriginalLength);
-            Assert.AreEqual("some_value", lex.UnparsedText);
+            Assert.AreEqual("some_value", lex.UnParsedText);
         }
 
         [Test]
         public void TestCaseUnparsedLexContruction2()
         {
-            ExpectArgumentLessThanException("firstCharacterIndex", 0, () => new UnparsedLex("100", -1, 1));
-            ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new UnparsedLex("100", 1, 0));
+            ExpectArgumentLessThanException("firstCharacterIndex", 0, () => new UnParsedLex("100", -1, 1));
+            ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new UnParsedLex("100", 1, 0));
 
-            ExpectArgumentNullException("unparsedText", () => new UnparsedLex(null, 0, 1));
-            ExpectArgumentEmptyException("unparsedText", () => new UnparsedLex(String.Empty, 0, 1));
+            ExpectArgumentNullException("unParsedText", () => new UnParsedLex(null, 0, 1));
+            ExpectArgumentEmptyException("unParsedText", () => new UnParsedLex(string.Empty, 0, 1));
         }
 
         [Test]
         public void TestCaseTagLexContruction1()
         {
             var tag = new Tag().Keyword("Hello").Expression();
-            var components = new Object[] { "Hello", "Some" };
+            var components = new object[] { "Hello", "Some" };
 
             var lex = new TagLex(tag, components, 100, 999);
 
@@ -73,14 +73,14 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseTagLexContruction2()
         {
             var tag = new Tag().Keyword("Hello").Expression();
-            var components = new Object[] { "Hello", "Some" };
+            var components = new object[] { "Hello", "Some" };
 
             ExpectArgumentLessThanException("firstCharacterIndex", 0, () => new TagLex(tag, components, -1, 1));
             ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new TagLex(tag, components, 1, 0));
 
             ExpectArgumentNullException("tag", () => new TagLex(null, components, 0, 1));
             ExpectArgumentNullException("components", () => new TagLex(tag, null, 0, 1));
-            ExpectArgumentEmptyException("components", () => new TagLex(tag, new Object[0], 0, 1));
+            ExpectArgumentEmptyException("components", () => new TagLex(tag, new object[0], 0, 1));
         }
     }
 }

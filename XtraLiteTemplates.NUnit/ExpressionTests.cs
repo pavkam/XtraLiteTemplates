@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,16 +30,20 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-    using System.Linq;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
-    using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Expressions.Operators;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
+    using System.Linq;
     using System.Threading;
+
+    using Evaluation;
+
+    using Expressions;
+    using Expressions.Operators;
+
+    using Inside;
+
+    using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
     public class ExpressionTests : TestBase
@@ -85,24 +89,24 @@ namespace XtraLiteTemplates.NUnit
             return expression;
         }
 
-        private Expression CreateTestExpression(String exprString)
+        private Expression CreateTestExpression(string exprString)
         {
-            Debug.Assert(!String.IsNullOrEmpty(exprString));
+            Debug.Assert(!string.IsNullOrEmpty(exprString));
             var split = exprString.Split(' ');
 
-            Expression result = CreateBloatedExpression();
+            var result = CreateBloatedExpression();
             foreach (var term in split)
             {
-                Int64 _integer;
-                Double _float;
-                Boolean _boolean;
+                long integer;
+                double _float;
+                bool boolean;
 
-                if (Int64.TryParse(term, out _integer))
-                    result.FeedLiteral(_integer);
-                else if (Double.TryParse(term, NumberStyles.Float, CultureInfo.InvariantCulture, out _float))
+                if (long.TryParse(term, out integer))
+                    result.FeedLiteral(integer);
+                else if (double.TryParse(term, NumberStyles.Float, CultureInfo.InvariantCulture, out _float))
                     result.FeedLiteral(_float);
-                else if (Boolean.TryParse(term, out _boolean))
-                    result.FeedLiteral(_boolean);
+                else if (bool.TryParse(term, out boolean))
+                    result.FeedLiteral(boolean);
                 else if (term.StartsWith("'", StringComparison.Ordinal) && term.EndsWith("'", StringComparison.Ordinal))
                     result.FeedLiteral(term.Substring(1, term.Length - 2));
                 else
@@ -115,7 +119,7 @@ namespace XtraLiteTemplates.NUnit
 
         private IExpressionEvaluationContext CreateStandardTestEvaluationContext(Expression e)
         {
-            var variables = new Dictionary<String, Object>()
+            var variables = new Dictionary<string, object>()
             {
                 { "a", -2 },
                 { "b", -1 },
@@ -134,20 +138,20 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseContruction_1()
+        public void TestCaseContruction1()
         {
             ExpectArgumentNullException("comparer", () => new Expression(ExpressionFlowSymbols.Default, null));
             ExpectArgumentNullException("flowSymbols", () => new Expression(null, StringComparer.InvariantCulture));
 
-            var expression_default = new Expression();
-            Assert.AreEqual(StringComparer.OrdinalIgnoreCase, expression_default.Comparer);
+            var expressionDefault = new Expression();
+            Assert.AreEqual(StringComparer.OrdinalIgnoreCase, expressionDefault.Comparer);
 
-            var expression_withCulture = new Expression(ExpressionFlowSymbols.Default, StringComparer.CurrentCulture);
-            Assert.AreEqual(StringComparer.CurrentCulture, expression_withCulture.Comparer);
-            Assert.AreEqual(ExpressionFlowSymbols.Default, expression_withCulture.FlowSymbols);
+            var expressionWithCulture = new Expression(ExpressionFlowSymbols.Default, StringComparer.CurrentCulture);
+            Assert.AreEqual(StringComparer.CurrentCulture, expressionWithCulture.Comparer);
+            Assert.AreEqual(ExpressionFlowSymbols.Default, expressionWithCulture.FlowSymbols);
 
-            Assert.AreEqual(0, expression_default.SupportedOperators.Count);
-            Assert.AreEqual(0, expression_withCulture.SupportedOperators.Count);
+            Assert.AreEqual(0, expressionDefault.SupportedOperators.Count);
+            Assert.AreEqual(0, expressionWithCulture.SupportedOperators.Count);
         }
 
         [Test]
@@ -171,47 +175,47 @@ namespace XtraLiteTemplates.NUnit
             Assert.IsTrue(expression.IsSupportedOperator(sum.Symbol));
 
             ExpectArgumentNullException("symbol", () => expression.IsSupportedOperator(null));
-            ExpectArgumentEmptyException("symbol", () => expression.IsSupportedOperator(String.Empty));
+            ExpectArgumentEmptyException("symbol", () => expression.IsSupportedOperator(string.Empty));
         }
 
         [Test]
-        public void TestCaseOperatorRegistration_1()
+        public void TestCaseOperatorRegistration1()
         {
             var expression = new Expression();
 
-            var unaryOp_plus = new ArithmeticNeutralOperator("+", TypeConverter);
-            var binaryOp_plus = new ArithmeticSumOperator("+", TypeConverter);
+            var unaryOpPlus = new ArithmeticNeutralOperator("+", TypeConverter);
+            var binaryOpPlus = new ArithmeticSumOperator("+", TypeConverter);
 
-            expression.RegisterOperator(unaryOp_plus);
-            ExpectOperatorAlreadyRegisteredException(unaryOp_plus.ToString(), () => expression.RegisterOperator(unaryOp_plus));
-            expression.RegisterOperator(binaryOp_plus);
-            ExpectOperatorAlreadyRegisteredException(binaryOp_plus.ToString(), () => expression.RegisterOperator(binaryOp_plus));
+            expression.RegisterOperator(unaryOpPlus);
+            ExpectOperatorAlreadyRegisteredException(unaryOpPlus.ToString(), () => expression.RegisterOperator(unaryOpPlus));
+            expression.RegisterOperator(binaryOpPlus);
+            ExpectOperatorAlreadyRegisteredException(binaryOpPlus.ToString(), () => expression.RegisterOperator(binaryOpPlus));
         }
 
         [Test]
-        public void TestCaseOperatorRegistration_2()
+        public void TestCaseOperatorRegistration2()
         {
             var expression = new Expression();
 
-            var unary_1 = new ArithmeticNeutralOperator("(", TypeConverter);
-            var unary_2 = new ArithmeticNeutralOperator(")", TypeConverter);
-            var unary_3 = new ArithmeticNeutralOperator(".", TypeConverter);
-            var unary_4 = new ArithmeticNeutralOperator(",", TypeConverter);
+            var unary1 = new ArithmeticNeutralOperator("(", TypeConverter);
+            var unary2 = new ArithmeticNeutralOperator(")", TypeConverter);
+            var unary3 = new ArithmeticNeutralOperator(".", TypeConverter);
+            var unary4 = new ArithmeticNeutralOperator(",", TypeConverter);
 
-            var binary_1 = new ArithmeticSumOperator("(", TypeConverter);
-            var binary_2 = new ArithmeticSumOperator(")", TypeConverter);
-            var binary_3 = new ArithmeticSumOperator(".", TypeConverter);
-            var binary_4 = new ArithmeticSumOperator(",", TypeConverter);
+            var binary1 = new ArithmeticSumOperator("(", TypeConverter);
+            var binary2 = new ArithmeticSumOperator(")", TypeConverter);
+            var binary3 = new ArithmeticSumOperator(".", TypeConverter);
+            var binary4 = new ArithmeticSumOperator(",", TypeConverter);
 
-            ExpectOperatorAlreadyRegisteredException(unary_1.ToString(), () => expression.RegisterOperator(unary_1));
-            ExpectOperatorAlreadyRegisteredException(unary_2.ToString(), () => expression.RegisterOperator(unary_2));
-            ExpectOperatorAlreadyRegisteredException(unary_3.ToString(), () => expression.RegisterOperator(unary_3));
-            ExpectOperatorAlreadyRegisteredException(unary_4.ToString(), () => expression.RegisterOperator(unary_4));
+            ExpectOperatorAlreadyRegisteredException(unary1.ToString(), () => expression.RegisterOperator(unary1));
+            ExpectOperatorAlreadyRegisteredException(unary2.ToString(), () => expression.RegisterOperator(unary2));
+            ExpectOperatorAlreadyRegisteredException(unary3.ToString(), () => expression.RegisterOperator(unary3));
+            ExpectOperatorAlreadyRegisteredException(unary4.ToString(), () => expression.RegisterOperator(unary4));
 
-            ExpectOperatorAlreadyRegisteredException(binary_1.ToString(), () => expression.RegisterOperator(binary_1));
-            ExpectOperatorAlreadyRegisteredException(binary_2.ToString(), () => expression.RegisterOperator(binary_2));
-            ExpectOperatorAlreadyRegisteredException(binary_3.ToString(), () => expression.RegisterOperator(binary_3));
-            ExpectOperatorAlreadyRegisteredException(binary_4.ToString(), () => expression.RegisterOperator(binary_4));
+            ExpectOperatorAlreadyRegisteredException(binary1.ToString(), () => expression.RegisterOperator(binary1));
+            ExpectOperatorAlreadyRegisteredException(binary2.ToString(), () => expression.RegisterOperator(binary2));
+            ExpectOperatorAlreadyRegisteredException(binary3.ToString(), () => expression.RegisterOperator(binary3));
+            ExpectOperatorAlreadyRegisteredException(binary4.ToString(), () => expression.RegisterOperator(binary4));
         }
 
         [Test]
@@ -246,7 +250,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseEvaluation_1()
+        public void TestCaseEvaluation1()
         {
             var expression = CreateTestExpression("+ ( - ( ( a - + b ) / - - ( c + 1 ) ) >> 8 ) * ( d / ( ! e + 1 ) )");
             Assert.AreEqual("+( -( ( @a - +@b ) / --( @c + 1 ) ) >> 8 ) * ( @d / ( !@e + 1 ) )", expression.ToString());
@@ -256,7 +260,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseEvaluation_2()
+        public void TestCaseEvaluation2()
         {
             var expression = CreateTestExpression("1 + 2 * 3 + 4 / 5 - 6 + 7 + 8 / a + 9 % 10");
             Assert.AreEqual("1 + 2 * 3 + 4 / 5 - 6 + 7 + 8 / @a + 9 % 10", expression.ToString());
@@ -266,7 +270,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseEvaluation_3a()
+        public void TestCaseEvaluation_3A()
         {
             var expression = CreateTestExpression("false && a > 0");
             Assert.AreEqual("False && @a > 0", expression.ToString());
@@ -276,7 +280,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseEvaluation_3b()
+        public void TestCaseEvaluation_3B()
         {
             var expression = CreateTestExpression("a > -100 && true");
             Assert.AreEqual("@a > -100 && True", expression.ToString());
@@ -286,7 +290,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseEvaluation_4()
+        public void TestCaseEvaluation4()
         {
             var expression = CreateTestExpression("0 * ( 1 + ( 2 + c ) )");
             Assert.AreEqual("0 * ( 1 + ( 2 + @c ) )", expression.ToString());
@@ -372,52 +376,52 @@ namespace XtraLiteTemplates.NUnit
         public void TestCaseEvaluationFull()
         {
             var expression = CreateTestExpression("true / 100.0 * string >> false >= -10 | something_else");
-            var result_wg = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
+            var resultWg = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
 
-            Assert.AreEqual("1", result_wg.ToString());
+            Assert.AreEqual("1", resultWg.ToString());
         }
 
         [Test]
         public void TestCaseCaseSensitivity()
         {
-            var expression_ins = new Expression(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase);
-            var expression_sens = new Expression(ExpressionFlowSymbols.Default, StringComparer.Ordinal);
+            var expressionIns = new Expression(ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase);
+            var expressionSens = new Expression(ExpressionFlowSymbols.Default, StringComparer.Ordinal);
 
             var testOperator = new ArithmeticNeutralOperator("lower_case_operator", TypeConverter);
 
-            expression_ins.RegisterOperator(testOperator);
-            expression_sens.RegisterOperator(testOperator);
+            expressionIns.RegisterOperator(testOperator);
+            expressionSens.RegisterOperator(testOperator);
 
-            Assert.IsTrue(expression_ins.IsSupportedOperator(testOperator.Symbol.ToUpper()));
-            Assert.IsTrue(expression_ins.IsSupportedOperator(testOperator.Symbol));
-            Assert.IsFalse(expression_sens.IsSupportedOperator(testOperator.Symbol.ToUpper()));
-            Assert.IsTrue(expression_sens.IsSupportedOperator(testOperator.Symbol));
+            Assert.IsTrue(expressionIns.IsSupportedOperator(testOperator.Symbol.ToUpper()));
+            Assert.IsTrue(expressionIns.IsSupportedOperator(testOperator.Symbol));
+            Assert.IsFalse(expressionSens.IsSupportedOperator(testOperator.Symbol.ToUpper()));
+            Assert.IsTrue(expressionSens.IsSupportedOperator(testOperator.Symbol));
 
-            expression_ins.FeedSymbol(testOperator.Symbol.ToUpper());
-            expression_sens.FeedSymbol(testOperator.Symbol.ToUpper());
+            expressionIns.FeedSymbol(testOperator.Symbol.ToUpper());
+            expressionSens.FeedSymbol(testOperator.Symbol.ToUpper());
 
-            Assert.AreEqual("lower_case_operator{??}", expression_ins.ToString(ExpressionFormatStyle.Canonical));
-            Assert.AreEqual("@LOWER_CASE_OPERATOR", expression_sens.ToString(ExpressionFormatStyle.Canonical));
+            Assert.AreEqual("lower_case_operator{??}", expressionIns.ToString(ExpressionFormatStyle.Canonical));
+            Assert.AreEqual("@LOWER_CASE_OPERATOR", expressionSens.ToString(ExpressionFormatStyle.Canonical));
         }
 
         [Test]
-        public void TestCaseCaseToString_1()
+        public void TestCaseCaseToString1()
         {
             var expression = CreateTestExpression("a + 'b' % ( ( c ) ) >> ( ( ( + + + t - 3 ) / ! false ) )");
 
-            var s_def = expression.ToString();
-            var s_arithm = expression.ToString(ExpressionFormatStyle.Arithmetic);
-            var s_canon = expression.ToString(ExpressionFormatStyle.Canonical);
-            var s_polish = expression.ToString(ExpressionFormatStyle.Polish);
+            var sDef = expression.ToString();
+            var sArithm = expression.ToString(ExpressionFormatStyle.Arithmetic);
+            var sCanon = expression.ToString(ExpressionFormatStyle.Canonical);
+            var sPolish = expression.ToString(ExpressionFormatStyle.Polish);
 
-            Assert.AreEqual(s_def, s_arithm);
-            Assert.AreEqual("@a + \"b\" % ( ( @c ) ) >> ( ( ( +++@t - 3 ) / !False ) )", s_arithm);
-            Assert.AreEqual(">>{+{@a,%{\"b\",(){(){@c}}}},(){(){/{(){-{+{+{+{@t}}},3}},!{False}}}}}", s_canon);
-            Assert.AreEqual(">> + @a % \"b\" ((@c)) ((/ (- +++@t 3) !False))", s_polish);
+            Assert.AreEqual(sDef, sArithm);
+            Assert.AreEqual("@a + \"b\" % ( ( @c ) ) >> ( ( ( +++@t - 3 ) / !False ) )", sArithm);
+            Assert.AreEqual(">>{+{@a,%{\"b\",(){(){@c}}}},(){(){/{(){-{+{+{+{@t}}},3}},!{False}}}}}", sCanon);
+            Assert.AreEqual(">> + @a % \"b\" ((@c)) ((/ (- +++@t 3) !False))", sPolish);
         }
 
         [Test]
-        public void TestCaseCaseToString_2()
+        public void TestCaseCaseToString2()
         {
             var expression = CreateBloatedExpression();
             var def1 = expression.ToString();
@@ -442,19 +446,19 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseCaseToString_3()
+        public void TestCaseCaseToString3()
         {
             var expression = CreateTestExpression("a + b , 1 + ( c - d - - e , 2 , 3 , ( m , n , o ) )");
 
-            var s_def = expression.ToString();
-            var s_arithm = expression.ToString(ExpressionFormatStyle.Arithmetic);
-            var s_canon = expression.ToString(ExpressionFormatStyle.Canonical);
-            var s_polish = expression.ToString(ExpressionFormatStyle.Polish);
+            var sDef = expression.ToString();
+            var sArithm = expression.ToString(ExpressionFormatStyle.Arithmetic);
+            var sCanon = expression.ToString(ExpressionFormatStyle.Canonical);
+            var sPolish = expression.ToString(ExpressionFormatStyle.Polish);
 
-            Assert.AreEqual(s_def, s_arithm);
-            Assert.AreEqual("@a + @b , 1 + ( @c - @d - -@e , 2 , 3 , ( @m , @n , @o ) )", s_arithm);
-            Assert.AreEqual("+{@a,@b} , +{1,(){-{-{@c,@d},-{@e}} , 2 , 3 , (){@m , @n , @o}}}", s_canon);
-            Assert.AreEqual("+ @a @b , + 1 (- - @c @d -@e , 2 , 3 , (@m , @n , @o))", s_polish);
+            Assert.AreEqual(sDef, sArithm);
+            Assert.AreEqual("@a + @b , 1 + ( @c - @d - -@e , 2 , 3 , ( @m , @n , @o ) )", sArithm);
+            Assert.AreEqual("+{@a,@b} , +{1,(){-{-{@c,@d},-{@e}} , 2 , 3 , (){@m , @n , @o}}}", sCanon);
+            Assert.AreEqual("+ @a @b , + 1 (- - @c @d -@e , 2 , 3 , (@m , @n , @o))", sPolish);
         }
 
         [Test]
@@ -593,15 +597,15 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("(){1 , 2 , +{3,4} , (){1 , 4 , 6}}", canonical);
 
             var result = expression.Evaluate(CreateStandardTestEvaluationContext(expression));
-            Assert.IsInstanceOf<IEnumerable<Object>>(result);
+            Assert.IsInstanceOf<IEnumerable<object>>(result);
 
-            var list = (result as IEnumerable<Object>).ToArray();
+            var list = (result as IEnumerable<object>).ToArray();
             Assert.AreEqual(1, list[0]);
             Assert.AreEqual(2, list[1]);
             Assert.AreEqual(7, list[2]);
 
-            Assert.IsInstanceOf<IEnumerable<Object>>(list[3]);
-            list = (list[3] as IEnumerable<Object>).ToArray();
+            Assert.IsInstanceOf<IEnumerable<object>>(list[3]);
+            list = (list[3] as IEnumerable<object>).ToArray();
             Assert.AreEqual(1, list[0]);
             Assert.AreEqual(4, list[1]);
             Assert.AreEqual(6, list[2]);
@@ -739,7 +743,7 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(OperationCanceledException))]
-        public void Evaluate_WithACancellingToken_RaisesTheExpectedException()
+        public void EvaluateWithACancellingTokenRaisesTheExpectedException()
         {
             var cancellationTokenSource = new CancellationTokenSource();
             var evalutionContext = new EvaluationContext(true, cancellationTokenSource.Token, StringComparer.InvariantCulture,

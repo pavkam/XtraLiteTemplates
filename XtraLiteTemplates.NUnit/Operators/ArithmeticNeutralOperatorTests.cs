@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,11 +30,7 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
-    using System.Collections;
-    using System.Collections.Generic;
-    using System.Globalization;
     using XtraLiteTemplates.Dialects.Standard.Operators;
-    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class ArithmeticNeutralOperatorTests : OperatorTestsBase
@@ -43,7 +39,7 @@ namespace XtraLiteTemplates.NUnit.Operators
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticNeutralOperator(null, TypeConverter));
-            ExpectArgumentEmptyException("symbol", () => new ArithmeticNeutralOperator(String.Empty, TypeConverter));
+            ExpectArgumentEmptyException("symbol", () => new ArithmeticNeutralOperator(string.Empty, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ArithmeticNeutralOperator("operator", null));
             ExpectArgumentNullException("typeConverter", () => new ArithmeticNeutralOperator(null));
         }
@@ -78,9 +74,9 @@ namespace XtraLiteTemplates.NUnit.Operators
         {
             var @operator = new ArithmeticNeutralOperator(TypeConverter);
 
-            AssertEvaluation<Double>(@operator, 0, 0);
-            AssertEvaluation<Double>(@operator, Double.NaN, Double.NaN);
-            AssertEvaluation<Double>(@operator, -Double.NaN, -Double.NaN);
+            AssertEvaluation<double>(@operator, 0, 0);
+            AssertEvaluation<double>(@operator, double.NaN, double.NaN);
+            AssertEvaluation<double>(@operator, -double.NaN, -double.NaN);
         }
     }
 }

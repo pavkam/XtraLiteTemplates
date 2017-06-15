@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2016, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,14 +30,9 @@ using NUnit.Framework;
 namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
-    using System.IO;
-    using System.Linq;
-    using XtraLiteTemplates.NUnit.Inside;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Parsing;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
-    using System.Globalization;
     using System.Collections.Generic;
+
+    using XtraLiteTemplates.Dialects.Standard.Directives;
 
     [TestFixture]
     public class StandardRepeatDirectiveTests : TestBase
@@ -80,7 +75,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new RepeatDirective("REP $", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{REP 0}a{BEER}", directive));
+            Assert.AreEqual(string.Empty, Evaluate("{REP 0}a{BEER}", directive));
         }
 
         [Test]
@@ -88,7 +83,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", -10)));
+            Assert.AreEqual(string.Empty, Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<string, object>("number", -10)));
         }
 
         [Test]
@@ -104,7 +99,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", null)));
+            Assert.AreEqual(string.Empty, Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<string, object>("number", null)));
         }
 
         [Test]
@@ -112,7 +107,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
-            Assert.AreEqual("a", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", true)));
+            Assert.AreEqual("a", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<string, object>("number", true)));
         }
 
         [Test]
@@ -120,7 +115,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", Double.NaN)));
+            Assert.AreEqual(string.Empty, Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<string, object>("number", double.NaN)));
         }
 
         [Test]
@@ -128,7 +123,7 @@ namespace XtraLiteTemplates.NUnit.Directives
         {
             var directive = new RepeatDirective("DO $ TIMES", "BEER", TypeConverter);
 
-            Assert.AreEqual("", Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<String, Object>("number", Double.PositiveInfinity)));
+            Assert.AreEqual(string.Empty, Evaluate("{DO number TIMES}a{BEER}", directive, new KeyValuePair<string, object>("number", double.PositiveInfinity)));
         }
     }
 }
