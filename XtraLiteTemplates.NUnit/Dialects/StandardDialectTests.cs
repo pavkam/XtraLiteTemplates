@@ -40,7 +40,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class StandardDialectTests : TestBase
     {
-        private StandardDialect TestDialect(CultureInfo culture, DialectCasing casing)
+        private static StandardDialect TestDialect(CultureInfo culture, DialectCasing casing)
         {
             var dialect = new StandardDialect(culture, casing);
 

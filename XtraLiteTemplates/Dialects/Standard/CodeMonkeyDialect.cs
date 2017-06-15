@@ -144,5 +144,20 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new PreFormattedUnParsedTextDirective(AdjustCasing("PRE"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
             };
         }
+
+        /// <summary>
+        /// Override in descendant classes to supply an instance of the <see cref="StandardDialectBase.Self" /> object.
+        /// </summary>
+        /// <remarks>
+        /// This implementation creates an instance of <see cref="CodeMonkeySelfObject"/>.
+        /// </remarks>
+        /// <param name="typeConverter">The concrete <see cref="IPrimitiveTypeConverter" /> implementation used for type conversions.</param>
+        /// <returns>
+        /// An instance of the self object.
+        /// </returns>
+        protected override StandardSelfObject CreateSelfObject(IPrimitiveTypeConverter typeConverter)
+        {
+            return new CodeMonkeySelfObject(typeConverter);
+        }
     }
 }

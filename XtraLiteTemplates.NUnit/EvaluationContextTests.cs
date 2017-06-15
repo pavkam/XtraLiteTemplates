@@ -51,24 +51,42 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorUsingNullIdentifierComparerRaisesException()
         {
-            new EvaluationContext(false, CancellationToken.None, null, ObjectFormatter, this, (context, text) => text);
+            Assert.Throws<ArgumentNullException>(
+                () => new EvaluationContext(
+                    false,
+                    CancellationToken.None,
+                    null,
+                    ObjectFormatter,
+                    this,
+                    (context, text) => text));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ConstructorUsingNullObjectFormatterRaisesException()
         {
-            new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCulture, null, this, (context, text) => text);
+            Assert.Throws<ArgumentNullException>(
+                () => new EvaluationContext(
+                    false,
+                    CancellationToken.None,
+                    StringComparer.InvariantCulture,
+                    null,
+                    this,
+                    (context, text) => text));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void Constructor_UsingNullUnParsedTextHandler_RaisesException()
         {
-            new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCulture, ObjectFormatter, this, null);
+            Assert.Throws<ArgumentNullException>(
+                () => new EvaluationContext(
+                    false,
+                    CancellationToken.None,
+                    StringComparer.InvariantCulture,
+                    ObjectFormatter,
+                    this,
+                    null));
         }
 
         [Test]
@@ -130,17 +148,15 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void SetPropertyUsingNullPropertyNameRaisesException()
         {
-            _evaluationContext.SetProperty(null, 1);
+            Assert.Throws<ArgumentNullException>(() => _evaluationContext.SetProperty(null, 1));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void SetPropertyUsingInvalidPropertyNameRaisesException()
         {
-            _evaluationContext.SetProperty("123", 1);
+            Assert.Throws<ArgumentException>(() => _evaluationContext.SetProperty("123", 1));
         }
 
         [Test]
@@ -177,17 +193,15 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void GetPropertyUsingNullPropertyNameRaisesException()
         {
-            _evaluationContext.GetProperty(null);
+            Assert.Throws<ArgumentNullException>(() => _evaluationContext.GetProperty(null));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void GetPropertyUsingInvalidPropertyNameRaisesException()
         {
-            _evaluationContext.GetProperty("123");
+            Assert.Throws<ArgumentException>(() => _evaluationContext.GetProperty("123"));
         }
 
         [Test]
@@ -211,17 +225,15 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void GetPropertyWithObjectUsingNullPropertyNameRaisesException()
         {
-            _evaluationContext.GetProperty(this, null);
+            Assert.Throws<ArgumentNullException>(() => _evaluationContext.GetProperty(this, null));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void GetPropertyWithObjectUsingInvalidPropertyNameRaisesException()
         {
-            _evaluationContext.GetProperty(this, "123");
+            Assert.Throws<ArgumentException>(() => _evaluationContext.GetProperty(this, "123"));
         }
 
         [Test]
@@ -243,10 +255,9 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void AddStateObjectUsingNullStateObjectRaisesException()
         {
-            _evaluationContext.AddStateObject(null);
+            Assert.Throws<ArgumentNullException>(() => _evaluationContext.AddStateObject(null));
         }
 
         [Test]
@@ -267,10 +278,9 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void RemoveStateObjectUsingNullStateObjectRaisesException()
         {
-            _evaluationContext.RemoveStateObject(null);
+            Assert.Throws<ArgumentNullException>(() => _evaluationContext.RemoveStateObject(null));
         }
 
         [Test]
@@ -283,10 +293,9 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void ContainsStateObjectUsingNullStateObjectRaisesException()
         {
-            _evaluationContext.ContainsStateObject(null);
+            Assert.Throws<ArgumentNullException>(() => _evaluationContext.ContainsStateObject(null));
         }
 
         [Test]
@@ -303,17 +312,15 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void InvokeUsingNullMethodNameRaisesException()
         {
-            _evaluationContext.Invoke(null, new object[] { });
+            Assert.Throws<ArgumentNullException>(() => _evaluationContext.Invoke(null, new object[] { }));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void InvokeUsingInvalidMethodNameRaisesException()
         {
-            _evaluationContext.Invoke("123", new object[] { });
+            Assert.Throws<ArgumentException>(() => _evaluationContext.Invoke("123", new object[] { }));
         }
 
         [Test]
@@ -349,17 +356,15 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void InvokeWithObjectUsingNullMethodNameRaisesException()
         {
-            _evaluationContext.Invoke(this, null, new object[] { });
+            Assert.Throws<ArgumentNullException>(() => _evaluationContext.Invoke(this, null, new object[] { }));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentException))]
         public void InvokeWithObjectUsingInvalidMethodNameRaisesException()
         {
-            _evaluationContext.Invoke(this, "123", new object[] { });
+            Assert.Throws<ArgumentException>(() => _evaluationContext.Invoke(this, "123", new object[] { }));
         }
 
         [Test]

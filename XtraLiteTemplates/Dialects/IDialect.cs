@@ -39,7 +39,7 @@ namespace XtraLiteTemplates.Dialects
     /// Defines all the common properties and behaviors specific to a template language dialect.
     /// A dialect exposes any number of expression operators and directives; specifies all control characters and how
     /// text is parsed.
-    /// <para>Check out the <seealso cref="XtraLiteTemplates.Dialects.Standard.StandardDialect"/> and <seealso cref="XtraLiteTemplates.Dialects.Standard.CodeMonkeyDialect"/> for specific implementations of this interface.</para>
+    /// <para>Check out the <seealso cref="Standard.StandardDialect"/> and <seealso cref="Standard.CodeMonkeyDialect"/> for specific implementations of this interface.</para>
     /// </summary>
     public interface IDialect
     {

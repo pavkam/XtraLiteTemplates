@@ -46,6 +46,7 @@
     <Compile Include="Dialects\Standard\Directives\PreFormattedUnParsedTextDirective.cs" />
     <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
     <Compile Include="Dialects\Standard\DialectCasing.cs" />
+    <Compile Include="Dialects\Standard\CodeMonkeySelfObject.cs" />
     <Compile Include="Dialects\Standard\StandardSelfObject.cs" />
     <Compile Include="Compilation\GenericCompiledTemplateFactory.cs" />
     <Compile Include="Evaluation\EvaluationContext.cs" />
@@ -139,7 +140,9 @@
     <Compile Include="XLTemplate.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="XtraLiteTemplates.nuspec" />
+  </ItemGroup>
   <ProjectExtensions>
     <MonoDevelop>
       <Properties>

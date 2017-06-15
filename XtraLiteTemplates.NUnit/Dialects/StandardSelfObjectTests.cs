@@ -26,29 +26,35 @@
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
 
-namespace XtraLiteTemplates.NUnit
+namespace XtraLiteTemplates.NUnit.Dialects
 {
     using System.Diagnostics.CodeAnalysis;
     using global::NUnit.Framework;
     using XtraLiteTemplates.Dialects.Standard;
+    using Introspection;
 
     [TestFixture]
     public class StandardSelfObjectTests : TestBase
     {
+        protected virtual StandardSelfObject CreateSelfObject(IPrimitiveTypeConverter typeConverter)
+        {
+            return new StandardSelfObject(typeConverter);
+        }
+
         [Test]
         [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstruction()
         {
-            ExpectArgumentNullException("typeConverter", () => new StandardSelfObject(null));
+            ExpectArgumentNullException("typeConverter", () => CreateSelfObject(null));
 
-            var selfObject = new StandardSelfObject(TypeConverter);
+            var selfObject = CreateSelfObject(TypeConverter);
             Assert.AreEqual(selfObject.TypeConverter, TypeConverter);
         }
 
         [Test]
         public void TestCaseBooleanMethod()
         {
-            var selfObject = new StandardSelfObject(TypeConverter);
+            var selfObject = CreateSelfObject(TypeConverter);
 
             Assert.AreEqual(false, selfObject.Boolean(default(byte)));
             Assert.AreEqual(true, selfObject.Boolean((byte)10));
@@ -83,7 +89,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseStringMethod()
         {
-            var selfObject = new StandardSelfObject(TypeConverter);
+            var selfObject = CreateSelfObject(TypeConverter);
 
             Assert.AreEqual("10", selfObject.String((byte)10));
             Assert.AreEqual("10", selfObject.String((sbyte)10));
@@ -107,7 +113,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseNumberMethod()
         {
-            var selfObject = new StandardSelfObject(TypeConverter);
+            var selfObject = CreateSelfObject(TypeConverter);
 
             Assert.AreEqual(10, selfObject.Number((byte)10));
             Assert.AreEqual(-10, selfObject.Number((sbyte)(-10)));

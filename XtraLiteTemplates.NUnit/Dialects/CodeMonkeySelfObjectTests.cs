@@ -1,4 +1,5 @@
-﻿//  Author:
+﻿//
+//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
 //  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
@@ -23,61 +24,36 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+//
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.NUnit.Dialects
 {
-    using System.Diagnostics;
-    using System.Threading;
+    using global::NUnit.Framework;
+    using XtraLiteTemplates.Dialects.Standard;
+    using Introspection;
 
-    internal sealed class ReduceExpressionEvaluationContext : IExpressionEvaluationContext
+    [TestFixture]
+    public class CodeMonkeySelfObjectTests: StandardSelfObjectTests
     {
-        public static readonly IExpressionEvaluationContext Instance = new ReduceExpressionEvaluationContext();
+        private CodeMonkeySelfObject _selfObject;
 
-        public CancellationToken CancellationToken => CancellationToken.None;
-
-        public void AddStateObject(object state)
+        protected override StandardSelfObject CreateSelfObject(IPrimitiveTypeConverter typeConverter)
         {
-            Debug.Fail("Invalid operation.");
+            return new CodeMonkeySelfObject(typeConverter);
         }
 
-        public void RemoveStateObject(object state)
+        [SetUp]
+        public void SetUp()
         {
-            Debug.Fail("Invalid operation.");
+            _selfObject = (CodeMonkeySelfObject)CreateSelfObject(TypeConverter);
         }
 
-        public bool ContainsStateObject(object state)
+        [TestCase(-1, 1)]
+        [TestCase(2, 2)]
+        public void TestCaseAbs(double input, double expected)
         {
-            Debug.Fail("Invalid operation.");
-            return false;
-        }
-
-        public void SetProperty(string property, object value)
-        {
-            Debug.Fail("Invalid operation.");
-        }
-
-        public object GetProperty(string property)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
-        }
-
-        public object GetProperty(object @object, string property)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
-        }
-
-        public object Invoke(string method, object[] arguments)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
-        }
-
-        public object Invoke(object @object, string method, object[] arguments)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
+            Assert.AreEqual(expected, _selfObject.Abs(input));
         }
     }
 }
+

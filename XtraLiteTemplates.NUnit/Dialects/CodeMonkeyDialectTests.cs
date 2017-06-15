@@ -30,10 +30,11 @@ namespace XtraLiteTemplates.NUnit.Dialects
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+
+    using XtraLiteTemplates.Dialects.Standard.Directives;
     using System.Globalization;
     using global::NUnit.Framework;
     using XtraLiteTemplates.Dialects.Standard;
-    using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
@@ -72,8 +73,8 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("TRUE")) && dialect.SpecialKeywords[transformer("TRUE")].Equals(true));
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("FALSE")) && dialect.SpecialKeywords[transformer("FALSE")].Equals(false));
             Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("UNDEFINED")) && dialect.SpecialKeywords[transformer("UNDEFINED")] == null);
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("NAN")) && dialect.SpecialKeywords[transformer("NAN")].Equals(double.NaN));
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("INFINITY")) && dialect.SpecialKeywords[transformer("INFINITY")].Equals(double.PositiveInfinity));
+            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("NAN")) && dialect.SpecialKeywords[transformer("NAN")].Equals(Double.NaN));
+            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("INFINITY")) && dialect.SpecialKeywords[transformer("INFINITY")].Equals(Double.PositiveInfinity));
 
             Assert.AreEqual(9, dialect.Directives.Count);
             foreach (var directive in dialect.Directives)
@@ -189,7 +190,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
             var ilc = new CodeMonkeyDialect(DialectCasing.LowerCase);
 
             /* 1 */
-            Assert.AreEqual(iic, iic);           
+            Assert.AreEqual(iic, iic);
             Assert.AreNotEqual(iic, iuc);
             Assert.AreNotEqual(iic.GetHashCode(), iuc.GetHashCode());
             Assert.AreNotEqual(iic, ilc);
@@ -245,9 +246,9 @@ namespace XtraLiteTemplates.NUnit.Dialects
 
             ExpectArgumentNullException("context", () => dialect.DecorateUnParsedText(null, string.Empty));
 
-            Assert.AreEqual(string.Empty, dialect.DecorateUnParsedText(context, null));
-            Assert.AreEqual(string.Empty, dialect.DecorateUnParsedText(context, string.Empty));
-            Assert.AreEqual(string.Empty, dialect.DecorateUnParsedText(context, "    \r\n"));
+            Assert.AreEqual("", dialect.DecorateUnParsedText(context, null));
+            Assert.AreEqual("", dialect.DecorateUnParsedText(context, string.Empty));
+            Assert.AreEqual("", dialect.DecorateUnParsedText(context, "    \r\n"));
         }
 
         [Test]
@@ -308,24 +309,23 @@ namespace XtraLiteTemplates.NUnit.Dialects
         public void TestCaseShowcase1()
         {
             var customer = new
-            {
-                FirstName = "John",
-                LastName = "McMann",
-                Age = 31,
-                Loves = new[] { "Apples", "Bikes", "Everything Nice" }
-            };
+                               {
+                                   FirstName = "John",
+                                   LastName = "McMann",
+                                   Age = 31,
+                                   Loves = new[] { "Apples", "Bikes", "Everything Nice" }
+                               };
 
-            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{pre}Hello, {_0.FirstName} {_0.LastName}. You are {_0.Age} years old and you love: {for entity in _0.loves}{entity}, {end}{end}", customer);            
+            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{pre}Hello, {_0.FirstName} {_0.LastName}. You are {_0.Age} years old and you love: {for entity in _0.loves}{entity}, {end}{end}", customer);
             Assert.AreEqual("Hello, John McMann. You are 31 years old and you love: Apples,Bikes,Everything Nice,", result);
         }
 
         [Test]
         public void TestCaseShowcase2()
         {
-            var template = "{TypeMembers AS GetType.GetMembers()}{FOR Member IN TypeMembers }{ Member.Name }{WITH}{PRE}, {END}{END}{END}";
-            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, template);
+            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, "{Abs(_0)}", "-1");
 
-            Assert.AreEqual("get_TypeConverter, String, Number, Boolean, ToString, Equals, GetHashCode, GetType, .ctor, TypeConverter", result);
+            Assert.AreEqual("1", result);
         }
     }
 }

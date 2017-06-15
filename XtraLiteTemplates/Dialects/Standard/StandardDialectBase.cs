@@ -300,6 +300,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public override string ToString()
         {
             string caseDescription = null;
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_dialectCasing)
             {
                 case DialectCasing.IgnoreCase:
@@ -455,6 +456,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return markup;
             }
 
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_dialectCasing)
             {
                 case DialectCasing.LowerCase:

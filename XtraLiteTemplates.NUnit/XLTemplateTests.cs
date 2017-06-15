@@ -33,6 +33,8 @@ namespace XtraLiteTemplates.NUnit
     using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Threading;
+    using System.Threading.Tasks;
+
     using global::NUnit.Framework;
     using XtraLiteTemplates.Dialects.Standard;
 
@@ -133,24 +135,21 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void EvaluateUsingNullDialectRaisesException()
         {
-            XLTemplate.Evaluate(null, string.Empty);
+            Assert.Throws<ArgumentNullException>(() => XLTemplate.Evaluate(null, string.Empty));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void EvaluateUsingNullTemplateRaisesException()
         {
-            XLTemplate.Evaluate(StandardDialect.Default, null);
+            Assert.Throws<ArgumentNullException>(() => XLTemplate.Evaluate(StandardDialect.Default, null));
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
         public void EvaluateUsingNullArgumentsRaisesException()
         {
-            XLTemplate.Evaluate(StandardDialect.Default, string.Empty, null);
+            Assert.Throws<ArgumentNullException>(() => XLTemplate.Evaluate(StandardDialect.Default, string.Empty, null));
         }
 
         [Test]
@@ -215,40 +214,43 @@ namespace XtraLiteTemplates.NUnit
             Assert.AreEqual("True", result);
         }
 
-
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async void EvaluateAsyncForNullTextWriterRaisesException()
+        public void EvaluateAsyncForNullTextWriterRaisesException()
         {
-            await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(null, new Dictionary<string, object>());
+            Assert.ThrowsAsync<ArgumentNullException>(
+                    async () =>
+                        {
+                            await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(
+                                null,
+                                new Dictionary<string, object>());
+                        });
         }
 
         [Test]
-        [ExpectedException(typeof(ArgumentNullException))]
-        public async void EvaluateAsyncForNullVariablesDictionaryRaisesException()
+        public void EvaluateAsyncForNullVariablesDictionaryRaisesException()
         {
-            using (var sw = new StringWriter())
-            {
-                await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(sw, null);
-            }
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () => await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(
+                                new StringWriter(),
+                                null));
         }
 
         [Test]
-        [ExpectedException(typeof(OperationCanceledException))]
-        public async void EvaluateAsyncCancelledByTokenRaisesException()
+        public void EvaluateAsyncCancelledByTokenRaisesException()
         {
             var tokenSource = new CancellationTokenSource();
             var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"{FOR EACH X IN 0..99999999}{X}{END}");
 
-            using (var sw = new StringWriter())
-            {
-                tokenSource.CancelAfter(50);
-                await xlTemplate.EvaluateAsync(sw, new Dictionary<string, object>(), tokenSource.Token);
-            }
+            tokenSource.CancelAfter(50);
+            Assert.ThrowsAsync<TaskCanceledException>(
+                async () => await xlTemplate.EvaluateAsync(
+                                new StringWriter(),
+                                new Dictionary<string, object>(),
+                                tokenSource.Token));
         }
 
         [Test]
-        public async void EvaluateAsyncWithAZeroTokenCompletesAsExpected()
+        public async Task EvaluateAsyncWithAZeroTokenCompletesAsExpected()
         {
             var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text");
 
@@ -260,7 +262,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public async void EvaluateAsyncCompletesAsExpected()
+        public async Task EvaluateAsyncCompletesAsExpected()
         {
             var xlTemplate = new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text");
 

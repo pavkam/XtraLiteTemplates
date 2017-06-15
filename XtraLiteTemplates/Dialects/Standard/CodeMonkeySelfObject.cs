@@ -24,60 +24,33 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-namespace XtraLiteTemplates.Expressions
+namespace XtraLiteTemplates.Dialects.Standard
 {
-    using System.Diagnostics;
-    using System.Threading;
+    using System;
 
-    internal sealed class ReduceExpressionEvaluationContext : IExpressionEvaluationContext
+    using Introspection;
+
+    /// <summary>
+    /// The developer version of the <c>self</c> object implementation. Extends the <see cref="StandardSelfObject"/> with developer-focused methods and properties.
+    /// </summary>
+    public class CodeMonkeySelfObject : StandardSelfObject
     {
-        public static readonly IExpressionEvaluationContext Instance = new ReduceExpressionEvaluationContext();
-
-        public CancellationToken CancellationToken => CancellationToken.None;
-
-        public void AddStateObject(object state)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="CodeMonkeySelfObject"/> class.
+        /// </summary>
+        /// <param name="typeConverter">The type converter.</param>
+        public CodeMonkeySelfObject(IPrimitiveTypeConverter typeConverter): base(typeConverter)
         {
-            Debug.Fail("Invalid operation.");
         }
 
-        public void RemoveStateObject(object state)
+        /// <summary>
+        /// Evaluates the absolute value of number.
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns>The absolute value.</returns>
+        public double Abs(object value)
         {
-            Debug.Fail("Invalid operation.");
-        }
-
-        public bool ContainsStateObject(object state)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
-        }
-
-        public void SetProperty(string property, object value)
-        {
-            Debug.Fail("Invalid operation.");
-        }
-
-        public object GetProperty(string property)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
-        }
-
-        public object GetProperty(object @object, string property)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
-        }
-
-        public object Invoke(string method, object[] arguments)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
-        }
-
-        public object Invoke(object @object, string method, object[] arguments)
-        {
-            Debug.Fail("Invalid operation.");
-            return false;
+            return Math.Abs(Number(value));
         }
     }
 }

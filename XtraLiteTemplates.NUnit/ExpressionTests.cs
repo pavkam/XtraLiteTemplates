@@ -744,7 +744,6 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        [ExpectedException(typeof(OperationCanceledException))]
         public void EvaluateWithACancelingTokenRaisesTheExpectedException()
         {
             var cancellationTokenSource = new CancellationTokenSource();
@@ -754,7 +753,7 @@ namespace XtraLiteTemplates.NUnit
             var expression = CreateTestExpression("( Sleep ( 50 ) + Sleep ( 50 ) ) * Sleep ( 50 )");
             cancellationTokenSource.CancelAfter(50);
 
-            expression.Evaluate(evaluationContext);
+            Assert.Throws<OperationCanceledException>(() => expression.Evaluate(evaluationContext));
         }
     }
 }

@@ -3,15 +3,15 @@
   <metadata xmlns="http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd">
     <id>XtraLiteTemplates</id>
     <version>$version$</version>
-    <authors>Alexandru Ciobanu (alex@ciobanu.org)</authors>
-    <owners>Alexandru Ciobanu (alex@ciobanu.org)</owners>
+    <authors>Alexandru Ciobanu (alex+git@ciobanu.org)</authors>
+    <owners>Alexandru Ciobanu (alex+git@ciobanu.org)</owners>
     <licenseUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/LICENSE</licenseUrl>
     <iconUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/artwork/32px-transparent-bkg.png</iconUrl>
     <projectUrl>https://github.com/pavkam/XtraLiteTemplates</projectUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>A highly customizable and lightweight template engine for Microsoft .NET and Mono.</description>
     <releaseNotes>Version 1.1 of XtraLiteTemplates. XML Documentation and Unit Test covered.</releaseNotes>
-    <copyright>Copyright Alexandru Ciobanu (alex@ciobanu.org) 2015</copyright>
+    <copyright>Copyright Alexandru Ciobanu (alex+git@ciobanu.org) 2015-2017</copyright>
     <tags>Template Domain Language Expression Parser</tags>
     <dependencies>
       <group targetFramework="net45">
