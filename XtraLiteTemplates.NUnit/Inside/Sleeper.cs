@@ -28,14 +28,15 @@
 
 namespace XtraLiteTemplates.NUnit.Inside
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
 
     public sealed class Sleeper
     {
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
         public void Sleep(int timeout)
         {
             Thread.Sleep(timeout);
         }
     }
 }
-

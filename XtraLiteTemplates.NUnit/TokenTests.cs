@@ -25,18 +25,18 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
-    using System;
+    using System.Diagnostics.CodeAnalysis;
+    using global::NUnit.Framework;
     using Parsing;
 
     [TestFixture]
     public class TokenTests : TestBase
     {
         [Test]
-        public void TestCaseContruction1()
+        public void TestCaseConstruction1()
         {
             var token = new Token(Token.TokenType.UnParsed, "some_value", 100, 999);
 
@@ -47,7 +47,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseContruction2()
+        public void TestCaseConstruction2()
         {
             var token = new Token(Token.TokenType.String, null, 0, 1);
 
@@ -58,6 +58,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstructionExceptions()
         {
             ExpectArgumentLessThanException("characterIndex", 0, () => new Token(Token.TokenType.Number, "100", -1, 1));

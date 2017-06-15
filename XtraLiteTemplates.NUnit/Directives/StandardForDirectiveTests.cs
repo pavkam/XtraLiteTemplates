@@ -25,19 +25,20 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit.Directives
 {
-    using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
 
+    using global::NUnit.Framework;
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
     [TestFixture]
     public class StandardForDirectiveTests : TestBase
     {
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstructor1()
         {
             ExpectInvalidTagMarkupException(null, () => new ForDirective(null, "END", TypeConverter));

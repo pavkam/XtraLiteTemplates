@@ -25,13 +25,11 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
-
 namespace XtraLiteTemplates.NUnit.Operators
 {
-    using System;
-
+    using System.Diagnostics.CodeAnalysis;
     using Expressions.Operators;
+    using global::NUnit.Framework;
 
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
@@ -39,6 +37,7 @@ namespace XtraLiteTemplates.NUnit.Operators
     public class ArithmeticSubtractOperatorTests : OperatorTestsBase
     {
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("symbol", () => new ArithmeticSubtractOperator(null, TypeConverter));

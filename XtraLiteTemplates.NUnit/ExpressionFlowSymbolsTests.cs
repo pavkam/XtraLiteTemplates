@@ -25,18 +25,19 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
-    using System;
+    using System.Diagnostics.CodeAnalysis;
     using Expressions;
+    using global::NUnit.Framework;
 
     [TestFixture]
     public class ExpressionFlowSymbolsTests : TestBase
     { 
         [Test]
-        public void TestCaseContruction1()
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("separatorSymbol", () => new ExpressionFlowSymbols(null, ".", "(", ")"));
             ExpectArgumentNullException("memberAccessSymbol", () => new ExpressionFlowSymbols(",", null, "(", ")"));
@@ -50,7 +51,8 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseContruction2()
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public void TestCaseConstruction2()
         {
             ExpectArgumentsEqualException("separatorSymbol", "memberAccessSymbol", () => new ExpressionFlowSymbols("A", "A", "C", "D"));
             ExpectArgumentsEqualException("separatorSymbol", "groupOpenSymbol", () => new ExpressionFlowSymbols("A", "B", "A", "D"));
@@ -61,7 +63,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseContruction3()
+        public void TestCaseConstruction3()
         {
             var flowSymbols = new ExpressionFlowSymbols("A", "B", "C", "D");
 
@@ -72,7 +74,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseContructionDefault()
+        public void TestCaseConstructionDefault()
         {
             var flowSymbols = ExpressionFlowSymbols.Default;
 

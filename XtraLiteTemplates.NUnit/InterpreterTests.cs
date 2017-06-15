@@ -25,29 +25,27 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
     using System;
-
+    using System.Diagnostics.CodeAnalysis;
     using Evaluation;
-
     using Expressions;
-
+    using global::NUnit.Framework;
     using Inside;
-
     using Parsing;
-
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class InterpreterTests : TestBase
     {
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseInterpreterConstructionExceptions()
         {
-            ExpectArgumentNullException("tokenizer", () => new Interpreter((ITokenizer)null, ExpressionFlowSymbols.Default, StringComparer.Ordinal));
+            ExpectArgumentNullException("tokenizer", () => new Interpreter(null, ExpressionFlowSymbols.Default, StringComparer.Ordinal));
             ExpectArgumentNullException("expressionFlowSymbols", () => new Interpreter(new Tokenizer("irrelevant"), null, StringComparer.Ordinal));
             ExpectArgumentNullException("comparer", () => new Interpreter(new Tokenizer("irrelevant"), ExpressionFlowSymbols.Default, null));
         }

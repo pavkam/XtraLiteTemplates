@@ -25,43 +25,49 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Linq;
 
     using Expressions;
 
+    using global::NUnit.Framework;
+
     using Parsing;
 
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class LexerTests : TestBase
     {
-        private static void AssertUnparsedLex(Lex lex, int firstCharacterIndex, int originalLength, string unparsedText)
+        private static void AssertUnParsedLex(Lex lex, int firstCharacterIndex, int originalLength, string unParsedText)
         {
             Assert.IsInstanceOf<UnParsedLex>(lex);
-            var unparsedLex = lex as UnParsedLex;
+            var unParsedLex = lex as UnParsedLex;
+            Debug.Assert(unParsedLex != null);
 
-            Assert.AreEqual(firstCharacterIndex, unparsedLex.FirstCharacterIndex);
-            Assert.AreEqual(originalLength, unparsedLex.OriginalLength);
-            Assert.AreEqual(unparsedText, unparsedLex.UnParsedText);
+            Assert.AreEqual(firstCharacterIndex, unParsedLex.FirstCharacterIndex);
+            Assert.AreEqual(originalLength, unParsedLex.OriginalLength);
+            Assert.AreEqual(unParsedText, unParsedLex.UnParsedText);
         }
 
-        private static void AssertUnparsedLex(Lex lex, int firstCharacterIndex, string unparsedText)
+        private static void AssertUnParsedLex(Lex lex, int firstCharacterIndex, string unParsedText)
         {
-            AssertUnparsedLex(lex, firstCharacterIndex, unparsedText.Length, unparsedText);
+            AssertUnParsedLex(lex, firstCharacterIndex, unParsedText.Length, unParsedText);
         }
 
         private static void AssertTagLex(Lex lex, int firstCharacterIndex, int originalLength, Tag tag, string asText)
         {
             Assert.IsInstanceOf<TagLex>(lex);
             var tagLex = lex as TagLex;
+            Debug.Assert(tagLex != null);
 
             Assert.AreEqual(firstCharacterIndex, tagLex.FirstCharacterIndex);
             Assert.AreEqual(originalLength, tagLex.OriginalLength);
@@ -73,6 +79,7 @@ namespace XtraLiteTemplates.NUnit
 
 
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstruction1()
         {
             var tokenizer = new Tokenizer("irrelevant");
@@ -88,6 +95,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
         public void TestCaseTagRegistration()
         {
             var tokenizer = new Tokenizer("irrelevant");
@@ -108,6 +116,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
         public void TestCaseOperatorRegistration()
         {
             var tokenizer = new Tokenizer("irrelevant");
@@ -178,12 +187,12 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseUparsedOnlyInputString()
+        public void TestCaseUnParsedOnlyInputString()
         {
             const string Test = "unparsed text is here baby {{ and some other {{{{ tokens also.";
             var lexer = new Lexer(new Tokenizer(Test), ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase);
 
-            AssertUnparsedLex(lexer.ReadNext(), 0, Test.Length, Test.Replace("{{", "{"));
+            AssertUnParsedLex(lexer.ReadNext(), 0, Test.Length, Test.Replace("{{", "{"));
             Assert.IsNull(lexer.ReadNext());
         }
 
@@ -199,7 +208,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseTwoKeywordTagsAndUnparsed()
+        public void TestCaseTwoKeywordTagsAndUnParsed()
         {
             const string Test = "{K1 K2}unparsed{K1 K3}";
 
@@ -211,7 +220,7 @@ namespace XtraLiteTemplates.NUnit
                 RegisterTag(tag2);
 
             AssertTagLex(lexer.ReadNext(), 0, 7, tag1, "K1|K2");
-            AssertUnparsedLex(lexer.ReadNext(), 7, "unparsed");
+            AssertUnParsedLex(lexer.ReadNext(), 7, "unparsed");
             AssertTagLex(lexer.ReadNext(), 15, 7, tag2, "K1|K3");
             Assert.IsNull(lexer.ReadNext());
         }
@@ -263,7 +272,7 @@ namespace XtraLiteTemplates.NUnit
             var tag = new Tag().Expression();
             var lexer = new Lexer(new Tokenizer(Test), ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase).RegisterTag(tag);
 
-            AssertTagLex(lexer.ReadNext(), 0, 6, tag, 1.33.ToString());
+            AssertTagLex(lexer.ReadNext(), 0, 6, tag, 1.33.ToString(CultureInfo.InvariantCulture));
             Assert.IsNull(lexer.ReadNext());
         }
 
@@ -522,6 +531,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "AccessToModifiedClosure")]
         public void TestCaseBadTokenOrder()
         {
             var tag = new Tag().Expression();

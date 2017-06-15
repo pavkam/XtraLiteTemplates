@@ -25,11 +25,12 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
+    using global::NUnit.Framework;
     using Parsing;
 
     [TestFixture]
@@ -70,7 +71,7 @@ namespace XtraLiteTemplates.NUnit
 
             Assert.AreSame(tag, tag.Identifier());
             Assert.AreSame(tag, tag.Expression());
-            ExpectTagAnyIndentifierCannotFollowExpressionException(() => tag.Identifier());
+            ExpectTagAnyIdentifierCannotFollowExpressionException(() => tag.Identifier());
 
             Assert.AreEqual("? $", tag.ToString());
         }
@@ -104,6 +105,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "StringLiteralTypo")]
         public void TestCaseComplexTag()
         {
             var tag = new Tag();

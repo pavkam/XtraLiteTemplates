@@ -25,18 +25,19 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
-
 namespace XtraLiteTemplates.NUnit.Dialects
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-
+    using global::NUnit.Framework;
     using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class StandardDialectTests : TestBase
     {
         private StandardDialect TestDialect(CultureInfo culture, DialectCasing casing)
@@ -156,6 +157,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstructor1()
         {
             ExpectArgumentNullException("culture", () => new StandardDialect(null, DialectCasing.IgnoreCase));

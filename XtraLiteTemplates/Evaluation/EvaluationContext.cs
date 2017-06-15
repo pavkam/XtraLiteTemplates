@@ -171,13 +171,8 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.Identifier("property", property);
 
-            if (@object != null)
-            {
-                var type = @object.GetType();
-                return GetDisembowelerForType(type).Invoke(@object, property);
-            }
-
-            return null;
+            return @object != null ? 
+                GetDisembowelerForType(GetTypeOfObject(@object)).Invoke(@object, property) : null;
         }
 
         /// <summary>
@@ -222,13 +217,8 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.Identifier("method", method);
 
-            if (@object != null)
-            {
-                var type = @object.GetType();
-                return GetDisembowelerForType(type).Invoke(@object, method, arguments);
-            }
-
-            return null;
+            return @object != null ? 
+                GetDisembowelerForType(GetTypeOfObject(@object)).Invoke(@object, method, arguments) : null;
         }
 
         /// <summary>
@@ -310,6 +300,14 @@ namespace XtraLiteTemplates.Evaluation
 
             value = null;
             return false;
+        }
+
+        private Type GetTypeOfObject(object @object)
+        {
+            Debug.Assert(@object != null, "Object cannot be null.");
+
+            var @static = @object as Static;
+            return @static != null ? @static.ExposedType : @object.GetType();
         }
 
         private SimpleTypeDisemboweler GetDisembowelerForType(Type type)

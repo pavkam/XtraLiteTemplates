@@ -158,23 +158,6 @@ namespace XtraLiteTemplates.Compilation
             Directive directive,
             object[] components);
 
-        /// <summary>
-        /// Finalizes the root <see cref="CompiledEvaluationDelegate{TContext}"/> delegate.
-        /// </summary>
-        /// <remarks>
-        /// This method is called prior to returning the fully built <see cref="CompiledEvaluationDelegate{TContext}"/> delegate to the caller. Implementers
-        /// can override this method to provide custom functionality.
-        /// </remarks>
-        /// <param name="finalDelegate">The final root delegate.</param>
-        /// <returns>A new finalized delegate.</returns>
-        protected virtual CompiledEvaluationDelegate<TContext> FinalizeEvaluationDelegate(CompiledEvaluationDelegate<TContext> finalDelegate)
-        {
-            Debug.Assert(finalDelegate != null, "Argument finalDelegate cannot be null.");
-
-            /* Do nothing. */
-            return finalDelegate;
-        }
-
         private CompiledEvaluationDelegate<TContext> CompileUnParsedNode(UnParsedNode unParsedNode)
         {
             Debug.Assert(unParsedNode != null, "Argument unParsedNode cannot be null.");
@@ -214,6 +197,7 @@ namespace XtraLiteTemplates.Compilation
 
             Debug.Assert(innerTagNodes.Count == 0, "No post-tag node can exist in directive node.");
 
+            // ReSharper disable once SwitchStatementMissingSomeCases
             switch (directive.Tags.Count)
             {
                 case 1:

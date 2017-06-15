@@ -25,13 +25,12 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit.Inside
 {
-    using System;
     using Expressions;
     using Expressions.Operators;
+    using global::NUnit.Framework;
 
     public sealed class LtrAssocTestOperator : BinaryOperator
     {

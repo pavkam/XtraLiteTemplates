@@ -25,34 +25,34 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
     using System.Threading;
-
     using Evaluation;
-
     using Expressions;
     using Expressions.Operators;
-
+    using global::NUnit.Framework;
     using Inside;
-
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class ExpressionTests : TestBase
     { 
-        private Expression CreateBloatedExpression()
+        private static Expression CreateBloatedExpression()
         {
             var comparer = StringComparer.Ordinal;
 
-            var operators = new List<Operator>()
+            var operators = new List<Operator>
             {
                 new RelationalEqualsOperator(comparer, TypeConverter),
                 new RelationalNotEqualsOperator(comparer, TypeConverter),
@@ -89,7 +89,7 @@ namespace XtraLiteTemplates.NUnit
             return expression;
         }
 
-        private Expression CreateTestExpression(string exprString)
+        private static Expression CreateTestExpression(string exprString)
         {
             Debug.Assert(!string.IsNullOrEmpty(exprString));
             var split = exprString.Split(' ');
@@ -117,7 +117,7 @@ namespace XtraLiteTemplates.NUnit
             return result;
         }
 
-        private IExpressionEvaluationContext CreateStandardTestEvaluationContext(Expression e)
+        private static IExpressionEvaluationContext CreateStandardTestEvaluationContext(Expression e)
         {
             var variables = new Dictionary<string, object>()
             {
@@ -138,7 +138,8 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseContruction1()
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("comparer", () => new Expression(ExpressionFlowSymbols.Default, null));
             ExpectArgumentNullException("flowSymbols", () => new Expression(null, StringComparer.InvariantCulture));
@@ -235,7 +236,7 @@ namespace XtraLiteTemplates.NUnit
             var context = CreateStandardTestEvaluationContext(expression1);
 
             ExpectCannotRegisterOperatorsForStartedExpressionException(() => expression1.RegisterOperator(new ArithmeticSumOperator(TypeConverter)));
-            ExpectCannotEvaluateUnconstructedExpressionException(() => expression1.Evaluate(context));
+            ExpectCannotEvaluateUnConstructedExpressionException(() => expression1.Evaluate(context));
 
             expression1.Construct();
             Assert.IsTrue(expression1.Started);
@@ -589,6 +590,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
         public void TestCaseSeparatorEvaluation()
         {
             var expression = CreateTestExpression("( 1 , 2 , 3 + 4 , ( 1 , 4 , 6 ) )");
@@ -743,16 +745,16 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(OperationCanceledException))]
-        public void EvaluateWithACancellingTokenRaisesTheExpectedException()
+        public void EvaluateWithACancelingTokenRaisesTheExpectedException()
         {
             var cancellationTokenSource = new CancellationTokenSource();
-            var evalutionContext = new EvaluationContext(true, cancellationTokenSource.Token, StringComparer.InvariantCulture,
+            var evaluationContext = new EvaluationContext(true, cancellationTokenSource.Token, StringComparer.InvariantCulture,
                 ObjectFormatter, new Sleeper(), (context, text) => text);
 
             var expression = CreateTestExpression("( Sleep ( 50 ) + Sleep ( 50 ) ) * Sleep ( 50 )");
             cancellationTokenSource.CancelAfter(50);
 
-            expression.Evaluate(evalutionContext);
+            expression.Evaluate(evaluationContext);
         }
     }
 }

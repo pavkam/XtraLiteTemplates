@@ -25,21 +25,22 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
     using System.Threading;
-
+    using global::NUnit.Framework;
     using XtraLiteTemplates.Dialects.Standard;
 
     [TestFixture]
     public class XLTemplateTests : TestBase
     {
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("dialect", () => new XLTemplate(null, string.Empty));
@@ -49,22 +50,21 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseConstruction2()
         {
-            var text = "{IF true THEN}Say True Baby!{END}";
-            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+            const string Text = "{IF true THEN}Say True Baby!{END}";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, Text);
             
             Assert.AreEqual(StandardDialect.DefaultIgnoreCase, template.Dialect);
-            Assert.AreEqual(text, template.Template);
+            Assert.AreEqual(Text, template.Template);
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
         public void TestCaseEvaluate1()
         {
-            var text = "contents are irrelevant";
-            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+            const string Text = "contents are irrelevant";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, Text);
 
-            var variables = new Dictionary<string, object>()
-            {
-            };
+            var variables = new Dictionary<string, object>();
 
             ExpectArgumentNullException("variables", () => template.Evaluate(null));
             ExpectArgumentNullException("writer", () => template.Evaluate(null, variables));
@@ -73,8 +73,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluate2()
         {
-            var text = "V = {variable}";
-            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+            const string Text = "V = {variable}";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, Text);
 
             var variables = new Dictionary<string, object>()
             {
@@ -93,8 +93,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEvaluate3()
         {
-            var text = "V = {variable}";
-            var template = new XLTemplate(StandardDialect.Default, text);
+            const string Text = "V = {variable}";
+            var template = new XLTemplate(StandardDialect.Default, Text);
 
             var variables1 = new Dictionary<string, object>()
             {
@@ -118,8 +118,8 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void ToStringForAComplexTemplateReturnsTheExpectedRepresentation()
         {
-            var text = "{if true then}eat a cookie!{else}{variable}{end}";
-            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, text);
+            const string Text = "{if true then}eat a cookie!{else}{variable}{end}";
+            var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, Text);
 
             Assert.AreEqual("(({if True then}eat a cookie!{else}({@variable}){end}))", template.ToString());
         }
@@ -150,18 +150,18 @@ namespace XtraLiteTemplates.NUnit
         [ExpectedException(typeof(ArgumentNullException))]
         public void EvaluateUsingNullArgumentsRaisesException()
         {
-            XLTemplate.Evaluate(StandardDialect.Default, string.Empty, (object[])null);
+            XLTemplate.Evaluate(StandardDialect.Default, string.Empty, null);
         }
 
         [Test]
-        public void EvaluateWithoutPreformattedDirectoveRemovesExtraWhitespaces()
+        public void EvaluateWithoutPreformattedDirectiveRemovesExtraWhitespaces()
         {
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{_0} -> {_1}", "string", 100.33);
             Assert.AreEqual("string->100.33", result);
         }
 
         [Test]
-        public void EvaluateUsingPreformattedDirectiveProducesUnformattedResult()
+        public void EvaluateUsingPreformattedDirectiveProducesUnFormattedResult()
         {
             var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, "{preformatted}{_0} -> {_1}{end}", "string", 100.33);
             Assert.AreEqual("string -> 100.33", result);
@@ -170,7 +170,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void EvaluateForTwoNestedLoopsProducesTheExpectedResult()
         {
-            var template = @"
+            const string Template = @"
             {_0} /
             {FOR EACH _0 IN 1..2}
                 {_0} /
@@ -181,7 +181,7 @@ namespace XtraLiteTemplates.NUnit
             {END}
             {_0}";
 
-            var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, template, "initial");
+            var result = XLTemplate.Evaluate(StandardDialect.DefaultIgnoreCase, Template, "initial");
             Assert.AreEqual("initial/1/  3  /  4  /1/2/  3  /  4  /2/initial", result);
         }
 
@@ -200,7 +200,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void EvaluateUsingSdandardSelfMethodsCompletesAsExpected()
+        public void EvaluateUsingStandardSelfMethodsCompletesAsExpected()
         {
             var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{Number('199') + Number(true)}");
             Assert.AreEqual("200", result);
@@ -272,4 +272,3 @@ namespace XtraLiteTemplates.NUnit
         }
     }
 }
-

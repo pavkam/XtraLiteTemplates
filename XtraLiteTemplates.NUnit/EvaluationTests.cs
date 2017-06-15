@@ -25,29 +25,26 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-
     using Evaluation;
-
     using Expressions;
-
+    using global::NUnit.Framework;
     using Inside;
-
     using Parsing;
-
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class EvaluationTests : TestBase
     {
-        private KeyValuePair<string, object> Kw(string key, object value)
+        private static KeyValuePair<string, object> Kw(string key, object value)
         {
             return new KeyValuePair<string, object>(key, value);
         }

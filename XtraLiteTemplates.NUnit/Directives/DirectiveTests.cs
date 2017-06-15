@@ -25,18 +25,21 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
+    using global::NUnit.Framework;
     using Inside;
     using Parsing;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "IdentifierTypo")]
     public class DirectiveTests : TestBase
     {
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseDirectiveConstructorExceptions()
         {
             var tag = Tag.Parse("HELLO WORLD");

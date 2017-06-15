@@ -32,42 +32,37 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.IO;
     using System.Linq;
     using System.Threading;
-
     using Compilation;
-
     using Evaluation;
-
     using Expressions;
-
     using Inside;
-
     using Introspection;
-
     using Parsing;
-
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
+    [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     public class TestBase
     {
-        protected static IObjectFormatter ObjectFormatter = new TestObjectFormatter(CultureInfo.InvariantCulture);
-        protected static IPrimitiveTypeConverter TypeConverter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
+        protected static readonly IObjectFormatter ObjectFormatter = new TestObjectFormatter(CultureInfo.InvariantCulture);
+        protected static readonly IPrimitiveTypeConverter TypeConverter = new FlexiblePrimitiveTypeConverter(CultureInfo.InvariantCulture, ObjectFormatter);
 
         protected static EvaluationContext CreateContext(IEqualityComparer<string> comparer)
         {
             return new EvaluationContext(true, CancellationToken.None, comparer, ObjectFormatter, null, (context, text) => text);
         }
 
-        protected string Evaluate(CompiledTemplate<EvaluationContext> compiledTemplate, StringComparer comparer, params KeyValuePair<string, object>[] values)
+        protected static string Evaluate(CompiledTemplate<EvaluationContext> compiledTemplate, StringComparer comparer, params KeyValuePair<string, object>[] values)
         {
             var context = CreateContext(comparer);
             foreach (var kvp in values)
                 context.SetProperty(kvp.Key, kvp.Value);
 
-            string result = null;
+            string result;
             using (var sw = new StringWriter())
             {
                 compiledTemplate.Evaluate(sw, context);
@@ -90,7 +85,7 @@ namespace XtraLiteTemplates.NUnit
             return Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, values);
         }
 
-        protected void ExpectArgumentNullException(string argument, Action action)
+        protected static void ExpectArgumentNullException(string argument, Action action)
         {
             try
             {
@@ -108,7 +103,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected void ExpectArgumentEmptyException(string argument, Action action)
+        protected static void ExpectArgumentEmptyException(string argument, Action action)
         {
             try
             {
@@ -126,7 +121,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected void ExpectArgumentNotIdentifierException(string argument, Action action)
+        protected static void ExpectArgumentNotIdentifierException(string argument, Action action)
         {
             try
             {
@@ -143,7 +138,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
 
-        protected void ExpectArgumentsEqualException(string argument1, string argument2, Action action)
+        protected static void ExpectArgumentsEqualException(string argument1, string argument2, Action action)
         {
             try
             {
@@ -233,7 +228,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected void ExpectArgumentConditionNotTrueException(string condition, Action action)
+        protected static void ExpectArgumentConditionNotTrueException(string condition, Action action)
         {
             try
             {
@@ -251,7 +246,6 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-
         protected static void ExpectUnexpectedCharacterException(int index, char character, Action action)
         {
             try
@@ -262,9 +256,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ParseException), e);
                 Assert.AreEqual($"Unexpected character '{character}' found at position {index}.", e.Message);
-                if (e is ParseException)
+                var exception = e as ParseException;
+                if (exception != null)
                 {
-                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+                    Assert.AreEqual(index, exception.CharacterIndex);
                 }
 
                 return;
@@ -283,9 +278,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ParseException), e);
                 Assert.AreEqual($"Invalid escape character '{character}' at position {index}.", e.Message);
-                if (e is ParseException)
+                var exception = e as ParseException;
+                if (exception != null)
                 {
-                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+                    Assert.AreEqual(index, exception.CharacterIndex);
                 }
 
                 return;
@@ -304,9 +300,10 @@ namespace XtraLiteTemplates.NUnit
             {
                 Assert.IsInstanceOf(typeof(ParseException), e);
                 Assert.AreEqual($"Unexpected end of stream detected at position {index}.", e.Message);
-                if (e is ParseException)
+                var exception = e as ParseException;
+                if (exception != null)
                 {
-                    Assert.AreEqual(index, (e as ParseException).CharacterIndex);
+                    Assert.AreEqual(index, exception.CharacterIndex);
                 }
 
                 return;
@@ -328,10 +325,11 @@ namespace XtraLiteTemplates.NUnit
                 Assert.IsInstanceOf(typeof(LexingException), e);
                 Assert.AreEqual($"Unexpected token '{token}' (type: {type}) found at position {index}.", e.Message);
 
-                Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
-                Assert.AreEqual(originalLength, (e as LexingException).Token.OriginalLength);
-                Assert.AreEqual(token, (e as LexingException).Token.Value);
-                Assert.AreEqual(type, (e as LexingException).Token.Type);
+                var exception = (LexingException)e;
+                Assert.AreEqual(index, exception.Token.CharacterIndex);
+                Assert.AreEqual(originalLength, exception.Token.OriginalLength);
+                Assert.AreEqual(token, exception.Token.Value);
+                Assert.AreEqual(type, exception.Token.Type);
 
                 return;
             }
@@ -359,11 +357,12 @@ namespace XtraLiteTemplates.NUnit
                     Assert.AreEqual(
                         $"No matching tags found that can be continued with the token '{token}' (type: {type}) found at position {index}.", e.Message);
                 }
+                var exception = (LexingException)e;
 
-                Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
-                Assert.AreEqual(originalLength, (e as LexingException).Token.OriginalLength);
-                Assert.AreEqual(token, (e as LexingException).Token.Value);
-                Assert.AreEqual(type, (e as LexingException).Token.Type);
+                Assert.AreEqual(index, exception.Token.CharacterIndex);
+                Assert.AreEqual(originalLength, exception.Token.OriginalLength);
+                Assert.AreEqual(token, exception.Token.Value);
+                Assert.AreEqual(type, exception.Token.Type);
 
                 return;
             }
@@ -383,10 +382,11 @@ namespace XtraLiteTemplates.NUnit
                 Assert.AreEqual(string.Format("Unexpected or invalid expression token '{0}' (type: {1}) found at position {2}. Error: Invalid expression term: '{0}'.",
                     token, type, index), e.Message);
 
-                Assert.AreEqual(index, (e as LexingException).Token.CharacterIndex);
-                Assert.AreEqual(originalLength, (e as LexingException).Token.OriginalLength);
-                Assert.AreEqual(token, (e as LexingException).Token.Value);
-                Assert.AreEqual(type, (e as LexingException).Token.Type);
+                var exception = (LexingException)e;
+                Assert.AreEqual(index, exception.Token.CharacterIndex);
+                Assert.AreEqual(originalLength, exception.Token.OriginalLength);
+                Assert.AreEqual(token, exception.Token.Value);
+                Assert.AreEqual(type, exception.Token.Type);
 
                 return;
             }
@@ -428,7 +428,6 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-
         protected static void ExpectSpecialCannotBeRegisteredException(string keyword, Action action)
         {
             try
@@ -466,7 +465,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
 
-        protected static void ExpectTagAnyIndentifierCannotFollowExpressionException(Action action)
+        protected static void ExpectTagAnyIdentifierCannotFollowExpressionException(Action action)
         {
             try
             {
@@ -514,7 +513,6 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-
         protected static void ExpectCannotModifyAConstructedExpressionException(Action action)
         {
             try
@@ -547,7 +545,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-        protected static void ExpectCannotEvaluateUnconstructedExpressionException(Action action)
+        protected static void ExpectCannotEvaluateUnConstructedExpressionException(Action action)
         {
             try
             {
@@ -661,8 +659,7 @@ namespace XtraLiteTemplates.NUnit
             Assert.Fail();
         }
 
-
-        protected static void ExpectUnmatchedDirectiveTagException(Directive[] directives, int index, Action action)
+        protected static void ExpectUnmatchedDirectiveTagException(IEnumerable<Directive> directives, int index, Action action)
         {
             try
             {

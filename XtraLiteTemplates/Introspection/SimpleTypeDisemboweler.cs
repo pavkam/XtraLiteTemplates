@@ -30,7 +30,7 @@ namespace XtraLiteTemplates.Introspection
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
+    using System.Linq;
     using System.Reflection;
     using System.Text;
 
@@ -146,7 +146,7 @@ namespace XtraLiteTemplates.Introspection
             if (!_cachedMemberMap.TryGetValue(signature.ToString(), out getterMethod))
             {
                 /* No cache made for this call structure. Do it now and cache the invoke candidate. */
-                getterMethod = LocateSuitableInvokeCandidate(@object, member, arguments);
+                getterMethod = LocateSuitableInvokeCandidate(member, arguments);
                 _cachedMemberMap[signature.ToString()] = getterMethod;
             }
 
@@ -170,9 +170,9 @@ namespace XtraLiteTemplates.Introspection
             return candidateAccepted;
         }
 
-        private Func<object, object[], object> LocateSuitableInvokeCandidate(object @object, string member, object[] arguments)
+        private Func<object, object[], object> LocateSuitableInvokeCandidate(string member, IReadOnlyList<object> arguments)
         {
-            if (arguments == null || arguments.Length == 0)
+            if (arguments == null || arguments.Count == 0)
             {
                 /* Scan the type for properties. */
                 foreach (var property in Type.GetProperties())
@@ -205,12 +205,11 @@ namespace XtraLiteTemplates.Introspection
             }
 
             /* Try to find a suitable method candidate. */
-            return LocateSuitableMethodCandidate(@object, member, arguments);
+            return LocateSuitableMethodCandidate(member, arguments);
         }
 
-        private Func<object, object[], object> LocateSuitableMethodCandidate(object @object, string member, IReadOnlyList<object> arguments)
+        private Func<object, object[], object> LocateSuitableMethodCandidate(string member, IReadOnlyList<object> arguments)
         {
-            Debug.Assert(@object != null, "object cannot be null.");
             Debug.Assert(!string.IsNullOrEmpty(member), "member cannot be null or empty.");
 
             MethodInfo bestMatchingMethod = null;
@@ -230,13 +229,9 @@ namespace XtraLiteTemplates.Introspection
 
                 /* Reconcile arguments of the method. */
                 var methodParameters = method.GetParameters();
-                foreach (var parameter in methodParameters)
+                if (methodParameters.Any(m => m.IsRetval || m.IsOut))
                 {
-                    /* Scan for unsupported method parameter types. */
-                    if (parameter.IsRetval || parameter.IsOut)
-                    {
-                        continue;
-                    }
+                    continue;
                 }
 
                 var methodScore = .0;
@@ -399,8 +394,7 @@ namespace XtraLiteTemplates.Introspection
             return null;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private Func<object, object> ReconcileMissingArgument(ParameterInfo parameter, ref double reconciliationScore)
+        private static Func<object, object> ReconcileMissingArgument(ParameterInfo parameter, ref double reconciliationScore)
         {
             Debug.Assert(parameter != null, "parameter cannot be null.");
 
@@ -444,7 +438,6 @@ namespace XtraLiteTemplates.Introspection
             return a => defaultValue;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
         private Func<object, object> ReconcileArgument(Type parameterType, object argument, ref double reconciliationScore)
         {
             Debug.Assert(parameterType != null, "parameterType cannot be null.");

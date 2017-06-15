@@ -25,12 +25,12 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
-    using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.IO;
+    using global::NUnit.Framework;
     using Parsing;
 
     [TestFixture]
@@ -51,15 +51,14 @@ namespace XtraLiteTemplates.NUnit
             AssertToken(token, type, charIndex, value.Length, value);
         }
 
-
-
         [Test]
-        public void TestCaseConstrunction1()
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public void TestCaseConstruction1()
         {
             ExpectArgumentNullException("reader", () => new Tokenizer(null, '<', '>', '{', '}', '-', ','));
             ExpectArgumentNullException("reader", () => new Tokenizer((TextReader)null));
 
-            var tokenizer = new Tokenizer((string)null);
+            var tokenizer = new Tokenizer(null);
             Assert.IsNull(tokenizer.ReadNext());
         }
 
@@ -99,7 +98,7 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void TestCaseEmptyOrNullText()
         {
-            var tokenizer = new Tokenizer((string)null);
+            var tokenizer = new Tokenizer(null);
             Assert.IsNull(tokenizer.ReadNext());
 
             tokenizer = new Tokenizer(string.Empty);
@@ -110,7 +109,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseOneUnparsedCharacter()
+        public void TestCaseOneUnParsedCharacter()
         {
             const string Test = "T";
             var tokenizer = new Tokenizer(Test);
@@ -414,12 +413,14 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstructionExceptions()
         {
             ExpectArgumentNullException("reader", () => new Tokenizer((TextReader)null));
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstructionExceptionsExclusionRules()
         {
             var dummyReader = new StringReader("valid");
@@ -447,6 +448,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstructionExceptionsCharacterSets()
         {
             var dummyReader = new StringReader("valid");

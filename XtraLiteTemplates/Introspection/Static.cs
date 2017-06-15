@@ -1,5 +1,4 @@
-﻿//
-//  Author:
+﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
 //  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
@@ -24,27 +23,33 @@
 //  LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-//
 
-namespace XtraLiteTemplates.NUnit.Inside
+namespace XtraLiteTemplates.Introspection
 {
-    using Expressions;
-    using Expressions.Operators;
-    using global::NUnit.Framework;
+    using System;
 
-    public sealed class RtlAssocTestOperator : BinaryOperator
+    /// <summary>
+    /// A wrapper class used to expose static types to the <see cref="SimpleTypeDisemboweler"/>.
+    /// </summary>
+    public sealed class Static
     {
-        public RtlAssocTestOperator(string symbol)
-            : base(symbol, 5, Associativity.RightToLeft)
-        {
-        }
+        /// <summary>
+        /// Gets the <see cref="Type"/> of the exposed static type.
+        /// </summary>
+        /// <value>
+        /// The type of the exposed static type.
+        /// </value>
+        internal Type ExposedType { get; }
 
-        public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Static"/> class.
+        /// </summary>
+        /// <param name="type">The static type to expose.</param>
+        public Static(Type type)
         {
-            Assert.NotNull(context);
+            Expect.NotNull(nameof(type), type);
 
-            return $"{left},{right}";
+            ExposedType = type;
         }
     }
 }
-

@@ -25,18 +25,19 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
-    using System;
+    using System.Diagnostics.CodeAnalysis;
+
+    using global::NUnit.Framework;
     using Parsing;
 
     [TestFixture]
     public class LexTests : TestBase
     {
         [Test]
-        public void TestCaseUnparsedLexContruction1()
+        public void TestCaseUnParsedLexConstruction1()
         {
             var lex = new UnParsedLex("some_value", 100, 999);
 
@@ -46,7 +47,8 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseUnparsedLexContruction2()
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public void TestCaseUnParsedLexConstruction2()
         {
             ExpectArgumentLessThanException("firstCharacterIndex", 0, () => new UnParsedLex("100", -1, 1));
             ExpectArgumentLessThanOrEqualException("originalLength", 0, () => new UnParsedLex("100", 1, 0));
@@ -56,7 +58,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseTagLexContruction1()
+        public void TestCaseTagLexConstruction1()
         {
             var tag = new Tag().Keyword("Hello").Expression();
             var components = new object[] { "Hello", "Some" };
@@ -70,7 +72,9 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void TestCaseTagLexContruction2()
+        [SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+        public void TestCaseTagLexConstruction2()
         {
             var tag = new Tag().Keyword("Hello").Expression();
             var components = new object[] { "Hello", "Some" };

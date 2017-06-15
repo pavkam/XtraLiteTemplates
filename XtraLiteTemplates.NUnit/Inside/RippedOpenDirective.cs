@@ -25,17 +25,12 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
-
 namespace XtraLiteTemplates.NUnit.Inside
 {
-    using System;
     using System.Linq;
-
     using Evaluation;
-
     using Expressions;
-
+    using global::NUnit.Framework;
     using Parsing;
 
     public sealed class RippedOpenDirective : Directive
@@ -97,8 +92,8 @@ namespace XtraLiteTemplates.NUnit.Inside
                     };
                 }
 
-                text += $" -> {(state as FlowState).PreviousDecision} -> (";
-                return (state as FlowState).PreviousDecision;
+                text += $" -> {((FlowState)state).PreviousDecision} -> (";
+                return ((FlowState)state).PreviousDecision;
             }
 
             text = $") -> {{{tag}}}";
@@ -109,16 +104,18 @@ namespace XtraLiteTemplates.NUnit.Inside
             Assert.AreSame(tag, stateAsFlow.ExpectedTag);
             Assert.AreNotEqual(FlowDecision.Terminate, stateAsFlow.PreviousDecision);
 
-            if (stateAsFlow.PreviousDecision == FlowDecision.Evaluate || stateAsFlow.PreviousDecision == FlowDecision.Skip)
+            switch (stateAsFlow.PreviousDecision)
             {
-                Assert.AreEqual(_mMyTags[tagIndex - 1], stateAsFlow.PreviousTag);
-            }
-            else if (stateAsFlow.PreviousDecision == FlowDecision.Restart)
-            {
-                Assert.AreEqual(_mMyTags[0], stateAsFlow.ExpectedTag);
+                case FlowDecision.Evaluate:
+                case FlowDecision.Skip:
+                    Assert.AreEqual(_mMyTags[tagIndex - 1], stateAsFlow.PreviousTag);
+                    break;
+                case FlowDecision.Restart:
+                    Assert.AreEqual(_mMyTags[0], stateAsFlow.ExpectedTag);
+                    break;
             }
 
-            if (_mMyTags.Last() == tag)
+            if (Equals(_mMyTags.Last(), tag))
             {
                 /* This is the last tag. */
                 if (stateAsFlow.Mode == 0)
@@ -133,7 +130,7 @@ namespace XtraLiteTemplates.NUnit.Inside
                     stateAsFlow.PreviousDecision = FlowDecision.Terminate;
                 }
             }
-            else if (_mMyTags.First() == tag)
+            else if (Equals(_mMyTags.First(), tag))
             {
                 /* This is the last tag. */
                 if (stateAsFlow.Mode == 1)

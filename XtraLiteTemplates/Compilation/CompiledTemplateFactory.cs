@@ -374,6 +374,7 @@ namespace XtraLiteTemplates.Compilation
                     writer.Write(directiveText);
                 }
 
+                // ReSharper disable once SwitchStatementMissingSomeCases
                 switch (flowDecision)
                 {
                     case Directive.FlowDecision.Terminate:

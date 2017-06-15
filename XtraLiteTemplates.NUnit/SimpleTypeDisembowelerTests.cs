@@ -25,18 +25,21 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics.CodeAnalysis;
+    using global::NUnit.Framework;
     using Introspection;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class SimpleTypeDisembowelerTests : TestBase
     {
         [Test]
+        [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
         public void TestCaseConstruction()
         {
             ExpectArgumentNullException("type", () => new SimpleTypeDisemboweler(null, StringComparer.Ordinal, ObjectFormatter));
@@ -61,13 +64,13 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.Ordinal, 
                 ObjectFormatter);
 
-            var value = "Hello World";
+            const string Value = "Hello World";
 
-            Assert.AreEqual(value.Length, disemboweler.Invoke(value, "Length"));
-            Assert.AreEqual("HELLO WORLD", disemboweler.Invoke(value, "ToUpper"));
-            Assert.IsNull(disemboweler.Invoke(value, "length"));
-            Assert.IsNull(disemboweler.Invoke(value, "LENGTH"));
-            Assert.IsNull(disemboweler.Invoke(value, "Toupper"));
+            Assert.AreEqual(Value.Length, disemboweler.Invoke(Value, "Length"));
+            Assert.AreEqual("HELLO WORLD", disemboweler.Invoke(Value, "ToUpper"));
+            Assert.IsNull(disemboweler.Invoke(Value, "length"));
+            Assert.IsNull(disemboweler.Invoke(Value, "LENGTH"));
+            Assert.IsNull(disemboweler.Invoke(Value, "Toupper"));
         }
 
         [Test]
@@ -78,14 +81,14 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.OrdinalIgnoreCase, 
                 ObjectFormatter);
 
-            var value = "Hello World";
+            const string Value = "Hello World";
 
-            Assert.AreEqual(value.Length, disemboweler.Invoke(value, "Length"));
-            Assert.AreEqual(value.Length, disemboweler.Invoke(value, "length"));
-            Assert.AreEqual(value.Length, disemboweler.Invoke(value, "LENGTH"));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Invoke(value, "ToUpper"));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Invoke(value, "toupper"));
-            Assert.AreEqual(value.ToUpper(), disemboweler.Invoke(value, "TOUPPER"));
+            Assert.AreEqual(Value.Length, disemboweler.Invoke(Value, "Length"));
+            Assert.AreEqual(Value.Length, disemboweler.Invoke(Value, "length"));
+            Assert.AreEqual(Value.Length, disemboweler.Invoke(Value, "LENGTH"));
+            Assert.AreEqual(Value.ToUpper(), disemboweler.Invoke(Value, "ToUpper"));
+            Assert.AreEqual(Value.ToUpper(), disemboweler.Invoke(Value, "toupper"));
+            Assert.AreEqual(Value.ToUpper(), disemboweler.Invoke(Value, "TOUPPER"));
         }
 
         [Test]
@@ -138,6 +141,7 @@ namespace XtraLiteTemplates.NUnit
             ExpectArgumentNotIdentifierException("member", () => disemboweler.Invoke(string.Empty, "+Value"));
         }
 
+        [SuppressMessage("ReSharper", "UnusedMember.Local")]
         private class SelectiveObject
         {
             private readonly List<string> _journal = new List<string>();
@@ -197,7 +201,6 @@ namespace XtraLiteTemplates.NUnit
                 _journal.Add($"[...Int32({string.Join(",", args)})]");
             }
 
-
             public void Function6(object arg0, object arg1)
             {
                 _journal.Add($"[Object({arg0}) Object({arg1})]");
@@ -207,7 +210,6 @@ namespace XtraLiteTemplates.NUnit
             {
                 _journal.Add($"[Object({arg0}) ...Object({string.Join(",", args)})]");
             }
-
 
             public override string ToString()
             {
@@ -225,11 +227,11 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.Ordinal,
                 ObjectFormatter);
 
-            disemboweler.Invoke(selectiveObject, "Function1", null);
+            disemboweler.Invoke(selectiveObject, "Function1");
             disemboweler.Invoke(selectiveObject, "Function1", new object[] { "text" });
             disemboweler.Invoke(selectiveObject, "Function1", new object[] { StringComparer.InvariantCulture } );
             disemboweler.Invoke(selectiveObject, "Function1", new object[] { 100 } );
-            disemboweler.Invoke(selectiveObject, "Function1", new object[] { (Int16)99 });
+            disemboweler.Invoke(selectiveObject, "Function1", new object[] { (short)99 });
             disemboweler.Invoke(selectiveObject, "Function1", new object[] { 100.0 } );
             disemboweler.Invoke(selectiveObject, "Function1", new object[] { true });
 
@@ -246,11 +248,11 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.Ordinal,
                 ObjectFormatter);
 
-            disemboweler.Invoke(selectiveObject, "Function2", null);
+            disemboweler.Invoke(selectiveObject, "Function2");
             disemboweler.Invoke(selectiveObject, "Function2", new object[] { "text", 34, 78 });
             disemboweler.Invoke(selectiveObject, "Function2", new object[] { StringComparer.InvariantCulture, 18 });
             disemboweler.Invoke(selectiveObject, "Function2", new object[] { 100, this });
-            disemboweler.Invoke(selectiveObject, "Function2", new object[] { (Int16)99, string.Empty });
+            disemboweler.Invoke(selectiveObject, "Function2", new object[] { (short)99, string.Empty });
             disemboweler.Invoke(selectiveObject, "Function2", new object[] { 100.0, true });
             disemboweler.Invoke(selectiveObject, "Function2", new object[] { true, 1, 2 });
 
@@ -267,12 +269,12 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.Ordinal,
                 ObjectFormatter);
 
-            disemboweler.Invoke(selectiveObject, "Function3", null);
+            disemboweler.Invoke(selectiveObject, "Function3");
             disemboweler.Invoke(selectiveObject, "Function3", new object[] { null, null } );
             disemboweler.Invoke(selectiveObject, "Function3", new object[] { "text", 34, 78 });
-            disemboweler.Invoke(selectiveObject, "Function3", new object[] { StringComparer.InvariantCulture, (Byte)18 });
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { StringComparer.InvariantCulture, (byte)18 });
             disemboweler.Invoke(selectiveObject, "Function3", new object[] { 100, null });
-            disemboweler.Invoke(selectiveObject, "Function3", new object[] { (Int16)99, string.Empty });
+            disemboweler.Invoke(selectiveObject, "Function3", new object[] { (short)99, string.Empty });
             disemboweler.Invoke(selectiveObject, "Function3", new object[] { 100.0, true });
             disemboweler.Invoke(selectiveObject, "Function3", new object[] { true, 1.99, 2 });
 
@@ -289,7 +291,7 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.Ordinal,
                 ObjectFormatter);
 
-            disemboweler.Invoke(selectiveObject, "Function4", null);
+            disemboweler.Invoke(selectiveObject, "Function4");
             disemboweler.Invoke(selectiveObject, "Function4", new object[] { null, null });
             disemboweler.Invoke(selectiveObject, "Function4", new object[] { true, 1.99, 2 });
 
@@ -306,7 +308,7 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.Ordinal,
                 ObjectFormatter);
 
-            disemboweler.Invoke(selectiveObject, "Function5", null);
+            disemboweler.Invoke(selectiveObject, "Function5");
             disemboweler.Invoke(selectiveObject, "Function5", new object[] { 1, 2 });
             disemboweler.Invoke(selectiveObject, "Function5", new object[] { (byte)1, (ushort)2, (uint)3, (long)4, 5.33, 6.23M });
 
@@ -323,7 +325,7 @@ namespace XtraLiteTemplates.NUnit
                 StringComparer.Ordinal,
                 ObjectFormatter);
 
-            disemboweler.Invoke(selectiveObject, "Function6", null);
+            disemboweler.Invoke(selectiveObject, "Function6");
             disemboweler.Invoke(selectiveObject, "Function6", new object[] { null });
             disemboweler.Invoke(selectiveObject, "Function6", new object[] { null, null });
             disemboweler.Invoke(selectiveObject, "Function6", new object[] { null, null, null });

@@ -25,16 +25,19 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using System.Threading;
-
     using Evaluation;
+    using Introspection;
+    using global::NUnit.Framework;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+    [SuppressMessage("ReSharper", "StringLiteralTypo")]
     public class EvaluationContextTests : TestBase
     {
         private EvaluationContext _evaluationContext;
@@ -56,14 +59,14 @@ namespace XtraLiteTemplates.NUnit
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void ConstructorUsingNullObjectFomatterRaisesException()
+        public void ConstructorUsingNullObjectFormatterRaisesException()
         {
             new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCulture, null, this, (context, text) => text);
         }
 
         [Test]
         [ExpectedException(typeof(ArgumentNullException))]
-        public void Constructor_UsingNullUnparsedTextHandler_RaisesException()
+        public void Constructor_UsingNullUnParsedTextHandler_RaisesException()
         {
             new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCulture, ObjectFormatter, this, null);
         }
@@ -106,7 +109,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void Constructor_ForUnparsedTextHandler_StoresTheValue()
+        public void Constructor_ForUnParsedTextHandler_StoresTheValue()
         {
             var evaluationContext = new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCultureIgnoreCase, ObjectFormatter, this, (context, text) => text.ToUpper());
 
@@ -114,18 +117,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void ProcessUnparsedTextUsingNullValueExecutesDelegate()
-        {
-            var evaluationContext = new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCultureIgnoreCase,
-                ObjectFormatter, this, (context, text) =>
-           {
-               Assert.IsNull(text);
-               return null;
-           });
-        }
-
-        [Test]
-        public void ProcessUnparsedTextUsingNonNullTextExecutesDelegate()
+        public void ProcessUnParsedTextUsingNonNullTextExecutesDelegate()
         {
             var evaluationContext = new EvaluationContext(false, CancellationToken.None, StringComparer.InvariantCultureIgnoreCase,
                 ObjectFormatter, this, (context, text) =>
@@ -384,7 +376,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void InvokeWithObjectUsingNullAgrumentsArrayIsSimilarToEmptyArray()
+        public void InvokeWithObjectUsingNullArgumentsArrayIsSimilarToEmptyArray()
         {
             Assert.AreEqual(_evaluationContext.Invoke(this, "ToString", new object[] { }), _evaluationContext.Invoke(this, "ToString", null));
         }
@@ -393,6 +385,20 @@ namespace XtraLiteTemplates.NUnit
         public void InvokeWithObjectForUnknownMethodOrPropertyReturnsNull()
         {
             Assert.IsNull(_evaluationContext.Invoke(this, "DoesNotExist", null));
+        }
+
+        [Test]
+        public void GetPropertyHonorsStaticTypes()
+        {
+            var result = _evaluationContext.GetProperty(new Static(typeof(Math)), "PI");
+            Assert.AreEqual(Math.PI, result);
+        }
+
+        [Test]
+        public void InvokeHonorsStaticTypes()
+        {
+            var result = _evaluationContext.Invoke(new Static(typeof(Math)), "Abs", new object[] {-1} );
+            Assert.AreEqual(1, result);
         }
     }
 }

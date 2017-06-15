@@ -49,10 +49,11 @@ namespace XtraLiteTemplates.NUnit.Inside
 
             if (obj == null)
                 return "!undefined!";
-            if (obj is string)
-                result = (string)obj;
+            var s = obj as string;
+            if (s != null)
+                result = s;
             else if (obj is IFormattable)
-                result = (obj as IFormattable).ToString(null, formatProvider);
+                result = ((IFormattable)obj).ToString(null, formatProvider);
             else
                 result = obj.ToString();
 
@@ -61,7 +62,7 @@ namespace XtraLiteTemplates.NUnit.Inside
 
         public string ToString(object obj)
         {
-            return ((IObjectFormatter)this).ToString(obj, _mCulture);
+            return this.ToString(obj, _mCulture);
         }
     }
 }

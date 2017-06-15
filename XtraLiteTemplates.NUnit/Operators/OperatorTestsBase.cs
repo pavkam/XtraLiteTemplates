@@ -25,19 +25,21 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
+    using System.Diagnostics.CodeAnalysis;
     using Expressions;
     using Expressions.Operators;
+    using global::NUnit.Framework;
 
     [TestFixture]
     public class OperatorTestsBase : TestBase
     {
         protected readonly IExpressionEvaluationContext EmptyEvaluationContext = CreateContext(StringComparer.OrdinalIgnoreCase);
 
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         protected void AssertEvaluation<T, TR>(UnaryOperator @operator, T arg, TR expected)
         {
             var result = @operator.Evaluate(EmptyEvaluationContext, arg);
