@@ -374,8 +374,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The string representation.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
-        [NotNull]
-        string IObjectFormatter.ToString([CanBeNull] object obj, [NotNull] IFormatProvider formatProvider)
+        string IObjectFormatter.ToString(object obj, IFormatProvider formatProvider)
         {
             string result;
 
@@ -409,7 +408,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <returns>The string representation.</returns>
-        string IObjectFormatter.ToString([CanBeNull] object obj)
+        string IObjectFormatter.ToString(object obj)
         {
             return ((IObjectFormatter)this).ToString(obj, Culture);
         }
@@ -472,13 +471,10 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <remarks>
         /// Descendant classes need to call this method when creating directives and operators to adjust the case accordingly.
         /// </remarks>
-        [CanBeNull]
-        protected string AdjustCasing([CanBeNull] string markup)
+        [NotNull]
+        protected string AdjustCasing([NotNull] string markup)
         {
-            if (string.IsNullOrEmpty(markup))
-            {
-                return markup;
-            }
+            Expect.NotNull(nameof(markup), markup);
 
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_dialectCasing)

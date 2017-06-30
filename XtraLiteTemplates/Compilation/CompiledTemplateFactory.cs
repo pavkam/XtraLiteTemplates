@@ -57,12 +57,11 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="openComponents">The components associated with the opening tag.</param>
         /// <param name="closeComponents">The components associated with the closing tag.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
-        [NotNull]
         protected override CompiledEvaluationDelegate<EvaluationContext> BuildDoubleTagDirectiveEvaluationDelegate(
-            [NotNull] Directive directive,
-            [NotNull] CompiledEvaluationDelegate<EvaluationContext> innerDelegate,
-            [NotNull] object[] openComponents,
-            [NotNull] object[] closeComponents)
+            Directive directive,
+            CompiledEvaluationDelegate<EvaluationContext> innerDelegate,
+            object[] openComponents,
+            object[] closeComponents)
         {
             Debug.Assert(directive != null, "Argument directive cannot be null.");
             Debug.Assert(openComponents != null, "Argument openComponents cannot be null.");
@@ -115,11 +114,10 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="innerDelegates">A list of evaluable delegates that represent all inner nodes.</param>
         /// <param name="components">A list of tag components.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
-        [NotNull]
         protected override CompiledEvaluationDelegate<EvaluationContext> BuildMultipleTagDirectiveEvaluationDelegate(
-            [NotNull] Directive directive,
-            [NotNull] CompiledEvaluationDelegate<EvaluationContext>[] innerDelegates,
-            [NotNull] object[][] components)
+            Directive directive,
+            CompiledEvaluationDelegate<EvaluationContext>[] innerDelegates,
+            object[][] components)
         {
             Debug.Assert(directive != null, "Argument directive cannot be null.");
             Debug.Assert(components != null, "Argument components cannot be null.");
@@ -160,7 +158,6 @@ namespace XtraLiteTemplates.Compilation
         /// </summary>
         /// <param name="unParsedText">The un-parsed text.</param>
         /// <returns>A new delegate that handles the given text.</returns>
-        [NotNull]
         protected override CompiledEvaluationDelegate<EvaluationContext> BuildUnParsedTextEvaluationDelegate([NotNull] string unParsedText)
         {
             Debug.Assert(!string.IsNullOrEmpty(unParsedText), "Argument unParsedText cannot be empty.");
@@ -191,10 +188,9 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="directive">The directive.</param>
         /// <param name="components">The components associated with directive's tag.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
-        [NotNull]
         protected override CompiledEvaluationDelegate<EvaluationContext> BuildSingleTagDirectiveEvaluationDelegate(
-            [NotNull] Directive directive,
-            [NotNull] object[] components)
+            Directive directive,
+            object[] components)
         {
             Debug.Assert(directive != null, "Argument directive cannot be null.");
             Debug.Assert(components != null, "Argument components cannot be null.");

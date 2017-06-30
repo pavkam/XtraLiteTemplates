@@ -95,9 +95,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// </remarks>
         protected internal override FlowDecision Execute(
             int tagIndex,
-            [NotNull] object[] components, 
+            object[] components, 
             ref object state,
-            [NotNull] IExpressionEvaluationContext context, 
+            IExpressionEvaluationContext context, 
             out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1, "tagIndex must be between 0 and 1.");

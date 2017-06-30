@@ -133,8 +133,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported directives.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        [NotNull]
-        protected override IEnumerable<Directive> CreateDirectives([NotNull] IPrimitiveTypeConverter typeConverter)
+        protected override IEnumerable<Directive> CreateDirectives(IPrimitiveTypeConverter typeConverter)
         {
             Expect.NotNull(nameof(typeConverter), typeConverter);
 
@@ -162,8 +161,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// An instance of the self object.
         /// </returns>
-        [NotNull]
-        protected override StandardSelfObject CreateSelfObject([NotNull] IPrimitiveTypeConverter typeConverter)
+        protected override StandardSelfObject CreateSelfObject(IPrimitiveTypeConverter typeConverter)
         {
             Expect.NotNull(nameof(typeConverter), typeConverter);
 

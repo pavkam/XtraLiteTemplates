@@ -130,7 +130,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="value">The property value.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        public void SetProperty([NotNull] string property, [CanBeNull] object value)
+        public void SetProperty(string property, object value)
         {
             Expect.Identifier("property", property);
 
@@ -152,8 +152,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        [CanBeNull]
-        public object GetProperty([NotNull] string property)
+        public object GetProperty(string property)
         {
             Expect.Identifier("property", property);
 
@@ -176,8 +175,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        [CanBeNull]
-        public object GetProperty([CanBeNull] object @object, [NotNull] string property)
+        public object GetProperty([CanBeNull] object @object, string property)
         {
             Expect.Identifier("property", property);
 
@@ -195,8 +193,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
-        [CanBeNull]
-        public object Invoke([NotNull] string method, [CanBeNull] object[] arguments)
+        public object Invoke(string method, [CanBeNull] object[] arguments)
         {
             Expect.Identifier("method", method);
             
@@ -224,8 +221,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
-        [CanBeNull]
-        public object Invoke([CanBeNull] object @object, [NotNull] string method, [CanBeNull] object[] arguments)
+        public object Invoke([CanBeNull] object @object, string method, [CanBeNull] object[] arguments)
         {
             Expect.Identifier("method", method);
 
@@ -242,7 +238,7 @@ namespace XtraLiteTemplates.Evaluation
         /// State objects can represent anything and are a simple way of storing state information for special operators
         /// or directives.
         /// </remarks>
-        public void AddStateObject([NotNull] object state)
+        public void AddStateObject(object state)
         {
             Expect.NotNull("state", state);
 
@@ -264,7 +260,7 @@ namespace XtraLiteTemplates.Evaluation
         /// State objects can represent anything and are a simple way of storing state information for special operators
         /// or directives.
         /// </remarks>
-        public void RemoveStateObject([NotNull] object state)
+        public void RemoveStateObject(object state)
         {
             Expect.NotNull("state", state);
 
@@ -280,7 +276,7 @@ namespace XtraLiteTemplates.Evaluation
         ///   <c>true</c> if the state object was added; <c>false</c> otherwise.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
-        public bool ContainsStateObject([NotNull] object state)
+        public bool ContainsStateObject(object state)
         {
             Expect.NotNull("state", state);
 

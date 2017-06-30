@@ -83,7 +83,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="int"/> value.</returns>
-        public int ConvertToInteger([CanBeNull] object obj)
+        public int ConvertToInteger(object obj)
         {
             var number = ConvertToNumber(obj);
             if (double.IsNaN(number) || double.IsInfinity(number))
@@ -100,7 +100,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="double"/> value.</returns>
-        public double ConvertToNumber([CanBeNull] object obj)
+        public double ConvertToNumber(object obj)
         {
             if (obj is IEnumerable)
             {
@@ -154,8 +154,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="string"/> value.</returns>
-        [CanBeNull]
-        public string ConvertToString([CanBeNull] object obj)
+        public string ConvertToString(object obj)
         {
             var str = obj as string;
             if (str != null)
@@ -189,7 +188,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="bool"/> value.</returns>
-        public bool ConvertToBoolean([CanBeNull] object obj)
+        public bool ConvertToBoolean(object obj)
         {
             obj = ReduceObject(obj);
 
@@ -225,8 +224,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="IEnumerable{Object}"/> value.</returns>
-        [CanBeNull]
-        public IEnumerable<object> ConvertToSequence([CanBeNull] object obj)
+        public IEnumerable<object> ConvertToSequence(object obj)
         {
             if (obj == null)
             {
@@ -248,7 +246,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The object to check the type for.</param>
         /// <returns>A <see cref="PrimitiveType"/> value.</returns>
-        public PrimitiveType TypeOf([CanBeNull] object obj)
+        public PrimitiveType TypeOf(object obj)
         {
             if (obj == null)
             {

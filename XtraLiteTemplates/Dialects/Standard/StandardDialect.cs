@@ -29,6 +29,7 @@ namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Globalization;
     using Directives;
     using Evaluation;
@@ -218,8 +219,10 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported operators.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override IEnumerable<Operator> CreateOperators([NotNull] IPrimitiveTypeConverter typeConverter)
+        protected override IEnumerable<Operator> CreateOperators(IPrimitiveTypeConverter typeConverter)
         {
+            Debug.Assert(typeConverter != null);
+
             return new Operator[]
             {
                 new RelationalEqualsOperator(StringLiteralComparer, typeConverter),
@@ -259,6 +262,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
         protected override IEnumerable<Directive> CreateDirectives(IPrimitiveTypeConverter typeConverter)
         {
+            Debug.Assert(typeConverter != null);
+
             return new Directive[]
             {
                 new ConditionalInterpolationDirective(AdjustCasing("$ IF $"), false, typeConverter),

@@ -103,9 +103,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// </returns>
         protected internal override FlowDecision Execute(
             int tagIndex,
-            [NotNull] object[] components,
+            object[] components,
             ref object state,
-            [NotNull] IExpressionEvaluationContext context, 
+            IExpressionEvaluationContext context, 
             out string text)
         {
             /* It is a simple directive. Expecting just one tag here. */
