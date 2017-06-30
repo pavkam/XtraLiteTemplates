@@ -120,6 +120,14 @@ namespace XtraLiteTemplates.NUnit.Dialects
         }
 
         [Test]
+        public void TestCaseJoinOnNullSequence()
+        {
+            var result = _selfObject.Join(",", null);
+
+            Assert.IsNull(result);
+        }
+
+        [Test]
         public void TestCaseNl()
         {
             Assert.AreEqual(Environment.NewLine, _selfObject.NL);

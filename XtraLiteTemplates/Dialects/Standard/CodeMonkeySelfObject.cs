@@ -178,11 +178,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <param name="separator">The separator string.</param>
         /// <param name="sequence">The sequence to join.</param>
         /// <returns>The resulting string.</returns>
+        [CanBeNull]
         public string Join(object separator, object sequence)
         {
-            return string.Join(
-                TypeConverter.ConvertToString(separator), 
-                TypeConverter.ConvertToSequence(sequence));
+            var enumerable = TypeConverter.ConvertToSequence(sequence);
+            return enumerable != null ? string.Join(TypeConverter.ConvertToString(separator), enumerable) : null;
         }
     }
 }

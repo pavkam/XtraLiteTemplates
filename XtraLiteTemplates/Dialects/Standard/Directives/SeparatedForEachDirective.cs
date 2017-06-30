@@ -76,8 +76,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             var identifierComponents = Enumerable.Range(0, tag.ComponentCount)
                 .Where(index => tag.MatchesAnyIdentifier(index)).Select(index => index).ToArray();
 
-            Expect.IsTrue("one expression component", expressionComponents.Length == 1);
-            Expect.IsTrue("one identifier component", identifierComponents.Length == 1);
+            Expect.IsTrue(nameof(expressionComponents), expressionComponents.Length == 1);
+            Expect.IsTrue(nameof(expressionComponents), identifierComponents.Length == 1);
 
             _sequenceExpressionComponentIndex = expressionComponents[0];
             _identifierComponentIndex = identifierComponents[0];
@@ -141,6 +141,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                         }
 
                         var propertyName = components[_identifierComponentIndex] as string;
+                        Debug.Assert(propertyName != null);
                         context.SetProperty(propertyName, enumerator.Current);
 
                         state = new State { Enumerator = enumerator, IsLast = !enumerator.MoveNext() };
@@ -156,6 +157,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                         Debug.Assert(!asState1.IsLast, "iteration cannot be the last.");
 
                         var propertyName = components[_identifierComponentIndex] as string;
+                        Debug.Assert(propertyName != null);
                         context.SetProperty(propertyName, asState1.Enumerator.Current);
                         asState1.IsLast = !asState1.Enumerator.MoveNext();
 

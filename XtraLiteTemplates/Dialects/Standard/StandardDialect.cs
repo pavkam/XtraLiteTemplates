@@ -164,7 +164,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The preformatted state object.
         /// </value>
-        [CanBeNull]
+        [NotNull]
         protected object PreformattedStateObject { get; }
 
         /// <summary>
@@ -182,12 +182,9 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             Expect.NotNull(nameof(context), context);
 
-            if (PreformattedStateObject != null && context.ContainsStateObject(PreformattedStateObject))
-            {
-                return unParsedText;
-            }
-
-            return base.DecorateUnParsedText(context, unParsedText);
+            return 
+                context.ContainsStateObject(PreformattedStateObject) ? unParsedText : 
+                base.DecorateUnParsedText(context, unParsedText);
         }
 
         /// <summary>

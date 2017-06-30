@@ -68,7 +68,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             var expressionComponents = Enumerable.Range(0, tag.ComponentCount)
                 .Where(index => tag.MatchesExpression(index)).Select(index => index).ToArray();
 
-            Expect.IsTrue("two expression components", expressionComponents.Length == 2);
+            Expect.IsTrue(nameof(expressionComponents), expressionComponents.Length == 2);
 
             if (invertExpressionOrder)
             {

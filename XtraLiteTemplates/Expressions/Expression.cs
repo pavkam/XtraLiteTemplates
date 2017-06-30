@@ -345,6 +345,7 @@ namespace XtraLiteTemplates.Expressions
 
         private void OpenNewGroup()
         {
+            Debug.Assert(_currentNode != null);
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.NewGroup))
             {
                 ExceptionHelper.InvalidExpressionTerm(FlowSymbols.GroupOpen);
@@ -386,12 +387,14 @@ namespace XtraLiteTemplates.Expressions
 
         private void CloseExistingGroup()
         {
+            Debug.Assert(_currentGroupRootNode != null);
             /* Special case just here! */
             if (_currentGroupRootNode.Parent == null)
             {
                 ExceptionHelper.InvalidExpressionTerm(FlowSymbols.GroupClose);
             }
 
+            Debug.Assert(_currentNode != null);
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.CloseGroup))
             {
                 ExceptionHelper.InvalidExpressionTerm(FlowSymbols.GroupClose);
@@ -420,6 +423,7 @@ namespace XtraLiteTemplates.Expressions
 
         private void ContinueExistingGroup()
         {
+            Debug.Assert(_currentNode != null);
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.ContinueGroup))
             {
                 ExceptionHelper.InvalidExpressionTerm(FlowSymbols.Separator);
@@ -431,6 +435,7 @@ namespace XtraLiteTemplates.Expressions
         private void StartUnary([NotNull] UnaryOperator unaryOperator)
         {
             Debug.Assert(unaryOperator != null);
+            Debug.Assert(_currentNode != null);
 
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
             {
@@ -459,6 +464,7 @@ namespace XtraLiteTemplates.Expressions
         private void StartBinary([NotNull] BinaryOperator binaryOperator)
         {
             Debug.Assert(binaryOperator != null);
+            Debug.Assert(_currentNode != null);
 
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
             {
@@ -489,6 +495,7 @@ namespace XtraLiteTemplates.Expressions
             }
 
             leftNode.Parent = _currentNode;
+            Debug.Assert(_currentGroupRootNode != null);
             if (_currentGroupRootNode.LastChild == leftNode)
             {
                 _currentGroupRootNode.LastChild = _currentNode;
@@ -498,6 +505,8 @@ namespace XtraLiteTemplates.Expressions
         private void CompleteWithSymbol([NotNull] string symbol)
         {
             Debug.Assert(!string.IsNullOrEmpty(symbol));
+            Debug.Assert(_currentNode != null);
+
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.Identifier))
             {
                 ExceptionHelper.InvalidExpressionTerm(symbol);
@@ -536,6 +545,7 @@ namespace XtraLiteTemplates.Expressions
 
         private void CompleteWithLiteral([CanBeNull] object literal)
         {
+            Debug.Assert(_currentNode != null);
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.Literal))
             {
                 var currentReferenceNode = _currentNode as ReferenceNode;
@@ -571,6 +581,7 @@ namespace XtraLiteTemplates.Expressions
 
         private void ContinueWithMemberAccess()
         {
+            Debug.Assert(_currentNode != null);
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
             {
                 ExceptionHelper.UnexpectedOperator(FlowSymbols.MemberAccess);
@@ -586,6 +597,7 @@ namespace XtraLiteTemplates.Expressions
             }
             else if (_currentNode.Parent == _currentGroupRootNode)
             {
+                Debug.Assert(_currentGroupRootNode != null);
                 Debug.Assert(_currentGroupRootNode.LastChild == _currentNode, "the last child of the current root node must be the current node.");
                 _currentGroupRootNode.LastChild = newNode;
             }
@@ -634,6 +646,7 @@ namespace XtraLiteTemplates.Expressions
                     UnaryOperator unaryOperator;
                     if (_unaryOperatorSymbols.TryGetValue(symbol, out unaryOperator))
                     {
+                        Debug.Assert(_currentNode != null);
                         if (_currentNode.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
                         {
                             StartUnary(unaryOperator);
@@ -644,6 +657,7 @@ namespace XtraLiteTemplates.Expressions
                     BinaryOperator binaryOperator;
                     if (_binaryOperatorSymbols.TryGetValue(symbol, out binaryOperator))
                     {
+                        Debug.Assert(_currentNode != null);
                         if (_currentNode.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
                         {
                             StartBinary(binaryOperator);

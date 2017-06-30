@@ -65,7 +65,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             var expressionComponents = Enumerable.Range(0, tag.ComponentCount)
                 .Where(index => tag.MatchesExpression(index)).Select(index => index).ToArray();
 
-            Expect.IsTrue("one expression component", expressionComponents.Length == 1);
+            Expect.IsTrue(nameof(expressionComponents), expressionComponents.Length == 1);
 
             _conditionalExpressionComponentIndex = expressionComponents[0];
         }

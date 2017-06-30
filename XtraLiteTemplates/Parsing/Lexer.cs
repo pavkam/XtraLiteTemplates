@@ -563,6 +563,7 @@ namespace XtraLiteTemplates.Parsing
             Debug.Assert(token != null);
 
             var remainingSymbols = token.Value;
+            Debug.Assert(remainingSymbols != null);
 
             while (remainingSymbols.Length > 0)
             {

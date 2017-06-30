@@ -59,7 +59,7 @@ namespace XtraLiteTemplates.Evaluation
 
             foreach (var tag in tags)
             {
-                Expect.NotNull("tag", tag);
+                Expect.NotNull(nameof(tags), tag);
 
                 if (tag.ComponentCount == 0)
                 {
