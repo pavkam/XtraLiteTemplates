@@ -29,12 +29,14 @@ namespace XtraLiteTemplates
     using System.IO;
     using System.Threading;
     using System.Threading.Tasks;
-    using Compilation;
-    using Dialects;
-    using Evaluation;
-    using Expressions;
+
     using JetBrains.Annotations;
-    using Parsing;
+
+    using XtraLiteTemplates.Compilation;
+    using XtraLiteTemplates.Dialects;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// Facade class that uses all components exposed by the <c>XtraLiteTemplates library</c>. XLTemplate class uses an instance of <see cref="IDialect" /> interface
@@ -104,7 +106,7 @@ namespace XtraLiteTemplates
         /// </summary>
         /// <param name="dialect">An instance <see cref="IDialect"/> used to define the domain-specific language properties.</param>
         /// <param name="template">A <see cref="string"/> value that is compiled and used for evaluation.</param>
-        /// <param name="arguments">A <see cref="IReadOnlyDictionary{String, Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <param name="arguments">A <see cref="IReadOnlyDictionary{TKey,TValue}"/> storing all variables exposed to the template at evaluation time.</param>
         /// <returns>The result of evaluating the template.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="dialect"/>, <paramref name="template"/> or <paramref name="arguments"/> parameters are <c>null</c>.</exception>
         /// <exception cref="ParseException">Parsing error during template compilation.</exception>

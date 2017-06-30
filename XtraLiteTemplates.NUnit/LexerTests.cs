@@ -35,13 +35,11 @@ namespace XtraLiteTemplates.NUnit
     using System.IO;
     using System.Linq;
 
-    using Expressions;
-
     using global::NUnit.Framework;
 
-    using Parsing;
-
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]

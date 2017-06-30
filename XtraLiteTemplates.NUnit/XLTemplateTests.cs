@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.NUnit
     using System.Threading.Tasks;
 
     using global::NUnit.Framework;
+
     using XtraLiteTemplates.Dialects.Standard;
 
     [TestFixture]
@@ -79,8 +80,8 @@ namespace XtraLiteTemplates.NUnit
             const string Text = "V = {variable}";
             var template = new XLTemplate(StandardDialect.DefaultIgnoreCase, Text);
 
-            var variables = new Dictionary<string, object>()
-            {
+            var variables = new Dictionary<string, object>
+                                {
                 { "Variable", 1 }
             };
             
@@ -99,16 +100,16 @@ namespace XtraLiteTemplates.NUnit
             const string Text = "V = {variable}";
             var template = new XLTemplate(StandardDialect.Default, Text);
 
-            var variables1 = new Dictionary<string, object>()
-            {
+            var variables1 = new Dictionary<string, object>
+                                 {
                 { "Variable", 1 }
             };
-            var variables2 = new Dictionary<string, object>()
-            {
+            var variables2 = new Dictionary<string, object>
+                                 {
                 { "variable", 1 }
             };
-            var variables3 = new Dictionary<string, object>()
-            {
+            var variables3 = new Dictionary<string, object>
+                                 {
                 { "Variable", 1 },
                 { "variable", 2 }
             };

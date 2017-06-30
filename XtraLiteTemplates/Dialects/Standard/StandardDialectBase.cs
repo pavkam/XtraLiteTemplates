@@ -32,11 +32,13 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Text;
-    using Evaluation;
-    using Expressions;
-    using Expressions.Operators;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviors that concrete

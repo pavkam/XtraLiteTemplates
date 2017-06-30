@@ -27,8 +27,10 @@
 namespace XtraLiteTemplates.Compilation
 {
     using System.IO;
-    using Expressions;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Expressions;
 
     /// <summary>
     /// Delegate type used by <see cref="CompiledTemplateFactory{TContext}"/> when compiling a template.

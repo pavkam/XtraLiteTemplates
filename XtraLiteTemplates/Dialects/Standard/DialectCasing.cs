@@ -50,6 +50,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The dialect is upper-cased. All keywords are required to be lower case to match. The variables and properties are
         /// case-sensitive.
         /// </summary>
-        LowerCase,
+        LowerCase
     }
 }

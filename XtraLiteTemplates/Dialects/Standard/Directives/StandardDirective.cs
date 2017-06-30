@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
-    using Evaluation;
-    using Introspection;
+
     using JetBrains.Annotations;
-    using Parsing;
+
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Introspection;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// Abstract base class for all standard directives.

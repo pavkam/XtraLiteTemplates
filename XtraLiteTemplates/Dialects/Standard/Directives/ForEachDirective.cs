@@ -31,10 +31,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-    using Expressions;
-    using Introspection;
+
     using JetBrains.Annotations;
-    using Parsing;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The FOR EACH directive implementation.

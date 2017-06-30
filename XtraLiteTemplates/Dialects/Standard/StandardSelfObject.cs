@@ -26,9 +26,9 @@
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
-    using Introspection;
-
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// The standard <c>self</c> object implementation. Provides a set of standard methods and properties exposed globally to

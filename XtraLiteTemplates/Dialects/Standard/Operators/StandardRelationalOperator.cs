@@ -29,9 +29,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using Expressions;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// The abstract base class for all standard binary relational expression operators.

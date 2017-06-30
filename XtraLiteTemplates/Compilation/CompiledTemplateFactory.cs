@@ -31,9 +31,11 @@ namespace XtraLiteTemplates.Compilation
     using System.Diagnostics;
     using System.IO;
     using System.Runtime.InteropServices;
-    using Evaluation;
-    using Expressions;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
 
     /// <summary>
     /// Class that encapsulates <c>compilation</c> logic defined for the standard <see cref="EvaluationContext"/>. The sole purpose of <see cref="CompiledTemplateFactory{TContext}"/> is to

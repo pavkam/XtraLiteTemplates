@@ -27,9 +27,11 @@
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
-    using Expressions;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Implements the standard floating point sum ('+') operation, with an extension for <see cref="string"/> and <see cref="bool"/> types.

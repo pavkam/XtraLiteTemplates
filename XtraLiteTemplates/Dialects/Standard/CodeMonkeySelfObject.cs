@@ -29,8 +29,10 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// The developer version of the <c>self</c> object implementation. Extends the <see cref="StandardSelfObject"/> with developer-focused methods and properties.

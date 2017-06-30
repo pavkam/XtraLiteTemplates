@@ -31,10 +31,11 @@ namespace XtraLiteTemplates.Parsing
     using System.Diagnostics;
     using System.Globalization;
     using System.Linq;
-    using Expressions;
-    using Expressions.Operators;
 
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
 
     /// <summary>
     /// The lexical analyzer class. Requires an instance of <see cref="ITokenizer"/> to obtain all the tokens from. Based
@@ -273,7 +274,7 @@ namespace XtraLiteTemplates.Parsing
             }
 
             var matchingTags = new HashSet<Tag>(_registeredTags);
-            var allTagTokens = new List<Token>() { _currentToken };
+            var allTagTokens = new List<Token> { _currentToken };
             var currentComponents = new List<object>();
 
             Expression currentExpression = null;

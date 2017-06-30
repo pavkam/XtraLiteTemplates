@@ -32,13 +32,15 @@ namespace XtraLiteTemplates.NUnit
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using Evaluation;
-    using Expressions;
+
     using global::NUnit.Framework;
-    using Inside;
-    using Parsing;
+
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.NUnit.Inside;
+    using XtraLiteTemplates.Parsing;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
@@ -127,14 +129,14 @@ namespace XtraLiteTemplates.NUnit
             {
                 IsDear = false,
                 FirstName = "Jenny",
-                LastName = "O'Peters",
+                LastName = "O'Peters"
             };
 
             var dearDude = new
             {
                 IsDear = true,
                 FirstName = "John",
-                LastName = "McDude",
+                LastName = "McDude"
             };
 
             var exo = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, Kw("Dude", dude));

@@ -28,10 +28,12 @@
 namespace XtraLiteTemplates.NUnit.Inside
 {
     using System.Linq;
-    using Evaluation;
-    using Expressions;
+
     using global::NUnit.Framework;
-    using Parsing;
+
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     public sealed class RippedOpenDirective : Directive
     {
@@ -78,7 +80,7 @@ namespace XtraLiteTemplates.NUnit.Inside
                         Mode = 0,
                         ExpectedTag = _mMyTags[1],
                         PreviousDecision = FlowDecision.Evaluate,
-                        PreviousTag = tag,
+                        PreviousTag = tag
                     };
                 } 
                 else
@@ -88,7 +90,7 @@ namespace XtraLiteTemplates.NUnit.Inside
                         Mode = 1,
                         ExpectedTag = _mMyTags[0],
                         PreviousDecision = FlowDecision.Restart,
-                        PreviousTag = tag,
+                        PreviousTag = tag
                     };
                 }
 

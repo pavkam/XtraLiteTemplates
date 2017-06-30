@@ -27,6 +27,7 @@
 namespace XtraLiteTemplates.Introspection
 {
     using System.Collections.Generic;
+
     using JetBrains.Annotations;
 
     /// <summary>

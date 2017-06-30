@@ -30,9 +30,11 @@ namespace XtraLiteTemplates.NUnit.Directives
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
+
     using global::NUnit.Framework;
-    using Inside;
-    using Parsing;
+
+    using XtraLiteTemplates.NUnit.Inside;
+    using XtraLiteTemplates.Parsing;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "IdentifierTypo")]

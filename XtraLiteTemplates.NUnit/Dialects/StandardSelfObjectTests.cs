@@ -29,9 +29,11 @@
 namespace XtraLiteTemplates.NUnit.Dialects
 {
     using System.Diagnostics.CodeAnalysis;
+
     using global::NUnit.Framework;
+
     using XtraLiteTemplates.Dialects.Standard;
-    using Introspection;
+    using XtraLiteTemplates.Introspection;
 
     [TestFixture]
     public class StandardSelfObjectTests : TestBase

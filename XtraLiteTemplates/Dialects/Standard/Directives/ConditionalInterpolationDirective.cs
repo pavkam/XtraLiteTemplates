@@ -29,11 +29,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System;
     using System.Diagnostics;
     using System.Linq;
-    using Evaluation;
-    using Expressions;
-    using Introspection;
+
     using JetBrains.Annotations;
-    using Parsing;
+
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The conditional interpolation directive implementation.

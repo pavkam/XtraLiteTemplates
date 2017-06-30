@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.NUnit.Directives
     using System.Diagnostics.CodeAnalysis;
 
     using global::NUnit.Framework;
+
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
     [TestFixture]

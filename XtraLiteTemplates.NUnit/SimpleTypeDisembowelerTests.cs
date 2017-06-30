@@ -31,8 +31,10 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+
     using global::NUnit.Framework;
-    using Introspection;
+
+    using XtraLiteTemplates.Introspection;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
@@ -98,7 +100,7 @@ namespace XtraLiteTemplates.NUnit
             var anon1 = new
             {
                 VALUE = "1",
-                Value = "2",
+                Value = "2"
             };
 
             var disemboweler1 = new SimpleTypeDisemboweler(
@@ -116,7 +118,7 @@ namespace XtraLiteTemplates.NUnit
             var anon1 = new
             {
                 VALUE = "1",
-                Value = "2",
+                Value = "2"
             };
 
             var disemboweler1 = new SimpleTypeDisemboweler(
@@ -352,7 +354,7 @@ namespace XtraLiteTemplates.NUnit
             var anon1 = new
             {
                 A = "1",
-                a = "2",
+                a = "2"
             };
 
             var disemboweler1 = new SimpleTypeDisemboweler(

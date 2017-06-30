@@ -30,12 +30,14 @@ namespace XtraLiteTemplates.NUnit
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using Evaluation;
-    using Expressions;
+
     using global::NUnit.Framework;
-    using Inside;
-    using Parsing;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.NUnit.Inside;
+    using XtraLiteTemplates.Parsing;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "IdentifierTypo")]

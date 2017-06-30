@@ -28,7 +28,8 @@ namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System.Diagnostics;
 
-    using Operators;
+    using XtraLiteTemplates.Expressions.Operators;
+
     using LinqExpression = System.Linq.Expressions.Expression;
 
     internal sealed class BinaryOperatorNode : OperatorNode

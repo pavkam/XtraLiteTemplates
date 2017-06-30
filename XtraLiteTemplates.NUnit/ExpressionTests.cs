@@ -35,12 +35,14 @@ namespace XtraLiteTemplates.NUnit
     using System.Globalization;
     using System.Linq;
     using System.Threading;
-    using Evaluation;
-    using Expressions;
-    using Expressions.Operators;
+
     using global::NUnit.Framework;
-    using Inside;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.NUnit.Inside;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
@@ -54,7 +56,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var comparer = StringComparer.Ordinal;
 
-            var operators = new List<Operator>
+            var operators = new global::System.Collections.Generic.List<Operator>
             {
                 new RelationalEqualsOperator(comparer, TypeConverter),
                 new RelationalNotEqualsOperator(comparer, TypeConverter),
@@ -79,7 +81,7 @@ namespace XtraLiteTemplates.NUnit
                 new ArithmeticSubtractOperator(TypeConverter),
                 new ArithmeticSumOperator(TypeConverter),
                 new SequenceOperator(TypeConverter),
-                new FormatOperator(CultureInfo.InvariantCulture, TypeConverter),
+                new FormatOperator(CultureInfo.InvariantCulture, TypeConverter)
             };
 
             var expression = new Expression(ExpressionFlowSymbols.Default, StringComparer.Ordinal);
@@ -121,14 +123,14 @@ namespace XtraLiteTemplates.NUnit
 
         private static IExpressionEvaluationContext CreateStandardTestEvaluationContext(Expression e)
         {
-            var variables = new Dictionary<string, object>()
-            {
+            var variables = new Dictionary<string, object>
+                                {
                 { "a", -2 },
                 { "b", -1 },
                 { "c", 0 },
                 { "d", 1 },
                 { "e", 2 },
-                { "s", "Hello World" },
+                { "s", "Hello World" }
             };
 
             var result = CreateContext(e.Comparer);

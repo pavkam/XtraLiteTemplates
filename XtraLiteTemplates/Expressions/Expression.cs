@@ -29,9 +29,12 @@ namespace XtraLiteTemplates.Expressions
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+
     using JetBrains.Annotations;
-    using Nodes;
-    using Operators;
+
+    using XtraLiteTemplates.Expressions.Nodes;
+    using XtraLiteTemplates.Expressions.Operators;
+
     using LinqExpression = System.Linq.Expressions.Expression;
 
     /// <summary>
@@ -476,7 +479,7 @@ namespace XtraLiteTemplates.Expressions
 
             _currentNode = new BinaryOperatorNode(leftNode.Parent, binaryOperator)
             {
-                LeftNode = leftNode,
+                LeftNode = leftNode
             };
 
             /* Re-jig the tree. */

@@ -28,10 +28,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
     using System;
     using System.Diagnostics;
-    using Expressions;
-    using Introspection;
+
     using JetBrains.Annotations;
-    using Parsing;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// The "keep formatting" directive implementation. This is a special directive that simply

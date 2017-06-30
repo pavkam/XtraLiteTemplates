@@ -27,6 +27,7 @@
 namespace XtraLiteTemplates.Parsing
 {
     using System;
+
     using JetBrains.Annotations;
 
     /// <summary>

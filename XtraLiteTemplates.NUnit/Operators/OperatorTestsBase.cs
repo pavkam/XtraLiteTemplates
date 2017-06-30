@@ -30,9 +30,11 @@ namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using Expressions;
-    using Expressions.Operators;
+
     using global::NUnit.Framework;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     public class OperatorTestsBase : TestBase

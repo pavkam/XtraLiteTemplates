@@ -32,9 +32,11 @@ namespace XtraLiteTemplates.NUnit
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Linq;
+
     using global::NUnit.Framework;
-    using Inside;
-    using Introspection;
+
+    using XtraLiteTemplates.Introspection;
+    using XtraLiteTemplates.NUnit.Inside;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]

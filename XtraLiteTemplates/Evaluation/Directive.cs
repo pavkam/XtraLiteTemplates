@@ -29,10 +29,12 @@ namespace XtraLiteTemplates.Evaluation
     using System;
     using System.Collections.Generic;
     using System.Linq;
-    using System.Text;    
-    using Expressions;
+    using System.Text;
+
     using JetBrains.Annotations;
-    using Parsing;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Parsing;
 
     /// <summary>
     /// Abstract base class for all supported directives.
@@ -91,7 +93,7 @@ namespace XtraLiteTemplates.Evaluation
             /// <summary>
             /// Skip directly to the next following tag in the directive.
             /// </summary>
-            Skip = 3,
+            Skip = 3
         }
 
         [NotNull]

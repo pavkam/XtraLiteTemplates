@@ -28,6 +28,7 @@ namespace XtraLiteTemplates.Expressions
 {
     using System.Diagnostics;
     using System.Threading;
+
     using JetBrains.Annotations;
 
     internal sealed class ReduceExpressionEvaluationContext : IExpressionEvaluationContext

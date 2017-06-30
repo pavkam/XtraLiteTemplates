@@ -24,16 +24,17 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using System.Collections.Generic;
-
 namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
-    using Directives;
-    using Evaluation;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Dialects.Standard.Directives;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// A minimalistic, programmer-oriented standard dialect. Contains the full set of supported expression operators, directives and special constants.
@@ -147,7 +148,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new IfDirective(AdjustCasing("IF $"), AdjustCasing("END"), typeConverter),
                 new IfElseDirective(AdjustCasing("IF $"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
                 new InterpolationDirective(typeConverter),
-                new PreFormattedUnParsedTextDirective(AdjustCasing("PRE"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
+                new PreFormattedUnParsedTextDirective(AdjustCasing("PRE"), AdjustCasing("END"), PreformattedStateObject, typeConverter)
             };
         }
 

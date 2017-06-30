@@ -54,13 +54,13 @@ namespace XtraLiteTemplates.Introspection
         Boolean,
 
         /// <summary>
-        /// A sequence of other objects. Usually applies to any type implementing <see cref="IEnumerable{Object}"/> interface.
+        /// A sequence of other objects. Usually applies to any type implementing <see cref="IEnumerable{T}"/> interface.
         /// </summary>
         Sequence,
 
         /// <summary>
         /// Any object that does not map directly to the other four types.
         /// </summary>
-        Object,
+        Object
     }
 }

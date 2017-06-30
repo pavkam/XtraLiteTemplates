@@ -32,6 +32,7 @@ namespace XtraLiteTemplates.Introspection
     using System.Diagnostics;
     using System.Globalization;
     using System.Text;
+
     using JetBrains.Annotations;
 
     /// <summary>

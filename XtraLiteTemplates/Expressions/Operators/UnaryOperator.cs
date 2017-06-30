@@ -27,6 +27,7 @@
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
+
     using JetBrains.Annotations;
 
     /// <summary>

@@ -31,8 +31,9 @@ namespace XtraLiteTemplates.NUnit.Dialects
     using System;
 
     using global::NUnit.Framework;
+
     using XtraLiteTemplates.Dialects.Standard;
-    using Introspection;
+    using XtraLiteTemplates.Introspection;
 
     [TestFixture]
     public class CodeMonkeySelfObjectTests: StandardSelfObjectTests

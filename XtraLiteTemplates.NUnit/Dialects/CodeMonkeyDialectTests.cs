@@ -30,11 +30,12 @@ namespace XtraLiteTemplates.NUnit.Dialects
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-
-    using XtraLiteTemplates.Dialects.Standard.Directives;
     using System.Globalization;
+
     using global::NUnit.Framework;
+
     using XtraLiteTemplates.Dialects.Standard;
+    using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]

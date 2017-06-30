@@ -28,9 +28,10 @@
 
 namespace XtraLiteTemplates.NUnit.Inside
 {
-    using Expressions;
-    using Expressions.Operators;
     using global::NUnit.Framework;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
 
     public sealed class RtlAssocTestOperator : BinaryOperator
     {

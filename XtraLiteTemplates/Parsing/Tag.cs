@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.Parsing
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
+
     using JetBrains.Annotations;
 
     /// <summary>

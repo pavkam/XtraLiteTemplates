@@ -28,8 +28,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
     using System.Collections.Generic;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Implements the standard relational equals ('==') operation.

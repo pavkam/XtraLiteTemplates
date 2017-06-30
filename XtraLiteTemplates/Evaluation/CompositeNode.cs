@@ -29,6 +29,7 @@ namespace XtraLiteTemplates.Evaluation
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Text;
+
     using JetBrains.Annotations;
 
     internal abstract class CompositeNode : TemplateNode

@@ -28,6 +28,7 @@ namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
+
     using JetBrains.Annotations;
 
     /// <summary>

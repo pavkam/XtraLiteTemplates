@@ -27,6 +27,7 @@
 namespace XtraLiteTemplates.Parsing
 {
     using System;
+
     using JetBrains.Annotations;
 
     /// <summary>
@@ -106,7 +107,7 @@ namespace XtraLiteTemplates.Parsing
             /// <summary>
             /// Whitespace in an open tag.
             /// </summary>
-            Whitespace,
+            Whitespace
         }
 
         /// <summary>

@@ -27,9 +27,11 @@
 namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
-    using Expressions;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Implements the standard 32-bit bitwise exclusive or ('^') operation.

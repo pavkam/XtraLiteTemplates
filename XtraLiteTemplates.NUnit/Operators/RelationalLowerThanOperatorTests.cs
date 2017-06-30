@@ -30,9 +30,11 @@ namespace XtraLiteTemplates.NUnit.Operators
 {
     using System;
     using System.Diagnostics.CodeAnalysis;
-    using Expressions.Operators;
+
     using global::NUnit.Framework;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Expressions.Operators;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]

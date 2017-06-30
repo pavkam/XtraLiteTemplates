@@ -28,9 +28,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
 {
     using System;
     using System.Linq;
-    using Expressions;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Implements the standard integer sequence operator ('..').

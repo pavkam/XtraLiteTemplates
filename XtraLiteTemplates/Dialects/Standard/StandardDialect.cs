@@ -31,13 +31,15 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Globalization;
-    using Directives;
-    using Evaluation;
-    using Expressions;
-    using Expressions.Operators;
-    using Introspection;
+
     using JetBrains.Annotations;
-    using Operators;
+
+    using XtraLiteTemplates.Dialects.Standard.Directives;
+    using XtraLiteTemplates.Dialects.Standard.Operators;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// The standard dialect. Contains the full set of supported expression operators, directives and special constants.
@@ -248,7 +250,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new ArithmeticSubtractOperator(typeConverter),
                 new ArithmeticSumOperator(typeConverter),
                 new SequenceOperator(typeConverter),
-                new FormatOperator(Culture, typeConverter),
+                new FormatOperator(Culture, typeConverter)
             };
         }
 
@@ -272,7 +274,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new IfElseDirective(AdjustCasing("IF $ THEN"), AdjustCasing("ELSE"), AdjustCasing("END"), typeConverter),
                 new InterpolationDirective(typeConverter),
                 new RepeatDirective(AdjustCasing("REPEAT $ TIMES"), AdjustCasing("END"), typeConverter),
-                new PreFormattedUnParsedTextDirective(AdjustCasing("PREFORMATTED"), AdjustCasing("END"), PreformattedStateObject, typeConverter),
+                new PreFormattedUnParsedTextDirective(AdjustCasing("PREFORMATTED"), AdjustCasing("END"), PreformattedStateObject, typeConverter)
             };
         }
 
@@ -290,7 +292,7 @@ namespace XtraLiteTemplates.Dialects.Standard
                 new KeyValuePair<string, object>(AdjustCasing("False"), false),
                 new KeyValuePair<string, object>(AdjustCasing("Undefined"), null),
                 new KeyValuePair<string, object>(AdjustCasing("NaN"), double.NaN),
-                new KeyValuePair<string, object>(AdjustCasing("Infinity"), double.PositiveInfinity),
+                new KeyValuePair<string, object>(AdjustCasing("Infinity"), double.PositiveInfinity)
             };
         }
     }

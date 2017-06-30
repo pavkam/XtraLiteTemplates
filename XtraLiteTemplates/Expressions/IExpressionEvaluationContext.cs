@@ -28,6 +28,7 @@ namespace XtraLiteTemplates.Expressions
 {
     using System;
     using System.Threading;
+
     using JetBrains.Annotations;
 
     /// <summary>

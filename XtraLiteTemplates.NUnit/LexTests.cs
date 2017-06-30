@@ -31,7 +31,8 @@ namespace XtraLiteTemplates.NUnit
     using System.Diagnostics.CodeAnalysis;
 
     using global::NUnit.Framework;
-    using Parsing;
+
+    using XtraLiteTemplates.Parsing;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]

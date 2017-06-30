@@ -25,7 +25,6 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //
-using NUnit.Framework;
 
 namespace XtraLiteTemplates.NUnit
 {
@@ -37,13 +36,16 @@ namespace XtraLiteTemplates.NUnit
     using System.IO;
     using System.Linq;
     using System.Threading;
-    using Compilation;
-    using Evaluation;
-    using Expressions;
-    using Inside;
-    using Introspection;
-    using Parsing;
+
+    using global::NUnit.Framework;
+
+    using XtraLiteTemplates.Compilation;
     using XtraLiteTemplates.Dialects.Standard.Directives;
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
+    using XtraLiteTemplates.NUnit.Inside;
+    using XtraLiteTemplates.Parsing;
 
     [SuppressMessage("ReSharper", "UnusedParameter.Global")]
     public class TestBase

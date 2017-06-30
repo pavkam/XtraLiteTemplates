@@ -29,11 +29,13 @@ namespace XtraLiteTemplates.Dialects
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-    using Evaluation;
-    using Expressions;
-    using Expressions.Operators;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Defines all the common properties and behaviors specific to a template language dialect.
@@ -54,7 +56,7 @@ namespace XtraLiteTemplates.Dialects
         CultureInfo Culture { get; }
 
         /// <summary>
-        /// Gets the <see cref="IEqualityComparer{String}" /> object used to compare keywords and identifiers.
+        /// Gets the <see cref="IEqualityComparer{T}" /> object used to compare keywords and identifiers.
         /// </summary>
         /// <value>
         /// The identifier comparer.

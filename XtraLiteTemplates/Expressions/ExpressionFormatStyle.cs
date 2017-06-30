@@ -44,6 +44,6 @@ namespace XtraLiteTemplates.Expressions
         /// <summary>
         /// A special formatting mostly used for testing purposes.
         /// </summary>
-        Canonical,
+        Canonical
     }
 }

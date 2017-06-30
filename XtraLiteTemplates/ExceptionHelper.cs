@@ -30,11 +30,13 @@ namespace XtraLiteTemplates
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-    using Evaluation;
-    using Expressions;
-    using Expressions.Operators;
+
     using JetBrains.Annotations;
-    using Parsing;
+
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Parsing;
 
     internal static class ExceptionHelper
     {

@@ -30,9 +30,11 @@ namespace XtraLiteTemplates.Evaluation
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading;
-    using Expressions;
-    using Introspection;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Introspection;
 
     /// <summary>
     /// Provides a standard implementation of an evaluation context.

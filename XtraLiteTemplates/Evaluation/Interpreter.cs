@@ -31,12 +31,14 @@ namespace XtraLiteTemplates.Evaluation
     using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Linq;
-    using Compilation;
-    using Expressions;
-    using Expressions.Operators;
+
     using JetBrains.Annotations;
-    using Parsing;
-    
+
+    using XtraLiteTemplates.Compilation;
+    using XtraLiteTemplates.Expressions;
+    using XtraLiteTemplates.Expressions.Operators;
+    using XtraLiteTemplates.Parsing;
+
     /// <summary>
     /// Provides <c>lex</c> interpretation facilities. Instances of this class are used to interpret
     /// sequences of <see cref="Lex" /> objects and assemble the final <see cref="CompiledTemplate{TContext}" /> objects.

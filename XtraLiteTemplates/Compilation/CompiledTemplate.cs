@@ -28,9 +28,11 @@ namespace XtraLiteTemplates.Compilation
     using System;
     using System.Diagnostics;
     using System.IO;
-    using Evaluation;
-    using Expressions;
+
     using JetBrains.Annotations;
+
+    using XtraLiteTemplates.Evaluation;
+    using XtraLiteTemplates.Expressions;
 
     /// <summary>
     /// Class that represents a compiled template. Instances of <see cref="CompiledTemplate{TContext}"/> created by a call to <see cref="Interpreter.Compile"/>.

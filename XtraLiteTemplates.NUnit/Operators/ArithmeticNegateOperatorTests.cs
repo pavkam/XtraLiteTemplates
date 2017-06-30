@@ -29,7 +29,9 @@
 namespace XtraLiteTemplates.NUnit.Operators
 {
     using System.Diagnostics.CodeAnalysis;
+
     using global::NUnit.Framework;
+
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
