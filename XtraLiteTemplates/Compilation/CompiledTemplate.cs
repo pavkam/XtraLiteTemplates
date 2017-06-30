@@ -30,17 +30,23 @@ namespace XtraLiteTemplates.Compilation
     using System.IO;
     using Evaluation;
     using Expressions;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Class that represents a compiled template. Instances of <see cref="CompiledTemplate{TContext}"/> created by a call to <see cref="Interpreter.Compile"/>.
     /// </summary>
     /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
-    public sealed class CompiledTemplate<TContext> where TContext : IExpressionEvaluationContext
+    [PublicAPI]
+    public sealed class CompiledTemplate<TContext>
+        where TContext : IExpressionEvaluationContext
     {
+        [NotNull]
         private readonly TemplateDocument _document;
+
+        [NotNull]
         private readonly CompiledEvaluationDelegate<TContext> _evaluationDelegate;
 
-        internal CompiledTemplate(TemplateDocument document, CompiledEvaluationDelegate<TContext> evaluationDelegate)
+        internal CompiledTemplate([NotNull] TemplateDocument document, [NotNull] CompiledEvaluationDelegate<TContext> evaluationDelegate)
         {
             Debug.Assert(document != null, "Argument document cannot be null.");
             Debug.Assert(evaluationDelegate != null, "Argument evaluationDelegate cannot be null.");
@@ -55,7 +61,7 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="writer">The text writer which will serve as the destination of the evaluated text.</param>
         /// <param name="context">The evaluation context providing all required state and variables.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="writer"/> or <paramref name="context"/> is <c>null</c>.</exception>
-        public void Evaluate(TextWriter writer, TContext context)
+        public void Evaluate([NotNull] TextWriter writer, [NotNull] TContext context)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("context", context);

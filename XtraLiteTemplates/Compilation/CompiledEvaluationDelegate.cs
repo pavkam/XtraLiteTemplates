@@ -28,6 +28,7 @@ namespace XtraLiteTemplates.Compilation
 {
     using System.IO;
     using Expressions;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Delegate type used by <see cref="CompiledTemplateFactory{TContext}"/> when compiling a template.
@@ -35,5 +36,6 @@ namespace XtraLiteTemplates.Compilation
     /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
     /// <param name="writer">The <see cref="TextWriter"/> that will be written to.</param>
     /// <param name="context">The evaluation context.</param>
-    public delegate void CompiledEvaluationDelegate<in TContext>(TextWriter writer, TContext context) where TContext : IExpressionEvaluationContext;
+    [PublicAPI]
+    public delegate void CompiledEvaluationDelegate<in TContext>([NotNull] TextWriter writer, [NotNull] TContext context) where TContext : IExpressionEvaluationContext;
 }

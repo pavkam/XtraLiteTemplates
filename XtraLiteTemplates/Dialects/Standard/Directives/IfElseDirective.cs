@@ -31,11 +31,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Linq;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
     using Parsing;
 
     /// <summary>
     /// The IF - ELSE directive implementation.
     /// </summary>
+    [PublicAPI]
     public sealed class IfElseDirective : StandardDirective
     {
         private readonly int _conditionalExpressionComponentIndex;
@@ -52,7 +54,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <remarks>
         /// The <paramref name="startTagMarkup" /> is expected to contain exactly one expression components - the conditional expression.
         /// </remarks>
-        public IfElseDirective(string startTagMarkup, string midTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter)
+        public IfElseDirective(
+            [NotNull] string startTagMarkup, 
+            [NotNull] string midTagMarkup, 
+            [NotNull] string endTagMarkup, 
+            [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(midTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 3, "Expected a tag count of 3.");
@@ -71,7 +77,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// Initializes a new instance of the <see cref="IfElseDirective" /> class using the standard markup {IF $ THEN}...{ELSE}...{END}.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
-        public IfElseDirective(IPrimitiveTypeConverter typeConverter)
+        public IfElseDirective([NotNull] IPrimitiveTypeConverter typeConverter)
             : this("IF $ THEN", "ELSE", "END", typeConverter)
         {
         }
@@ -91,7 +97,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// If the expression evaluates to <c>true</c>, the contents between the first and the middle tag are evaluated, other wise the constants between the middle
         /// and the end tag are evaluated.
         /// </remarks>
-        protected internal override FlowDecision Execute(int tagIndex, object[] components, ref object state, IExpressionEvaluationContext context, out string text)
+        protected internal override FlowDecision Execute(
+            int tagIndex, 
+            [NotNull] object[] components, 
+            ref object state, 
+            [NotNull] IExpressionEvaluationContext context, 
+            out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 2, "tagIndex must be between 0 and 2.");
             Debug.Assert(components != null, "components cannot be null.");

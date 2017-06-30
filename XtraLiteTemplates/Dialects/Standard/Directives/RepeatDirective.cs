@@ -31,11 +31,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Linq;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
     using Parsing;
 
     /// <summary>
     /// The REPEAT directive implementation.
     /// </summary>
+    [PublicAPI]
     public sealed class RepeatDirective : StandardDirective
     {
         private readonly int _iterationCountExpressionComponentIndex;
@@ -51,7 +53,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <remarks>
         /// The <paramref name="startTagMarkup" /> is expected to contain exactly one expression component - the iteration count expression.
         /// </remarks>
-        public RepeatDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+        public RepeatDirective(
+            [NotNull] string startTagMarkup,
+            [NotNull] string endTagMarkup,
+            [NotNull] IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2, "Expected a tag count of 2.");
@@ -70,7 +75,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// Initializes a new instance of the <see cref="RepeatDirective"/> class using the standard markup {REPEAT $ TIMES}...{END}.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
-        public RepeatDirective(IPrimitiveTypeConverter typeConverter) :
+        public RepeatDirective([NotNull] IPrimitiveTypeConverter typeConverter) :
             this("REPEAT $ TIMES", "END", typeConverter)
         {
         }

@@ -52,16 +52,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             var childAsString = RightNode != null ? RightNode.ToString(style) : "??";
 
-            string result = null;
-
-            if (style == ExpressionFormatStyle.Canonical)
-            {
-                result = $"{Operator}{{{childAsString}}}";
-            }
-            else
-            {
-                result = $"{Operator}{childAsString}";
-            }
+            var result = style == ExpressionFormatStyle.Canonical ? $"{Operator}{{{childAsString}}}" : $"{Operator}{childAsString}";
 
             Debug.Assert(result != null, "resulting string cannot be null.");
             return result;

@@ -29,10 +29,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Implements the standard 32-bit bitwise shift left ('&lt;&lt;') operation.
     /// </summary>
+    [PublicAPI]
     public sealed class BitwiseShiftLeftOperator : StandardBinaryOperator
     {
         /// <summary>
@@ -42,7 +44,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public BitwiseShiftLeftOperator(string symbol, IPrimitiveTypeConverter typeConverter)
+        public BitwiseShiftLeftOperator([NotNull] string symbol, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, 5, typeConverter)
         {
         }
@@ -52,7 +54,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        public BitwiseShiftLeftOperator(IPrimitiveTypeConverter typeConverter)
+        public BitwiseShiftLeftOperator([NotNull] IPrimitiveTypeConverter typeConverter)
             : this("<<", typeConverter)
         {
         }

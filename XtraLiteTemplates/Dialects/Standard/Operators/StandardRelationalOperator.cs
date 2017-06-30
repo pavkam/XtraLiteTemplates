@@ -31,10 +31,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Diagnostics.CodeAnalysis;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The abstract base class for all standard binary relational expression operators.
     /// </summary>
+    [PublicAPI]
     public abstract class StandardRelationalOperator : StandardBinaryOperator
     {
         /// <summary>
@@ -48,10 +50,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
         protected StandardRelationalOperator(
-            string symbol, 
-            int precedence, 
-            IComparer<string> stringComparer, 
-            IPrimitiveTypeConverter typeConverter)
+            [NotNull] string symbol, 
+            int precedence,
+            [NotNull] IComparer<string> stringComparer,
+            [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, typeConverter)
         {
             Expect.NotNull("stringComparer", stringComparer);
@@ -66,6 +68,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <value>
         /// The string literal comparer.
         /// </value>
+        [NotNull]
         public IComparer<string> StringComparer { get; }
 
         /// <summary>
@@ -106,6 +109,6 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// A <see cref="bool"/> value indicating the result of the validation.
         /// </returns>
         [SuppressMessage("ReSharper", "UnusedParameter.Global")]
-        protected abstract bool Evaluate(int relation, object left, object right);
+        protected abstract bool Evaluate(int relation, [CanBeNull] object left, [CanBeNull] object right);
     }
 }

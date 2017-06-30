@@ -28,12 +28,12 @@ namespace XtraLiteTemplates.Dialects
 {
     using System;
     using System.Collections.Generic;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using Evaluation;
     using Expressions;
     using Expressions.Operators;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Defines all the common properties and behaviors specific to a template language dialect.
@@ -41,6 +41,7 @@ namespace XtraLiteTemplates.Dialects
     /// text is parsed.
     /// <para>Check out the <seealso cref="Standard.StandardDialect"/> and <seealso cref="Standard.CodeMonkeyDialect"/> for specific implementations of this interface.</para>
     /// </summary>
+    [PublicAPI]
     public interface IDialect
     {
         /// <summary>
@@ -49,7 +50,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The culture-specific properties.
         /// </value>
-        [SuppressMessage("ReSharper", "UnusedMemberInSuper.Global")]
+        [NotNull]
         CultureInfo Culture { get; }
 
         /// <summary>
@@ -58,6 +59,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The identifier comparer.
         /// </value>
+        [NotNull]
         IEqualityComparer<string> IdentifierComparer { get; }
 
         /// <summary>
@@ -66,6 +68,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The object formatter.
         /// </value>
+        [NotNull]
         IObjectFormatter ObjectFormatter { get; }
 
         /// <summary>
@@ -74,6 +77,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The flow symbols.
         /// </value>
+        [NotNull]
         ExpressionFlowSymbols FlowSymbols { get; }
 
         /// <summary>
@@ -82,6 +86,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The operators.
         /// </value>
+        [NotNull]
         IReadOnlyCollection<Operator> Operators { get; }
 
         /// <summary>
@@ -90,6 +95,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The directives.
         /// </value>
+        [NotNull]
         IReadOnlyCollection<Directive> Directives { get; }
 
         /// <summary>
@@ -98,6 +104,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The special keywords.
         /// </value>
+        [NotNull]
         IReadOnlyDictionary<string, object> SpecialKeywords { get; }
 
         /// <summary>
@@ -155,6 +162,7 @@ namespace XtraLiteTemplates.Dialects
         /// <value>
         /// The self object.
         /// </value>
+        [NotNull]
         object Self { get; }
 
         /// <summary>
@@ -166,6 +174,7 @@ namespace XtraLiteTemplates.Dialects
         /// The processed text value.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
-        string DecorateUnParsedText(IExpressionEvaluationContext context, string unParsedText);
+        [CanBeNull]
+        string DecorateUnParsedText([NotNull] IExpressionEvaluationContext context, [CanBeNull] string unParsedText);
     }
 }

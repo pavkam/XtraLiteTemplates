@@ -31,11 +31,15 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Linq;
     using Expressions;
     using Introspection;
+
+    using JetBrains.Annotations;
+
     using Parsing;
 
     /// <summary>
     /// The FOR EACH directive implementation.
     /// </summary>
+    [PublicAPI]
     public sealed class UsingDirective : StandardDirective
     {
         private readonly int _expressionComponentIndex;
@@ -53,7 +57,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="InvalidOperationException">Argument <paramref name="startTagMarkup"/> or <paramref name="endTagMarkup"/>  does not correspond to the expressed rules.</exception>
         /// <exception cref="System.FormatException">Argument <paramref name="startTagMarkup"/> or <paramref name="endTagMarkup"/> cannot be parsed.</exception>
-        public UsingDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+        public UsingDirective(
+            [NotNull] string startTagMarkup,
+            [NotNull] string endTagMarkup,
+            [NotNull] IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2, "Expected a tag count of 2.");
@@ -76,7 +83,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// Initializes a new instance of the <see cref="UsingDirective"/> class using the standard markup {USING ? AS $}...{END}.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
-        public UsingDirective(IPrimitiveTypeConverter typeConverter) :
+        public UsingDirective([NotNull] IPrimitiveTypeConverter typeConverter) :
             this("USING ? AS $", "END", typeConverter)
         {
         }

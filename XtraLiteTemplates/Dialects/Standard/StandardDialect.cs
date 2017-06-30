@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     using Expressions;
     using Expressions.Operators;
     using Introspection;
+    using JetBrains.Annotations;
     using Operators;
 
     /// <summary>
@@ -42,6 +43,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     /// This is the default, medium-verbosity dialect exposed by this library.
     /// See <seealso cref="CodeMonkeyDialect" /> for a less verbose, programmer-oriented dialect.
     /// </summary>
+    [PublicAPI]
     public class StandardDialect : StandardDialectBase
     {
         /// <summary>
@@ -59,7 +61,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <param name="culture">A <see cref="CultureInfo" /> object that drives the formatting and collation behavior of the dialect.</param>
         /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="culture" /> is <c>null</c>.</exception>
-        public StandardDialect(CultureInfo culture, DialectCasing casing)
+        public StandardDialect([NotNull]CultureInfo culture, DialectCasing casing)
             : this("Standard", culture, casing)
         {
         }
@@ -80,7 +82,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
         /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
-        protected StandardDialect(string name, CultureInfo culture, DialectCasing casing)
+        protected StandardDialect([NotNull] string name, [NotNull] CultureInfo culture, DialectCasing casing)
             : base(name, culture, casing)
         {
             PreformattedStateObject = new object();
@@ -92,6 +94,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture-invariant, case-insensitive instance of <see cref="StandardDialect"/> class.
         /// </value>
+        [NotNull]
         public static IDialect DefaultIgnoreCase { get; }
 
         /// <summary>
@@ -100,6 +103,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
         /// </value>
+        [NotNull]
         public static IDialect Default { get; }
 
         /// <summary>
@@ -157,6 +161,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The preformatted state object.
         /// </value>
+        [CanBeNull]
         protected object PreformattedStateObject { get; }
 
         /// <summary>
@@ -213,7 +218,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported operators.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override IEnumerable<Operator> CreateOperators(IPrimitiveTypeConverter typeConverter)
+        protected override IEnumerable<Operator> CreateOperators([NotNull] IPrimitiveTypeConverter typeConverter)
         {
             return new Operator[]
             {

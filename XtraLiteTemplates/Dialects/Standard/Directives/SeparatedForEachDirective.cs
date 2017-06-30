@@ -33,11 +33,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Linq;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
     using Parsing;
 
     /// <summary>
     /// The FOR EACH directive implementation that includes a separator text.
     /// </summary>
+    [PublicAPI]
     public sealed class SeparatedForEachDirective : StandardDirective
     {
         private readonly int _sequenceExpressionComponentIndex;
@@ -56,7 +58,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// The <paramref name="startTagMarkup" /> is expected to contain exactly one expression components and one "any identifier" component.
         /// The identifier is used to represent each element in the evaluated sequence.
         /// </remarks>
-        public SeparatedForEachDirective(string startTagMarkup, string separatorTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter) :
+        public SeparatedForEachDirective(
+            [NotNull] string startTagMarkup,
+            [NotNull] string separatorTagMarkup,
+            [NotNull] string endTagMarkup,
+            [NotNull] IPrimitiveTypeConverter typeConverter) :
             base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(separatorTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 3, "Expected a tag count of 3.");
@@ -79,7 +85,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// Initializes a new instance of the <see cref="SeparatedForEachDirective"/> class using the standard markup {FOR EACH ? IN $}...{WITH}...{END}.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
-        public SeparatedForEachDirective(IPrimitiveTypeConverter typeConverter) :
+        public SeparatedForEachDirective([NotNull] IPrimitiveTypeConverter typeConverter) :
             this("FOR EACH ? IN $", "WITH", "END", typeConverter)
         {
         }
@@ -167,6 +173,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
 
         private class State
         {
+            [CanBeNull]
             public IEnumerator<object> Enumerator { get; set; }
 
             public bool IsLast { get; set; }

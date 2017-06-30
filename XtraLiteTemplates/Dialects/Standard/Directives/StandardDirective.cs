@@ -29,11 +29,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System;
     using Evaluation;
     using Introspection;
+    using JetBrains.Annotations;
     using Parsing;
 
     /// <summary>
     /// Abstract base class for all standard directives.
     /// </summary>
+    [PublicAPI]
     public abstract class StandardDirective : Directive
     {
         /// <summary>
@@ -44,10 +46,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <exception cref="ArgumentNullException">Argument <paramref name="tags"/> or <paramref name="typeConverter"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="tags"/> is empty.</exception>
         /// <exception cref="InvalidOperationException">One or more tags have no defined components.</exception>
-        protected StandardDirective(IPrimitiveTypeConverter typeConverter, params Tag[] tags)
+        protected StandardDirective([NotNull] IPrimitiveTypeConverter typeConverter, [NotNull] [ItemNotNull] params Tag[] tags)
             : base(tags)
         {
             Expect.NotNull("typeConverter", typeConverter);
+
             TypeConverter = typeConverter;
         }
 
@@ -58,6 +61,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <value>
         /// The type converter.
         /// </value>
+        [NotNull]
         protected IPrimitiveTypeConverter TypeConverter { get; }
     }
 }

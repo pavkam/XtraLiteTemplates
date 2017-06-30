@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The abstract base class for all binary expression operators.
     /// </summary>
+    [PublicAPI]
     public abstract class BinaryOperator : Operator
     {
         /// <summary>
@@ -42,7 +44,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
-        protected BinaryOperator(string symbol, int precedence, Associativity associativity)
+        protected BinaryOperator([NotNull] string symbol, int precedence, Associativity associativity)
             : base(symbol, precedence)
         {
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
@@ -66,7 +68,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="right">The right operand.</param>
         /// <returns>The evaluated object.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public abstract object Evaluate(IExpressionEvaluationContext context, object left, object right);
+        public abstract object Evaluate([NotNull] IExpressionEvaluationContext context, [CanBeNull] object left, [CanBeNull] object right);
 
         /// <summary>
         /// Tries to evaluate the current operator for a given <paramref name="left"/> operand.
@@ -77,7 +79,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="result">The result of the evaluation if the return value is <c>true</c>.</param>
         /// <returns><c>true</c> if the operation is supported; <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public virtual bool EvaluateLhs(IExpressionEvaluationContext context, object left, out object result)
+        public virtual bool EvaluateLhs([NotNull] IExpressionEvaluationContext context, [CanBeNull] object left, [CanBeNull] out object result)
         {
             Expect.NotNull("context", context);
 

@@ -32,19 +32,21 @@ namespace XtraLiteTemplates.Compilation
     using System.Linq;
     using Evaluation;
     using Expressions;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Class that encapsulates <c>compilation</c> logic. The sole purpose of <see cref="CompiledTemplateFactory{TContext}"/> is to
     /// transform the internal <c>lexed</c> representation of a template to its compiled form (form that can be evaluated).
     /// </summary>
     /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
-    [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
+    [PublicAPI]
     public abstract class CompiledTemplateFactory<TContext> 
         where TContext : IExpressionEvaluationContext
     {
+        [NotNull]
         private static readonly CompiledEvaluationDelegate<TContext> EmptyCompiledEvaluationDelegate = (writer, context) => { };
 
-        internal CompiledEvaluationDelegate<TContext> CompileTemplate(TemplateDocument document)
+        internal CompiledEvaluationDelegate<TContext> CompileTemplate([NotNull] TemplateDocument document)
         {
             Debug.Assert(document != null, "Argument document cannot be null.");
 
@@ -66,11 +68,12 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="openComponents">The components associated with the opening tag.</param>
         /// <param name="closeComponents">The components associated with the closing tag.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
+        [NotNull]
         protected abstract CompiledEvaluationDelegate<TContext> BuildDoubleTagDirectiveEvaluationDelegate(
-            Directive directive,
-            CompiledEvaluationDelegate<TContext> innerDelegate,
-            object[] openComponents,
-            object[] closeComponents);
+            [NotNull] Directive directive,
+            [NotNull] CompiledEvaluationDelegate<TContext> innerDelegate,
+            [NotNull] object[] openComponents,
+            [NotNull] object[] closeComponents);
 
         /// <summary>
         /// Constructs a delegate used in evaluation of a given multi-tag <paramref name="directive"/>.
@@ -86,16 +89,18 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="innerDelegates">A list of evaluable delegates that represent all inner nodes.</param>
         /// <param name="components">A list of tag components.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
+        [NotNull]
         protected abstract CompiledEvaluationDelegate<TContext> BuildMultipleTagDirectiveEvaluationDelegate(
-            Directive directive,
-            CompiledEvaluationDelegate<TContext>[] innerDelegates,
-            object[][] components);
+            [NotNull] Directive directive,
+            [NotNull] CompiledEvaluationDelegate<TContext>[] innerDelegates,
+            [NotNull] object[][] components);
 
         /// <summary>
         /// Constructs an un-parsed text evaluation delegate.
         /// </summary>
         /// <param name="unParsedText">The un-parsed text.</param>
         /// <returns>A new delegate that handles the given text.</returns>
+        [NotNull]
         protected abstract CompiledEvaluationDelegate<TContext> BuildUnParsedTextEvaluationDelegate(string unParsedText);
 
         /// <summary>
@@ -107,7 +112,9 @@ namespace XtraLiteTemplates.Compilation
         /// </remarks>
         /// <param name="delegates">The delegates to be merged.</param>
         /// <returns>A new merged delegate.</returns>
-        protected virtual CompiledEvaluationDelegate<TContext> BuildMergedEvaluationDelegate(CompiledEvaluationDelegate<TContext>[] delegates)
+        [NotNull]
+        [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
+        protected virtual CompiledEvaluationDelegate<TContext> BuildMergedEvaluationDelegate([NotNull] CompiledEvaluationDelegate<TContext>[] delegates)
         {
             Debug.Assert(delegates != null, "Argument delegates cannot be null.");
             Debug.Assert(delegates.Length > 0, "Argument delegates cannot be empty.");
@@ -154,18 +161,21 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="directive">The directive.</param>
         /// <param name="components">The components associated with directive's tag.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
+        [NotNull]
         protected abstract CompiledEvaluationDelegate<TContext> BuildSingleTagDirectiveEvaluationDelegate(
-            Directive directive,
-            object[] components);
+            [NotNull] Directive directive,
+            [NotNull] object[] components);
 
-        private CompiledEvaluationDelegate<TContext> CompileUnParsedNode(UnParsedNode unParsedNode)
+        [NotNull]
+        private CompiledEvaluationDelegate<TContext> CompileUnParsedNode([NotNull] UnParsedNode unParsedNode)
         {
             Debug.Assert(unParsedNode != null, "Argument unParsedNode cannot be null.");
 
             return BuildUnParsedTextEvaluationDelegate(unParsedNode.UnParsedText);
         }
 
-        private CompiledEvaluationDelegate<TContext> CompileDirectiveNode(DirectiveNode directiveNode)
+        [NotNull]
+        private CompiledEvaluationDelegate<TContext> CompileDirectiveNode([NotNull] DirectiveNode directiveNode)
         {
             Debug.Assert(directiveNode != null, "Argument directiveNode cannot be null.");
             Debug.Assert(directiveNode.CandidateDirectiveLockedIn, "Argument directiveNode must have a locked in candidate.");
@@ -220,7 +230,8 @@ namespace XtraLiteTemplates.Compilation
             return BuildMultipleTagDirectiveEvaluationDelegate(directive, innerDelegates.ToArray(), componentArray);
         }
 
-        private CompiledEvaluationDelegate<TContext> CompileTemplateNodes(IReadOnlyCollection<TemplateNode> nodes)
+        [NotNull]
+        private CompiledEvaluationDelegate<TContext> CompileTemplateNodes([NotNull] IReadOnlyCollection<TemplateNode> nodes)
         {
             Debug.Assert(nodes != null, "Argument nodes cannot be null.");
 

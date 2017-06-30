@@ -26,9 +26,12 @@
 
 namespace XtraLiteTemplates.Dialects.Standard
 {
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Defines the the casing of a standard dialect. This type controls how the keywords, variables and properties are matched.
     /// </summary>
+    [PublicAPI]
     public enum DialectCasing
     {
         /// <summary>

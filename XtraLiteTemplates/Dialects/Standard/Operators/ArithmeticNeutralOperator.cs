@@ -29,10 +29,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Implements the standard floating point neutral ('+') operation.
     /// </summary>
+    [PublicAPI]
     public sealed class ArithmeticNeutralOperator : StandardUnaryOperator
     {
         /// <summary>
@@ -42,7 +44,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public ArithmeticNeutralOperator(string symbol, IPrimitiveTypeConverter typeConverter)
+        public ArithmeticNeutralOperator([NotNull] string symbol, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, typeConverter)
         {
         }
@@ -52,7 +54,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        public ArithmeticNeutralOperator(IPrimitiveTypeConverter typeConverter)
+        public ArithmeticNeutralOperator([NotNull] IPrimitiveTypeConverter typeConverter)
             : base("+", typeConverter)
         {
         }

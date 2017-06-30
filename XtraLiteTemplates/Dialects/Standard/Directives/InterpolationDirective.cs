@@ -32,11 +32,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using Evaluation;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
     using Parsing;
 
     /// <summary>
     /// The simple interpolation directive implementation.
     /// </summary>
+    [PublicAPI]
     public sealed class InterpolationDirective : StandardDirective
     {
         private readonly int _interpolatedExpressionComponentIndex;
@@ -51,7 +53,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="InvalidOperationException">Argument <paramref name="tagMarkup"/> does not correspond to the expressed rules.</exception>
         /// <exception cref="System.FormatException">Argument <paramref name="tagMarkup"/> cannot be parsed.</exception>
-        public InterpolationDirective(string tagMarkup, IPrimitiveTypeConverter typeConverter)
+        public InterpolationDirective([NotNull] string tagMarkup, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(tagMarkup))
         {
             Debug.Assert(Tags.Count == 1, "Expected a tag count of 1.");
@@ -70,7 +72,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// Initializes a new instance of the <see cref="InterpolationDirective"/> class using the standard markup {$}.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
-        public InterpolationDirective(IPrimitiveTypeConverter typeConverter)
+        public InterpolationDirective([NotNull] IPrimitiveTypeConverter typeConverter)
             : this("$", typeConverter)
         {
         }

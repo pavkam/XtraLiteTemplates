@@ -31,11 +31,15 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Linq;
     using Expressions;
     using Introspection;
+
+    using JetBrains.Annotations;
+
     using Parsing;
 
     /// <summary>
     /// The IF directive implementation.
     /// </summary>
+    [PublicAPI]
     public sealed class IfDirective : StandardDirective    
     {
         private readonly int _conditionalExpressionComponentIndex;
@@ -51,7 +55,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <remarks>
         /// The <paramref name="startTagMarkup" /> is expected to contain exactly one expression components - the conditional expression.
         /// </remarks>
-        public IfDirective(string startTagMarkup, string endTagMarkup, IPrimitiveTypeConverter typeConverter)
+        public IfDirective([NotNull] string startTagMarkup, [NotNull] string endTagMarkup, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2, "Expected a tag count of 2.");
@@ -70,7 +74,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// Initializes a new instance of the <see cref="IfDirective" /> class using the standard markup {IF $ THEN}...{END}.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
-        public IfDirective(IPrimitiveTypeConverter typeConverter)
+        public IfDirective([NotNull] IPrimitiveTypeConverter typeConverter)
             : this("IF $ THEN", "END", typeConverter)
         {
         }
@@ -90,10 +94,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// The directive evaluates only if the expression evaluates to <c>true</c>.
         /// </remarks>
         protected internal override FlowDecision Execute(
-            int tagIndex, 
-            object[] components, 
+            int tagIndex,
+            [NotNull] object[] components, 
             ref object state,
-            IExpressionEvaluationContext context, 
+            [NotNull] IExpressionEvaluationContext context, 
             out string text)
         {
             Debug.Assert(tagIndex >= 0 && tagIndex <= 1, "tagIndex must be between 0 and 1.");

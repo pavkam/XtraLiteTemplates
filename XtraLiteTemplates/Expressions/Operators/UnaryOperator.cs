@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The abstract base class for all unary expression operators.
     /// </summary>
+    [PublicAPI]
     public abstract class UnaryOperator : Operator
     {
         /// <summary>
@@ -39,7 +41,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="symbol">The operator's symbol.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
-        protected UnaryOperator(string symbol)
+        protected UnaryOperator([NotNull] string symbol)
             : base(symbol, 1) 
         {
         }
@@ -51,6 +53,6 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="arg">The operand.</param>
         /// <returns>The evaluated object.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public abstract object Evaluate(IExpressionEvaluationContext context, object arg);
+        public abstract object Evaluate([NotNull] IExpressionEvaluationContext context, [CanBeNull] object arg);
     }
 }

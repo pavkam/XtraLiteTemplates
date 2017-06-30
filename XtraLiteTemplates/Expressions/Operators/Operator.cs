@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Expressions.Operators
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The abstract base class for all expression operators.
     /// </summary>
+    [PublicAPI]
     public abstract class Operator
     {
         /// <summary>
@@ -41,7 +43,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
-        protected Operator(string symbol, int precedence)
+        protected Operator([NotNull] string symbol, int precedence)
         {
             Expect.NotEmpty("symbol", symbol);
             Expect.GreaterThanOrEqual("precedence", precedence, 0);
@@ -57,6 +59,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <value>
         /// The operator's symbol.
         /// </value>
+        [NotNull]
         public string Symbol { get; }
 
         /// <summary>

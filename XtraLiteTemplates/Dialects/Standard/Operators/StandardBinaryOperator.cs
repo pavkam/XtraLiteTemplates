@@ -29,10 +29,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using Expressions.Operators;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The abstract base class for all standard binary expression operators.
     /// </summary>
+    [PublicAPI]
     public abstract class StandardBinaryOperator : BinaryOperator
     {
         /// <summary>
@@ -44,7 +46,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected StandardBinaryOperator(string symbol, int precedence, IPrimitiveTypeConverter typeConverter)
+        protected StandardBinaryOperator([NotNull] string symbol, int precedence, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, Associativity.LeftToRight)
         {
             Expect.NotNull("typeConverter", typeConverter);
@@ -59,6 +61,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <value>
         /// The type converter.
         /// </value>
+        [NotNull]
         protected IPrimitiveTypeConverter TypeConverter { get; }
     }
 }

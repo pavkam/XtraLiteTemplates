@@ -33,11 +33,13 @@ namespace XtraLiteTemplates.Dialects.Standard
     using Directives;
     using Evaluation;
     using Introspection;
-    
+    using JetBrains.Annotations;
+
     /// <summary>
     /// A minimalistic, programmer-oriented standard dialect. Contains the full set of supported expression operators, directives and special constants.
     /// See <seealso cref="StandardDialect" /> for a medium verbose dialect.
     /// </summary>
+    [PublicAPI]
     public class CodeMonkeyDialect : StandardDialect
     {
         /// <summary>
@@ -72,6 +74,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture-invariant, case-insensitive instance of <see cref="CodeMonkeyDialect"/> class.
         /// </value>
+        [NotNull]
         public static new IDialect DefaultIgnoreCase { get; }
 
         /// <summary>
@@ -80,6 +83,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The culture-invariant, case-sensitive instance of <see cref="StandardDialect"/> class.
         /// </value>
+        [NotNull]
         public static new IDialect Default { get; }
 
         /// <summary>
@@ -129,8 +133,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported directives.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected override IEnumerable<Directive> CreateDirectives(IPrimitiveTypeConverter typeConverter)
+        [NotNull]
+        protected override IEnumerable<Directive> CreateDirectives([NotNull] IPrimitiveTypeConverter typeConverter)
         {
+            Expect.NotNull(nameof(typeConverter), typeConverter);
+
             return new Directive[]
             {
                 new ConditionalInterpolationDirective(AdjustCasing("$ IF $"), false, typeConverter),
@@ -155,8 +162,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// An instance of the self object.
         /// </returns>
-        protected override StandardSelfObject CreateSelfObject(IPrimitiveTypeConverter typeConverter)
+        [NotNull]
+        protected override StandardSelfObject CreateSelfObject([NotNull] IPrimitiveTypeConverter typeConverter)
         {
+            Expect.NotNull(nameof(typeConverter), typeConverter);
+
             return new CodeMonkeySelfObject(typeConverter);
         }
     }

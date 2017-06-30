@@ -29,10 +29,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Implements the standard floating point sum ('+') operation, with an extension for <see cref="string"/> and <see cref="bool"/> types.
     /// </summary>
+    [PublicAPI]
     public sealed class ArithmeticSumOperator : StandardBinaryOperator
     {
         /// <summary>
@@ -42,7 +44,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public ArithmeticSumOperator(string symbol, IPrimitiveTypeConverter typeConverter)
+        public ArithmeticSumOperator([NotNull] string symbol, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, 4, typeConverter)
         {
         }
@@ -52,7 +54,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        public ArithmeticSumOperator(IPrimitiveTypeConverter typeConverter)
+        public ArithmeticSumOperator([NotNull] IPrimitiveTypeConverter typeConverter)
             : this("+", typeConverter)
         {
         }

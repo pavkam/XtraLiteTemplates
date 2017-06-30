@@ -28,17 +28,20 @@ namespace XtraLiteTemplates.Dialects.Standard
 {
     using Introspection;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// The standard <c>self</c> object implementation. Provides a set of standard methods and properties exposed globally to
     /// all templates running under standard dialects.
     /// </summary>
+    [PublicAPI]
     public class StandardSelfObject
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="StandardSelfObject"/> class.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
-        public StandardSelfObject(IPrimitiveTypeConverter typeConverter)
+        public StandardSelfObject([CanBeNull] IPrimitiveTypeConverter typeConverter)
         {
             Expect.NotNull("typeConverter", typeConverter);
 
@@ -52,6 +55,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The type converter.
         /// </value>
         /// <remarks>The value of this property is supplied by the caller during instance initialization.</remarks>
+        [NotNull]
         public IPrimitiveTypeConverter TypeConverter { get; }
 
         /// <summary>
@@ -59,7 +63,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="argument">The argument to convert.</param>
         /// <returns>The <c>string</c> representation of the <paramref name="argument"/>.</returns>
-        public string String(object argument)
+        [CanBeNull]
+        public string String([CanBeNull] object argument)
         {
             return TypeConverter.ConvertToString(argument);
         }
@@ -69,7 +74,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="argument">The argument to convert.</param>
         /// <returns>The <c>numerical</c> representation of the <paramref name="argument"/>.</returns>
-        public double Number(object argument)
+        public double Number([CanBeNull] object argument)
         {
             return TypeConverter.ConvertToNumber(argument);
         }
@@ -79,7 +84,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="argument">The argument to convert.</param>
         /// <returns>The <c>boolean</c> representation of the <paramref name="argument"/>.</returns>
-        public bool Boolean(object argument)
+        public bool Boolean([CanBeNull]object argument)
         {
             return TypeConverter.ConvertToBoolean(argument);
         }

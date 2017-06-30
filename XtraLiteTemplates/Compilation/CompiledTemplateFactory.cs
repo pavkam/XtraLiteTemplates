@@ -33,12 +33,14 @@ namespace XtraLiteTemplates.Compilation
     using System.Runtime.InteropServices;
     using Evaluation;
     using Expressions;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Class that encapsulates <c>compilation</c> logic defined for the standard <see cref="EvaluationContext"/>. The sole purpose of <see cref="CompiledTemplateFactory{TContext}"/> is to
     /// transform the internal <c>lexed</c> representation of a template to its compiled form (form that can be evaluated).
     /// </summary>
     [ComVisible(false)]
+    [PublicAPI]
     public class CompiledTemplateFactory : CompiledTemplateFactory<EvaluationContext>
     {
         /// <summary>
@@ -55,11 +57,12 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="openComponents">The components associated with the opening tag.</param>
         /// <param name="closeComponents">The components associated with the closing tag.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
+        [NotNull]
         protected override CompiledEvaluationDelegate<EvaluationContext> BuildDoubleTagDirectiveEvaluationDelegate(
-            Directive directive,
-            CompiledEvaluationDelegate<EvaluationContext> innerDelegate,
-            object[] openComponents, 
-            object[] closeComponents)
+            [NotNull] Directive directive,
+            [NotNull] CompiledEvaluationDelegate<EvaluationContext> innerDelegate,
+            [NotNull] object[] openComponents,
+            [NotNull] object[] closeComponents)
         {
             Debug.Assert(directive != null, "Argument directive cannot be null.");
             Debug.Assert(openComponents != null, "Argument openComponents cannot be null.");
@@ -112,10 +115,11 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="innerDelegates">A list of evaluable delegates that represent all inner nodes.</param>
         /// <param name="components">A list of tag components.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
+        [NotNull]
         protected override CompiledEvaluationDelegate<EvaluationContext> BuildMultipleTagDirectiveEvaluationDelegate(
-            Directive directive,
-            CompiledEvaluationDelegate<EvaluationContext>[] innerDelegates,
-            object[][] components)
+            [NotNull] Directive directive,
+            [NotNull] CompiledEvaluationDelegate<EvaluationContext>[] innerDelegates,
+            [NotNull] object[][] components)
         {
             Debug.Assert(directive != null, "Argument directive cannot be null.");
             Debug.Assert(components != null, "Argument components cannot be null.");
@@ -156,7 +160,8 @@ namespace XtraLiteTemplates.Compilation
         /// </summary>
         /// <param name="unParsedText">The un-parsed text.</param>
         /// <returns>A new delegate that handles the given text.</returns>
-        protected override CompiledEvaluationDelegate<EvaluationContext> BuildUnParsedTextEvaluationDelegate(string unParsedText)
+        [NotNull]
+        protected override CompiledEvaluationDelegate<EvaluationContext> BuildUnParsedTextEvaluationDelegate([NotNull] string unParsedText)
         {
             Debug.Assert(!string.IsNullOrEmpty(unParsedText), "Argument unParsedText cannot be empty.");
 
@@ -186,9 +191,10 @@ namespace XtraLiteTemplates.Compilation
         /// <param name="directive">The directive.</param>
         /// <param name="components">The components associated with directive's tag.</param>
         /// <returns>A new delegate tasked with evaluating the given directive.</returns>
+        [NotNull]
         protected override CompiledEvaluationDelegate<EvaluationContext> BuildSingleTagDirectiveEvaluationDelegate(
-            Directive directive,
-            object[] components)
+            [NotNull] Directive directive,
+            [NotNull] object[] components)
         {
             Debug.Assert(directive != null, "Argument directive cannot be null.");
             Debug.Assert(components != null, "Argument components cannot be null.");
@@ -214,7 +220,8 @@ namespace XtraLiteTemplates.Compilation
             };
         }
 
-        private static object[] EvaluateTag(IExpressionEvaluationContext context, IReadOnlyList<object> components)
+        [NotNull]
+        private static object[] EvaluateTag([NotNull] IExpressionEvaluationContext context, [NotNull] IReadOnlyList<object> components)
         {
             var result = new object[components.Count];
             for (var i = 0; i < components.Count; i++)
@@ -239,10 +246,10 @@ namespace XtraLiteTemplates.Compilation
         }
 
         private static void EvaluateSingleTagDirective(
-            TextWriter writer,
-            IExpressionEvaluationContext context,
-            Directive directive,
-            IReadOnlyList<object> components)
+            [NotNull] TextWriter writer,
+            [NotNull] IExpressionEvaluationContext context,
+            [NotNull] Directive directive,
+            [NotNull] IReadOnlyList<object> components)
         {
             /* Pre-evaluate the tag's components, as these  */
             var tagEvaluatedComponents = EvaluateTag(context, components);
@@ -269,12 +276,12 @@ namespace XtraLiteTemplates.Compilation
         }
 
         private static void EvaluateDoubleTagDirective(
-            TextWriter writer,
-            EvaluationContext context,
-            Directive directive,
-            IReadOnlyList<object> beginComponents,
-            IReadOnlyList<object> closeComponents,
-            CompiledEvaluationDelegate<EvaluationContext> beginToCloseEvaluateProc)
+            [NotNull] TextWriter writer,
+            [NotNull] EvaluationContext context,
+            [NotNull] Directive directive,
+            [NotNull] IReadOnlyList<object> beginComponents,
+            [NotNull] IReadOnlyList<object> closeComponents,
+            [CanBeNull] CompiledEvaluationDelegate<EvaluationContext> beginToCloseEvaluateProc)
         {
             /* Get tag components. */
             var beginTagEvaluatedComponents = EvaluateTag(context, beginComponents);
@@ -341,11 +348,11 @@ namespace XtraLiteTemplates.Compilation
         }
 
         private static void EvaluateTagDirective(
-            TextWriter writer,
-            EvaluationContext context,
-            Directive directive,
-            IReadOnlyList<object[]> components,
-            IReadOnlyList<CompiledEvaluationDelegate<EvaluationContext>> evaluationProcs)
+            [NotNull] TextWriter writer,
+            [NotNull] EvaluationContext context,
+            [NotNull] Directive directive,
+            [NotNull] IReadOnlyList<object[]> components,
+            [NotNull] IReadOnlyList<CompiledEvaluationDelegate<EvaluationContext>> evaluationProcs)
         {
             /* Get tag components. */
             var evaluatedComponents = new object[components.Count][];

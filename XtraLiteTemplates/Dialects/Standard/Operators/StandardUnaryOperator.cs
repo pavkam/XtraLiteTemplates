@@ -29,10 +29,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using Expressions.Operators;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The abstract base class for all standard unary expression operators.
     /// </summary>
+    [PublicAPI]
     public abstract class StandardUnaryOperator : UnaryOperator
     {
         /// <summary>
@@ -43,7 +45,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected StandardUnaryOperator(string symbol, IPrimitiveTypeConverter typeConverter)
+        protected StandardUnaryOperator([NotNull] string symbol, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol)
         {
             Expect.NotNull("typeConverter", typeConverter);
@@ -58,6 +60,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <value>
         /// The type converter.
         /// </value>
+        [NotNull]
         protected IPrimitiveTypeConverter TypeConverter { get; }
     }
 }

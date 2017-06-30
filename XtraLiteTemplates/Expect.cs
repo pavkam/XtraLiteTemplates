@@ -27,87 +27,86 @@
 namespace XtraLiteTemplates
 {
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
+
+    using JetBrains.Annotations;
 
     internal static class Expect
     {
-        public static void NotNull(string name, object value)
+        [ContractAnnotation("halt <= value: null")]
+        public static void NotNull([NotNull] [InvokerParameterName] string argument, object value)
         {
+            Debug.Assert(!string.IsNullOrEmpty(argument), "Argument name cannot be empty.");
+
             if (value == null)
             {
-                ExceptionHelper.ArgumentIsNull(name);
+                ExceptionHelper.ArgumentIsNull(argument);
             }
         }
 
-        public static void NotEmpty<T>(string name, IEnumerable<T> value)
+        [ContractAnnotation("halt <= value: false")]
+        public static void NotEmpty<T>([NotNull] [InvokerParameterName] string argument, IEnumerable<T> value)
         {
-            NotNull(name, value);
+            NotNull(argument, value);
 
             if (!value.Any())
             {
-                ExceptionHelper.ArgumentIsEmpty(name);
+                ExceptionHelper.ArgumentIsEmpty(argument);
             }
         }
 
-        public static void Identifier(string name, string value)
+        [ContractAnnotation("halt <= value: false")]
+        public static void Identifier([NotNull] [InvokerParameterName] string argument, string value)
         {
-            NotEmpty(name, value);
+            NotEmpty(argument, value);
 
-            var identifierValid =
-                (char.IsLetter(value[0]) || value[0] == '_') &&
-                value.All(c => char.IsLetterOrDigit(c) || c == '_');
+            var identifierValid = (char.IsLetter(value[0]) || value[0] == '_')
+                                  && value.All(c => char.IsLetterOrDigit(c) || c == '_');
 
             if (!identifierValid)
             {
-                ExceptionHelper.ArgumentIsNotValidIdentifier(name);
+                ExceptionHelper.ArgumentIsNotValidIdentifier(argument);
             }
         }
 
-        public static void NotEqual<T>(string name1, string name2, T value1, T value2)
+        public static void NotEqual<T>(
+            [NotNull] [InvokerParameterName] string argument1,
+            [NotNull] [InvokerParameterName] string argument2,
+            T value1,
+            T value2)
         {
+            Debug.Assert(!string.IsNullOrEmpty(argument1));
+            Debug.Assert(!string.IsNullOrEmpty(argument2));
+
             if (EqualityComparer<T>.Default.Equals(value1, value2))
             {
-                ExceptionHelper.ArgumentsAreEqual(name1, name2);
+                ExceptionHelper.ArgumentsAreEqual(argument1, argument2);
             }
         }
 
-        public static void GreaterThan<T>(string name, T value, T than)
+        public static void GreaterThan<T>([NotNull] [InvokerParameterName] string argument, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) <= 0)
             {
-                ExceptionHelper.ArgumentNotGreaterThan(name, than == null ? null : than.ToString());
+                ExceptionHelper.ArgumentNotGreaterThan(argument, than == null ? null : than.ToString());
             }
         }
 
-        public static void GreaterThanOrEqual<T>(string name, T value, T than)
+        public static void GreaterThanOrEqual<T>([NotNull] [InvokerParameterName] string argument, T value, T than)
         {
             if (Comparer<T>.Default.Compare(value, than) < 0)
             {
-                ExceptionHelper.ArgumentNotGreaterThanOrEqual(name, than == null ? null : than.ToString());
+                ExceptionHelper.ArgumentNotGreaterThanOrEqual(argument, than == null ? null : than.ToString());
             }
         }
 
-        public static void LessThan<T>(string name, T value, T than)
-        {
-            if (Comparer<T>.Default.Compare(value, than) >= 0)
-            {
-                ExceptionHelper.ArgumentNotLessThan(name, than == null ? null : than.ToString());
-            }
-        }
-
-        public static void LessThanOrEqual<T>(string name, T value, T than)
-        {
-            if (Comparer<T>.Default.Compare(value, than) > 0)
-            {
-                ExceptionHelper.ArgumentNotLessThanOrEqual(name, than == null ? null : than.ToString());
-            }
-        }
-
-        public static void IsTrue(string name, bool condition)
+        [ContractAnnotation("halt <= condition: false")]
+        public static void IsTrue([NotNull] [InvokerParameterName] string argument, bool condition)
         {
             if (!condition)
             {
-                ExceptionHelper.ConditionFailed(name);
+                ExceptionHelper.ConditionFailed(argument);
             }
         }
     }

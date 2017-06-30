@@ -47,8 +47,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
             _allowEmptyGroup = allowEmptyGroup;
         }
 
-        public IReadOnlyList<ExpressionNode> Children { get; private set; }
-
         public ExpressionNode LastChild
         {
             get

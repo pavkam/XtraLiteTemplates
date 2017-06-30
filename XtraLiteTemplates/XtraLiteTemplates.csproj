@@ -59,6 +59,7 @@
     <Compile Include="Expressions\Nodes\ReferenceNode.cs" />
     <Compile Include="Introspection\Static.cs" />
     <Compile Include="Introspection\SimpleTypeDisemboweler.cs" />
+    <Compile Include="JetBrainsAnnotations.cs" />
     <Compile Include="Parsing\LexingException.cs" />
     <Compile Include="Dialects\Standard\CodeMonkeyDialect.cs" />
     <Compile Include="Dialects\Standard\StandardDialectBase.cs" />

@@ -28,6 +28,8 @@
 
 namespace XtraLiteTemplates.NUnit.Dialects
 {
+    using System;
+
     using global::NUnit.Framework;
     using XtraLiteTemplates.Dialects.Standard;
     using Introspection;
@@ -48,11 +50,137 @@ namespace XtraLiteTemplates.NUnit.Dialects
             _selfObject = (CodeMonkeySelfObject)CreateSelfObject(TypeConverter);
         }
 
-        [TestCase(-1, 1)]
-        [TestCase(2, 2)]
-        public void TestCaseAbs(double input, double expected)
+        [TestCase(-1)]
+        [TestCase(2)]
+        public void TestCaseAbs(double input)
         {
-            Assert.AreEqual(expected, _selfObject.Abs(input));
+            Assert.AreEqual(Math.Abs(input), _selfObject.Abs(input));
+        }
+
+        [TestCase(-1)]
+        [TestCase(-1.4)]
+        [TestCase(-1.5)]
+        [TestCase(-1.6)]
+        [TestCase(2)]
+        [TestCase(2.4)]
+        [TestCase(2.5)]
+        [TestCase(2.6)]
+        public void TestCaseCeiling(double input)
+        {
+            Assert.AreEqual(Math.Ceiling(input), _selfObject.Ceiling(input));
+        }
+
+        [TestCase(-1)]
+        [TestCase(-1.4)]
+        [TestCase(-1.5)]
+        [TestCase(-1.6)]
+        [TestCase(2)]
+        [TestCase(2.4)]
+        [TestCase(2.5)]
+        [TestCase(2.6)]
+        public void TestCaseFloor(double input)
+        {
+            Assert.AreEqual(Math.Floor(input), _selfObject.Floor(input));
+        }
+
+        [TestCase(-1, -1)]
+        [TestCase(-1, 1)]
+        [TestCase(1, -1)]
+        [TestCase(double.PositiveInfinity, double.NegativeInfinity)]
+        public void TestCaseMin(double v1, double v2)
+        {
+            Assert.AreEqual(Math.Min(v1, v2), _selfObject.Min(v1, v2));
+        }
+
+        [TestCase(-1, -1)]
+        [TestCase(-1, 1)]
+        [TestCase(1, -1)]
+        [TestCase(double.PositiveInfinity, double.NegativeInfinity)]
+        public void TestCaseMax(double v1, double v2)
+        {
+            Assert.AreEqual(Math.Max(v1, v2), _selfObject.Max(v1, v2));
+        }
+
+        [TestCase(1.12345, 1)]
+        [TestCase(1.12345, 2)]
+        [TestCase(-1.12345, 1)]
+        [TestCase(-1.12345, 2)]
+        public void TestCaseRound(double v, int d)
+        {
+            Assert.AreEqual(Math.Round(v, d), _selfObject.Round(v, d));
+        }
+
+        [Test]
+        public void TestCaseJoin()
+        {
+            var result = _selfObject.Join(",", new[] { "1", "2", "3" });
+
+            Assert.AreEqual("1,2,3", result);
+        }
+
+        [Test]
+        public void TestCaseNl()
+        {
+            Assert.AreEqual(Environment.NewLine, _selfObject.NL);
+        }
+
+        public struct SystemEnvironment
+        {
+            /// <summary>
+            /// Gets the name of the machine.
+            /// </summary>
+            /// <value>
+            /// The name of the machine.
+            /// </value>
+            public string MachineName => Environment.MachineName;
+
+            /// <summary>
+            /// Gets the name of the user domain.
+            /// </summary>
+            /// <value>
+            /// The name of the user domain.
+            /// </value>
+            public string UserDomainName => Environment.UserDomainName;
+
+            /// <summary>
+            /// Gets the name of the user.
+            /// </summary>
+            /// <value>
+            /// The name of the user.
+            /// </value>
+            public string UserName => Environment.UserName;
+
+            /// <summary>
+            /// Gets the OS version.
+            /// </summary>
+            /// <value>
+            /// The OS version.
+            /// </value>
+            public string OsVersion => Environment.OSVersion.ToString();
+        }
+
+        [Test]
+        public void TestCaseSystemMachineName()
+        {
+            Assert.AreEqual(Environment.MachineName, _selfObject.System.MachineName);
+        }
+
+        [Test]
+        public void TestCaseSystemOsVersion()
+        {
+            Assert.AreEqual(Environment.OSVersion.ToString(), _selfObject.System.OsVersion);
+        }
+
+        [Test]
+        public void TestCaseSystemUserDomainName()
+        {
+            Assert.AreEqual(Environment.UserDomainName, _selfObject.System.UserDomainName);
+        }
+
+        [Test]
+        public void TestCaseSystemUserName()
+        {
+            Assert.AreEqual(Environment.UserName, _selfObject.System.UserName);
         }
     }
 }

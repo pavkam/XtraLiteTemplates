@@ -32,11 +32,13 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using Evaluation;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
     using Parsing;
 
     /// <summary>
     /// The conditional interpolation directive implementation.
     /// </summary>
+    [PublicAPI]
     public sealed class ConditionalInterpolationDirective : StandardDirective
     {
         private readonly int _interpolatedExpressionComponentIndex;
@@ -54,7 +56,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// The <paramref name="markup" /> is expected to contain exactly two expression components; one is the conditional expression, and the second
         /// one is the interpolated expression.
         /// </remarks>
-        public ConditionalInterpolationDirective(string markup, bool invertExpressionOrder, IPrimitiveTypeConverter typeConverter)
+        public ConditionalInterpolationDirective([NotNull] string markup, bool invertExpressionOrder, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(markup))
         {
             Debug.Assert(Tags.Count == 1, "Expected a tag count of 1.");
@@ -83,7 +85,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// The first expression is the interpolation expression followed by the conditional expression.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
-        public ConditionalInterpolationDirective(IPrimitiveTypeConverter typeConverter)
+        public ConditionalInterpolationDirective([NotNull] IPrimitiveTypeConverter typeConverter)
             : this("$ IF $", false, typeConverter)
         {
         }
@@ -100,10 +102,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// In the current implementation always equal to <see cref="Directive.FlowDecision.Terminate"/>.
         /// </returns>
         protected internal override FlowDecision Execute(
-            int tagIndex, 
-            object[] components,
-            ref object state, 
-            IExpressionEvaluationContext context, 
+            int tagIndex,
+            [NotNull] object[] components,
+            ref object state,
+            [NotNull] IExpressionEvaluationContext context, 
             out string text)
         {
             /* It is a simple directive. Expecting just one tag here. */
@@ -112,7 +114,8 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             Debug.Assert(components.Length == Tags[tagIndex].ComponentCount, "component length must match tag component length.");
             Debug.Assert(context != null, "context cannot be null.");
 
-            text = TypeConverter.ConvertToBoolean(components[_conditionalExpressionComponentIndex]) ? TypeConverter.ConvertToString(components[_interpolatedExpressionComponentIndex]) : null;
+            text = TypeConverter.ConvertToBoolean(components[_conditionalExpressionComponentIndex]) ? 
+                TypeConverter.ConvertToString(components[_interpolatedExpressionComponentIndex]) : null;
 
             return FlowDecision.Terminate;
         }

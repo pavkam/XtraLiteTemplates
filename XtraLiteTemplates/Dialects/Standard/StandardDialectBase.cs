@@ -28,6 +28,7 @@ namespace XtraLiteTemplates.Dialects.Standard
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Text;
@@ -35,20 +36,29 @@ namespace XtraLiteTemplates.Dialects.Standard
     using Expressions;
     using Expressions.Operators;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Abstract base class for all standard dialects supported by this library. Defines a set of common properties and behaviors that concrete
     /// dialect implementations can use out-of-the box.
     /// </summary>
+    [PublicAPI]
     public abstract class StandardDialectBase : IDialect, IObjectFormatter
     {
+        [NotNull]
         private readonly IPrimitiveTypeConverter _typeConverter;
         private readonly DialectCasing _dialectCasing;
+        [CanBeNull]
         private List<Operator> _dialectOperators;
+        [CanBeNull]
         private List<Directive> _dialectDirectives;
+        [CanBeNull]
         private Dictionary<string, object> _dialectSpecialConstants;
+        [CanBeNull]
         private Dictionary<object, string> _dialectSpecialConstantIdentifiers;
+        [NotNull]
         private string _dialectUndefinedSpecialIdentifier;
+        [CanBeNull]
         private object _selfObject;
 
         /// <summary>
@@ -62,17 +72,20 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <param name="casing">A <see cref="DialectCasing" /> value that controls the dialect string casing behavior.</param>
         /// <exception cref="ArgumentNullException">Either argument <paramref name="name" /> or <paramref name="culture" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="name" /> is an empty string.</exception>
-        protected StandardDialectBase(string name, CultureInfo culture, DialectCasing casing)
+        protected StandardDialectBase([NotNull] string name, [NotNull] CultureInfo culture, DialectCasing casing)
         {
-            Expect.NotEmpty("name", name);
-            Expect.NotNull("culture", culture);
+            Expect.NotEmpty(nameof(name), name);
+            Expect.NotNull(nameof(culture), culture);
 
             /* Build culture-aware values.*/
             Name = name;
             Culture = culture;
             _typeConverter = new FlexiblePrimitiveTypeConverter(Culture, this);
             _dialectCasing = casing;
-            _dialectUndefinedSpecialIdentifier = AdjustCasing("Undefined");
+
+            var casedUndefined = AdjustCasing("Undefined");
+            Debug.Assert(casedUndefined != null);
+            _dialectUndefinedSpecialIdentifier = casedUndefined;
 
             var comparer = StringComparer.Create(culture, casing == DialectCasing.IgnoreCase);
 
@@ -114,6 +127,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The string literal comparer.
         /// </value>
+        [NotNull]
         public IComparer<string> StringLiteralComparer { get; }
 
         /// <summary>
@@ -123,7 +137,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The name of the dialect.
         /// </value>
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        [NotNull]
         public string Name { get; }
 
         /// <summary>
@@ -170,6 +184,7 @@ namespace XtraLiteTemplates.Dialects.Standard
 
                     foreach (var kvp in CreateSpecials())
                     {
+                        Debug.Assert(_dialectSpecialConstants != null);
                         _dialectSpecialConstants.Add(kvp.Key, kvp.Value);
                         if (kvp.Value == null)
                         {
@@ -177,11 +192,13 @@ namespace XtraLiteTemplates.Dialects.Standard
                         }
                         else
                         {
+                            Debug.Assert(_dialectSpecialConstantIdentifiers != null);
                             _dialectSpecialConstantIdentifiers[kvp.Value] = kvp.Key;
                         }
                     }
                 }
 
+                Debug.Assert(_dialectSpecialConstants != null);
                 return _dialectSpecialConstants;
             }
         }
@@ -256,7 +273,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public virtual string DecorateUnParsedText(IExpressionEvaluationContext context, string unParsedText)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             if (string.IsNullOrEmpty(unParsedText))
             {
@@ -300,6 +317,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         public override string ToString()
         {
             string caseDescription = null;
+
             // ReSharper disable once SwitchStatementMissingSomeCases
             switch (_dialectCasing)
             {
@@ -356,7 +374,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// The string representation.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
-        string IObjectFormatter.ToString(object obj, IFormatProvider formatProvider)
+        [NotNull]
+        string IObjectFormatter.ToString([CanBeNull] object obj, [NotNull] IFormatProvider formatProvider)
         {
             string result;
 
@@ -390,7 +409,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <returns>The string representation.</returns>
-        string IObjectFormatter.ToString(object obj)
+        string IObjectFormatter.ToString([CanBeNull] object obj)
         {
             return ((IObjectFormatter)this).ToString(obj, Culture);
         }
@@ -403,10 +422,11 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An instance of the self object.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
+        [NotNull]
         [SuppressMessage("ReSharper", "VirtualMemberNeverOverridden.Global")]
-        protected virtual StandardSelfObject CreateSelfObject(IPrimitiveTypeConverter typeConverter)
+        protected virtual StandardSelfObject CreateSelfObject([NotNull] IPrimitiveTypeConverter typeConverter)
         {
-            Expect.NotNull("typeConverter", typeConverter);
+            Expect.NotNull(nameof(typeConverter), typeConverter);
 
             return new StandardSelfObject(typeConverter);
         }
@@ -419,7 +439,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported operators.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected abstract IEnumerable<Operator> CreateOperators(IPrimitiveTypeConverter typeConverter);
+        [NotNull]
+        protected abstract IEnumerable<Operator> CreateOperators([NotNull] IPrimitiveTypeConverter typeConverter);
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported directives.
@@ -429,7 +450,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// An array of all supported directives.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        protected abstract IEnumerable<Directive> CreateDirectives(IPrimitiveTypeConverter typeConverter);
+        [NotNull]
+        protected abstract IEnumerable<Directive> CreateDirectives([NotNull] IPrimitiveTypeConverter typeConverter);
 
         /// <summary>
         /// Override in descendant classes to supply all dialect supported special constants.
@@ -437,6 +459,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <returns>
         /// An array of all supported special constants.
         /// </returns>
+        [NotNull]
         protected abstract IEnumerable<KeyValuePair<string, object>> CreateSpecials();
 
         /// <summary>
@@ -449,7 +472,8 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <remarks>
         /// Descendant classes need to call this method when creating directives and operators to adjust the case accordingly.
         /// </remarks>
-        protected string AdjustCasing(string markup)
+        [CanBeNull]
+        protected string AdjustCasing([CanBeNull] string markup)
         {
             if (string.IsNullOrEmpty(markup))
             {

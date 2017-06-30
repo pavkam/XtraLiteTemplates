@@ -27,7 +27,6 @@
 namespace XtraLiteTemplates.Evaluation
 {
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using Parsing;
 
     internal sealed class UnParsedNode : TemplateNode

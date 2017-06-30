@@ -30,14 +30,17 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     using System.Diagnostics;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
     using Parsing;
 
     /// <summary>
     /// The "keep formatting" directive implementation. This is a special directive that simply
     /// registers a given state object that can be later queried for.
     /// </summary>
+    [PublicAPI]
     public sealed class PreFormattedUnParsedTextDirective : StandardDirective    
     {
+        [NotNull]
         private readonly object _stateObject;
 
         /// <summary>
@@ -49,7 +52,11 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="FormatException">Argument <paramref name="startTagMarkup" /> or <paramref name="endTagMarkup" /> cannot be parsed.</exception>
         /// <exception cref="ArgumentNullException">Argument <paramref name="stateObject" /> is <c>null</c>.</exception>
-        public PreFormattedUnParsedTextDirective(string startTagMarkup, string endTagMarkup, object stateObject, IPrimitiveTypeConverter typeConverter)
+        public PreFormattedUnParsedTextDirective(
+            [NotNull] string startTagMarkup,
+            [NotNull] string endTagMarkup,
+            [NotNull] object stateObject,
+            [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(typeConverter, Tag.Parse(startTagMarkup), Tag.Parse(endTagMarkup))
         {
             Debug.Assert(Tags.Count == 2, "Expected a tag count of 2.");
@@ -65,7 +72,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <param name="stateObject">The state object to register.</param>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="stateObject" /> is <c>null</c>.</exception>
-        public PreFormattedUnParsedTextDirective(object stateObject, IPrimitiveTypeConverter typeConverter)
+        public PreFormattedUnParsedTextDirective(
+            [NotNull] object stateObject,
+            [NotNull] IPrimitiveTypeConverter typeConverter)
             : this("PREFORMATTED", "END", stateObject, typeConverter)
         {
         }
