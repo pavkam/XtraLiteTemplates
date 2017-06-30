@@ -56,7 +56,7 @@ namespace XtraLiteTemplates.NUnit
         {
             var comparer = StringComparer.Ordinal;
 
-            var operators = new global::System.Collections.Generic.List<Operator>
+            var operators = new List<Operator>
             {
                 new RelationalEqualsOperator(comparer, TypeConverter),
                 new RelationalNotEqualsOperator(comparer, TypeConverter),
