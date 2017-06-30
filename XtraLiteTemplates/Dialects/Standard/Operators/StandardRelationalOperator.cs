@@ -56,7 +56,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
             [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, typeConverter)
         {
-            Expect.NotNull("stringComparer", stringComparer);
+            Expect.NotNull(nameof(stringComparer), stringComparer);
 
             StringComparer = stringComparer;
         }
@@ -84,7 +84,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
         public override sealed object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             int relation;
             if (TypeConverter.TypeOf(left) == PrimitiveType.String || TypeConverter.TypeOf(right) == PrimitiveType.String)

@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.NUnit
     using Parsing;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class LexTests : TestBase
     {
         [Test]

@@ -95,7 +95,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <value>
         /// The system environment details.
         /// </value>
-        public SystemEnvironment System { get; } = new SystemEnvironment();
+        public SystemEnvironment System { get; }
 
         /// <summary>
         /// Gets the new line sequence.

@@ -49,12 +49,12 @@ namespace XtraLiteTemplates.Parsing
             int characterIndex, 
             int originalLength)
         {
-            Expect.GreaterThanOrEqual("characterIndex", characterIndex, 0);
-            Expect.GreaterThan("originalLength", originalLength, 0);
+            Expect.GreaterThanOrEqual(nameof(characterIndex), characterIndex, 0);
+            Expect.GreaterThan(nameof(originalLength), originalLength, 0);
 
             if (type != TokenType.String)
             {
-                Expect.NotEmpty("value", value);
+                Expect.NotEmpty(nameof(value), value);
             }
 
             Type = type;

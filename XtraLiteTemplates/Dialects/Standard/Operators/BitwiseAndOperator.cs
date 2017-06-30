@@ -71,7 +71,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             return TypeConverter.ConvertToInteger(left) & TypeConverter.ConvertToInteger(right);
         }

@@ -57,9 +57,9 @@ namespace XtraLiteTemplates.Introspection
             [NotNull] IEqualityComparer<string> memberComparer,
             [NotNull] IObjectFormatter objectFormatter)
         {
-            Expect.NotNull("type", type);
-            Expect.NotNull("memberComparer", memberComparer);
-            Expect.NotNull("objectFormatter", objectFormatter);
+            Expect.NotNull(nameof(type), type);
+            Expect.NotNull(nameof(memberComparer), memberComparer);
+            Expect.NotNull(nameof(objectFormatter), objectFormatter);
 
             Type = type;
             Comparer = memberComparer;
@@ -122,7 +122,7 @@ namespace XtraLiteTemplates.Introspection
         [CanBeNull]
         public object Invoke([CanBeNull] object @object, [NotNull] string member, [CanBeNull] object[] arguments = null)
         {
-            Expect.Identifier("member", member);
+            Expect.Identifier(nameof(member), member);
 
             if (@object == null)
             {
@@ -178,7 +178,7 @@ namespace XtraLiteTemplates.Introspection
             return candidateAccepted;
         }
 
-        [NotNull]
+        [CanBeNull]
         private Func<object, object[], object> LocateSuitableInvokeCandidate([NotNull] string member, [CanBeNull] IReadOnlyList<object> arguments)
         {
             if (arguments == null || arguments.Count == 0)

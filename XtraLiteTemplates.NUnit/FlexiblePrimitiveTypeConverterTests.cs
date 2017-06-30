@@ -38,6 +38,7 @@ namespace XtraLiteTemplates.NUnit
 
     [TestFixture]
     [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class FlexiblePrimitiveTypeConverterTests : TestBase
     {
         [Test]

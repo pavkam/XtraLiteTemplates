@@ -39,6 +39,7 @@ namespace XtraLiteTemplates.NUnit
     using XtraLiteTemplates.Dialects.Standard;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class XLTemplateTests : TestBase
     {
         [Test]

@@ -43,8 +43,8 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
         protected Lex(int firstCharacterIndex, int originalLength)
         {
-            Expect.GreaterThanOrEqual("firstCharacterIndex", firstCharacterIndex, 0);
-            Expect.GreaterThan("originalLength", originalLength, 0);
+            Expect.GreaterThanOrEqual(nameof(firstCharacterIndex), firstCharacterIndex, 0);
+            Expect.GreaterThan(nameof(originalLength), originalLength, 0);
 
             FirstCharacterIndex = firstCharacterIndex;
             OriginalLength = originalLength;

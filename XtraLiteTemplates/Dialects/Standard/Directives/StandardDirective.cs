@@ -49,7 +49,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         protected StandardDirective([NotNull] IPrimitiveTypeConverter typeConverter, [NotNull] [ItemNotNull] params Tag[] tags)
             : base(tags)
         {
-            Expect.NotNull("typeConverter", typeConverter);
+            Expect.NotNull(nameof(typeConverter), typeConverter);
 
             TypeConverter = typeConverter;
         }

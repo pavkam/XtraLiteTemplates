@@ -48,7 +48,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         protected StandardUnaryOperator([NotNull] string symbol, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol)
         {
-            Expect.NotNull("typeConverter", typeConverter);
+            Expect.NotNull(nameof(typeConverter), typeConverter);
 
             TypeConverter = typeConverter;
         }

@@ -46,6 +46,8 @@ namespace XtraLiteTemplates.NUnit
     [SuppressMessage("ReSharper", "ImplicitlyCapturedClosure")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
     [SuppressMessage("ReSharper", "IdentifierTypo")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
+    [SuppressMessage("ReSharper", "PossibleNullReferenceException")]
     public class ExpressionTests : TestBase
     { 
         private static Expression CreateBloatedExpression()

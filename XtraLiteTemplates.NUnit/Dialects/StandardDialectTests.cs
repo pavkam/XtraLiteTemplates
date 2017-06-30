@@ -38,6 +38,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
     [TestFixture]
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class StandardDialectTests : TestBase
     {
         private static StandardDialect TestDialect(CultureInfo culture, DialectCasing casing)

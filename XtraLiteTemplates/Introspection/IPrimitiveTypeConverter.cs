@@ -105,7 +105,7 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>
         /// A <see cref="IEnumerable{Object}" /> value.
         /// </returns>
-        [NotNull]
+        [CanBeNull]
         IEnumerable<object> ConvertToSequence([CanBeNull] object obj);
     }
 }

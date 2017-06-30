@@ -69,18 +69,18 @@ namespace XtraLiteTemplates.Parsing
             char stringEscapeCharacter = '\\', 
             char numberDecimalSeparatorCharacter = '.')
         {
-            Expect.NotNull("reader", reader);
-            Expect.NotEqual("tagStartCharacter", "tagEndCharacter", tagStartCharacter, tagEndCharacter);
-            Expect.NotEqual("stringStartCharacter", "tagStartCharacter", stringStartCharacter, tagStartCharacter);
-            Expect.NotEqual("stringStartCharacter", "tagEndCharacter", stringStartCharacter, tagEndCharacter);
-            Expect.NotEqual("stringEndCharacter", "tagStartCharacter", stringEndCharacter, tagStartCharacter);
-            Expect.NotEqual("stringEndCharacter", "tagEndCharacter", stringEndCharacter, tagEndCharacter);
-            Expect.NotEqual("stringEscapeCharacter", "stringStartCharacter", stringEscapeCharacter, stringStartCharacter);
-            Expect.NotEqual("stringEscapeCharacter", "stringEndCharacter", stringEscapeCharacter, stringEndCharacter);
-            Expect.NotEqual("tagStartCharacter", "numberDecimalSeparatorCharacter", tagStartCharacter, numberDecimalSeparatorCharacter);
-            Expect.NotEqual("tagEndCharacter", "numberDecimalSeparatorCharacter", tagEndCharacter, numberDecimalSeparatorCharacter);
-            Expect.NotEqual("stringStartCharacter", "numberDecimalSeparatorCharacter", stringStartCharacter, numberDecimalSeparatorCharacter);
-            Expect.NotEqual("stringEndCharacter", "numberDecimalSeparatorCharacter", stringEndCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotNull(nameof(reader), reader);
+            Expect.NotEqual(nameof(tagStartCharacter), nameof(tagEndCharacter), tagStartCharacter, tagEndCharacter);
+            Expect.NotEqual(nameof(stringStartCharacter), nameof(tagStartCharacter), stringStartCharacter, tagStartCharacter);
+            Expect.NotEqual(nameof(stringStartCharacter), nameof(tagEndCharacter), stringStartCharacter, tagEndCharacter);
+            Expect.NotEqual(nameof(stringEndCharacter), nameof(tagStartCharacter), stringEndCharacter, tagStartCharacter);
+            Expect.NotEqual(nameof(stringEndCharacter), nameof(tagEndCharacter), stringEndCharacter, tagEndCharacter);
+            Expect.NotEqual(nameof(stringEscapeCharacter), nameof(stringStartCharacter), stringEscapeCharacter, stringStartCharacter);
+            Expect.NotEqual(nameof(stringEscapeCharacter), nameof(stringEndCharacter), stringEscapeCharacter, stringEndCharacter);
+            Expect.NotEqual(nameof(tagStartCharacter), nameof(numberDecimalSeparatorCharacter), tagStartCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual(nameof(tagEndCharacter), nameof(numberDecimalSeparatorCharacter), tagEndCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual(nameof(stringStartCharacter), nameof(numberDecimalSeparatorCharacter), stringStartCharacter, numberDecimalSeparatorCharacter);
+            Expect.NotEqual(nameof(stringEndCharacter), nameof(numberDecimalSeparatorCharacter), stringEndCharacter, numberDecimalSeparatorCharacter);
 
             /* Validate allow character set. */
             var all = new[]

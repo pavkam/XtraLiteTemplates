@@ -35,6 +35,7 @@ namespace XtraLiteTemplates.NUnit.Directives
     using XtraLiteTemplates.Dialects.Standard.Directives;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class StandardSeparatedForEachDirectiveTests : TestBase
     {
         [Test]

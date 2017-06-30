@@ -71,7 +71,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             return TypeConverter.ConvertToBoolean(left) && TypeConverter.ConvertToBoolean(right);
         }
@@ -88,7 +88,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// </returns>
         public override bool EvaluateLhs(IExpressionEvaluationContext context, object left, out object result)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             result = false;
             return TypeConverter.TypeOf(left) == PrimitiveType.Boolean && TypeConverter.ConvertToBoolean(left) == false;

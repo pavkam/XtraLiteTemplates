@@ -53,7 +53,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="InvalidOperationException">One or more tags have no defined components.</exception>
         protected Directive([NotNull] [ItemNotNull] params Tag[] tags)
         {
-            Expect.NotEmpty("tags", tags);
+            Expect.NotEmpty(nameof(tags), tags);
 
             foreach (var tag in tags)
             {
@@ -132,7 +132,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         public bool Equals([CanBeNull] object obj, [NotNull] IEqualityComparer<string> comparer)
         {
-            Expect.NotNull("comparer", comparer);
+            Expect.NotNull(nameof(comparer), comparer);
 
             if (obj == null || obj.GetType() != GetType())
             {
@@ -177,7 +177,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         public int GetHashCode([NotNull] IEqualityComparer<string> comparer)
         {
-            Expect.NotNull("comparer", comparer);
+            Expect.NotNull(nameof(comparer), comparer);
 
             var hash = 73; /* Magic constant */
             unchecked

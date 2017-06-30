@@ -70,9 +70,9 @@ namespace XtraLiteTemplates.Evaluation
             [CanBeNull] object selfObject,
             [NotNull] Func<IExpressionEvaluationContext, string, string> unParsedTextHandler)
         {
-            Expect.NotNull("identifierComparer", identifierComparer);
-            Expect.NotNull("objectFormatter", objectFormatter);
-            Expect.NotNull("unParsedTextHandler", unParsedTextHandler);
+            Expect.NotNull(nameof(identifierComparer), identifierComparer);
+            Expect.NotNull(nameof(objectFormatter), objectFormatter);
+            Expect.NotNull(nameof(unParsedTextHandler), unParsedTextHandler);
 
             CancellationToken = cancellationToken;
             _identifierComparer = identifierComparer;
@@ -132,7 +132,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
         public void SetProperty(string property, object value)
         {
-            Expect.Identifier("property", property);
+            Expect.Identifier(nameof(property), property);
 
             var topFrame = TopFrame;
             if (topFrame.Variables == null)
@@ -154,7 +154,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
         public object GetProperty(string property)
         {
-            Expect.Identifier("property", property);
+            Expect.Identifier(nameof(property), property);
 
             object result;
             if (!TryGetProperty(property, out result))
@@ -177,7 +177,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
         public object GetProperty([CanBeNull] object @object, string property)
         {
-            Expect.Identifier("property", property);
+            Expect.Identifier(nameof(property), property);
 
             return @object != null ? 
                 GetDisembowelerForType(GetTypeOfObject(@object)).Invoke(@object, property) : null;
@@ -195,7 +195,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
         public object Invoke(string method, [CanBeNull] object[] arguments)
         {
-            Expect.Identifier("method", method);
+            Expect.Identifier(nameof(method), method);
             
             if (arguments == null || arguments.Length == 0)
             {
@@ -223,7 +223,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
         public object Invoke([CanBeNull] object @object, string method, [CanBeNull] object[] arguments)
         {
-            Expect.Identifier("method", method);
+            Expect.Identifier(nameof(method), method);
 
             return @object != null ? 
                 GetDisembowelerForType(GetTypeOfObject(@object)).Invoke(@object, method, arguments) : null;
@@ -240,7 +240,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </remarks>
         public void AddStateObject(object state)
         {
-            Expect.NotNull("state", state);
+            Expect.NotNull(nameof(state), state);
 
             var topFrame = TopFrame;
             if (topFrame.StateObjects == null)
@@ -262,7 +262,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </remarks>
         public void RemoveStateObject(object state)
         {
-            Expect.NotNull("state", state);
+            Expect.NotNull(nameof(state), state);
 
             var topFrame = TopFrame;
             topFrame.StateObjects?.Remove(state);
@@ -278,7 +278,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
         public bool ContainsStateObject(object state)
         {
-            Expect.NotNull("state", state);
+            Expect.NotNull(nameof(state), state);
 
             var topFrame = TopFrame;
             return topFrame.StateObjects != null && topFrame.StateObjects.Contains(state);

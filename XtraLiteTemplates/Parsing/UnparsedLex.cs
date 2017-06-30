@@ -50,7 +50,7 @@ namespace XtraLiteTemplates.Parsing
             int originalLength)
             : base(firstCharacterIndex, originalLength)
         {
-            Expect.NotEmpty("unParsedText", unParsedText);
+            Expect.NotEmpty(nameof(unParsedText), unParsedText);
 
             UnParsedText = unParsedText;
         }

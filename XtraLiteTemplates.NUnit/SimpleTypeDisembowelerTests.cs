@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.NUnit
 
     [TestFixture]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class SimpleTypeDisembowelerTests : TestBase
     {
         [Test]

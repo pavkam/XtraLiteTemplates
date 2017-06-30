@@ -49,7 +49,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         protected StandardBinaryOperator([NotNull] string symbol, int precedence, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, precedence, Associativity.LeftToRight)
         {
-            Expect.NotNull("typeConverter", typeConverter);
+            Expect.NotNull(nameof(typeConverter), typeConverter);
 
             TypeConverter = typeConverter;
         }

@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.NUnit.Operators
     using XtraLiteTemplates.Dialects.Standard.Operators;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class BitwiseShiftRightOperatorTests : OperatorTestsBase
     {
         [Test]

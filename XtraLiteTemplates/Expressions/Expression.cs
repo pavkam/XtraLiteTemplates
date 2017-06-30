@@ -62,8 +62,8 @@ namespace XtraLiteTemplates.Expressions
         /// <exception cref="ArgumentNullException">Argument <paramref name="flowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
         public Expression([NotNull] ExpressionFlowSymbols flowSymbols, [NotNull] IEqualityComparer<string> comparer)
         {
-            Expect.NotNull("comparer", comparer);
-            Expect.NotNull("flowSymbols", flowSymbols);
+            Expect.NotNull(nameof(comparer), comparer);
+            Expect.NotNull(nameof(flowSymbols), flowSymbols);
 
             FlowSymbols = flowSymbols;
             _unaryOperatorSymbols = new Dictionary<string, UnaryOperator>(comparer);
@@ -134,7 +134,7 @@ namespace XtraLiteTemplates.Expressions
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
         public bool IsSupportedOperator([NotNull] string symbol)
         {
-            Expect.NotEmpty("symbol", symbol);
+            Expect.NotEmpty(nameof(symbol), symbol);
 
             return _unaryOperatorSymbols.ContainsKey(symbol) || _binaryOperatorSymbols.ContainsKey(symbol);
         }
@@ -149,7 +149,7 @@ namespace XtraLiteTemplates.Expressions
         [NotNull]
         public Expression RegisterOperator([NotNull] Operator @operator)
         {
-            Expect.NotNull("operator", @operator);
+            Expect.NotNull(nameof(@operator), @operator);
 
             if (Started)
             {
@@ -231,7 +231,7 @@ namespace XtraLiteTemplates.Expressions
         [NotNull]
         public Expression FeedSymbol([NotNull] string symbol)
         {
-            Expect.NotEmpty("symbol", symbol);
+            Expect.NotEmpty(nameof(symbol), symbol);
 
             if (Constructed)
             {
@@ -307,7 +307,7 @@ namespace XtraLiteTemplates.Expressions
         [CanBeNull]
         public object Evaluate([NotNull] IExpressionEvaluationContext context)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             if (!Constructed)
             {
@@ -590,7 +590,7 @@ namespace XtraLiteTemplates.Expressions
             _currentNode = newNode;
         }
 
-        private void FeedTerm([NotNull] object term, bool literalTerm)
+        private void FeedTerm([CanBeNull] object term, bool literalTerm)
         {
             Debug.Assert(literalTerm || term is string, "the term expected to be a string for non-literals.");
 

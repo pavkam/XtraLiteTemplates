@@ -74,9 +74,9 @@ namespace XtraLiteTemplates.Parsing
             [NotNull] ExpressionFlowSymbols expressionFlowSymbols,
             [NotNull] IEqualityComparer<string> comparer)
         {
-            Expect.NotNull("tokenizer", tokenizer);
-            Expect.NotNull("comparer", comparer);
-            Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
+            Expect.NotNull(nameof(tokenizer), tokenizer);
+            Expect.NotNull(nameof(comparer), comparer);
+            Expect.NotNull(nameof(expressionFlowSymbols), expressionFlowSymbols);
 
             Tokenizer = tokenizer;
             Comparer = comparer;
@@ -143,7 +143,7 @@ namespace XtraLiteTemplates.Parsing
         [NotNull]
         public Lexer RegisterTag([NotNull] Tag tag)
         {
-            Expect.NotNull("tag", tag);
+            Expect.NotNull(nameof(tag), tag);
             if (tag.ComponentCount == 0)
             {
                 ExceptionHelper.CannotRegisterTagWithNoComponents();
@@ -169,7 +169,7 @@ namespace XtraLiteTemplates.Parsing
         [NotNull]
         public Lexer RegisterOperator([NotNull] Operator @operator)
         {
-            Expect.NotNull("operator", @operator);
+            Expect.NotNull(nameof(@operator), @operator);
 
             var unaryOperator = @operator as UnaryOperator;
             if (unaryOperator != null)
@@ -218,7 +218,7 @@ namespace XtraLiteTemplates.Parsing
         [NotNull]
         public Lexer RegisterSpecial([NotNull] string keyword, [CanBeNull] object value)
         {
-            Expect.Identifier("keyword", keyword);
+            Expect.Identifier(nameof(keyword), keyword);
 
             if (_unaryExpressionOperators.Contains(keyword) || _binaryExpressionOperators.Contains(keyword))
             {

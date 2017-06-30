@@ -45,6 +45,7 @@ namespace XtraLiteTemplates.NUnit
 
     [TestFixture]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class LexerTests : TestBase
     {
         private static void AssertUnParsedLex(Lex lex, int firstCharacterIndex, int originalLength, string unParsedText)

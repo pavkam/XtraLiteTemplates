@@ -39,6 +39,7 @@ namespace XtraLiteTemplates.NUnit
 
     [TestFixture]
     [SuppressMessage("ReSharper", "IdentifierTypo")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class InterpreterTests : TestBase
     {
         [Test]

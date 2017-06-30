@@ -38,6 +38,7 @@ namespace XtraLiteTemplates.NUnit
     [TestFixture]
     [SuppressMessage("ReSharper", "ObjectCreationAsStatement")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class EvaluationContextTests : TestBase
     {
         private EvaluationContext _evaluationContext;

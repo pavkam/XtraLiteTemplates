@@ -61,8 +61,8 @@ namespace XtraLiteTemplates
         /// </remarks>
         public XLTemplate([NotNull] IDialect dialect, [NotNull] string template)
         {
-            Expect.NotNull("dialect", dialect);
-            Expect.NotNull("template", template);
+            Expect.NotNull(nameof(dialect), dialect);
+            Expect.NotNull(nameof(template), template);
 
             Dialect = dialect;
             Template = template;
@@ -114,9 +114,9 @@ namespace XtraLiteTemplates
         [CanBeNull]
         public static string Evaluate([NotNull] IDialect dialect, [NotNull] string template, [NotNull] params object[] arguments)
         {
-            Expect.NotNull("dialect", dialect);
-            Expect.NotNull("template", template);
-            Expect.NotNull("arguments", arguments);
+            Expect.NotNull(nameof(dialect), dialect);
+            Expect.NotNull(nameof(template), template);
+            Expect.NotNull(nameof(arguments), arguments);
 
             var instance = new XLTemplate(dialect, template);
 
@@ -140,8 +140,8 @@ namespace XtraLiteTemplates
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
         public void Evaluate([NotNull] TextWriter writer, [NotNull] IReadOnlyDictionary<string, object> variables)
         {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("variables", variables);
+            Expect.NotNull(nameof(writer), writer);
+            Expect.NotNull(nameof(variables), variables);
 
             /* No thread scheduling. */
             EvaluateInternal(writer, variables, CancellationToken.None);
@@ -163,8 +163,8 @@ namespace XtraLiteTemplates
             [NotNull] IReadOnlyDictionary<string, object> variables, 
             CancellationToken cancellationToken)
         {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("variables", variables);
+            Expect.NotNull(nameof(writer), writer);
+            Expect.NotNull(nameof(variables), variables);
 
             await Task.Run(
                 () =>
@@ -186,8 +186,8 @@ namespace XtraLiteTemplates
         [NotNull]
         public async Task EvaluateAsync([NotNull] TextWriter writer, [NotNull] IReadOnlyDictionary<string, object> variables)
         {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("variables", variables);
+            Expect.NotNull(nameof(writer), writer);
+            Expect.NotNull(nameof(variables), variables);
 
             await Task.Run(() =>
             {

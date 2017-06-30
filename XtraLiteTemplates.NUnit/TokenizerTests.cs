@@ -34,6 +34,7 @@ namespace XtraLiteTemplates.NUnit
     using Parsing;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class TokenizerTests : TestBase
     {
         private static void AssertToken(Token token, Token.TokenType type, int charIndex, int length, string value)

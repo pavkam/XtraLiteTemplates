@@ -63,9 +63,9 @@ namespace XtraLiteTemplates.Evaluation
             [NotNull] ExpressionFlowSymbols expressionFlowSymbols, 
             [NotNull] IEqualityComparer<string> comparer)
         {
-            Expect.NotNull("tokenizer", tokenizer);
-            Expect.NotNull("comparer", comparer);
-            Expect.NotNull("expressionFlowSymbols", expressionFlowSymbols);
+            Expect.NotNull(nameof(tokenizer), tokenizer);
+            Expect.NotNull(nameof(comparer), comparer);
+            Expect.NotNull(nameof(expressionFlowSymbols), expressionFlowSymbols);
 
             _lexer = new Lexer(tokenizer, expressionFlowSymbols, comparer);
             _registeredDirectives = new List<Directive>();
@@ -92,7 +92,7 @@ namespace XtraLiteTemplates.Evaluation
         [NotNull]
         public Interpreter RegisterDirective([NotNull] Directive directive)
         {
-            Expect.NotNull("directive", directive);
+            Expect.NotNull(nameof(directive), directive);
             Debug.Assert(directive.Tags.Any(), "Directive must have at least one tag defined.");
 
             if (!_registeredDirectives.Contains(directive))
@@ -150,7 +150,7 @@ namespace XtraLiteTemplates.Evaluation
         public CompiledTemplate<TContext> Compile<TContext>([NotNull] CompiledTemplateFactory<TContext> factory) 
             where TContext : IExpressionEvaluationContext
         {
-            Expect.NotNull("factory", factory);
+            Expect.NotNull(nameof(factory), factory);
 
             var document = new TemplateDocument();
             Interpret(document);

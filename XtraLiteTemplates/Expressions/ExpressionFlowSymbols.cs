@@ -58,17 +58,17 @@ namespace XtraLiteTemplates.Expressions
             [NotNull] string groupOpenSymbol,
             [NotNull] string groupCloseSymbol)
         {
-            Expect.NotEmpty("separatorSymbol", separatorSymbol);
-            Expect.NotEmpty("memberAccessSymbol", memberAccessSymbol);
-            Expect.NotEmpty("groupOpenSymbol", groupOpenSymbol);
-            Expect.NotEmpty("groupCloseSymbol", groupCloseSymbol);
+            Expect.NotEmpty(nameof(separatorSymbol), separatorSymbol);
+            Expect.NotEmpty(nameof(memberAccessSymbol), memberAccessSymbol);
+            Expect.NotEmpty(nameof(groupOpenSymbol), groupOpenSymbol);
+            Expect.NotEmpty(nameof(groupCloseSymbol), groupCloseSymbol);
 
-            Expect.NotEqual("separatorSymbol", "memberAccessSymbol", separatorSymbol, memberAccessSymbol);
-            Expect.NotEqual("separatorSymbol", "groupOpenSymbol", separatorSymbol, groupOpenSymbol);
-            Expect.NotEqual("separatorSymbol", "groupCloseSymbol", separatorSymbol, groupCloseSymbol);
-            Expect.NotEqual("memberAccessSymbol", "groupOpenSymbol", memberAccessSymbol, groupOpenSymbol);
-            Expect.NotEqual("memberAccessSymbol", "groupCloseSymbol", memberAccessSymbol, groupCloseSymbol);
-            Expect.NotEqual("groupOpenSymbol", "groupCloseSymbol", groupOpenSymbol, groupCloseSymbol);
+            Expect.NotEqual(nameof(separatorSymbol), nameof(memberAccessSymbol), separatorSymbol, memberAccessSymbol);
+            Expect.NotEqual(nameof(separatorSymbol), nameof(groupOpenSymbol), separatorSymbol, groupOpenSymbol);
+            Expect.NotEqual(nameof(separatorSymbol), nameof(groupCloseSymbol), separatorSymbol, groupCloseSymbol);
+            Expect.NotEqual(nameof(memberAccessSymbol), nameof(groupOpenSymbol), memberAccessSymbol, groupOpenSymbol);
+            Expect.NotEqual(nameof(memberAccessSymbol), nameof(groupCloseSymbol), memberAccessSymbol, groupCloseSymbol);
+            Expect.NotEqual(nameof(groupOpenSymbol), nameof(groupCloseSymbol), groupOpenSymbol, groupCloseSymbol);
 
             Separator = separatorSymbol;
             MemberAccess = memberAccessSymbol;

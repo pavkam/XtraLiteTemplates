@@ -50,8 +50,8 @@ namespace XtraLiteTemplates.Introspection
         /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider" /> or <paramref name="objectFormatter" /> is <c>null</c>.</exception>
         public FlexiblePrimitiveTypeConverter([NotNull] IFormatProvider formatProvider, [NotNull] IObjectFormatter objectFormatter)
         {
-            Expect.NotNull("formatProvider", formatProvider);
-            Expect.NotNull("objectFormatter", objectFormatter);
+            Expect.NotNull(nameof(formatProvider), formatProvider);
+            Expect.NotNull(nameof(objectFormatter), objectFormatter);
 
             FormatProvider = formatProvider;
             ObjectFormatter = objectFormatter;

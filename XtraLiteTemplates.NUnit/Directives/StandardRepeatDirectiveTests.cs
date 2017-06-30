@@ -36,6 +36,7 @@ namespace XtraLiteTemplates.NUnit.Directives
 
     [TestFixture]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class StandardRepeatDirectiveTests : TestBase
     {
         [Test]

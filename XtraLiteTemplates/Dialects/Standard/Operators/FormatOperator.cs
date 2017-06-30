@@ -48,7 +48,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         public FormatOperator([NotNull] string symbol, [NotNull] IFormatProvider formatProvider, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, 2, typeConverter)
         {
-            Expect.NotNull("formatProvider", formatProvider);
+            Expect.NotNull(nameof(formatProvider), formatProvider);
 
             FormatProvider = formatProvider;
         }
@@ -87,7 +87,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override object Evaluate(IExpressionEvaluationContext context, object left, object right)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             var formattable = left as IFormattable;
             if (formattable != null)

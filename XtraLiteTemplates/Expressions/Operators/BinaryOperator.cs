@@ -47,7 +47,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         protected BinaryOperator([NotNull] string symbol, int precedence, Associativity associativity)
             : base(symbol, precedence)
         {
-            Expect.GreaterThanOrEqual("precedence", precedence, 0);
+            Expect.GreaterThanOrEqual(nameof(precedence), precedence, 0);
             Associativity = associativity;
         }
 
@@ -81,7 +81,7 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
         public virtual bool EvaluateLhs([NotNull] IExpressionEvaluationContext context, [CanBeNull] object left, [CanBeNull] out object result)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             result = null;
             return false;

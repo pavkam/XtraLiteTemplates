@@ -33,6 +33,7 @@ namespace XtraLiteTemplates.NUnit
     using global::NUnit.Framework;
 
     [TestFixture]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class ExpressionFlowSymbolsTests : TestBase
     { 
         [Test]

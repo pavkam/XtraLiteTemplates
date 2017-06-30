@@ -178,7 +178,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <exception cref="ArgumentNullException">Argument <paramref name="context" /> is <c>null</c>.</exception>
         public override string DecorateUnParsedText(IExpressionEvaluationContext context, string unParsedText)
         {
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(context), context);
 
             if (PreformattedStateObject != null && context.ContainsStateObject(PreformattedStateObject))
             {

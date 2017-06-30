@@ -45,8 +45,8 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <exception cref="ArgumentOutOfRangeException">Argument <paramref name="precedence"/> is less than zero.</exception>
         protected Operator([NotNull] string symbol, int precedence)
         {
-            Expect.NotEmpty("symbol", symbol);
-            Expect.GreaterThanOrEqual("precedence", precedence, 0);
+            Expect.NotEmpty(nameof(symbol), symbol);
+            Expect.GreaterThanOrEqual(nameof(precedence), precedence, 0);
 
             Symbol = symbol;
             Precedence = precedence;

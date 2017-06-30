@@ -71,7 +71,8 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="markup">The markup string.</param>
         /// <param name="result">The built tag object, if the parsing succeeded.</param>
         /// <returns><c>true</c> if the parsing was successful; or <c>false</c> otherwise.</returns>
-        public static bool TryParse([CanBeNull] string markup, [CanBeNull] out Tag result)
+        [ContractAnnotation("=> false, result : null; => true, result : notnull")]
+        public static bool TryParse([CanBeNull] string markup, out Tag result)
         {
             result = null;
             if (string.IsNullOrEmpty(markup))
@@ -247,7 +248,7 @@ namespace XtraLiteTemplates.Parsing
         [NotNull]
         public Tag Keyword([NotNull] string keyword)
         {
-            Expect.Identifier("keyword", keyword);
+            Expect.Identifier(nameof(keyword), keyword);
 
             _components.Add(keyword);
             return this;
@@ -282,7 +283,7 @@ namespace XtraLiteTemplates.Parsing
         [NotNull]
         public Tag Identifier([NotNull] params string[] candidates)
         {
-            Expect.NotEmpty("candidates", candidates);
+            Expect.NotEmpty(nameof(candidates), candidates);
 
             foreach (var arg in candidates)
             {
@@ -371,7 +372,7 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="System.ArgumentNullException"><paramref name="comparer"/> is <c>null</c>.</exception>
         public bool Equals([CanBeNull] object obj, [NotNull] IEqualityComparer<string> comparer)
         {
-            Expect.NotNull("comparer", comparer);
+            Expect.NotNull(nameof(comparer), comparer);
 
             var tag = obj as Tag;
             if (tag == null || tag._components.Count != _components.Count)
@@ -460,7 +461,7 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="System.ArgumentNullException"><paramref name="comparer"/> is <c>null</c>.</exception>
         public int GetHashCode([NotNull] IEqualityComparer<string> comparer)
         {
-            Expect.NotNull("comparer", comparer);
+            Expect.NotNull(nameof(comparer), comparer);
 
             var hash = 17; /* Just a magic constant */
             unchecked

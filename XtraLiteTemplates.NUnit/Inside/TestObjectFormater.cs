@@ -62,7 +62,7 @@ namespace XtraLiteTemplates.NUnit.Inside
 
         public string ToString(object obj)
         {
-            return this.ToString(obj, _mCulture);
+            return ToString(obj, _mCulture);
         }
     }
 }

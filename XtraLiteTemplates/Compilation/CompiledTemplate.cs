@@ -63,8 +63,8 @@ namespace XtraLiteTemplates.Compilation
         /// <exception cref="ArgumentNullException">Argument <paramref name="writer"/> or <paramref name="context"/> is <c>null</c>.</exception>
         public void Evaluate([NotNull] TextWriter writer, [NotNull] TContext context)
         {
-            Expect.NotNull("writer", writer);
-            Expect.NotNull("context", context);
+            Expect.NotNull(nameof(writer), writer);
+            Expect.NotNull(nameof(context), context);
 
             _evaluationDelegate(writer, context);
         }

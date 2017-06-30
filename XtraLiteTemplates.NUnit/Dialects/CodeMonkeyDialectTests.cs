@@ -40,6 +40,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
     [TestFixture]
     [SuppressMessage("ReSharper", "IdentifierTypo")]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
+    [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
     public class CodeMonkeyDialectTests : TestBase
     {
         private CodeMonkeyDialect TestDialect(DialectCasing casing)

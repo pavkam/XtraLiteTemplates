@@ -52,8 +52,8 @@ namespace XtraLiteTemplates.Parsing
             int originalLength)
             : base(firstCharacterIndex, originalLength)
         {
-            Expect.NotEmpty("components", components);
-            Expect.NotNull("tag", tag);
+            Expect.NotEmpty(nameof(components), components);
+            Expect.NotNull(nameof(tag), tag);
 
             Components = components;
             Tag = tag;

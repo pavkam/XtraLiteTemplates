@@ -43,7 +43,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <param name="typeConverter">The type converter.</param>
         public StandardSelfObject([CanBeNull] IPrimitiveTypeConverter typeConverter)
         {
-            Expect.NotNull("typeConverter", typeConverter);
+            Expect.NotNull(nameof(typeConverter), typeConverter);
 
             TypeConverter = typeConverter;
         }

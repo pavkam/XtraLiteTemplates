@@ -61,7 +61,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
             Debug.Assert(Tags.Count == 2, "Expected a tag count of 2.");
 
-            Expect.NotNull("stateObject", stateObject);
+            Expect.NotNull(nameof(stateObject), stateObject);
 
             _stateObject = stateObject;
         }
