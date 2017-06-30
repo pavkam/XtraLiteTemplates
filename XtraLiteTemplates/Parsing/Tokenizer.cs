@@ -91,7 +91,7 @@ namespace XtraLiteTemplates.Parsing
             };
 
             var allowedCharacterSet = !all.Any(c => char.IsWhiteSpace(c) || char.IsLetterOrDigit(c) || c == '_');
-            Expect.IsTrue("allowed set of characters", allowedCharacterSet);
+            Expect.IsTrue(nameof(allowedCharacterSet), allowedCharacterSet);
 
             _inputTextReader = reader;
             TagStartCharacter = tagStartCharacter;
@@ -199,7 +199,7 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         public void Dispose()
         {
-            _inputTextReader?.Dispose();
+            _inputTextReader.Dispose();
 
             GC.SuppressFinalize(this);
         }
@@ -222,7 +222,6 @@ namespace XtraLiteTemplates.Parsing
                 return (char)peekedCharacter;
             }
 
-            Debug.Fail("PeekCharacter()");
             return '\0';
         }
 

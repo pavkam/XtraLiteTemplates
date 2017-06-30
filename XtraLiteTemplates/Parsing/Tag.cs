@@ -48,7 +48,6 @@ namespace XtraLiteTemplates.Parsing
         private const char MarkupIdentifierGroupStartCharacter = '(';
         private const char MarkupIdentifierGroupEndCharacter = ')';
         [NotNull]
-        [ItemNotNull]
         private readonly IList<object> _components;
 
         /// <summary>
@@ -282,13 +281,13 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="ArgumentNullException">Argument <paramref name="candidates" /> or any of its elements are <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="candidates" /> is <c>empty</c> or any of its elements is not a valid identifier.</exception>
         [NotNull]
-        public Tag Identifier([NotNull] params string[] candidates)
+        public Tag Identifier([NotNull] [ItemNotNull] params string[] candidates)
         {
             Expect.NotEmpty(nameof(candidates), candidates);
 
             foreach (var arg in candidates)
             {
-                Expect.Identifier("candidate", arg);
+                Expect.Identifier(nameof(candidates), arg);
             }
 
             _components.Add(candidates);

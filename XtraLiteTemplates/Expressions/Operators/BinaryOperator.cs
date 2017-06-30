@@ -80,7 +80,8 @@ namespace XtraLiteTemplates.Expressions.Operators
         /// <param name="result">The result of the evaluation if the return value is <c>true</c>.</param>
         /// <returns><c>true</c> if the operation is supported; <c>false</c> otherwise.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
-        public virtual bool EvaluateLhs([NotNull] IExpressionEvaluationContext context, [CanBeNull] object left, [CanBeNull] out object result)
+        [ContractAnnotation("=> true, result: notnull; => false, result: null")]
+        public virtual bool EvaluateLhs([NotNull] IExpressionEvaluationContext context, [CanBeNull] object left, out object result)
         {
             Expect.NotNull(nameof(context), context);
 
