@@ -29,10 +29,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Implements the standard object formatting (':') operation.
     /// </summary>
+    [PublicAPI]
     public sealed class FormatOperator : StandardBinaryOperator
     {
         /// <summary>
@@ -43,7 +45,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> or <paramref name="formatProvider" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public FormatOperator(string symbol, IFormatProvider formatProvider, IPrimitiveTypeConverter typeConverter)
+        public FormatOperator([NotNull] string symbol, [NotNull] IFormatProvider formatProvider, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, 2, typeConverter)
         {
             Expect.NotNull("formatProvider", formatProvider);
@@ -57,7 +59,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="formatProvider">The culture-specific formatting provider.</param>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> or <paramref name="formatProvider" /> is <c>null</c>.</exception>
-        public FormatOperator(IFormatProvider formatProvider, IPrimitiveTypeConverter typeConverter)
+        public FormatOperator([NotNull] IFormatProvider formatProvider, [NotNull] IPrimitiveTypeConverter typeConverter)
             : this(":", formatProvider, typeConverter)
         {
         }
@@ -69,6 +71,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <value>
         /// The culture-specific formatting options.
         /// </value>
+        [NotNull]
         public IFormatProvider FormatProvider { get; }
 
         /// <summary>

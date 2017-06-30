@@ -28,52 +28,62 @@ namespace XtraLiteTemplates.Expressions
 {
     using System.Diagnostics;
     using System.Threading;
+    using JetBrains.Annotations;
 
     internal sealed class ReduceExpressionEvaluationContext : IExpressionEvaluationContext
     {
+        [NotNull]
         public static readonly IExpressionEvaluationContext Instance = new ReduceExpressionEvaluationContext();
 
         public CancellationToken CancellationToken => CancellationToken.None;
 
+        [ContractAnnotation("=> halt")]
         public void AddStateObject(object state)
         {
             Debug.Fail("Invalid operation.");
         }
 
+        [ContractAnnotation("=> halt")]
         public void RemoveStateObject(object state)
         {
             Debug.Fail("Invalid operation.");
         }
 
+        [ContractAnnotation("=> halt")]
         public bool ContainsStateObject(object state)
         {
             Debug.Fail("Invalid operation.");
             return false;
         }
 
+        [ContractAnnotation("=> halt")]
         public void SetProperty(string property, object value)
         {
             Debug.Fail("Invalid operation.");
         }
 
+        [ContractAnnotation("=> halt")]
         public object GetProperty(string property)
         {
             Debug.Fail("Invalid operation.");
             return false;
         }
 
+        [ContractAnnotation("=> halt")]
         public object GetProperty(object @object, string property)
         {
             Debug.Fail("Invalid operation.");
             return false;
         }
 
+        [ContractAnnotation("=> halt")]
         public object Invoke(string method, object[] arguments)
         {
             Debug.Fail("Invalid operation.");
             return false;
         }
 
+        [ContractAnnotation("=> halt")]
         public object Invoke(object @object, string method, object[] arguments)
         {
             Debug.Fail("Invalid operation.");

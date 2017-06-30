@@ -24,15 +24,16 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
 
 namespace XtraLiteTemplates.Introspection
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Defines a method that allows obtaining the string representation of an un-typed <see cref="object"/>.
     /// </summary>
+    [PublicAPI]
     public interface IObjectFormatter
     {
         /// <summary>
@@ -40,7 +41,8 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The object to obtain the string representation for.</param>
         /// <returns>The string representation.</returns>
-        string ToString(object obj);
+        [NotNull]
+        string ToString([CanBeNull] object obj);
 
         /// <summary>
         /// Gets the string representation of an <see cref="object" /> using the given <paramref name="formatProvider"/>.
@@ -51,6 +53,7 @@ namespace XtraLiteTemplates.Introspection
         /// The string representation.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
-        string ToString(object obj, IFormatProvider formatProvider);
+        [NotNull]
+        string ToString([CanBeNull] object obj, [NotNull] IFormatProvider formatProvider);
     }
 }

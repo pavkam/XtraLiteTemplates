@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Expressions
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Supplies a set of standard flow symbols used during the expression construction phase.
     /// </summary>
+    [PublicAPI]
     public sealed class ExpressionFlowSymbols
     {
         /// <summary>
@@ -51,10 +53,10 @@ namespace XtraLiteTemplates.Expressions
         /// <exception cref="ArgumentNullException">One or more symbols are <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">Some symbols are equal.</exception>
         public ExpressionFlowSymbols(
-            string separatorSymbol,
-            string memberAccessSymbol,
-            string groupOpenSymbol,
-            string groupCloseSymbol)
+            [NotNull] string separatorSymbol,
+            [NotNull] string memberAccessSymbol,
+            [NotNull] string groupOpenSymbol,
+            [NotNull] string groupCloseSymbol)
         {
             Expect.NotEmpty("separatorSymbol", separatorSymbol);
             Expect.NotEmpty("memberAccessSymbol", memberAccessSymbol);
@@ -80,6 +82,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The default set of symbols.
         /// </value>
+        [NotNull]
         public static ExpressionFlowSymbols Default { get; }
 
         /// <summary>
@@ -88,6 +91,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The group separator symbol.
         /// </value>
+        [NotNull]
         public string Separator { get; }
 
         /// <summary>
@@ -96,6 +100,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The member access symbol.
         /// </value>
+        [NotNull]
         public string MemberAccess { get; }
 
         /// <summary>
@@ -104,6 +109,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The group open symbol.
         /// </value>
+        [NotNull]
         public string GroupOpen { get; }
 
         /// <summary>
@@ -112,6 +118,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The group close symbol.
         /// </value>
+        [NotNull]
         public string GroupClose { get; }
     }
 }

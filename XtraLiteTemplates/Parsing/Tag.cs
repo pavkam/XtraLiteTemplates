@@ -31,17 +31,23 @@ namespace XtraLiteTemplates.Parsing
     using System.Diagnostics;
     using System.Linq;
     using System.Text;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The basic building block of <see cref="Evaluation.Directive"/> classes. The tag defines a set of keywords, identifier and expression
     /// match rules that need to be satisfied during the lexical analysis.
     /// </summary>
+    [PublicAPI]
     public sealed class Tag
     {
+        [NotNull]
         private const string MarkupExpressionWord = "$";
+        [NotNull]
         private const string MarkupAnyIdentifierWord = "?";
         private const char MarkupIdentifierGroupStartCharacter = '(';
         private const char MarkupIdentifierGroupEndCharacter = ')';
+        [NotNull]
+        [ItemNotNull]
         private readonly IList<object> _components;
 
         /// <summary>
@@ -65,7 +71,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="markup">The markup string.</param>
         /// <param name="result">The built tag object, if the parsing succeeded.</param>
         /// <returns><c>true</c> if the parsing was successful; or <c>false</c> otherwise.</returns>
-        public static bool TryParse(string markup, out Tag result)
+        public static bool TryParse([CanBeNull] string markup, [CanBeNull] out Tag result)
         {
             result = null;
             if (string.IsNullOrEmpty(markup))
@@ -219,7 +225,8 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="markup">The markup string.</param>
         /// <returns>The built tag object.</returns>
         /// <exception cref="System.FormatException">If <paramref name="markup"/> cannot be parsed.</exception>
-        public static Tag Parse(string markup)
+        [NotNull]
+        public static Tag Parse([NotNull] string markup)
         {
             Tag result;
             if (!TryParse(markup, out result))
@@ -237,7 +244,8 @@ namespace XtraLiteTemplates.Parsing
         /// <returns>This tag instance.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="keyword"/> is <c>null</c>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="keyword"/> is not a valid identifier.</exception>
-        public Tag Keyword(string keyword)
+        [NotNull]
+        public Tag Keyword([NotNull] string keyword)
         {
             Expect.Identifier("keyword", keyword);
 
@@ -250,6 +258,7 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         /// <returns>This tag instance.</returns>
         /// <exception cref="System.InvalidOperationException">If the previous requirement component was an expression.</exception>
+        [NotNull]
         public Tag Identifier()
         {
             if (_components.Count > 0 && _components[_components.Count - 1] == null)
@@ -270,7 +279,8 @@ namespace XtraLiteTemplates.Parsing
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="candidates" /> or any of its elements are <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="candidates" /> is <c>empty</c> or any of its elements is not a valid identifier.</exception>
-        public Tag Identifier(params string[] candidates)
+        [NotNull]
+        public Tag Identifier([NotNull] params string[] candidates)
         {
             Expect.NotEmpty("candidates", candidates);
 
@@ -290,6 +300,7 @@ namespace XtraLiteTemplates.Parsing
         /// This tag instance.
         /// </returns>
         /// <exception cref="System.InvalidOperationException">If the previous requirement component was another expression.</exception>
+        [NotNull]
         public Tag Expression()
         {
             if (_components.Count > 0 && _components[_components.Count - 1] == null)
@@ -358,7 +369,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="comparer">An instance of <see cref="System.Collections.Generic.IEqualityComparer{String}"/> used for comparison.</param>
         /// <returns><c>true</c> if the tags are equal; <c>false</c> otherwise.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="comparer"/> is <c>null</c>.</exception>
-        public bool Equals(object obj, IEqualityComparer<string> comparer)
+        public bool Equals([CanBeNull] object obj, [NotNull] IEqualityComparer<string> comparer)
         {
             Expect.NotNull("comparer", comparer);
 
@@ -447,7 +458,7 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="comparer">An instance of <see cref="System.Collections.Generic.IEqualityComparer{String}"/> used for hash code generation.</param>
         /// <returns>A <see cref="System.Int32"/> value representing the hash code.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="comparer"/> is <c>null</c>.</exception>
-        public int GetHashCode(IEqualityComparer<string> comparer)
+        public int GetHashCode([NotNull] IEqualityComparer<string> comparer)
         {
             Expect.NotNull("comparer", comparer);
 
@@ -490,7 +501,7 @@ namespace XtraLiteTemplates.Parsing
             return GetHashCode(StringComparer.CurrentCulture);
         }
 
-        internal bool MatchesKeyword(int index, IEqualityComparer<string> comparer, string keyword)
+        internal bool MatchesKeyword(int index, [NotNull] IEqualityComparer<string> comparer, [NotNull] string keyword)
         {
             Debug.Assert(comparer != null, "comparer cannot be null.");
             Debug.Assert(!string.IsNullOrEmpty(keyword), "keyword cannot be empty.");
@@ -504,7 +515,10 @@ namespace XtraLiteTemplates.Parsing
             return comparer.Equals(stringComponent, keyword);
         }
 
-        internal bool MatchesIdentifier(int index, IEqualityComparer<string> comparer, string identifier)
+        internal bool MatchesIdentifier(
+            int index, 
+            [NotNull] IEqualityComparer<string> comparer, 
+            [NotNull] string identifier)
         {
             Debug.Assert(comparer != null, "comparer cannot be null.");
             Debug.Assert(!string.IsNullOrEmpty(identifier), "identifier cannot be empty.");
@@ -541,7 +555,7 @@ namespace XtraLiteTemplates.Parsing
             return index >= 0 && index < _components.Count && _components[index] == null;
         }
 
-        private static string AsIdentifier(string candidate)
+        private static string AsIdentifier([CanBeNull] string candidate)
         {
             candidate = candidate?.Trim();
 

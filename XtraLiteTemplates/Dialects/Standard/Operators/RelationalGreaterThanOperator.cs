@@ -29,10 +29,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System;
     using System.Collections.Generic;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Implements the standard relational greater than ('&gt;') operation.
     /// </summary>
+    [PublicAPI]
     public sealed class RelationalGreaterThanOperator : StandardRelationalOperator
     {
         /// <summary>
@@ -43,7 +45,10 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> or <paramref name="stringComparer" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public RelationalGreaterThanOperator(string symbol, IComparer<string> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public RelationalGreaterThanOperator(
+            [NotNull] string symbol, 
+            [NotNull] IComparer<string> stringComparer, 
+            [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, 6, stringComparer, typeConverter)
         {
         }
@@ -54,7 +59,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="stringComparer">The string literal comparer.</param>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> or <paramref name="stringComparer" /> is <c>null</c>.</exception>
-        public RelationalGreaterThanOperator(IComparer<string> stringComparer, IPrimitiveTypeConverter typeConverter)
+        public RelationalGreaterThanOperator([NotNull] IComparer<string> stringComparer, [NotNull] IPrimitiveTypeConverter typeConverter)
             : this(">", stringComparer, typeConverter)
         {
         }
@@ -64,7 +69,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        public RelationalGreaterThanOperator(IPrimitiveTypeConverter typeConverter)
+        public RelationalGreaterThanOperator([NotNull] IPrimitiveTypeConverter typeConverter)
             : this(System.StringComparer.CurrentCulture, typeConverter)
         {
         }

@@ -28,11 +28,12 @@ namespace XtraLiteTemplates.Evaluation
 {
     using System;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Exception type thrown for any encountered interpretation error.
     /// </summary>
+    [PublicAPI]
     public class InterpreterException : FormatException
     {
         /// <summary>
@@ -43,13 +44,13 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="firstCharacterIndex">Index of the first character.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">Format arguments.</param>
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
+        [StringFormatMethod("format")]
         internal InterpreterException(
-            Exception innerException, 
-            Directive[] candidateDirectives, 
-            int firstCharacterIndex, 
-            string format, 
-            params object[] args)
+            [CanBeNull] Exception innerException,
+            [NotNull] [ItemNotNull] Directive[] candidateDirectives, 
+            int firstCharacterIndex,
+            [NotNull] string format,
+            [NotNull] params object[] args)
             : base(string.Format(format, args), innerException)
         {
             Debug.Assert(firstCharacterIndex >= 0, "firstCharacterIndex cannot be less than zero.");
@@ -65,7 +66,11 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="firstCharacterIndex">Index of the first character.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal InterpreterException(Directive[] candidateDirectives, int firstCharacterIndex, string format, params object[] args)
+        internal InterpreterException(
+            [NotNull] [ItemNotNull] Directive[] candidateDirectives, 
+            int firstCharacterIndex,
+            [NotNull] string format,
+            [NotNull] params object[] args)
             : this(null, candidateDirectives, firstCharacterIndex, format, args)
         {
         }
@@ -76,8 +81,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <value>
         /// The candidate directives.
         /// </value>
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
+        [NotNull]
+        [ItemNotNull]
         public Directive[] CandidateDirectives { get; }
 
         /// <summary>
@@ -86,8 +91,6 @@ namespace XtraLiteTemplates.Evaluation
         /// <value>
         /// The index of the first character.
         /// </value>
-        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-        [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
         public int FirstCharacterIndex { get; }
     }
 }

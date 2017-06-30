@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Parsing
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The exception type thrown for errors encountered during the lexical analysis.
     /// </summary>
+    [PublicAPI]
     public class LexingException : ParseException
     {
         /// <summary>
@@ -40,7 +42,12 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="token">The token that resulted in the error being thrown.</param>
         /// <param name="format">A format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal LexingException(Exception innerException, Token token, string format, params object[] args)
+        [StringFormatMethod("format")]
+        internal LexingException(
+            [CanBeNull] Exception innerException, 
+            [NotNull] Token token, 
+            [NotNull] string format, 
+            [NotNull] params object[] args)
             : base(innerException, token.CharacterIndex, format, args)
         {
             Token = token;
@@ -49,6 +56,7 @@ namespace XtraLiteTemplates.Parsing
         /// <summary>
         /// <value>Gets the token that resulted in the exception being thrown.</value>
         /// </summary>
+        [NotNull]
         public Token Token { get; }
     }
 }

@@ -24,17 +24,16 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Introspection
 {
-    using System;
     using System.Collections.Generic;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Common interface used by the standard dialects to facilitate type-conversion. Standard operators and directives
     /// use this interface to obtain the data type required for their correct operation.
     /// </summary>
+    [PublicAPI]
     public interface IPrimitiveTypeConverter
     {
         /// <summary>
@@ -45,7 +44,7 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>
         /// A <see cref="PrimitiveType" /> value.
         /// </returns>
-        PrimitiveType TypeOf(object obj);
+        PrimitiveType TypeOf([CanBeNull] object obj);
 
         /// <summary>
         /// Converts an object to a 32-bit integer.
@@ -57,7 +56,7 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>
         /// A <see cref="int" /> value.
         /// </returns>
-        int ConvertToInteger(object obj);
+        int ConvertToInteger([CanBeNull] object obj);
 
         /// <summary>
         /// Converts an object to a double-precision floating point number.
@@ -67,9 +66,9 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The object to convert.</param>
         /// <returns>
-        /// A <see cref="Double" /> value.
+        /// A <see cref="double" /> value.
         /// </returns>
-        double ConvertToNumber(object obj);
+        double ConvertToNumber([CanBeNull] object obj);
 
         /// <summary>
         /// Converts an object to its string representation.
@@ -81,7 +80,8 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>
         /// A <see cref="string" /> value.
         /// </returns>
-        string ConvertToString(object obj);
+        [CanBeNull]
+        string ConvertToString([CanBeNull] object obj);
 
         /// <summary>
         /// Converts an object to a boolean.
@@ -93,7 +93,7 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>
         /// A <see cref="bool" /> value.
         /// </returns>
-        bool ConvertToBoolean(object obj);
+        bool ConvertToBoolean([CanBeNull] object obj);
 
         /// <summary>
         /// Converts an object to a sequence of objects.
@@ -105,6 +105,7 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>
         /// A <see cref="IEnumerable{Object}" /> value.
         /// </returns>
-        IEnumerable<object> ConvertToSequence(object obj);
+        [NotNull]
+        IEnumerable<object> ConvertToSequence([CanBeNull] object obj);
     }
 }

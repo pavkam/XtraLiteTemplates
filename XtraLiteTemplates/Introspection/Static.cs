@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Introspection
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// A wrapper class used to expose static types to the <see cref="SimpleTypeDisemboweler"/>.
     /// </summary>
+    [PublicAPI]
     public sealed class Static
     {
         /// <summary>
@@ -39,13 +41,14 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The type of the exposed static type.
         /// </value>
+        [NotNull]
         internal Type ExposedType { get; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Static"/> class.
         /// </summary>
         /// <param name="type">The static type to expose.</param>
-        public Static(Type type)
+        public Static([NotNull] Type type)
         {
             Expect.NotNull(nameof(type), type);
 

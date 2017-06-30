@@ -33,13 +33,16 @@ namespace XtraLiteTemplates.Introspection
     using System.Linq;
     using System.Reflection;
     using System.Text;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Utility class that allows for easy access to a type's properties and methods.
     /// This class is used internally to implement the member access operator.
     /// </summary>
+    [PublicAPI]
     public sealed class SimpleTypeDisemboweler
     {
+        [NotNull]
         private readonly IDictionary<string, Func<object, object[], object>> _cachedMemberMap;
 
         /// <summary>
@@ -50,9 +53,9 @@ namespace XtraLiteTemplates.Introspection
         /// <param name="objectFormatter">The object formatter.</param>
         /// <exception cref="ArgumentNullException">Either <paramref name="type" /> or <paramref name="memberComparer" /> parameters are <c>null</c>.</exception>
         public SimpleTypeDisemboweler(
-            Type type, 
-            IEqualityComparer<string> memberComparer, 
-            IObjectFormatter objectFormatter)
+            [NotNull] Type type,
+            [NotNull] IEqualityComparer<string> memberComparer,
+            [NotNull] IObjectFormatter objectFormatter)
         {
             Expect.NotNull("type", type);
             Expect.NotNull("memberComparer", memberComparer);
@@ -69,6 +72,7 @@ namespace XtraLiteTemplates.Introspection
         /// The event handler invoked by this class for each candidate type member. The registered delegates
         /// are responsible with deciding if a member will be accepted or rejected during candidate selection.
         /// </summary>
+        [CanBeNull]
         public event EventHandler<MemberValidationEventArgs> ValidateMember;
 
         /// <summary>
@@ -80,6 +84,7 @@ namespace XtraLiteTemplates.Introspection
         /// <remarks>
         /// Value provided by the caller during construction.
         /// </remarks>
+        [NotNull]
         public Type Type { get; }
 
         /// <summary>
@@ -90,6 +95,7 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The equality comparer.
         /// </value>
+        [NotNull]
         public IEqualityComparer<string> Comparer { get; }
 
         /// <summary>
@@ -99,6 +105,7 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The object formatter.
         /// </value>
+        [NotNull]
         public IObjectFormatter ObjectFormatter { get; }
 
         /// <summary>
@@ -112,7 +119,8 @@ namespace XtraLiteTemplates.Introspection
         /// </returns>
         /// <exception cref="ArgumentNullException"><paramref name="member" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException"><paramref name="member" /> is not a valid identifier.</exception>
-        public object Invoke(object @object, string member, object[] arguments = null)
+        [CanBeNull]
+        public object Invoke([CanBeNull] object @object, [NotNull] string member, [CanBeNull] object[] arguments = null)
         {
             Expect.Identifier("member", member);
 
@@ -154,7 +162,7 @@ namespace XtraLiteTemplates.Introspection
             return getterMethod?.Invoke(@object, arguments);
         }
 
-        private bool ValidateCandidate(MemberInfo memberInfo)
+        private bool ValidateCandidate([NotNull] MemberInfo memberInfo)
         {
             Debug.Assert(memberInfo != null, "Argument memberInfo cannot be null.");
 
@@ -170,7 +178,8 @@ namespace XtraLiteTemplates.Introspection
             return candidateAccepted;
         }
 
-        private Func<object, object[], object> LocateSuitableInvokeCandidate(string member, IReadOnlyList<object> arguments)
+        [NotNull]
+        private Func<object, object[], object> LocateSuitableInvokeCandidate([NotNull] string member, [CanBeNull] IReadOnlyList<object> arguments)
         {
             if (arguments == null || arguments.Count == 0)
             {
@@ -208,7 +217,10 @@ namespace XtraLiteTemplates.Introspection
             return LocateSuitableMethodCandidate(member, arguments);
         }
 
-        private Func<object, object[], object> LocateSuitableMethodCandidate(string member, IReadOnlyList<object> arguments)
+        [CanBeNull]
+        private Func<object, object[], object> LocateSuitableMethodCandidate(
+            [NotNull] string member, 
+            [CanBeNull] IReadOnlyList<object> arguments)
         {
             Debug.Assert(!string.IsNullOrEmpty(member), "member cannot be null or empty.");
 
@@ -394,7 +406,10 @@ namespace XtraLiteTemplates.Introspection
             return null;
         }
 
-        private static Func<object, object> ReconcileMissingArgument(ParameterInfo parameter, ref double reconciliationScore)
+        [NotNull]
+        private static Func<object, object> ReconcileMissingArgument(
+            [NotNull] ParameterInfo parameter, 
+            ref double reconciliationScore)
         {
             Debug.Assert(parameter != null, "parameter cannot be null.");
 
@@ -438,7 +453,8 @@ namespace XtraLiteTemplates.Introspection
             return a => defaultValue;
         }
 
-        private Func<object, object> ReconcileArgument(Type parameterType, object argument, ref double reconciliationScore)
+        [CanBeNull]
+        private Func<object, object> ReconcileArgument([NotNull] Type parameterType, [CanBeNull] object argument, ref double reconciliationScore)
         {
             Debug.Assert(parameterType != null, "parameterType cannot be null.");
 

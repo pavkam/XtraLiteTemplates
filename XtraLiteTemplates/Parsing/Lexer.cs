@@ -34,30 +34,45 @@ namespace XtraLiteTemplates.Parsing
     using Expressions;
     using Expressions.Operators;
 
+    using JetBrains.Annotations;
+
     /// <summary>
     /// The lexical analyzer class. Requires an instance of <see cref="ITokenizer"/> to obtain all the tokens from. Based
     /// on said tokens, the <see cref="Lexer"/> identifies the correct lexical structures and generates <see cref="Lex"/> objects
     /// for the <see cref="Evaluation.Interpreter"/>.
     /// </summary>
+    [PublicAPI]
     public sealed class Lexer
     {
+        [NotNull]
         private readonly ExpressionFlowSymbols _expressionFlowSymbols;
+        [NotNull]
+        [ItemNotNull]
         private readonly List<Operator> _expressionOperators;
+        [NotNull]
         private readonly HashSet<string> _unaryExpressionOperators;
+        [NotNull]
         private readonly HashSet<string> _binaryExpressionOperators;
+        [NotNull]
         private readonly Dictionary<string, object> _specialConstants;
+        [NotNull]
+        [ItemNotNull]
         private readonly List<Tag> _registeredTags;
+        [CanBeNull]
         private Token _currentToken;
         private bool _endOfStream;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Lexer"/> class.
         /// </summary>
-        /// <param name="tokenizer">The <see cref="XtraLiteTemplates.Parsing.ITokenizer" /> object used to read the tokens from the input template.</param>
-        /// <param name="expressionFlowSymbols">The <see cref="XtraLiteTemplates.Expressions.ExpressionFlowSymbols" /> object containing the standard expression flow control symbols.</param>
+        /// <param name="tokenizer">The <see cref="ITokenizer" /> object used to read the tokens from the input template.</param>
+        /// <param name="expressionFlowSymbols">The <see cref="ExpressionFlowSymbols" /> object containing the standard expression flow control symbols.</param>
         /// <param name="comparer">The <see cref="System.Collections.Generic.IEqualityComparer{String}" /> object used to match keywords and identifiers.</param>
         /// <exception cref="System.ArgumentNullException">Either <paramref name="tokenizer" />, <paramref name="expressionFlowSymbols" /> or <paramref name="expressionFlowSymbols" /> are <c>null</c>.</exception>
-        public Lexer(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<string> comparer)
+        public Lexer(
+            [NotNull] ITokenizer tokenizer,
+            [NotNull] ExpressionFlowSymbols expressionFlowSymbols,
+            [NotNull] IEqualityComparer<string> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
             Expect.NotNull("comparer", comparer);
@@ -82,7 +97,7 @@ namespace XtraLiteTemplates.Parsing
         }
 
         /// <summary>
-        /// Gets the <see cref="XtraLiteTemplates.Parsing.ITokenizer" /> object used to read the tokens from the input template.
+        /// Gets the <see cref="ITokenizer" /> object used to read the tokens from the input template.
         /// </summary>
         /// <value>
         /// The input template <c>tokenizer</c>.
@@ -90,6 +105,7 @@ namespace XtraLiteTemplates.Parsing
         /// <remarks>
         /// The value of this property is provided by the caller during the construction process.
         /// </remarks>
+        [NotNull]
         public ITokenizer Tokenizer { get; }
 
         /// <summary>
@@ -101,10 +117,11 @@ namespace XtraLiteTemplates.Parsing
         /// <remarks>
         /// The value of this property is provided by the caller during the construction process.
         /// </remarks>
+        [NotNull]
         public IEqualityComparer<string> Comparer { get; }
 
         /// <summary>
-        /// Gets all the registered <see cref="XtraLiteTemplates.Parsing.Tag" /> objects.
+        /// Gets all the registered <see cref="Parsing.Tag" /> objects.
         /// </summary>
         /// <value>
         /// The registered tags.
@@ -112,16 +129,19 @@ namespace XtraLiteTemplates.Parsing
         /// <remarks>
         /// The caller is responsible with loading up the known tag objects into the <c>lexer</c> before attempting to reading the first <c>lex</c> object.
         /// </remarks>
+        [NotNull]
+        [ItemNotNull]
         public IReadOnlyCollection<Tag> Tags => _registeredTags;
 
         /// <summary>
         /// Registers a know tag with this <c>lexer</c> instance. All registered tags will take part in the matching process during the analysis of the
         /// incoming tokens.
         /// </summary>
-        /// <param name="tag">A <see cref="XtraLiteTemplates.Parsing.Tag"/> object to register.</param>
+        /// <param name="tag">A <see cref="Parsing.Tag"/> object to register.</param>
         /// <returns>This <c>lexer</c> instance.</returns>
         /// <exception cref="System.ArgumentNullException"><paramref name="tag"/> is <c>null</c>.</exception>
-        public Lexer RegisterTag(Tag tag)
+        [NotNull]
+        public Lexer RegisterTag([NotNull] Tag tag)
         {
             Expect.NotNull("tag", tag);
             if (tag.ComponentCount == 0)
@@ -130,12 +150,9 @@ namespace XtraLiteTemplates.Parsing
             }
 
             /* Check for an equivalent tag in the list */
-            foreach (var ot in _registeredTags)
+            if (_registeredTags.Any(ot => ot.Equals(tag, Comparer)))
             {
-                if (ot.Equals(tag, Comparer))
-                {
-                    return this;
-                }
+                return this;
             }
 
             _registeredTags.Add(tag);
@@ -149,7 +166,8 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="operator">A <see cref="XtraLiteTemplates.Expressions.Operators.Operator"/> object to register.</param>
         /// <returns>This <c>lexer</c> instance.</returns>
         /// <exception cref="System.ArgumentNullException">Argument <paramref name="operator"/> is <c>null</c>.</exception>
-        public Lexer RegisterOperator(Operator @operator)
+        [NotNull]
+        public Lexer RegisterOperator([NotNull] Operator @operator)
         {
             Expect.NotNull("operator", @operator);
 
@@ -197,7 +215,8 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="System.ArgumentNullException"><paramref name="keyword"/> is <c>null</c>.</exception>
         /// <exception cref="System.ArgumentException"><paramref name="keyword"/> is not a valid identifier.</exception>
         /// <exception cref="System.InvalidOperationException"><paramref name="keyword"/> is already in use by an operator.</exception>
-        public Lexer RegisterSpecial(string keyword, object value)
+        [NotNull]
+        public Lexer RegisterSpecial([NotNull] string keyword, [CanBeNull] object value)
         {
             Expect.Identifier("keyword", keyword);
 
@@ -214,9 +233,10 @@ namespace XtraLiteTemplates.Parsing
         /// Analyzes a batch of tokens and generates a <c>lex</c> object. If the <c>tokenizer</c> reached the end of the stream, this method will
         /// return a <c>null</c> value. All subsequent calls to this method will also return <c>null</c>.
         /// </summary>
-        /// <returns>An analyzed <see cref="XtraLiteTemplates.Parsing.Lex"/> object.</returns>
-        /// <exception cref="XtraLiteTemplates.Parsing.ParseException">A parsing error encountered.</exception>
-        /// <exception cref="XtraLiteTemplates.Expressions.ExpressionException">An expression construction error encountered.</exception>
+        /// <returns>An analyzed <see cref="Lex"/> object.</returns>
+        /// <exception cref="ParseException">A parsing error encountered.</exception>
+        /// <exception cref="ExpressionException">An expression construction error encountered.</exception>
+        [CanBeNull]
         public Lex ReadNext()
         {
             if (_currentToken == null && !_endOfStream)
@@ -511,6 +531,7 @@ namespace XtraLiteTemplates.Parsing
             return !_endOfStream;
         }
 
+        [NotNull]
         private Expression CreateExpression()
         {
             var expression = new Expression(_expressionFlowSymbols, Comparer);
@@ -523,7 +544,7 @@ namespace XtraLiteTemplates.Parsing
             return expression;
         }
 
-        private bool KnownSymbol(string symbol)
+        private bool KnownSymbol([NotNull] string symbol)
         {
             Debug.Assert(!string.IsNullOrEmpty(symbol), "symbol cannot be empty.");
 
@@ -535,8 +556,11 @@ namespace XtraLiteTemplates.Parsing
             return _expressionOperators.Any(@operator => Comparer.Equals(@operator.Symbol, symbol));
         }
 
-        private void InterpretSymbolChainToken(Expression expression, Token token)
+        private void InterpretSymbolChainToken([NotNull] Expression expression, [NotNull] Token token)
         {
+            Debug.Assert(expression != null);
+            Debug.Assert(token != null);
+
             var remainingSymbols = token.Value;
 
             while (remainingSymbols.Length > 0)

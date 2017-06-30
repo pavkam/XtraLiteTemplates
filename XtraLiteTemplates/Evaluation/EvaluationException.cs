@@ -27,11 +27,13 @@
 namespace XtraLiteTemplates.Evaluation
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The exception type thrown for any errors encountered during the evaluation (execution) of a compiled template.
     /// </summary>
     [Serializable]
+    [PublicAPI]
     public class EvaluationException : InvalidOperationException
     {
         /// <summary>
@@ -40,7 +42,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="innerException">The inner exception.</param>
         /// <param name="format">The format string.</param>
         /// <param name="args">The format arguments.</param>
-        internal EvaluationException(Exception innerException, string format, params object[] args)
+        [StringFormatMethod("format")]
+        internal EvaluationException([CanBeNull] Exception innerException, [NotNull] string format, [NotNull] params object[] args)
             : base(string.Format(format, args), innerException)
         {
         }

@@ -28,10 +28,12 @@ namespace XtraLiteTemplates.Parsing
 {
     using System;
     using System.Diagnostics;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// The generic exception for all identified parsing errors. Instances of this class can only be created internally.
     /// </summary>
+    [PublicAPI]
     public class ParseException : FormatException
     {
         /// <summary>
@@ -41,10 +43,16 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="characterIndex">The index of the character where the parsing error occurred.</param>
         /// <param name="format">A format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal ParseException(Exception innerException, int characterIndex, string format, params object[] args)
+        [StringFormatMethod("format")]
+        internal ParseException(
+            [CanBeNull] Exception innerException, 
+            int characterIndex, 
+            [NotNull] string format, 
+            [NotNull] params object[] args)
             : base(string.Format(format, args), innerException)
         {
             Debug.Assert(characterIndex >= 0, "characterIndex cannot be less than zero.");
+
             CharacterIndex = characterIndex;
         }
 

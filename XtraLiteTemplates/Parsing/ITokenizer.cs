@@ -26,10 +26,13 @@
 
 namespace XtraLiteTemplates.Parsing
 {
+    using JetBrains.Annotations;
+
     /// <summary>
     /// Defines the common traits of a <c>tokenizer</c>. A <c>tokenizer</c> is responsible for transforming a text document into a sequence of tokens
     /// easily interpretable by the other parts of this library.
     /// </summary>
+    [PublicAPI]
     public interface ITokenizer
     {
         /// <summary>
@@ -37,6 +40,7 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         /// <returns>The next read token; or <c>null</c> if the end of template was reached.</returns>
         /// <exception cref="ParseException">Any parsing error encountered.</exception>
+        [CanBeNull]
         Token ReadNext();
     }
 }

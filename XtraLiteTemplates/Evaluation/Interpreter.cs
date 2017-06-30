@@ -34,16 +34,21 @@ namespace XtraLiteTemplates.Evaluation
     using Compilation;
     using Expressions;
     using Expressions.Operators;
+    using JetBrains.Annotations;
     using Parsing;
     
     /// <summary>
     /// Provides <c>lex</c> interpretation facilities. Instances of this class are used to interpret
     /// sequences of <see cref="Lex" /> objects and assemble the final <see cref="CompiledTemplate{TContext}" /> objects.
     /// </summary>
+    [PublicAPI]
     public sealed class Interpreter
     {
+        [NotNull]
         private static readonly CompiledTemplateFactory CompiledTemplateFactory = new CompiledTemplateFactory();
+        [NotNull]
         private readonly List<Directive> _registeredDirectives;
+        [NotNull]
         private readonly Lexer _lexer;
 
         /// <summary>
@@ -53,7 +58,10 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="expressionFlowSymbols">The expression flow symbols.</param>
         /// <param name="comparer">The keyword and identifier comparer.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="tokenizer"/> or <paramref name="expressionFlowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
-        public Interpreter(ITokenizer tokenizer, ExpressionFlowSymbols expressionFlowSymbols, IEqualityComparer<string> comparer)
+        public Interpreter(
+            [NotNull] ITokenizer tokenizer, 
+            [NotNull] ExpressionFlowSymbols expressionFlowSymbols, 
+            [NotNull] IEqualityComparer<string> comparer)
         {
             Expect.NotNull("tokenizer", tokenizer);
             Expect.NotNull("comparer", comparer);
@@ -72,6 +80,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <remarks>
         /// Value of this property is specified by the caller at construction time.
         /// </remarks>
+        [NotNull]
         public IEqualityComparer<string> Comparer => _lexer.Comparer;
 
         /// <summary>
@@ -80,7 +89,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="directive">The directive to register.</param>
         /// <returns>This interpreter instance.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="directive"/> is <c>null</c>.</exception>
-        public Interpreter RegisterDirective(Directive directive)
+        [NotNull]
+        public Interpreter RegisterDirective([NotNull] Directive directive)
         {
             Expect.NotNull("directive", directive);
             Debug.Assert(directive.Tags.Any(), "Directive must have at least one tag defined.");
@@ -105,7 +115,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <returns>This interpreter instance.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="operator"/> is <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">The symbol used by <paramref name="operator"/> is already registered with the interpreter.</exception>
-        public Interpreter RegisterOperator(Operator @operator)
+        [NotNull]
+        public Interpreter RegisterOperator([NotNull] Operator @operator)
         {
             _lexer.RegisterOperator(@operator);
             return this;
@@ -119,8 +130,9 @@ namespace XtraLiteTemplates.Evaluation
         /// <returns>This interpreter instance.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="keyword"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="keyword"/> is empty.</exception>
+        [NotNull]
         [SuppressMessage("ReSharper", "UnusedMethodReturnValue.Global")]
-        public Interpreter RegisterSpecial(string keyword, object value)
+        public Interpreter RegisterSpecial([NotNull] string keyword, [CanBeNull] object value)
         {
             _lexer.RegisterSpecial(keyword, value);
             return this;
@@ -133,8 +145,10 @@ namespace XtraLiteTemplates.Evaluation
         /// <typeparam name="TContext">Any class that implements <see cref="IExpressionEvaluationContext"/> interface.</typeparam>
         /// <returns>An evaluable object.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="factory"/> is <c>null</c>.</exception>
+        [NotNull]
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-        public CompiledTemplate<TContext> Compile<TContext>(CompiledTemplateFactory<TContext> factory) where TContext : IExpressionEvaluationContext
+        public CompiledTemplate<TContext> Compile<TContext>([NotNull] CompiledTemplateFactory<TContext> factory) 
+            where TContext : IExpressionEvaluationContext
         {
             Expect.NotNull("factory", factory);
 
@@ -148,12 +162,13 @@ namespace XtraLiteTemplates.Evaluation
         /// Compiles the template prepared for the standard <see cref="EvaluationContext"/>-based evaluator.
         /// </summary>
         /// <returns>A compiled template.</returns>
+        [NotNull]
         public CompiledTemplate<EvaluationContext> Compile()
         {
             return Compile(CompiledTemplateFactory);
         }
 
-        private void Interpret(CompositeNode compositeNode)
+        private void Interpret([NotNull] CompositeNode compositeNode)
         {
             Debug.Assert(compositeNode != null, "compositeNode cannot be null.");
             var matchIndex = 1;

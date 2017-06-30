@@ -29,11 +29,12 @@ namespace XtraLiteTemplates.Evaluation
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
+    using JetBrains.Annotations;
     using Parsing;
 
     internal sealed class DirectiveNode : CompositeNode
     {
-        public DirectiveNode(TemplateNode parent, Directive[] candidateDirectives)
+        public DirectiveNode([NotNull] TemplateNode parent, [NotNull] [ItemNotNull] Directive[] candidateDirectives)
             : base(parent)
         {
             Debug.Assert(parent != null, "parent cannot be null.");
@@ -43,11 +44,13 @@ namespace XtraLiteTemplates.Evaluation
             CandidateDirectives = candidateDirectives;
         }
 
+        [NotNull]
+        [ItemNotNull]
         public Directive[] CandidateDirectives { get; private set; }
 
         public bool CandidateDirectiveLockedIn { get; private set; }
 
-        public bool SelectDirective(int presenceIndex, Tag tag, IEqualityComparer<string> comparer)
+        public bool SelectDirective(int presenceIndex, [NotNull] Tag tag, [NotNull] IEqualityComparer<string> comparer)
         {
             Debug.Assert(presenceIndex >= 0, "presenceIndex cannot be less than zero.");
             Debug.Assert(tag != null, "tag cannot be null.");

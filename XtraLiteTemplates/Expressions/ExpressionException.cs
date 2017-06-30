@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Expressions
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Exception type thrown for any errors encountered during expression construction.
     /// </summary>
+    [PublicAPI]
     [Serializable]
     public class ExpressionException : InvalidOperationException
     {
@@ -39,7 +41,8 @@ namespace XtraLiteTemplates.Expressions
         /// </summary>
         /// <param name="format">The format string.</param>
         /// <param name="args">Format arguments.</param>
-        internal ExpressionException(string format, params object[] args)
+        [StringFormatMethod("format")]
+        internal ExpressionException([NotNull] string format, [NotNull] params object[] args)
             : base(string.Format(format, args))
         {
         }

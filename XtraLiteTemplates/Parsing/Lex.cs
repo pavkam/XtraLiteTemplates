@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Parsing
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Abstract base class for all <c>lex</c> objects created and passed along during the lexical analysis process.
     /// </summary>
+    [PublicAPI]
     public abstract class Lex
     {
         /// <summary>

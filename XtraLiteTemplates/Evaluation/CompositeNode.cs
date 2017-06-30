@@ -29,20 +29,23 @@ namespace XtraLiteTemplates.Evaluation
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Text;
+    using JetBrains.Annotations;
 
     internal abstract class CompositeNode : TemplateNode
     {
+        [NotNull]
         private readonly List<TemplateNode> _childNodes;
 
-        protected CompositeNode(TemplateNode parent)
+        protected CompositeNode([CanBeNull] TemplateNode parent)
             : base(parent)
         {
             _childNodes = new List<TemplateNode>();
         }
 
+        [NotNull]
         public IReadOnlyList<TemplateNode> Children => _childNodes;
 
-        public void AddChild(TemplateNode child)
+        public void AddChild([NotNull] TemplateNode child)
         {
             Debug.Assert(child != null, "child cannot be null.");
             Debug.Assert(child.Parent == this, "child's Parent must be this.");

@@ -32,18 +32,25 @@ namespace XtraLiteTemplates.Evaluation
     using System.Threading;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Provides a standard implementation of an evaluation context.
     /// </summary>
+    [PublicAPI]
     public class EvaluationContext : IExpressionEvaluationContext
     {
+        [NotNull]
         private readonly Stack<Frame> _frames;
+        [NotNull]
         private readonly Dictionary<Type, SimpleTypeDisemboweler> _disembowelers;
+        [NotNull]
         private readonly IEqualityComparer<string> _identifierComparer;
+        [NotNull]
         private readonly IObjectFormatter _objectFormatter;
-
+        [CanBeNull]
         private readonly object _selfObject;
+        [NotNull]
         private readonly Func<IExpressionEvaluationContext, string, string> _unParsedTextHandler;
 
         /// <summary>
@@ -58,10 +65,10 @@ namespace XtraLiteTemplates.Evaluation
         public EvaluationContext(
             bool ignoreEvaluationExceptions,
             CancellationToken cancellationToken,
-            IEqualityComparer<string> identifierComparer,
-            IObjectFormatter objectFormatter,
-            object selfObject,
-            Func<IExpressionEvaluationContext, string, string> unParsedTextHandler)
+            [NotNull] IEqualityComparer<string> identifierComparer,
+            [NotNull] IObjectFormatter objectFormatter,
+            [CanBeNull] object selfObject,
+            [NotNull] Func<IExpressionEvaluationContext, string, string> unParsedTextHandler)
         {
             Expect.NotNull("identifierComparer", identifierComparer);
             Expect.NotNull("objectFormatter", objectFormatter);
@@ -96,6 +103,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </value>
         public CancellationToken CancellationToken { get; }
 
+        [NotNull]
         private Frame TopFrame
         {
             get
@@ -110,7 +118,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </summary>
         /// <param name="value">The un-parsed text value.</param>
         /// <returns>The processed un-parsed text.</returns>
-        public string ProcessUnParsedText(string value)
+        public string ProcessUnParsedText([CanBeNull] string value)
         {
             return _unParsedTextHandler(this, value);
         }
@@ -122,7 +130,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="value">The property value.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        public void SetProperty(string property, object value)
+        public void SetProperty([NotNull] string property, [CanBeNull] object value)
         {
             Expect.Identifier("property", property);
 
@@ -144,7 +152,8 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        public object GetProperty(string property)
+        [CanBeNull]
+        public object GetProperty([NotNull] string property)
         {
             Expect.Identifier("property", property);
 
@@ -167,7 +176,8 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        public object GetProperty(object @object, string property)
+        [CanBeNull]
+        public object GetProperty([CanBeNull] object @object, [NotNull] string property)
         {
             Expect.Identifier("property", property);
 
@@ -185,7 +195,8 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
-        public object Invoke(string method, object[] arguments)
+        [CanBeNull]
+        public object Invoke([NotNull] string method, [CanBeNull] object[] arguments)
         {
             Expect.Identifier("method", method);
             
@@ -213,7 +224,8 @@ namespace XtraLiteTemplates.Evaluation
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
-        public object Invoke(object @object, string method, object[] arguments)
+        [CanBeNull]
+        public object Invoke([CanBeNull] object @object, [NotNull] string method, [CanBeNull] object[] arguments)
         {
             Expect.Identifier("method", method);
 
@@ -230,7 +242,7 @@ namespace XtraLiteTemplates.Evaluation
         /// State objects can represent anything and are a simple way of storing state information for special operators
         /// or directives.
         /// </remarks>
-        public void AddStateObject(object state)
+        public void AddStateObject([NotNull] object state)
         {
             Expect.NotNull("state", state);
 
@@ -252,7 +264,7 @@ namespace XtraLiteTemplates.Evaluation
         /// State objects can represent anything and are a simple way of storing state information for special operators
         /// or directives.
         /// </remarks>
-        public void RemoveStateObject(object state)
+        public void RemoveStateObject([NotNull] object state)
         {
             Expect.NotNull("state", state);
 
@@ -268,7 +280,7 @@ namespace XtraLiteTemplates.Evaluation
         ///   <c>true</c> if the state object was added; <c>false</c> otherwise.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
-        public bool ContainsStateObject(object state)
+        public bool ContainsStateObject([NotNull] object state)
         {
             Expect.NotNull("state", state);
 
@@ -287,7 +299,7 @@ namespace XtraLiteTemplates.Evaluation
             _frames.Pop();
         }
 
-        private bool TryGetProperty(string property, out object value)
+        private bool TryGetProperty([NotNull] string property, [CanBeNull] out object value)
         {
             /* Obtain the property from the list given to us. */
             foreach (var frame in _frames)
@@ -302,7 +314,8 @@ namespace XtraLiteTemplates.Evaluation
             return false;
         }
 
-        private Type GetTypeOfObject(object @object)
+        [NotNull]
+        private Type GetTypeOfObject([NotNull] object @object)
         {
             Debug.Assert(@object != null, "Object cannot be null.");
 
@@ -310,7 +323,8 @@ namespace XtraLiteTemplates.Evaluation
             return @static != null ? @static.ExposedType : @object.GetType();
         }
 
-        private SimpleTypeDisemboweler GetDisembowelerForType(Type type)
+        [NotNull]
+        private SimpleTypeDisemboweler GetDisembowelerForType([NotNull] Type type)
         {
             Debug.Assert(type != null, "type cannot be null.");
 
@@ -327,8 +341,10 @@ namespace XtraLiteTemplates.Evaluation
 
         private sealed class Frame
         {
+            [CanBeNull]
             public Dictionary<string, object> Variables { get; set; }
 
+            [CanBeNull]
             public HashSet<object> StateObjects { get; set; }
         }
     }

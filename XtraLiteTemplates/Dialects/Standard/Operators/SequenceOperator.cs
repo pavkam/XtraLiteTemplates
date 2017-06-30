@@ -30,10 +30,12 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
     using System.Linq;
     using Expressions;
     using Introspection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Implements the standard integer sequence operator ('..').
     /// </summary>
+    [PublicAPI]
     public sealed class SequenceOperator : StandardBinaryOperator
     {
         /// <summary>
@@ -43,7 +45,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol" /> or <paramref name="typeConverter" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol" /> is empty.</exception>
-        public SequenceOperator(string symbol, IPrimitiveTypeConverter typeConverter)
+        public SequenceOperator([NotNull] string symbol, [NotNull] IPrimitiveTypeConverter typeConverter)
             : base(symbol, 2, typeConverter)
         {
         }
@@ -53,7 +55,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="typeConverter" /> is <c>null</c>.</exception>
-        public SequenceOperator(IPrimitiveTypeConverter typeConverter)
+        public SequenceOperator([NotNull] IPrimitiveTypeConverter typeConverter)
             : this("..", typeConverter)
         {
         }

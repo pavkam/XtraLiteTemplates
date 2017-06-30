@@ -29,7 +29,7 @@ namespace XtraLiteTemplates.Expressions
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
-
+    using JetBrains.Annotations;
     using Nodes;
     using Operators;
     using LinqExpression = System.Linq.Expressions.Expression;
@@ -37,13 +37,21 @@ namespace XtraLiteTemplates.Expressions
     /// <summary>
     /// Provides core expression construction and evaluation functionality.
     /// </summary>
+    [PublicAPI]
     public sealed class Expression
     {
+        [NotNull]
+        [ItemNotNull]
         private readonly List<Operator> _registeredOperators;
+        [NotNull]
         private readonly Dictionary<string, UnaryOperator> _unaryOperatorSymbols;
+        [NotNull]
         private readonly Dictionary<string, BinaryOperator> _binaryOperatorSymbols;
+        [CanBeNull]
         private ExpressionNode _currentNode;
+        [CanBeNull]
         private RootNode _currentGroupRootNode;
+        [CanBeNull]
         private Func<IExpressionEvaluationContext, object> _evaluationFunction;
 
         /// <summary>
@@ -52,7 +60,7 @@ namespace XtraLiteTemplates.Expressions
         /// <param name="flowSymbols">The flow symbols.</param>
         /// <param name="comparer">The symbol and identifier comparer.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="flowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
-        public Expression(ExpressionFlowSymbols flowSymbols, IEqualityComparer<string> comparer)
+        public Expression([NotNull] ExpressionFlowSymbols flowSymbols, [NotNull] IEqualityComparer<string> comparer)
         {
             Expect.NotNull("comparer", comparer);
             Expect.NotNull("flowSymbols", flowSymbols);
@@ -78,6 +86,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The supported operators.
         /// </value>
+        [NotNull]
         public IReadOnlyList<Operator> SupportedOperators => _registeredOperators;
 
         /// <summary>
@@ -86,6 +95,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The flow symbols.
         /// </value>
+        [NotNull]
         public ExpressionFlowSymbols FlowSymbols { get; }
 
         /// <summary>
@@ -94,6 +104,7 @@ namespace XtraLiteTemplates.Expressions
         /// <value>
         /// The symbol and identifier comparer.
         /// </value>
+        [NotNull]
         public IEqualityComparer<string> Comparer { get; }
 
         /// <summary>
@@ -121,7 +132,7 @@ namespace XtraLiteTemplates.Expressions
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="symbol"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
-        public bool IsSupportedOperator(string symbol)
+        public bool IsSupportedOperator([NotNull] string symbol)
         {
             Expect.NotEmpty("symbol", symbol);
 
@@ -135,7 +146,8 @@ namespace XtraLiteTemplates.Expressions
         /// <returns>This expression instance.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="operator"/> is <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">Expression under construction or the symbol of <paramref name="operator"/> already registered.</exception>
-        public Expression RegisterOperator(Operator @operator)
+        [NotNull]
+        public Expression RegisterOperator([NotNull] Operator @operator)
         {
             Expect.NotNull("operator", @operator);
 
@@ -193,7 +205,8 @@ namespace XtraLiteTemplates.Expressions
         /// </returns>
         /// <exception cref="ExpressionException">An expression construction error detected.</exception>
         /// <exception cref="InvalidOperationException">Expression construction finalized.</exception>
-        public Expression FeedLiteral(object literal)
+        [NotNull]
+        public Expression FeedLiteral([CanBeNull] object literal)
         {
             if (Constructed)
             {
@@ -215,7 +228,8 @@ namespace XtraLiteTemplates.Expressions
         /// <exception cref="ArgumentException">Argument <paramref name="symbol"/> is empty.</exception>
         /// <exception cref="ExpressionException">An expression construction error detected.</exception>
         /// <exception cref="InvalidOperationException">Expression construction finalized.</exception>
-        public Expression FeedSymbol(string symbol)
+        [NotNull]
+        public Expression FeedSymbol([NotNull] string symbol)
         {
             Expect.NotEmpty("symbol", symbol);
 
@@ -290,7 +304,8 @@ namespace XtraLiteTemplates.Expressions
         /// <returns>The result of expression evaluation.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="context"/> is <c>null</c>.</exception>
         /// <exception cref="InvalidOperationException">Expression not constructed.</exception>
-        public object Evaluate(IExpressionEvaluationContext context)
+        [CanBeNull]
+        public object Evaluate([NotNull] IExpressionEvaluationContext context)
         {
             Expect.NotNull("context", context);
 
@@ -410,8 +425,10 @@ namespace XtraLiteTemplates.Expressions
             _currentNode = _currentGroupRootNode;
         }
 
-        private void StartUnary(UnaryOperator unaryOperator)
+        private void StartUnary([NotNull] UnaryOperator unaryOperator)
         {
+            Debug.Assert(unaryOperator != null);
+
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
             {
                 ExceptionHelper.UnexpectedOperator(unaryOperator.Symbol);
@@ -436,8 +453,10 @@ namespace XtraLiteTemplates.Expressions
             }
         }
 
-        private void StartBinary(BinaryOperator binaryOperator)
+        private void StartBinary([NotNull] BinaryOperator binaryOperator)
         {
+            Debug.Assert(binaryOperator != null);
+
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.BinaryOperator))
             {
                 ExceptionHelper.UnexpectedOperator(binaryOperator.Symbol);
@@ -473,8 +492,9 @@ namespace XtraLiteTemplates.Expressions
             }
         }
 
-        private void CompleteWithSymbol(string symbol)
+        private void CompleteWithSymbol([NotNull] string symbol)
         {
+            Debug.Assert(!string.IsNullOrEmpty(symbol));
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.Identifier))
             {
                 ExceptionHelper.InvalidExpressionTerm(symbol);
@@ -511,7 +531,7 @@ namespace XtraLiteTemplates.Expressions
             }
         }
 
-        private void CompleteWithLiteral(object literal)
+        private void CompleteWithLiteral([CanBeNull] object literal)
         {
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.Literal))
             {
@@ -570,7 +590,7 @@ namespace XtraLiteTemplates.Expressions
             _currentNode = newNode;
         }
 
-        private void FeedTerm(object term, bool literalTerm)
+        private void FeedTerm([NotNull] object term, bool literalTerm)
         {
             Debug.Assert(literalTerm || term is string, "the term expected to be a string for non-literals.");
 

@@ -33,14 +33,17 @@ namespace XtraLiteTemplates
     using Dialects;
     using Evaluation;
     using Expressions;
+    using JetBrains.Annotations;
     using Parsing;
 
     /// <summary>
     /// Facade class that uses all components exposed by the <c>XtraLiteTemplates library</c>. XLTemplate class uses an instance of <see cref="IDialect" /> interface
     /// to perform the <c>parsing</c>, <c>lexing</c> and <c>interpretation</c> of the template.
     /// </summary>
+    [PublicAPI]
     public sealed class XLTemplate
     {
+        [NotNull]
         private readonly CompiledTemplate<EvaluationContext> _compiledTemplate;
 
         /// <summary>
@@ -56,7 +59,7 @@ namespace XtraLiteTemplates
         /// The value supplied in the <paramref name="template" /> parameter will be parsed, <c>lexed</c> and interpreted in the constructor. There are a number of exceptions
         /// that can be thrown at this stage.
         /// </remarks>
-        public XLTemplate(IDialect dialect, string template)
+        public XLTemplate([NotNull] IDialect dialect, [NotNull] string template)
         {
             Expect.NotNull("dialect", dialect);
             Expect.NotNull("template", template);
@@ -76,6 +79,7 @@ namespace XtraLiteTemplates
         /// This property is provided by the caller at construction time.
         /// </remarks>
         /// </summary>
+        [NotNull]
         public IDialect Dialect { get; }
 
         /// <summary>
@@ -86,6 +90,7 @@ namespace XtraLiteTemplates
         /// This property is provided by the caller at construction time.
         /// </remarks>
         /// </summary>
+        [NotNull]
         public string Template { get; }
 
         /// <summary>
@@ -106,7 +111,8 @@ namespace XtraLiteTemplates
         /// <exception cref="ExpressionException">Expression parsing error during template compilation.</exception>
         /// <exception cref="InterpreterException">Lexical error during template compilation.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public static string Evaluate(IDialect dialect, string template, params object[] arguments)
+        [CanBeNull]
+        public static string Evaluate([NotNull] IDialect dialect, [NotNull] string template, [NotNull] params object[] arguments)
         {
             Expect.NotNull("dialect", dialect);
             Expect.NotNull("template", template);
@@ -132,7 +138,7 @@ namespace XtraLiteTemplates
         /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
         /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public void Evaluate(TextWriter writer, IReadOnlyDictionary<string, object> variables)
+        public void Evaluate([NotNull] TextWriter writer, [NotNull] IReadOnlyDictionary<string, object> variables)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("variables", variables);
@@ -151,7 +157,11 @@ namespace XtraLiteTemplates
         /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public async Task EvaluateAsync(TextWriter writer, IReadOnlyDictionary<string, object> variables, CancellationToken cancellationToken)
+        [NotNull]
+        public async Task EvaluateAsync(
+            [NotNull] TextWriter writer, 
+            [NotNull] IReadOnlyDictionary<string, object> variables, 
+            CancellationToken cancellationToken)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("variables", variables);
@@ -173,7 +183,8 @@ namespace XtraLiteTemplates
         /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public async Task EvaluateAsync(TextWriter writer, IReadOnlyDictionary<string, object> variables)
+        [NotNull]
+        public async Task EvaluateAsync([NotNull] TextWriter writer, [NotNull] IReadOnlyDictionary<string, object> variables)
         {
             Expect.NotNull("writer", writer);
             Expect.NotNull("variables", variables);
@@ -191,7 +202,7 @@ namespace XtraLiteTemplates
         /// <returns>The result of evaluating the template.</returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="variables"/> is <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        public string Evaluate(IReadOnlyDictionary<string, object> variables)
+        public string Evaluate([NotNull] IReadOnlyDictionary<string, object> variables)
         {
             /* Call the original version with a created writer. */
             using (var writer = new StringWriter())
@@ -211,7 +222,10 @@ namespace XtraLiteTemplates
             return _compiledTemplate.ToString();
         }
 
-        private void EvaluateInternal(TextWriter writer, IReadOnlyDictionary<string, object> variables, CancellationToken cancellationToken)
+        private void EvaluateInternal(
+            [NotNull] TextWriter writer, 
+            [NotNull] IReadOnlyDictionary<string, object> variables, 
+            CancellationToken cancellationToken)
         {
             Debug.Assert(writer != null, "Argument writer cannot be null.");
             Debug.Assert(variables != null, "Argument variables cannot be null.");
@@ -235,6 +249,7 @@ namespace XtraLiteTemplates
             _compiledTemplate.Evaluate(writer, context);
         }
 
+        [NotNull]
         private CompiledTemplate<EvaluationContext> Compile()
         {
             using (var reader = new StringReader(Template))

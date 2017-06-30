@@ -33,32 +33,37 @@ namespace XtraLiteTemplates
     using Evaluation;
     using Expressions;
     using Expressions.Operators;
+    using JetBrains.Annotations;
     using Parsing;
 
     internal static class ExceptionHelper
     {
-        internal static void ArgumentIsNull(string argumentName)
+        [ContractAnnotation("=> halt")]
+        internal static void ArgumentIsNull([NotNull] string argumentName)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
             throw new ArgumentNullException(argumentName, $"Argument \"{argumentName}\" cannot be null.");
         }
 
-        internal static void ArgumentIsEmpty(string argumentName)
+        [ContractAnnotation("=> halt")]
+        internal static void ArgumentIsEmpty([NotNull] string argumentName)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
             throw new ArgumentException($"Argument \"{argumentName}\" cannot be empty.", argumentName);
         }
 
-        internal static void ArgumentIsNotValidIdentifier(string argumentName)
+        [ContractAnnotation("=> halt")]
+        internal static void ArgumentIsNotValidIdentifier([NotNull] string argumentName)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
 
             throw new ArgumentException($"Argument \"{argumentName}\" does not represent a valid identifier.", argumentName);
         }
 
-        internal static void ArgumentsAreEqual(string argumentName1, string argumentName2)
+        [ContractAnnotation("=> halt")]
+        internal static void ArgumentsAreEqual([NotNull] string argumentName1, [NotNull] string argumentName2)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName1), "argumentName1 cannot be empty.");
             Debug.Assert(!string.IsNullOrEmpty(argumentName2), "argumentName2 cannot be empty.");
@@ -66,7 +71,8 @@ namespace XtraLiteTemplates
             throw new ArgumentException($"Arguments \"{argumentName1}\" and \"{argumentName2}\" cannot be equal.", argumentName1);
         }
 
-        internal static void ArgumentNotGreaterThan(string argumentName, string comparand)
+        [ContractAnnotation("=> halt")]
+        internal static void ArgumentNotGreaterThan([NotNull] string argumentName, [NotNull] string comparand)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
             Debug.Assert(!string.IsNullOrEmpty(comparand), "comparand cannot be empty.");
@@ -76,7 +82,8 @@ namespace XtraLiteTemplates
                 $"Argument \"{argumentName}\" is expected to be greater than {comparand}.");
         }
 
-        internal static void ArgumentNotGreaterThanOrEqual(string argumentName, string comparand)
+        [ContractAnnotation("=> halt")]
+        internal static void ArgumentNotGreaterThanOrEqual([NotNull] string argumentName, [NotNull] string comparand)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
             Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
@@ -86,49 +93,34 @@ namespace XtraLiteTemplates
                 $"Argument \"{argumentName}\" is expected to be greater than or equal to {comparand}.");
         }
 
-        internal static void ArgumentNotLessThan(string argumentName, string comparand)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
-            Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
-
-            throw new ArgumentOutOfRangeException(
-                argumentName,
-                $"Argument \"{argumentName}\" is expected to be less than {comparand}.");
-        }
-
-        internal static void ArgumentNotLessThanOrEqual(string argumentName, string comparand)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
-            Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
-
-            throw new ArgumentOutOfRangeException(
-                argumentName,
-                $"Argument \"{argumentName}\" is expected to be less than or equal to {comparand}.");
-        }
-
-        internal static void ConditionFailed(string conditionName)
+        [ContractAnnotation("=> halt")]
+        internal static void ConditionFailed([NotNull] string conditionName)
         {
             Debug.Assert(!string.IsNullOrEmpty(conditionName), "conditionName cannot be empty.");
 
             throw new ArgumentException($"Argument condition \"{conditionName}\" failed to be validated as true.", conditionName);
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void UnexpectedCharacter(int characterIndex, char character)
         {
             throw new ParseException(null, characterIndex, "Unexpected character '{0}' found at position {1}.", character, characterIndex);
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void UnexpectedEndOfStream(int characterIndex)
         {
             throw new ParseException(null, characterIndex, "Unexpected end of stream detected at position {0}.", characterIndex);
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void InvalidEscapeCharacter(int characterIndex, char character)
         {
             throw new ParseException(null, characterIndex, "Invalid escape character '{0}' at position {1}.", character, characterIndex);
         }
 
-        internal static void UnexpectedToken(Token token)
+        [ContractAnnotation("=> halt")]
+        internal static void UnexpectedToken([NotNull] Token token)
         {
             Debug.Assert(token != null, "token cannot be null.");
 
@@ -141,7 +133,8 @@ namespace XtraLiteTemplates
                 token.CharacterIndex);
         }
 
-        internal static void NoMatchingTagsLeft(IReadOnlyList<object> components, Token token)
+        [ContractAnnotation("=> halt")]
+        internal static void NoMatchingTagsLeft([NotNull] [ItemNotNull] IReadOnlyList<object> components, [NotNull] Token token)
         {
             Debug.Assert(token != null, "token cannot be null.");
             Debug.Assert(components != null, "components cannot be null.");
@@ -167,7 +160,8 @@ namespace XtraLiteTemplates
                 token.CharacterIndex);
         }
 
-        internal static void UnexpectedOrInvalidExpressionToken(ExpressionException innerException, Token token)
+        [ContractAnnotation("=> halt")]
+        internal static void UnexpectedOrInvalidExpressionToken([NotNull] ExpressionException innerException, [NotNull] Token token)
         {
             Debug.Assert(token != null, "token cannot be null.");
             Debug.Assert(innerException != null, "innerException cannot be null.");
@@ -182,7 +176,8 @@ namespace XtraLiteTemplates
                 innerException.Message);
         }
 
-        internal static void UnexpectedTag(TagLex tagLex)
+        [ContractAnnotation("=> halt")]
+        internal static void UnexpectedTag([NotNull] TagLex tagLex)
         {
             Debug.Assert(tagLex != null, "tagLex cannot be null.");
 
@@ -194,7 +189,8 @@ namespace XtraLiteTemplates
                 tagLex.FirstCharacterIndex);
         }
 
-        internal static void UnmatchedDirectiveTag(Directive[] candidateDirectives, int firstCharacterIndex)
+        [ContractAnnotation("=> halt")]
+        internal static void UnmatchedDirectiveTag([NotNull] [ItemNotNull] Directive[] candidateDirectives, int firstCharacterIndex)
         {
             Debug.Assert(candidateDirectives != null, "candidateDirectives cannot be null.");
 
@@ -206,42 +202,36 @@ namespace XtraLiteTemplates
                 firstCharacterIndex);
         }
 
-        internal static void CannotEvaluateOperator(Operator @operator, object constant)
-        {
-            Debug.Assert(@operator != null, "operator cannot be null.");
-            throw new ExpressionException("Operator {0} could not be applied to value '{1}'.", @operator, constant);
-        }
-
-        internal static void InvalidExpressionTerm(object term)
+        [ContractAnnotation("=> halt")]
+        internal static void InvalidExpressionTerm([CanBeNull] object term)
         {
             throw new ExpressionException("Invalid expression term: '{0}'.", term);
         }
 
-        internal static void UnexpectedExpressionTerm(object term)
-        {
-            throw new ExpressionException("Unexpected expression term: '{0}'.", term);
-        }
-
-        internal static void UnexpectedLiteralRequiresOperator(object term)
+        [ContractAnnotation("=> halt")]
+        internal static void UnexpectedLiteralRequiresOperator([CanBeNull] object term)
         {
             throw new ExpressionException("Unexpected expression literal value: '{0}'. Expected operator.", term);
         }
 
-        internal static void UnexpectedOperator(string @operator)
+        [ContractAnnotation("=> halt")]
+        internal static void UnexpectedOperator([NotNull] string @operator)
         {
             Debug.Assert(!string.IsNullOrEmpty(@operator), "operator cannot be null.");
 
             throw new ExpressionException("Unexpected expression operator: '{0}'.", @operator);
         }
 
-        internal static void UnexpectedLiteralRequiresIdentifier(string @operator, object literal)
+        [ContractAnnotation("=> halt")]
+        internal static void UnexpectedLiteralRequiresIdentifier([NotNull] string @operator, [CanBeNull] object literal)
         {
             Debug.Assert(!string.IsNullOrEmpty(@operator), "operator cannot be null.");
 
             throw new ExpressionException("Operator '{0}' cannot be applied to literal value: '{1}'. Expected identifier.", @operator, literal);
         }
 
-        internal static void OperatorAlreadyRegistered(Operator @operator)
+        [ContractAnnotation("=> halt")]
+        internal static void OperatorAlreadyRegistered([NotNull] Operator @operator)
         {
             Debug.Assert(@operator != null, "operator cannot be null.");
 
@@ -249,7 +239,8 @@ namespace XtraLiteTemplates
                 $"Operator '{@operator}' (or one of its identifying symbols) already registered.");
         }
 
-        internal static void SpecialCannotBeRegistered(string keyword)
+        [ContractAnnotation("=> halt")]
+        internal static void SpecialCannotBeRegistered([NotNull] string keyword)
         {
             Debug.Assert(!string.IsNullOrEmpty(keyword), "keyword cannot be empty.");
 
@@ -257,67 +248,61 @@ namespace XtraLiteTemplates
                 $"Special keyword '{keyword}' cannot be registered as it is currently in use by an operator.");
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void CannotRegisterOperatorsForStartedExpression()
         {
             throw new InvalidOperationException("Operator registration must be performed before construction.");
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void CannotModifyAConstructedExpression()
         {
             throw new InvalidOperationException("Cannot modify a finalized expression.");
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void CannotConstructExpressionInvalidState()
         {
             throw new ExpressionException("Unbalanced expressions cannot be finalized.");
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void CannotEvaluateUnConstructedExpression()
         {
             throw new InvalidOperationException("Expression has not been finalized.");
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void TagAnyIdentifierCannotFollowExpression()
         {
             throw new InvalidOperationException("Identifier tag component cannot follow an expression.");
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void TagExpressionCannotFollowExpression()
         {
             throw new InvalidOperationException("Expression tag component cannot follow another expression.");
         }
 
+        [ContractAnnotation("=> halt")]
         internal static void CannotRegisterTagWithNoComponents()
         {
             throw new InvalidOperationException("Cannot register a tag with no defined components.");
         }
 
-        internal static void InvalidTagMarkup(string markup)
+        [ContractAnnotation("=> halt")]
+        internal static void InvalidTagMarkup([CanBeNull] string markup)
         {
             throw new FormatException($"Invalid tag markup: '{markup}'");
         }
 
-        internal static void DirectiveEvaluationError(Exception innerException, Directive directive)
+        [ContractAnnotation("=> halt")]
+        internal static void DirectiveEvaluationError([NotNull] Exception innerException, [NotNull] Directive directive)
         {
             Debug.Assert(directive != null, "directive cannot be null.");
             Debug.Assert(innerException != null, "exception cannot be null.");
 
             throw new EvaluationException(innerException, "Evaluation of directive {0} resulted in an error: {1}", directive, innerException.Message);
-        }
-
-        internal static void InvalidObjectMemberName(string name)
-        {
-            Debug.Assert(!string.IsNullOrEmpty(name), "name cannot be empty.");
-
-            throw new EvaluationException(null, "Property or method '{0}' could not be located in the provided object.", name);
-        }
-
-        internal static void ObjectMemberEvaluationError(Exception innerException, string name)
-        {
-            Debug.Assert(innerException != null, "innerException cannot be null.");
-            Debug.Assert(!string.IsNullOrEmpty(name), "name cannot be empty.");
-
-            throw new EvaluationException(innerException, "Evaluation of property or method '{0}' failed. An exception was raised: {1}", name, innerException.Message);
         }
     }
 }

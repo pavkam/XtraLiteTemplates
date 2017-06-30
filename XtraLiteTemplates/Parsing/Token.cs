@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Parsing
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Class used to carry tokens from the tokenization process to the lexical analyzer.
     /// </summary>
+    [PublicAPI]
     public sealed class Token
     {
         /// <summary>
@@ -41,7 +43,11 @@ namespace XtraLiteTemplates.Parsing
         /// <param name="characterIndex">Index of the first character.</param>
         /// <param name="originalLength">The original length of the token.</param>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="characterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        public Token(TokenType type, string value, int characterIndex, int originalLength)
+        public Token(
+            TokenType type, 
+            [CanBeNull] string value, 
+            int characterIndex, 
+            int originalLength)
         {
             Expect.GreaterThanOrEqual("characterIndex", characterIndex, 0);
             Expect.GreaterThan("originalLength", originalLength, 0);
@@ -119,6 +125,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The value of the token.
         /// </value>
+        [CanBeNull]
         public string Value { get; }
 
         /// <summary>

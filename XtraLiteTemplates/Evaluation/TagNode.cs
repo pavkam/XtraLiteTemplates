@@ -27,58 +27,23 @@
 namespace XtraLiteTemplates.Evaluation
 {
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Text;
-    using Expressions;
+    using JetBrains.Annotations;
     using Parsing;
 
-    [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-    [SuppressMessage("ReSharper", "UnusedAutoPropertyAccessor.Global")]
     internal sealed class TagNode : TemplateNode
     {
-        public TagNode(TemplateNode parent, TagLex lex)
+        public TagNode([NotNull] TemplateNode parent, [NotNull] TagLex lex)
             : base(parent)
         {
             Debug.Assert(parent != null, "parent cannot be null.");
             Debug.Assert(lex != null, "lex cannot be null.");
 
-            FirstCharacterIndex = lex.FirstCharacterIndex;
-            OriginalLength = lex.OriginalLength;
             Components = lex.Components;
-            Tag = lex.Tag;
         }
 
-        public new DirectiveNode Parent => (DirectiveNode)base.Parent;
-
-        public Tag Tag { get; }
-
-        public int FirstCharacterIndex { get; }
-
-        public int OriginalLength { get; }
-
+        [NotNull]
         public object[] Components { get; }
-
-        public object[] Evaluate(IExpressionEvaluationContext context)
-        {
-            Debug.Assert(context != null, "context cannot be null.");
-
-            var result = new object[Components.Length];
-            for (var i = 0; i < Components.Length; i++)
-            {
-                var expression = Components[i] as Expression;
-                if (expression != null)
-                {
-                    /* Evaluate the expression. */
-                    result[i] = expression.Evaluate(context);
-                }
-                else
-                {
-                    result[i] = Components[i];
-                }
-            }
-
-            return result;
-        }
 
         public override string ToString()
         {

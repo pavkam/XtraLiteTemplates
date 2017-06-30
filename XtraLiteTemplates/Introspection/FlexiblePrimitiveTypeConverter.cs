@@ -24,32 +24,31 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Introspection
 {
     using System;
     using System.Collections;
     using System.Collections.Generic;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Text;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// An implementation of <see cref="IPrimitiveTypeConverter"/> interface. This class offers
     /// a flexible approach to type conversion. It will select the most appropriate way to convert one type to another primitive type guiding
     /// as much as possible by how JavaScript conversion rules operate.
     /// </summary>
-    public class FlexiblePrimitiveTypeConverter : IPrimitiveTypeConverter
+    [PublicAPI]
+    public sealed class FlexiblePrimitiveTypeConverter : IPrimitiveTypeConverter
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FlexiblePrimitiveTypeConverter" /> class.
         /// </summary>
-        /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="Double" /> values.</param>
+        /// <param name="formatProvider">Formatting options used to parse string values. Primarily used when parsing <see cref="double" /> values.</param>
         /// <param name="objectFormatter">The object formatter.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider" /> or <paramref name="objectFormatter" /> is <c>null</c>.</exception>
-        public FlexiblePrimitiveTypeConverter(IFormatProvider formatProvider, IObjectFormatter objectFormatter)
+        public FlexiblePrimitiveTypeConverter([NotNull] IFormatProvider formatProvider, [NotNull] IObjectFormatter objectFormatter)
         {
             Expect.NotNull("formatProvider", formatProvider);
             Expect.NotNull("objectFormatter", objectFormatter);
@@ -59,12 +58,13 @@ namespace XtraLiteTemplates.Introspection
         }
 
         /// <summary>
-        /// Gets the formatting options used to parse string values. Primarily used when parsing <see cref="Double" /> values.
+        /// Gets the formatting options used to parse string values. Primarily used when parsing <see cref="double" /> values.
         /// <remarks>The value of the property is set by the caller during class construction.</remarks>
         /// </summary>
         /// <value>
         /// The format provider.
         /// </value>
+        [NotNull]
         public IFormatProvider FormatProvider { get; }
 
         /// <summary>
@@ -74,6 +74,7 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The object formatter.
         /// </value>
+        [NotNull]
         public IObjectFormatter ObjectFormatter { get; }
 
         /// <summary>
@@ -82,7 +83,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="int"/> value.</returns>
-        public virtual int ConvertToInteger(object obj)
+        public int ConvertToInteger([CanBeNull] object obj)
         {
             var number = ConvertToNumber(obj);
             if (double.IsNaN(number) || double.IsInfinity(number))
@@ -95,11 +96,11 @@ namespace XtraLiteTemplates.Introspection
 
         /// <summary>
         /// Tries to convert the value of <paramref name="obj"/> argument to a double-precision floating point number.
-        /// <remarks>A value of <see cref="Double.NaN"/> is returned if <paramref name="obj"/> is not directly convertible to a <c>double</c>.</remarks>
+        /// <remarks>A value of <see cref="double.NaN"/> is returned if <paramref name="obj"/> is not directly convertible to a <c>double</c>.</remarks>
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="Double"/> value.</returns>
-        public virtual double ConvertToNumber(object obj)
+        /// <returns>A <see cref="double"/> value.</returns>
+        public double ConvertToNumber([CanBeNull] object obj)
         {
             if (obj is IEnumerable)
             {
@@ -153,7 +154,8 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="string"/> value.</returns>
-        public virtual string ConvertToString(object obj)
+        [CanBeNull]
+        public string ConvertToString([CanBeNull] object obj)
         {
             var str = obj as string;
             if (str != null)
@@ -187,7 +189,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="bool"/> value.</returns>
-        public virtual bool ConvertToBoolean(object obj)
+        public bool ConvertToBoolean([CanBeNull] object obj)
         {
             obj = ReduceObject(obj);
 
@@ -223,7 +225,8 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The value object to convert.</param>
         /// <returns>A <see cref="IEnumerable{Object}"/> value.</returns>
-        public virtual IEnumerable<object> ConvertToSequence(object obj)
+        [CanBeNull]
+        public IEnumerable<object> ConvertToSequence([CanBeNull] object obj)
         {
             if (obj == null)
             {
@@ -245,7 +248,7 @@ namespace XtraLiteTemplates.Introspection
         /// </summary>
         /// <param name="obj">The object to check the type for.</param>
         /// <returns>A <see cref="PrimitiveType"/> value.</returns>
-        public PrimitiveType TypeOf(object obj)
+        public PrimitiveType TypeOf([CanBeNull] object obj)
         {
             if (obj == null)
             {
@@ -277,8 +280,8 @@ namespace XtraLiteTemplates.Introspection
             return PrimitiveType.Object;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IEnumerable<object> UpgradeEnumerable(IEnumerable enumerable)
+        [NotNull]
+        private IEnumerable<object> UpgradeEnumerable([NotNull] IEnumerable enumerable)
         {
             Debug.Assert(enumerable != null, "enumerable cannot be null.");
             foreach (var o in enumerable)
@@ -287,14 +290,14 @@ namespace XtraLiteTemplates.Introspection
             }
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private IEnumerable<object> ObjectToSequence(object obj)
+        [NotNull]
+        private IEnumerable<object> ObjectToSequence([CanBeNull] object obj)
         {
             yield return obj;
         }
 
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        private object ReduceObject(object obj)
+        [CanBeNull]
+        private object ReduceObject([CanBeNull] object obj)
         {
             object reduced;
 

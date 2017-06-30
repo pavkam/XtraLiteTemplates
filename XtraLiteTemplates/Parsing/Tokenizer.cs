@@ -32,12 +32,15 @@ namespace XtraLiteTemplates.Parsing
     using System.IO;
     using System.Linq;
     using System.Text;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Provides the standard tokenization services.
     /// </summary>
+    [PublicAPI]
     public sealed class Tokenizer : ITokenizer, IDisposable
     {
+        [NotNull]
         private readonly TextReader _inputTextReader;
         private bool _parsingTag;
         private int _currentCharacterIndex;
@@ -58,7 +61,7 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="InvalidOperationException">The supplied character combination is not valid.</exception>
         /// <exception cref="InvalidOperationException">One or more control characters is not allowed.</exception>
         public Tokenizer(
-            TextReader reader, 
+            [NotNull] TextReader reader, 
             char tagStartCharacter = '{', 
             char tagEndCharacter = '}', 
             char stringStartCharacter = '"',
@@ -112,7 +115,7 @@ namespace XtraLiteTemplates.Parsing
         /// </remarks>
         /// </summary>
         /// <param name="text">The input template.</param>
-        public Tokenizer(string text)
+        public Tokenizer([CanBeNull] string text)
             : this(new StringReader(text ?? string.Empty))
         {
         }
@@ -268,6 +271,7 @@ namespace XtraLiteTemplates.Parsing
                 unicodeCategory == UnicodeCategory.MathSymbol;
         }
 
+        [CanBeNull]
         private Token ReadNextInternal()
         {
             if (_currentCharacterIndex == -1)

@@ -24,22 +24,20 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-[module: System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Introspection
 {
     using System;
     using System.Diagnostics;
-    using System.Diagnostics.CodeAnalysis;
     using System.Reflection;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Event arguments class used by <see cref="SimpleTypeDisemboweler"/> class to decide whether a type member is accepted or rejected.
     /// </summary>
+    [PublicAPI]
     public sealed class MemberValidationEventArgs : EventArgs
     {
-        [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-        internal MemberValidationEventArgs(MemberInfo memberInfo)
+        internal MemberValidationEventArgs([NotNull] MemberInfo memberInfo)
         {
             Debug.Assert(memberInfo != null, "Argument memberInfo cannot be null.");
 
@@ -53,6 +51,7 @@ namespace XtraLiteTemplates.Introspection
         /// <value>
         /// The type member.
         /// </value>
+        [NotNull]
         public MemberInfo Member { get; }
 
         /// <summary>

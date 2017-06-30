@@ -26,13 +26,16 @@
 
 namespace XtraLiteTemplates.Evaluation
 {
+    using JetBrains.Annotations;
+
     internal abstract class TemplateNode
     {
-        protected TemplateNode(TemplateNode parent)
+        protected TemplateNode([CanBeNull] TemplateNode parent)
         {
             Parent = parent;
         }
-
+        
+        [CanBeNull]
         public TemplateNode Parent { get; }
     }
 }

@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Parsing
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// A <see cref="Lex"/> object representing an un-parsed text block.
     /// </summary>
+    [PublicAPI]
     public sealed class UnParsedLex : Lex
     {
         /// <summary>
@@ -42,7 +44,10 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="ArgumentNullException">Argument <paramref name="unParsedText"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="unParsedText"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        public UnParsedLex(string unParsedText, int firstCharacterIndex, int originalLength)
+        public UnParsedLex(
+            [NotNull] string unParsedText, 
+            int firstCharacterIndex, 
+            int originalLength)
             : base(firstCharacterIndex, originalLength)
         {
             Expect.NotEmpty("unParsedText", unParsedText);
@@ -57,6 +62,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The un-parsed text.
         /// </value>
+        [NotNull]
         public string UnParsedText { get; }
     }
 }

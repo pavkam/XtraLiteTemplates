@@ -27,10 +27,12 @@
 namespace XtraLiteTemplates.Parsing
 {
     using System;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// A <see cref="Lex"/> object representing a matched <see cref="Tag"/>.
     /// </summary>
+    [PublicAPI]
     public sealed class TagLex : Lex
     {
         /// <summary>
@@ -43,7 +45,11 @@ namespace XtraLiteTemplates.Parsing
         /// <exception cref="ArgumentNullException">Argument <paramref name="tag"/> or <paramref name="components"/> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="components"/> is empty.</exception>
         /// <exception cref="ArgumentOutOfRangeException"><paramref name="firstCharacterIndex" /> is less than zero; or <paramref name="originalLength" /> is less or equal to zero.</exception>
-        public TagLex(Tag tag, object[] components, int firstCharacterIndex, int originalLength)
+        public TagLex(
+            [NotNull] Tag tag, 
+            [NotNull] [ItemNotNull] object[] components, 
+            int firstCharacterIndex, 
+            int originalLength)
             : base(firstCharacterIndex, originalLength)
         {
             Expect.NotEmpty("components", components);
@@ -60,6 +66,7 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The tag object
         /// </value>
+        [NotNull]
         public Tag Tag { get; }
 
         /// <summary>
@@ -70,6 +77,8 @@ namespace XtraLiteTemplates.Parsing
         /// <value>
         /// The matched tag's components.
         /// </value>
+        [NotNull]
+        [ItemNotNull]
         public object[] Components { get; }
 
         /// <summary>

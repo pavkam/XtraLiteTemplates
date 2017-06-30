@@ -28,10 +28,12 @@ namespace XtraLiteTemplates.Expressions
 {
     using System;
     using System.Threading;
+    using JetBrains.Annotations;
 
     /// <summary>
     /// Defines a standard set of behaviors that have to be implemented by an expression evaluation context.
     /// </summary>
+    [PublicAPI]
     public interface IExpressionEvaluationContext
     {
         /// <summary>
@@ -49,7 +51,7 @@ namespace XtraLiteTemplates.Expressions
         /// <param name="value">The property value.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        void SetProperty(string property, object value);
+        void SetProperty([NotNull] string property, [CanBeNull] object value);
 
         /// <summary>
         /// Gets the value of context property (variable).
@@ -60,7 +62,8 @@ namespace XtraLiteTemplates.Expressions
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        object GetProperty(string property);
+        [CanBeNull]
+        object GetProperty([NotNull] string property);
 
         /// <summary>
         /// Gets the value of an object's property.
@@ -72,7 +75,8 @@ namespace XtraLiteTemplates.Expressions
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
-        object GetProperty(object @object, string property);
+        [CanBeNull]
+        object GetProperty([NotNull] object @object, [NotNull] string property);
 
         /// <summary>
         /// Invokes a context method (global).
@@ -84,7 +88,8 @@ namespace XtraLiteTemplates.Expressions
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
-        object Invoke(string method, object[] arguments);
+        [CanBeNull]
+        object Invoke([NotNull] string method, [NotNull] object[] arguments);
 
         /// <summary>
         /// Invokes an object's method.
@@ -97,7 +102,8 @@ namespace XtraLiteTemplates.Expressions
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
         /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
-        object Invoke(object @object, string method, object[] arguments);
+        [CanBeNull]
+        object Invoke([NotNull] object @object, [NotNull] string method, [NotNull] object[] arguments);
 
         /// <summary>
         /// Adds a state object.
@@ -108,7 +114,7 @@ namespace XtraLiteTemplates.Expressions
         /// State objects can represent anything and are a simple way of storing state information for special operators
         /// or directives.
         /// </remarks>
-        void AddStateObject(object state);
+        void AddStateObject([NotNull] object state);
 
         /// <summary>
         /// Removes a state object.
@@ -119,7 +125,7 @@ namespace XtraLiteTemplates.Expressions
         /// State objects can represent anything and are a simple way of storing state information for special operators
         /// or directives.
         /// </remarks>
-        void RemoveStateObject(object state);
+        void RemoveStateObject([NotNull] object state);
 
         /// <summary>
         /// Determines whether a given state object was registered in this context.
@@ -129,6 +135,6 @@ namespace XtraLiteTemplates.Expressions
         ///   <c>true</c> if the state object was added; <c>false</c> otherwise.
         /// </returns>
         /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
-        bool ContainsStateObject(object state);
+        bool ContainsStateObject([NotNull] object state);
     }
 }

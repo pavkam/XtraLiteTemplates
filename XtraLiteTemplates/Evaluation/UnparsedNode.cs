@@ -27,25 +27,21 @@
 namespace XtraLiteTemplates.Evaluation
 {
     using System.Diagnostics;
+    using JetBrains.Annotations;
     using Parsing;
 
     internal sealed class UnParsedNode : TemplateNode
     {
-        public UnParsedNode(TemplateNode parent, UnParsedLex lex)
+        public UnParsedNode([NotNull] TemplateNode parent, [NotNull] UnParsedLex lex)
             : base(parent)
         {
             Debug.Assert(parent != null, "parent cannot be null.");
             Debug.Assert(lex != null, "lex cannot be null.");
 
-            FirstCharacterIndex = lex.FirstCharacterIndex;
-            OriginalLength = lex.OriginalLength;
             UnParsedText = lex.UnParsedText;
         }
 
-        public int FirstCharacterIndex { get; }
-
-        public int OriginalLength { get; }
-
+        [NotNull]
         public string UnParsedText { get; }
 
         public override string ToString()
