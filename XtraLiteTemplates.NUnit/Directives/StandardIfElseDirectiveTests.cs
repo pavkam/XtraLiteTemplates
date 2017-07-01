@@ -48,8 +48,8 @@ namespace XtraLiteTemplates.NUnit.Directives
             ExpectInvalidTagMarkupException(null, () => new IfElseDirective("IF $", "ELSE", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new IfElseDirective("IF $", "ELSE", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new IfElseDirective("?", "ELSE", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new IfElseDirective("$ AND $ THEN ?", "ELSE", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new IfElseDirective("?", "ELSE", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new IfElseDirective("$ AND $ THEN ?", "ELSE", "END", TypeConverter));
         }
 
         [Test]

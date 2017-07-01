@@ -45,7 +45,7 @@ namespace XtraLiteTemplates.NUnit.Directives
             ExpectInvalidTagMarkupException(null, () => new InterpolationDirective(null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new InterpolationDirective("$", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new InterpolationDirective("$ A $", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new InterpolationDirective("$ A $", TypeConverter));
         }
 
         [Test]

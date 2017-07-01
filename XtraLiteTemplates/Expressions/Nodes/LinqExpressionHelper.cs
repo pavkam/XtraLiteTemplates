@@ -39,6 +39,9 @@ namespace XtraLiteTemplates.Expressions.Nodes
     [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal static class LinqExpressionHelper    
     {
+        public static readonly PropertyInfo CancellationTokenProperty  =
+            typeof(IExpressionEvaluationContext).GetProperty("CancellationToken");
+
         public static readonly MethodInfo MethodInfoUnaryOperatorEvaluate = typeof(UnaryOperator).GetMethod("Evaluate", new[] { typeof(IExpressionEvaluationContext), typeof(object) });
         public static readonly MethodInfo MethodInfoBinaryOperatorEvaluateLhs = typeof(BinaryOperator).GetMethod("EvaluateLhs", new[] { typeof(IExpressionEvaluationContext), typeof(object), typeof(object).MakeByRefType() });
         public static readonly MethodInfo MethodInfoBinaryOperatorEvaluate = typeof(BinaryOperator).GetMethod("Evaluate", new[] { typeof(IExpressionEvaluationContext), typeof(object), typeof(object) });
@@ -50,7 +53,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
         public static readonly ParameterExpression ExpressionParameterContext = Expression.Parameter(typeof(IExpressionEvaluationContext));
         public static readonly MethodCallExpression ExpressionCallThrowIfCancellationRequested =
             Expression.Call(
-                Expression.Property(ExpressionParameterContext, typeof(IExpressionEvaluationContext).GetProperty("CancellationToken")),
+                Expression.Property(ExpressionParameterContext, CancellationTokenProperty),
                 typeof(CancellationToken).GetMethod("ThrowIfCancellationRequested"));
     }
 }

@@ -48,8 +48,8 @@ namespace XtraLiteTemplates.NUnit.Directives
             var tag = Tag.Parse("HELLO WORLD");
 
             ExpectArgumentEmptyException("tags", () => new RippedOpenDirective());
-            ExpectArgumentNullException("tag", () => new RippedOpenDirective((Tag)null));
-            ExpectArgumentNullException("tag", () => new RippedOpenDirective(tag, null));
+            ExpectArgumentNullException("tags", () => new RippedOpenDirective((Tag)null));
+            ExpectArgumentNullException("tags", () => new RippedOpenDirective(tag, null));
             ExpectCannotRegisterTagWithNoComponentsException(() => new RippedOpenDirective(new Tag()));
             ExpectCannotRegisterTagWithNoComponentsException(() => new RippedOpenDirective(tag, new Tag()));
         }

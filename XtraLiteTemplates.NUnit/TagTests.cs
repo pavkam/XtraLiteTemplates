@@ -97,11 +97,11 @@ namespace XtraLiteTemplates.NUnit
 
             ExpectArgumentEmptyException("candidates", () => tag.Identifier(new string[0]));
 
-            ExpectArgumentNotIdentifierException("candidate", () => tag.Identifier("__good0ne", "0number"));
-            ExpectArgumentNotIdentifierException("candidate", () => tag.Identifier("__good0ne", "-sign"));
-            ExpectArgumentNotIdentifierException("candidate", () => tag.Identifier("__good0ne", " white space"));
-            ExpectArgumentNotIdentifierException("candidate", () => tag.Identifier("__good0ne", "whitespace inside"));
-            ExpectArgumentNotIdentifierException("candidate", () => tag.Identifier("__good0ne", "symbol|inside"));
+            ExpectArgumentNotIdentifierException("candidates", () => tag.Identifier("__good0ne", "0number"));
+            ExpectArgumentNotIdentifierException("candidates", () => tag.Identifier("__good0ne", "-sign"));
+            ExpectArgumentNotIdentifierException("candidates", () => tag.Identifier("__good0ne", " white space"));
+            ExpectArgumentNotIdentifierException("candidates", () => tag.Identifier("__good0ne", "whitespace inside"));
+            ExpectArgumentNotIdentifierException("candidates", () => tag.Identifier("__good0ne", "symbol|inside"));
 
             Assert.AreSame(tag, tag.Identifier("candidate1", "candidate2", "candidate3"));
             Assert.AreEqual("(candidate1 candidate2 candidate3)", tag.ToString());

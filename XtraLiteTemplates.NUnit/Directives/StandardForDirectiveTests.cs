@@ -47,8 +47,8 @@ namespace XtraLiteTemplates.NUnit.Directives
             ExpectInvalidTagMarkupException(null, () => new ForDirective("$", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ForDirective("$", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new ForDirective("?", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new ForDirective("$ AND $ THEN ?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new ForDirective("?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new ForDirective("$ AND $ THEN ?", "END", TypeConverter));
         }
 
         [Test]

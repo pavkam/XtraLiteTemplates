@@ -48,8 +48,8 @@ namespace XtraLiteTemplates.NUnit.Directives
             ExpectInvalidTagMarkupException(null, () => new RepeatDirective("TIMES $", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new RepeatDirective("$ TIMES", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new RepeatDirective("$ TIME $", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new RepeatDirective("? AND THEN", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new RepeatDirective("$ TIME $", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new RepeatDirective("? AND THEN", "END", TypeConverter));
         }
 
         [Test]

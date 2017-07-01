@@ -63,6 +63,30 @@ namespace XtraLiteTemplates.Dialects.Standard
         [CanBeNull]
         private object _selfObject;
 
+        private void NeedSpecialKeywords()
+        {
+            if (_dialectSpecialConstants == null)
+            {
+                _dialectSpecialConstants = new Dictionary<string, object>(IdentifierComparer);
+                _dialectSpecialConstantIdentifiers = new Dictionary<object, string>();
+
+                foreach (var kvp in CreateSpecials())
+                {
+                    Debug.Assert(_dialectSpecialConstants != null);
+                    _dialectSpecialConstants.Add(kvp.Key, kvp.Value);
+                    if (kvp.Value == null)
+                    {
+                        _dialectUndefinedSpecialIdentifier = kvp.Key;
+                    }
+                    else
+                    {
+                        Debug.Assert(_dialectSpecialConstantIdentifiers != null);
+                        _dialectSpecialConstantIdentifiers[kvp.Value] = kvp.Key;
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="StandardDialectBase" /> class.
         /// <remarks>
@@ -179,26 +203,7 @@ namespace XtraLiteTemplates.Dialects.Standard
         {
             get
             {
-                if (_dialectSpecialConstants == null)
-                {
-                    _dialectSpecialConstants = new Dictionary<string, object>(IdentifierComparer);
-                    _dialectSpecialConstantIdentifiers = new Dictionary<object, string>();
-
-                    foreach (var kvp in CreateSpecials())
-                    {
-                        Debug.Assert(_dialectSpecialConstants != null);
-                        _dialectSpecialConstants.Add(kvp.Key, kvp.Value);
-                        if (kvp.Value == null)
-                        {
-                            _dialectUndefinedSpecialIdentifier = kvp.Key;
-                        }
-                        else
-                        {
-                            Debug.Assert(_dialectSpecialConstantIdentifiers != null);
-                            _dialectSpecialConstantIdentifiers[kvp.Value] = kvp.Key;
-                        }
-                    }
-                }
+                NeedSpecialKeywords();
 
                 Debug.Assert(_dialectSpecialConstants != null);
                 return _dialectSpecialConstants;
@@ -385,6 +390,8 @@ namespace XtraLiteTemplates.Dialects.Standard
                 return _dialectUndefinedSpecialIdentifier;
             }
 
+            NeedSpecialKeywords();
+            Debug.Assert(_dialectSpecialConstantIdentifiers != null);
             if (!_dialectSpecialConstantIdentifiers.TryGetValue(obj, out result))
             {
                 var s = obj as string;

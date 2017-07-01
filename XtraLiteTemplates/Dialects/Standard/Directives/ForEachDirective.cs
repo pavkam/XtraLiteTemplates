@@ -72,7 +72,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
                 .Where(index => tag.MatchesAnyIdentifier(index)).Select(index => index).ToArray();
 
             Expect.IsTrue(nameof(expressionComponents), expressionComponents.Length == 1);
-            Expect.IsTrue(nameof(expressionComponents), identifierComponents.Length == 1);
+            Expect.IsTrue(nameof(identifierComponents), identifierComponents.Length == 1);
 
             _expressionComponentIndex = expressionComponents[0];
             _identifierComponentIndex = identifierComponents[0];

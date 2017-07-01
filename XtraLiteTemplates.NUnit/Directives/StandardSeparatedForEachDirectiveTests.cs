@@ -48,10 +48,10 @@ namespace XtraLiteTemplates.NUnit.Directives
             ExpectInvalidTagMarkupException(null, () => new SeparatedForEachDirective("START", "MID", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new SeparatedForEachDirective("START", "MID", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new SeparatedForEachDirective("?", "MID", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one identifier component", () => new SeparatedForEachDirective("$", "MID", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new SeparatedForEachDirective("$ AND $ THEN ?", "MID", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one identifier component", () => new SeparatedForEachDirective("? AND ? THEN $", "MID", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new SeparatedForEachDirective("?", "MID", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("identifierComponents", () => new SeparatedForEachDirective("$", "MID", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new SeparatedForEachDirective("$ AND $ THEN ?", "MID", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("identifierComponents", () => new SeparatedForEachDirective("? AND ? THEN $", "MID", "END", TypeConverter));
         }
 
         [Test]

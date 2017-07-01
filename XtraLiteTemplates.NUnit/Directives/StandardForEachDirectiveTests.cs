@@ -47,10 +47,10 @@ namespace XtraLiteTemplates.NUnit.Directives
             ExpectInvalidTagMarkupException(null, () => new ForEachDirective("? IN $", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ForEachDirective("? IN $", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new ForEachDirective("?", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one identifier component", () => new ForEachDirective("$", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new ForEachDirective("$ AND $ THEN ?", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one identifier component", () => new ForEachDirective("? AND ? THEN $", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new ForEachDirective("?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("identifierComponents", () => new ForEachDirective("$", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new ForEachDirective("$ AND $ THEN ?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("identifierComponents", () => new ForEachDirective("? AND ? THEN $", "END", TypeConverter));
         }
 
         [Test]

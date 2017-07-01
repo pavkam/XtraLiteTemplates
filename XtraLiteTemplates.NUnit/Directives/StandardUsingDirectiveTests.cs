@@ -47,10 +47,10 @@ namespace XtraLiteTemplates.NUnit.Directives
             ExpectInvalidTagMarkupException(null, () => new UsingDirective("? IMP $", null, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new UsingDirective("? IMP $", "END", null));
 
-            ExpectArgumentConditionNotTrueException("one expression component", () => new UsingDirective("?", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one identifier component", () => new UsingDirective("$", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one expression component", () => new UsingDirective("$ AND $ THEN ?", "END", TypeConverter));
-            ExpectArgumentConditionNotTrueException("one identifier component", () => new UsingDirective("? AND ? THEN $", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new UsingDirective("?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("identifierComponents", () => new UsingDirective("$", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new UsingDirective("$ AND $ THEN ?", "END", TypeConverter));
+            ExpectArgumentConditionNotTrueException("identifierComponents", () => new UsingDirective("? AND ? THEN $", "END", TypeConverter));
         }
 
         [Test]

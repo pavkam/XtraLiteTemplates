@@ -46,9 +46,9 @@ namespace XtraLiteTemplates.NUnit.Directives
             ExpectInvalidTagMarkupException(null, () => new ConditionalInterpolationDirective(null, false, TypeConverter));
             ExpectArgumentNullException("typeConverter", () => new ConditionalInterpolationDirective("$ __ $", false, null));
 
-            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("$ A $ B $", false, TypeConverter));
-            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("$", false, TypeConverter));
-            ExpectArgumentConditionNotTrueException("two expression components", () => new ConditionalInterpolationDirective("A $ B ? C $ D $", false, TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new ConditionalInterpolationDirective("$ A $ B $", false, TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new ConditionalInterpolationDirective("$", false, TypeConverter));
+            ExpectArgumentConditionNotTrueException("expressionComponents", () => new ConditionalInterpolationDirective("A $ B ? C $ D $", false, TypeConverter));
         }
 
         [Test]

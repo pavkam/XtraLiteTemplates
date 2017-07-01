@@ -260,6 +260,7 @@ namespace XtraLiteTemplates.Expressions
             if (!Constructed)
             {
                 bool fail;
+                Debug.Assert(_currentGroupRootNode != null);
                 if (_currentGroupRootNode.Parent != null)
                 {
                     fail = true;
@@ -317,6 +318,7 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.CannotEvaluateUnConstructedExpression();
             }
 
+            Debug.Assert(_evaluationFunction != null);
             return _evaluationFunction(context);
         }
 
