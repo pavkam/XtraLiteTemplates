@@ -199,7 +199,8 @@ namespace XtraLiteTemplates.Parsing
         /// </summary>
         public void Dispose()
         {
-            _inputTextReader.Dispose();
+            // ReSharper disable once ConstantConditionalAccessQualifier
+            _inputTextReader?.Dispose();
 
             GC.SuppressFinalize(this);
         }

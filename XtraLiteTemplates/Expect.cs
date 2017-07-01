@@ -85,19 +85,19 @@ namespace XtraLiteTemplates
             }
         }
 
-        public static void GreaterThan<T>([NotNull] [InvokerParameterName] string argument, T value, T than)
+        public static void GreaterThan<T>([NotNull] [InvokerParameterName] string argument, T value, T than) where T : struct
         {
             if (Comparer<T>.Default.Compare(value, than) <= 0)
             {
-                ExceptionHelper.ArgumentNotGreaterThan(argument, than == null ? null : than.ToString());
+                ExceptionHelper.ArgumentNotGreaterThan(argument, than.ToString());
             }
         }
 
-        public static void GreaterThanOrEqual<T>([NotNull] [InvokerParameterName] string argument, T value, T than)
+        public static void GreaterThanOrEqual<T>([NotNull] [InvokerParameterName] string argument, T value, T than) where T : struct 
         {
             if (Comparer<T>.Default.Compare(value, than) < 0)
             {
-                ExceptionHelper.ArgumentNotGreaterThanOrEqual(argument, than == null ? null : than.ToString());
+                ExceptionHelper.ArgumentNotGreaterThanOrEqual(argument, than.ToString());
             }
         }
 

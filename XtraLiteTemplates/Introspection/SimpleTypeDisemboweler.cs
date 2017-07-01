@@ -368,6 +368,8 @@ namespace XtraLiteTemplates.Introspection
                                 adaptedArguments[x] = argumentAdapters[x](a[x]);
                             }
 
+                            Debug.Assert(argsArrayElementType != null);
+
                             /* Params argument [params...end] */
                             var paramsArgument = (IList)Array.CreateInstance(
                                 argsArrayElementType,

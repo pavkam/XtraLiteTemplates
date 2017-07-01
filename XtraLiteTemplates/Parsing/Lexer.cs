@@ -63,6 +63,27 @@ namespace XtraLiteTemplates.Parsing
         private Token _currentToken;
         private bool _endOfStream;
 
+        [NotNull]
+        private Token CurrentValidToken
+        {
+            get
+            {
+                Debug.Assert(_currentToken != null);
+                return _currentToken;
+            }
+        }
+
+        [NotNull]
+        private string CurrentValidTokenValue
+        {
+            get
+            {
+                var value = CurrentValidToken.Value;
+                Debug.Assert(value != null);
+                return value;
+            }
+        }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Lexer"/> class.
         /// </summary>
@@ -244,18 +265,17 @@ namespace XtraLiteTemplates.Parsing
             {
                 NextToken();
             }
+
             if (_endOfStream)
             {
                 return null;
             }
 
-            Debug.Assert(_currentToken != null);
-
             /* Load all un-parsed tokens and merge them into a big component. */
-            if (_currentToken.Type == Token.TokenType.UnParsed)
+            if (CurrentValidToken.Type == Token.TokenType.UnParsed)
             {
                 var unParsedTokens = new List<Token>();
-                while (!_endOfStream && _currentToken.Type == Token.TokenType.UnParsed)
+                while (!_endOfStream && CurrentValidToken.Type == Token.TokenType.UnParsed)
                 {
                     unParsedTokens.Add(_currentToken);
                     NextToken();
@@ -268,9 +288,9 @@ namespace XtraLiteTemplates.Parsing
             }
 
             /* This is where a tag is parsed. */
-            if (_currentToken.Type != Token.TokenType.StartTag)
+            if (CurrentValidToken.Type != Token.TokenType.StartTag)
             {
-                ExceptionHelper.UnexpectedToken(_currentToken);
+                ExceptionHelper.UnexpectedToken(CurrentValidToken);
             }
 
             var matchingTags = new HashSet<Tag>(_registeredTags);
@@ -280,7 +300,7 @@ namespace XtraLiteTemplates.Parsing
             Expression currentExpression = null;
             while (true)
             {
-                var previousReadToken = _currentToken;
+                var previousReadToken = CurrentValidToken;
                 if (!NextToken())
                 {
                     ExceptionHelper.NoMatchingTagsLeft(currentComponents, previousReadToken);
@@ -288,13 +308,13 @@ namespace XtraLiteTemplates.Parsing
 
                 allTagTokens.Add(_currentToken);
 
-                if (_currentToken.Type == Token.TokenType.EndTag)
+                if (CurrentValidToken.Type == Token.TokenType.EndTag)
                 {
                     var matchingTag = matchingTags.FirstOrDefault(p => p.ComponentCount == currentComponents.Count);
 
                     if (matchingTag == null)
                     {
-                        ExceptionHelper.NoMatchingTagsLeft(currentComponents, _currentToken);
+                        ExceptionHelper.NoMatchingTagsLeft(currentComponents, CurrentValidToken);
                     }
                     else
                     {
@@ -307,7 +327,7 @@ namespace XtraLiteTemplates.Parsing
                             }
                             catch (ExpressionException constructException)
                             {
-                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, _currentToken);
+                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, CurrentValidToken);
                             }
                         }
 
@@ -344,18 +364,18 @@ namespace XtraLiteTemplates.Parsing
                     }
                 }
 
-                if (_currentToken.Type == Token.TokenType.Word &&
-                    !_specialConstants.ContainsKey(_currentToken.Value))
+                if (CurrentValidToken.Type == Token.TokenType.Word &&
+                    !_specialConstants.ContainsKey(CurrentValidTokenValue))
                 {
                     if (previousReadToken.Type != Token.TokenType.StartTag &&
                         previousReadToken.Type != Token.TokenType.Symbol &&
                         previousReadToken.Type != Token.TokenType.Whitespace)
                     {
-                        ExceptionHelper.UnexpectedToken(_currentToken);
+                        ExceptionHelper.UnexpectedToken(CurrentValidToken);
                     }
 
                     /* This is either a keyword or part of an expression. Reflect that. */
-                    var matchesByKeyword = matchingTags.Where(p => p.MatchesKeyword(currentComponents.Count, Comparer, _currentToken.Value)).ToArray();
+                    var matchesByKeyword = matchingTags.Where(p => p.MatchesKeyword(currentComponents.Count, Comparer, CurrentValidTokenValue)).ToArray();
                     if (matchesByKeyword.Length > 0)
                     {
                         /* Keyword match. All the rest is now history. */
@@ -374,16 +394,16 @@ namespace XtraLiteTemplates.Parsing
                             }
                             catch (ExpressionException constructException)
                             {
-                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, _currentToken);
+                                ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, CurrentValidToken);
                             }
                         }
 
                         currentExpression = null;
-                        currentComponents.Add(_currentToken.Value);
+                        currentComponents.Add(CurrentValidToken.Value);
                         continue;
                     }
 
-                    var matchesByIdentifier = matchingTags.Where(p => p.MatchesIdentifier(currentComponents.Count, Comparer, _currentToken.Value)).ToArray();
+                    var matchesByIdentifier = matchingTags.Where(p => p.MatchesIdentifier(currentComponents.Count, Comparer, CurrentValidTokenValue)).ToArray();
                     if (matchesByIdentifier.Length > 0)
                     {
                         if (currentExpression == null)
@@ -394,18 +414,18 @@ namespace XtraLiteTemplates.Parsing
                                 currentExpression = CreateExpression();
                                 try
                                 {
-                                    currentExpression.FeedSymbol(_currentToken.Value);
+                                    currentExpression.FeedSymbol(CurrentValidTokenValue);
                                 }
                                 catch (ExpressionException feedException)
                                 {
-                                    ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, _currentToken);
+                                    ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, CurrentValidToken);
                                 }
 
-                                currentComponents.Add(Tuple.Create(_currentToken.Value, currentExpression));
+                                currentComponents.Add(Tuple.Create(CurrentValidToken.Value, currentExpression));
                             }
                             else
                             {
-                                currentComponents.Add(_currentToken.Value);
+                                currentComponents.Add(CurrentValidToken.Value);
                             }
 
                             matchingTags = new HashSet<Tag>(matchesByIdentifier.Concat(matchesByExpression));
@@ -423,18 +443,18 @@ namespace XtraLiteTemplates.Parsing
                                 }
                                 catch (ExpressionException constructException)
                                 {
-                                    ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, _currentToken);
+                                    ExceptionHelper.UnexpectedOrInvalidExpressionToken(constructException, CurrentValidToken);
                                 }
                             }
 
-                            currentComponents.Add(_currentToken.Value);
+                            currentComponents.Add(CurrentValidToken.Value);
                         }
 
                         continue;
                     }
                 }
 
-                switch (_currentToken.Type)
+                switch (CurrentValidToken.Type)
                 {
                     case Token.TokenType.Word:
                     case Token.TokenType.Number:
@@ -443,7 +463,7 @@ namespace XtraLiteTemplates.Parsing
                             previousReadToken.Type != Token.TokenType.Symbol &&
                             previousReadToken.Type != Token.TokenType.Whitespace)
                         {
-                            ExceptionHelper.UnexpectedToken(_currentToken);
+                            ExceptionHelper.UnexpectedToken(CurrentValidToken);
                         }
 
                         if (currentExpression == null)
@@ -452,7 +472,7 @@ namespace XtraLiteTemplates.Parsing
                             matchingTags.RemoveWhere(p => !p.MatchesExpression(currentComponents.Count));
                             if (matchingTags.Count == 0)
                             {
-                                ExceptionHelper.NoMatchingTagsLeft(currentComponents, _currentToken);
+                                ExceptionHelper.NoMatchingTagsLeft(currentComponents, CurrentValidToken);
                             }
 
                             currentExpression = CreateExpression();
@@ -461,38 +481,38 @@ namespace XtraLiteTemplates.Parsing
 
                         try
                         {
-                            switch (_currentToken.Type)
+                            switch (CurrentValidToken.Type)
                             {
                                 case Token.TokenType.Number:
                                     double parsedDouble;
-                                    if (double.TryParse(_currentToken.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out parsedDouble))
+                                    if (double.TryParse(CurrentValidToken.Value, NumberStyles.Number, CultureInfo.InvariantCulture, out parsedDouble))
                                     {
                                         currentExpression.FeedLiteral(parsedDouble);
                                     }
                                     else
                                     {
-                                        ExceptionHelper.UnexpectedToken(_currentToken);
+                                        ExceptionHelper.UnexpectedToken(CurrentValidToken);
                                     }
                                     break;
                                 case Token.TokenType.String:
-                                    currentExpression.FeedLiteral(_currentToken.Value);
+                                    currentExpression.FeedLiteral(CurrentValidToken.Value);
                                     break;
                                 default:
                                     object keyLiteral;
-                                    if (_specialConstants.TryGetValue(_currentToken.Value, out keyLiteral))
+                                    if (_specialConstants.TryGetValue(CurrentValidTokenValue, out keyLiteral))
                                     {
                                         currentExpression.FeedLiteral(keyLiteral);
                                     }
                                     else
                                     {
-                                        currentExpression.FeedSymbol(_currentToken.Value);
+                                        currentExpression.FeedSymbol(CurrentValidTokenValue);
                                     }
                                     break;
                             }
                         }
                         catch (ExpressionException feedException)
                         {
-                            ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, _currentToken);
+                            ExceptionHelper.UnexpectedOrInvalidExpressionToken(feedException, CurrentValidToken);
                         }
                         break;
                     case Token.TokenType.Symbol:
@@ -503,14 +523,14 @@ namespace XtraLiteTemplates.Parsing
                             matchingTags.RemoveWhere(p => !p.MatchesExpression(currentComponents.Count));
                             if (matchingTags.Count == 0)
                             {
-                                ExceptionHelper.NoMatchingTagsLeft(currentComponents, _currentToken);
+                                ExceptionHelper.NoMatchingTagsLeft(currentComponents, CurrentValidToken);
                             }
 
                             currentExpression = CreateExpression();
                             currentComponents.Add(currentExpression);
                         }
 
-                        InterpretSymbolChainToken(currentExpression, _currentToken);
+                        InterpretSymbolChainToken(currentExpression, CurrentValidToken);
                         break;
                 }
             }
