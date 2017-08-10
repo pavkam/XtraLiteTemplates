@@ -251,31 +251,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void EvaluateAsyncForNullTextWriterRaisesException1()
-        {
-            Assert.ThrowsAsync<ArgumentNullException>(
-                async () =>
-                    {
-                        await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(
-                            null,
-                            new Dictionary<string, object>());
-                    });
-        }
-
-        [Test]
-        public void EvaluateAsyncForNullTextWriterRaisesException2()
-        {
-            Assert.ThrowsAsync<ArgumentNullException>(
-                async () =>
-                    {
-                        await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(
-                            null,
-                            a => a);
-                    });
-        }
-
-        [Test]
-        public void EvaluateAsyncWithCancellationTokenForNullTextWriterRaisesException1()
+        public void EvaluateAsyncTokenForNullTextWriterRaisesException1()
         {
             Assert.ThrowsAsync<ArgumentNullException>(
                 async () =>
@@ -288,7 +264,7 @@ namespace XtraLiteTemplates.NUnit
         }
 
         [Test]
-        public void EvaluateAsyncWithCancellationTokenForNullTextWriterRaisesException2()
+        public void EvaluateAsyncForNullTextWriterRaisesException2()
         {
             Assert.ThrowsAsync<ArgumentNullException>(
                 async () =>
@@ -306,31 +282,12 @@ namespace XtraLiteTemplates.NUnit
             Assert.ThrowsAsync<ArgumentNullException>(
                 async () => await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(
                                 new StringWriter(),
-                                (IReadOnlyDictionary<string, object>)null));
-        }
-
-        [Test]
-        public void EvaluateAsyncWithCancellationTokenForNullVariablesDictionaryRaisesException()
-        {
-            Assert.ThrowsAsync<ArgumentNullException>(
-                async () => await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(
-                                new StringWriter(),
                                 CancellationToken.None,
                                 (IReadOnlyDictionary<string, object>)null));
         }
 
-
         [Test]
         public void EvaluateAsyncForNullVariablesArrayRaisesException()
-        {
-            Assert.ThrowsAsync<ArgumentNullException>(
-                async () => await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(
-                                new StringWriter(),
-                                (Expression<Func<object, object>>[])null));
-        }
-
-        [Test]
-        public void EvaluateAsyncWithCancellationTokenForNullVariablesArrayRaisesException()
         {
             Assert.ThrowsAsync<ArgumentNullException>(
                 async () => await new XLTemplate(StandardDialect.DefaultIgnoreCase, @"text").EvaluateAsync(
@@ -365,7 +322,6 @@ namespace XtraLiteTemplates.NUnit
             }
         }
 
-
         [Test]
         public async Task EvaluateAsyncWithAZeroTokenCompletesAsExpected2()
         {
@@ -385,7 +341,7 @@ namespace XtraLiteTemplates.NUnit
 
             using (var sw = new StringWriter())
             {
-                await xlTemplate.EvaluateAsync(sw, new Dictionary<string, object>());
+                await xlTemplate.EvaluateAsync(sw, CancellationToken.None, new Dictionary<string, object>());
                 Assert.AreEqual("text", sw.ToString());
             }
         }
@@ -397,7 +353,7 @@ namespace XtraLiteTemplates.NUnit
 
             using (var sw = new StringWriter())
             {
-                await xlTemplate.EvaluateAsync(sw, a => "text");
+                await xlTemplate.EvaluateAsync(sw, CancellationToken.None, a => "text");
                 Assert.AreEqual("text", sw.ToString());
             }
         }
@@ -405,11 +361,14 @@ namespace XtraLiteTemplates.NUnit
         [Test]
         public void EvaluateThrowsExceptionIfVariableExpressionIsNull1()
         {
-            var sw= new StringWriter();
+            var sw = new StringWriter();
             Assert.Throws<ArgumentException>(
                 () => new XLTemplate(StandardDialect.Default, "template").Evaluate(sw, a => a, null));
             Assert.Throws<ArgumentException>(
-                () => new XLTemplate(StandardDialect.Default, "template").Evaluate(sw, a => a, b => ((string)null).Length));
+                () => new XLTemplate(StandardDialect.Default, "template").Evaluate(
+                    sw,
+                    a => a,
+                    b => ((string)null).Length));
             Assert.Throws<ArgumentException>(
                 () => new XLTemplate(StandardDialect.Default, "template").Evaluate(a => a, null));
             Assert.Throws<ArgumentException>(
@@ -421,13 +380,55 @@ namespace XtraLiteTemplates.NUnit
         {
             var sw = new StringWriter();
             Assert.ThrowsAsync<ArgumentException>(
-                async () => await new XLTemplate(StandardDialect.Default, "template").EvaluateAsync(sw, a => a, null));
+                async () => await new XLTemplate(StandardDialect.Default, "template").EvaluateAsync(
+                                sw,
+                                CancellationToken.None,
+                                a => a,
+                                null));
             Assert.ThrowsAsync<ArgumentException>(
-                async () => await new XLTemplate(StandardDialect.Default, "template").EvaluateAsync(sw, a => a, b => ((string)null).Length));
-            Assert.ThrowsAsync<ArgumentException>(
-                async () => await new XLTemplate(StandardDialect.Default, "template").EvaluateAsync(sw, CancellationToken.None, a => a, null));
-            Assert.ThrowsAsync<ArgumentException>(
-                async () => await new XLTemplate(StandardDialect.Default, "template").EvaluateAsync(sw, CancellationToken.None, a => a, b => ((string)null).Length));
+                async () => await new XLTemplate(StandardDialect.Default, "template").EvaluateAsync(
+                                sw,
+                                CancellationToken.None,
+                                a => a,
+                                b => ((string)null).Length));
+        }
+
+
+
+        [Test]
+        public void EvaluateAsyncStaticForNullVariablesArrayRaisesException()
+        {
+            Assert.ThrowsAsync<ArgumentNullException>(
+                async () => await XLTemplate.EvaluateAsync(
+                                StandardDialect.DefaultIgnoreCase,
+                                @"text",
+                                CancellationToken.None,
+                                null));
+        }
+
+        [Test]
+        public void EvaluateAsyncStaticCancelledByTokenRaisesException()
+        {
+            var tokenSource = new CancellationTokenSource();
+
+            tokenSource.CancelAfter(50);
+            Assert.ThrowsAsync<TaskCanceledException>(
+                async () => await XLTemplate.EvaluateAsync(
+                                StandardDialect.DefaultIgnoreCase,
+                                @"{FOR EACH X IN 0..99999999}{X}{END}",
+                                tokenSource.Token,
+                                a => a));
+        }
+
+        [Test]
+        public async Task EvaluateAsyncStaticCompletesAsExpected()
+        {
+            var result = await XLTemplate.EvaluateAsync(
+                             StandardDialect.DefaultIgnoreCase,
+                             @"{a}",
+                             CancellationToken.None,
+                             a => "text");
+            Assert.AreEqual("text", result);
         }
     }
 }

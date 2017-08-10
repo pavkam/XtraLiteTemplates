@@ -306,5 +306,20 @@ namespace XtraLiteTemplates
 
             throw new EvaluationException(innerException, "Evaluation of directive {0} resulted in an error: {1}", directive, innerException.Message);
         }
+
+        [ContractAnnotation("=> halt")]
+        internal static void VariableKeyValueExpressionIsNull(int index)
+        {
+            throw new ArgumentException($"The key => value expression with index {index} is null and cannot be evaluated.");
+        }
+
+        [ContractAnnotation("=> halt")]
+        internal static void VariableKeyValueExpressionIsFailedToEvaluate(string name, int index, Exception innerException)
+        {
+            Debug.Assert(!string.IsNullOrEmpty(name), "name cannot be null.");
+            Debug.Assert(innerException != null, "innerException cannot be null.");
+
+            throw new ArgumentException($"The key => value expression '{name}' with index {index} is failed to evaluate: \"{innerException.Message}\"", innerException);
+        }
     }
 }
