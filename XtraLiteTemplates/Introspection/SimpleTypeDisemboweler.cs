@@ -185,7 +185,7 @@ namespace XtraLiteTemplates.Introspection
             if (arguments == null || arguments.Count == 0)
             {
                 /* Scan the type for properties. */
-                foreach (var property in Type.GetProperties())
+                foreach (var property in Type.GetRuntimeProperties())
                 {
                     if (!Comparer.Equals(property.Name, member) || 
                         !property.CanRead || 
@@ -200,7 +200,7 @@ namespace XtraLiteTemplates.Introspection
                 }
 
                 /* Now scan for fields. */
-                foreach (var field in Type.GetFields())
+                foreach (var field in Type.GetRuntimeFields())
                 {
                     if (!Comparer.Equals(field.Name, member) || 
                         field.IsPrivate ||
@@ -232,7 +232,7 @@ namespace XtraLiteTemplates.Introspection
             Type argsArrayElementType = null;
 
             /* Scan for methods! */
-            foreach (var method in Type.GetMethods())
+            foreach (var method in Type.GetRuntimeMethods())
             {
                 if (!Comparer.Equals(method.Name, member) || method.IsAbstract || method.IsConstructor
                     || method.IsPrivate || !ValidateCandidate(method))

@@ -31,10 +31,8 @@ namespace XtraLiteTemplates.NUnit
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
-
     using global::NUnit.Framework;
-
-    using XtraLiteTemplates.Introspection;
+    using Introspection;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "StringLiteralTypo")]
