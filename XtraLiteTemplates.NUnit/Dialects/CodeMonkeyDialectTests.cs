@@ -31,9 +31,7 @@ namespace XtraLiteTemplates.NUnit.Dialects
     using System;
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
-
     using global::NUnit.Framework;
-
     using XtraLiteTemplates.Dialects.Standard;
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Dialects.Standard.Operators;
@@ -68,15 +66,24 @@ namespace XtraLiteTemplates.NUnit.Dialects
             Assert.AreEqual(dialect.StringLiteralComparer, expectedComparer);
 
             Func<string, string> transformer = input => input;
-            if (casing == DialectCasing.LowerCase)
-                transformer = input => input.ToLowerInvariant();
+            if (casing == DialectCasing.LowerCase) transformer = input => input.ToLowerInvariant();
 
             Assert.AreEqual(5, dialect.SpecialKeywords.Count);
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("TRUE")) && dialect.SpecialKeywords[transformer("TRUE")].Equals(true));
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("FALSE")) && dialect.SpecialKeywords[transformer("FALSE")].Equals(false));
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("UNDEFINED")) && dialect.SpecialKeywords[transformer("UNDEFINED")] == null);
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("NAN")) && dialect.SpecialKeywords[transformer("NAN")].Equals(double.NaN));
-            Assert.IsTrue(dialect.SpecialKeywords.ContainsKey(transformer("INFINITY")) && dialect.SpecialKeywords[transformer("INFINITY")].Equals(double.PositiveInfinity));
+            Assert.IsTrue(
+                dialect.SpecialKeywords.ContainsKey(transformer("TRUE"))
+                && dialect.SpecialKeywords[transformer("TRUE")].Equals(true));
+            Assert.IsTrue(
+                dialect.SpecialKeywords.ContainsKey(transformer("FALSE"))
+                && dialect.SpecialKeywords[transformer("FALSE")].Equals(false));
+            Assert.IsTrue(
+                dialect.SpecialKeywords.ContainsKey(transformer("UNDEFINED"))
+                && dialect.SpecialKeywords[transformer("UNDEFINED")] == null);
+            Assert.IsTrue(
+                dialect.SpecialKeywords.ContainsKey(transformer("NAN"))
+                && dialect.SpecialKeywords[transformer("NAN")].Equals(double.NaN));
+            Assert.IsTrue(
+                dialect.SpecialKeywords.ContainsKey(transformer("INFINITY")) && dialect
+                    .SpecialKeywords[transformer("INFINITY")].Equals(double.PositiveInfinity));
 
             Assert.AreEqual(9, dialect.Directives.Count);
             foreach (var directive in dialect.Directives)
@@ -91,71 +98,44 @@ namespace XtraLiteTemplates.NUnit.Dialects
                     Assert.AreEqual(transformer("{FOR ? IN $}...{END}"), directive.ToString());
                 else if (directive is SeparatedForEachDirective)
                     Assert.AreEqual(transformer("{FOR ? IN $}...{WITH}...{END}"), directive.ToString());
-                else if (directive is IfDirective)
-                    Assert.AreEqual(transformer("{IF $}...{END}"), directive.ToString());
+                else if (directive is IfDirective) Assert.AreEqual(transformer("{IF $}...{END}"), directive.ToString());
                 else if (directive is IfElseDirective)
                     Assert.AreEqual(transformer("{IF $}...{ELSE}...{END}"), directive.ToString());
-                else if (directive is InterpolationDirective)
-                    Assert.AreEqual("{$}", directive.ToString());
+                else if (directive is InterpolationDirective) Assert.AreEqual("{$}", directive.ToString());
                 else if (directive is PreFormattedUnParsedTextDirective)
                     Assert.AreEqual(transformer("{PRE}...{END}"), directive.ToString());
-                else
-                    Assert.Fail();
+                else Assert.Fail();
             }
 
             Assert.AreEqual(24, dialect.Operators.Count);
             foreach (var @operator in dialect.Operators)
             {
-                if (@operator is RelationalEqualsOperator)
-                    Assert.AreEqual("==", @operator.ToString());
-                else if (@operator is RelationalNotEqualsOperator)
-                    Assert.AreEqual("!=", @operator.ToString());
-                else if (@operator is RelationalGreaterThanOperator)
-                    Assert.AreEqual(">", @operator.ToString());
+                if (@operator is RelationalEqualsOperator) Assert.AreEqual("==", @operator.ToString());
+                else if (@operator is RelationalNotEqualsOperator) Assert.AreEqual("!=", @operator.ToString());
+                else if (@operator is RelationalGreaterThanOperator) Assert.AreEqual(">", @operator.ToString());
                 else if (@operator is RelationalGreaterThanOrEqualsOperator)
                     Assert.AreEqual(">=", @operator.ToString());
-                else if (@operator is RelationalLowerThanOperator)
-                    Assert.AreEqual("<", @operator.ToString());
-                else if (@operator is RelationalLowerThanOrEqualsOperator)
-                    Assert.AreEqual("<=", @operator.ToString());
-                else if (@operator is LogicalAndOperator)
-                    Assert.AreEqual("&&", @operator.ToString());
-                else if (@operator is LogicalOrOperator)
-                    Assert.AreEqual("||", @operator.ToString());
-                else if (@operator is LogicalNotOperator)
-                    Assert.AreEqual("!", @operator.ToString());
-                else if (@operator is BitwiseAndOperator)
-                    Assert.AreEqual("&", @operator.ToString());
-                else if (@operator is BitwiseOrOperator)
-                    Assert.AreEqual("|", @operator.ToString());
-                else if (@operator is BitwiseXorOperator)
-                    Assert.AreEqual("^", @operator.ToString());
-                else if (@operator is BitwiseNotOperator)
-                    Assert.AreEqual("~", @operator.ToString());
-                else if (@operator is BitwiseShiftLeftOperator)
-                    Assert.AreEqual("<<", @operator.ToString());
-                else if (@operator is BitwiseShiftRightOperator)
-                    Assert.AreEqual(">>", @operator.ToString());
-                else if (@operator is ArithmeticDivideOperator)
-                    Assert.AreEqual("/", @operator.ToString());
-                else if (@operator is ArithmeticModuloOperator)
-                    Assert.AreEqual("%", @operator.ToString());
-                else if (@operator is ArithmeticMultiplyOperator)
-                    Assert.AreEqual("*", @operator.ToString());
-                else if (@operator is ArithmeticNegateOperator)
-                    Assert.AreEqual("-", @operator.ToString());
-                else if (@operator is ArithmeticNeutralOperator)
-                    Assert.AreEqual("+", @operator.ToString());
-                else if (@operator is ArithmeticSubtractOperator)
-                    Assert.AreEqual("-", @operator.ToString());
-                else if (@operator is ArithmeticSumOperator)
-                    Assert.AreEqual("+", @operator.ToString());
-                else if (@operator is SequenceOperator)
-                    Assert.AreEqual("..", @operator.ToString());
-                else if (@operator is FormatOperator)
-                    Assert.AreEqual(":", @operator.ToString());
-                else
-                    Assert.Fail();
+                else if (@operator is RelationalLowerThanOperator) Assert.AreEqual("<", @operator.ToString());
+                else if (@operator is RelationalLowerThanOrEqualsOperator) Assert.AreEqual("<=", @operator.ToString());
+                else if (@operator is LogicalAndOperator) Assert.AreEqual("&&", @operator.ToString());
+                else if (@operator is LogicalOrOperator) Assert.AreEqual("||", @operator.ToString());
+                else if (@operator is LogicalNotOperator) Assert.AreEqual("!", @operator.ToString());
+                else if (@operator is BitwiseAndOperator) Assert.AreEqual("&", @operator.ToString());
+                else if (@operator is BitwiseOrOperator) Assert.AreEqual("|", @operator.ToString());
+                else if (@operator is BitwiseXorOperator) Assert.AreEqual("^", @operator.ToString());
+                else if (@operator is BitwiseNotOperator) Assert.AreEqual("~", @operator.ToString());
+                else if (@operator is BitwiseShiftLeftOperator) Assert.AreEqual("<<", @operator.ToString());
+                else if (@operator is BitwiseShiftRightOperator) Assert.AreEqual(">>", @operator.ToString());
+                else if (@operator is ArithmeticDivideOperator) Assert.AreEqual("/", @operator.ToString());
+                else if (@operator is ArithmeticModuloOperator) Assert.AreEqual("%", @operator.ToString());
+                else if (@operator is ArithmeticMultiplyOperator) Assert.AreEqual("*", @operator.ToString());
+                else if (@operator is ArithmeticNegateOperator) Assert.AreEqual("-", @operator.ToString());
+                else if (@operator is ArithmeticNeutralOperator) Assert.AreEqual("+", @operator.ToString());
+                else if (@operator is ArithmeticSubtractOperator) Assert.AreEqual("-", @operator.ToString());
+                else if (@operator is ArithmeticSumOperator) Assert.AreEqual("+", @operator.ToString());
+                else if (@operator is SequenceOperator) Assert.AreEqual("..", @operator.ToString());
+                else if (@operator is FormatOperator) Assert.AreEqual(":", @operator.ToString());
+                else Assert.Fail();
             }
 
             return dialect;
@@ -318,14 +298,20 @@ namespace XtraLiteTemplates.NUnit.Dialects
                                    Loves = new[] { "Apples", "Bikes", "Everything Nice" }
                                };
 
-            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, @"{pre}Hello, {_0.FirstName} {_0.LastName}. You are {_0.Age} years old and you love: {for entity in _0.loves}{entity}, {end}{end}", customer);
-            Assert.AreEqual("Hello, John McMann. You are 31 years old and you love: Apples,Bikes,Everything Nice,", result);
+            var result = XLTemplate.Evaluate(
+                CodeMonkeyDialect.DefaultIgnoreCase,
+                @"{pre}Hello, {c.FirstName} {c.LastName}. You are {c.Age} years old and you love: {for entity in c.loves}{entity}, {end}{end}",
+                c => customer);
+
+            Assert.AreEqual(
+                "Hello, John McMann. You are 31 years old and you love: Apples,Bikes,Everything Nice,",
+                result);
         }
 
         [Test]
         public void TestCaseShowcase2()
         {
-            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, "{Abs(_0)}", "-1");
+            var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, "{Abs(v)}", v => "-1");
 
             Assert.AreEqual("1", result);
         }

@@ -27,16 +27,15 @@ namespace XtraLiteTemplates
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.IO;
+    using System.Linq.Expressions;
     using System.Threading;
     using System.Threading.Tasks;
-
     using JetBrains.Annotations;
-
-    using XtraLiteTemplates.Compilation;
-    using XtraLiteTemplates.Dialects;
-    using XtraLiteTemplates.Evaluation;
-    using XtraLiteTemplates.Expressions;
-    using XtraLiteTemplates.Parsing;
+    using Compilation;
+    using Dialects;
+    using Evaluation;
+    using Expressions;
+    using Parsing;
 
     /// <summary>
     /// Facade class that uses all components exposed by the <c>XtraLiteTemplates library</c>. XLTemplate class uses an instance of <see cref="IDialect" /> interface
@@ -47,6 +46,36 @@ namespace XtraLiteTemplates
     {
         [NotNull]
         private readonly CompiledTemplate<EvaluationContext> _compiledTemplate;
+
+        private IReadOnlyDictionary<string, object> ExpressionArrayToVariableDictionary(
+            [NotNull] Expression<Func<object, object>>[] variables)
+        {
+            Debug.Assert(variables != null);
+            var result = new Dictionary<string, object>();
+
+            var index = 0;
+            foreach (var v in variables)
+            {
+                index++;
+                if (v == null)
+                {
+                    throw new ArgumentException($"The key => value expression with index {index} is null and cannot be evaluated.");
+                }
+                var name = v.Parameters[0].Name;
+
+                try
+                {
+                    var value = v.Compile().Invoke(name);
+                    result[name] = value;
+                }
+                catch (Exception e)
+                {
+                    throw new ArgumentException($"The key => value expression '{name}' with index {index} is failed to evaluate: \"{e.Message}\".", e);
+                }
+            }
+
+            return result;
+        }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="XLTemplate"/> class.
@@ -98,38 +127,113 @@ namespace XtraLiteTemplates
         /// <summary>
         /// An easy-to-use facade method that compiles a template and immediately evaluates it.
         /// <remarks>
-        /// An optional set of <paramref name="arguments"/> can be provided to the template. These objects will be exposed to the compiled template at evaluation time as follows:
-        /// <para>
-        /// The first object in <paramref name="arguments"/> can be referenced as <c>_0</c> inside the template. The second object can be referenced as <c>_1</c> and so on. In a sense,
-        /// it tries to mimic the behavior of <see cref="string.Format(IFormatProvider,string,object[])"/> method.</para>
+        /// All optional expressions in <paramref name="variables"/> are exposed to the compiled template as variables.
         /// </remarks>
         /// </summary>
         /// <param name="dialect">An instance <see cref="IDialect"/> used to define the domain-specific language properties.</param>
         /// <param name="template">A <see cref="string"/> value that is compiled and used for evaluation.</param>
-        /// <param name="arguments">A <see cref="IReadOnlyDictionary{TKey,TValue}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <param name = "variables"> A list of "variable => value" expressions where "variable" is treated as the name of the variable and "value" as its value.</param>
         /// <returns>The result of evaluating the template.</returns>
-        /// <exception cref="ArgumentNullException">Either <paramref name="dialect"/>, <paramref name="template"/> or <paramref name="arguments"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="ArgumentNullException">Either <paramref name="dialect"/>, <paramref name="template"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="ParseException">Parsing error during template compilation.</exception>
         /// <exception cref="ExpressionException">Expression parsing error during template compilation.</exception>
         /// <exception cref="InterpreterException">Lexical error during template compilation.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
         [CanBeNull]
-        public static string Evaluate([NotNull] IDialect dialect, [NotNull] string template, [NotNull] params object[] arguments)
+        public static string Evaluate(
+            [NotNull] IDialect dialect,
+            [NotNull] string template,
+            [NotNull] [ItemNotNull] params Expression<Func<object, object>>[] variables)
         {
             Expect.NotNull(nameof(dialect), dialect);
             Expect.NotNull(nameof(template), template);
-            Expect.NotNull(nameof(arguments), arguments);
+            Expect.NotNull(nameof(variables), variables);
 
-            var instance = new XLTemplate(dialect, template);
+            return new XLTemplate(dialect, template).Evaluate(variables);
+        }
 
-            /* Instantiate the variables */
-            var variables = new Dictionary<string, object>();
-            for (var i = 0; i < arguments.Length; i++)
-            {
-                variables.Add($"_{i}", arguments[i]);
-            }
+        /// <summary>
+        /// Evaluates the result of the compiled template asynchronously. The resulting text is written to <paramref name="writer"/>. All key-value-pairs
+        /// contained in <paramref name="variables"/> are exposed to the compiled template as variables.
+        /// </summary>
+        /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> instance.</param>
+        /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
+        /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
+        [NotNull]
+        public async Task EvaluateAsync(
+            [NotNull] TextWriter writer,
+            CancellationToken cancellationToken,
+            [NotNull] IReadOnlyDictionary<string, object> variables)
+        {
+            Expect.NotNull(nameof(writer), writer);
+            Expect.NotNull(nameof(variables), variables);
 
-            return instance.Evaluate(variables);
+            await Task.Run(() => { EvaluateInternal(writer, variables, cancellationToken); }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Evaluates the result of the compiled template asynchronously. The resulting text is written to <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
+        /// <param name="cancellationToken">A <see cref="CancellationToken"/> instance.</param>
+        /// <param name="variables">A list of "variable => value" expressions.</param>
+        /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
+        /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
+        [NotNull]
+        public async Task EvaluateAsync(
+            [NotNull] TextWriter writer,
+            CancellationToken cancellationToken,
+            [NotNull] [ItemNotNull] params Expression<Func<object, object>>[] variables)
+        {
+            Expect.NotNull(nameof(writer), writer);
+            Expect.NotNull(nameof(variables), variables);
+
+            var dict = ExpressionArrayToVariableDictionary(variables);
+            await Task.Run(() => { EvaluateInternal(writer, dict, cancellationToken); }, cancellationToken);
+        }
+
+        /// <summary>
+        /// Evaluates the result of the compiled template asynchronously. The resulting text is written to <paramref name="writer"/>. All key-value-pairs
+        /// contained in <paramref name="variables"/> are exposed to the compiled template as variables.
+        /// </summary>
+        /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
+        /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
+        /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
+        /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
+        [NotNull]
+        public async Task EvaluateAsync(
+            [NotNull] TextWriter writer,
+            [NotNull] IReadOnlyDictionary<string, object> variables)
+        {
+            Expect.NotNull(nameof(writer), writer);
+            Expect.NotNull(nameof(variables), variables);
+
+            await Task.Run(() => { EvaluateInternal(writer, variables, CancellationToken.None); });
+        }
+
+        /// <summary>
+        /// Evaluates the result of the compiled template asynchronously. The resulting text is written to <paramref name="writer"/>.
+        /// </summary>
+        /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
+        /// <param name="variables">A list of "variable => value" expressions.</param>
+        /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
+        /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
+        /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
+        [NotNull]
+        public async Task EvaluateAsync(
+            [NotNull] TextWriter writer,
+            [NotNull] [ItemNotNull] params Expression<Func<object, object>>[] variables)
+        {
+            Expect.NotNull(nameof(writer), writer);
+            Expect.NotNull(nameof(variables), variables);
+
+            var dict = ExpressionArrayToVariableDictionary(variables);
+            await Task.Run(() => { EvaluateInternal(writer, dict, CancellationToken.None); });
         }
 
         /// <summary>
@@ -150,51 +254,21 @@ namespace XtraLiteTemplates
         }
 
         /// <summary>
-        /// Evaluates the result of the compiled template asynchronously. The resulting text is written to <paramref name="writer"/>. All key-value-pairs
-        /// contained in <paramref name="variables"/> are exposed to the compiled template as variables.
+        /// Evaluates the result of the compiled template. The resulting text is written to <paramref name="writer"/>. 
         /// </summary>
         /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
-        /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
-        /// <param name="cancellationToken">A <see cref="CancellationToken"/> instance.</param>
-        /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
+        /// <param name="variables">A list of "variable => value" expressions.</param>
         /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        [NotNull]
-        public async Task EvaluateAsync(
-            [NotNull] TextWriter writer, 
-            [NotNull] IReadOnlyDictionary<string, object> variables, 
-            CancellationToken cancellationToken)
+        public void Evaluate(
+            [NotNull] TextWriter writer,
+            [NotNull] [ItemNotNull] params Expression<Func<object, object>>[] variables)
         {
             Expect.NotNull(nameof(writer), writer);
             Expect.NotNull(nameof(variables), variables);
 
-            await Task.Run(
-                () =>
-                {
-                    EvaluateInternal(writer, variables, cancellationToken);
-                }, 
-                cancellationToken);
-        }
-
-        /// <summary>
-        /// Evaluates the result of the compiled template asynchronously. The resulting text is written to <paramref name="writer"/>. All key-value-pairs
-        /// contained in <paramref name="variables"/> are exposed to the compiled template as variables.
-        /// </summary>
-        /// <param name="writer">A <see cref="TextWriter"/> instance which will be written to.</param>
-        /// <param name="variables">A <see cref="IReadOnlyDictionary{String,Object}"/> storing all variables exposed to the template at evaluation time.</param>
-        /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
-        /// <exception cref="ArgumentNullException">Either <paramref name="writer"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
-        /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
-        [NotNull]
-        public async Task EvaluateAsync([NotNull] TextWriter writer, [NotNull] IReadOnlyDictionary<string, object> variables)
-        {
-            Expect.NotNull(nameof(writer), writer);
-            Expect.NotNull(nameof(variables), variables);
-
-            await Task.Run(() =>
-            {
-                EvaluateInternal(writer, variables, CancellationToken.None);
-            });
+            /* No thread scheduling. */
+            EvaluateInternal(writer, ExpressionArrayToVariableDictionary(variables), CancellationToken.None);
         }
 
         /// <summary>
@@ -215,6 +289,23 @@ namespace XtraLiteTemplates
         }
 
         /// <summary>
+        /// Evaluates the result of the compiled template.
+        /// </summary>
+        /// <param name="variables">A list of "variable => value" expressions.</param>
+        /// <returns>The result of evaluating the template.</returns>
+        /// <exception cref="ArgumentNullException">Argument <paramref name="variables"/> is <c>null</c>.</exception>
+        /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
+        public string Evaluate([NotNull] [ItemNotNull] params Expression<Func<object, object>>[] variables)
+        {
+            /* Call the original version with a created writer. */
+            using (var writer = new StringWriter())
+            {
+                Evaluate(writer, variables);
+                return writer.ToString();
+            }
+        }
+
+        /// <summary>
         /// Returns a human-readable <see cref="string"/> representation of the compiled template.
         /// </summary>
         /// <returns>The <see cref="string"/> value.</returns>
@@ -225,8 +316,8 @@ namespace XtraLiteTemplates
         }
 
         private void EvaluateInternal(
-            [NotNull] TextWriter writer, 
-            [NotNull] IReadOnlyDictionary<string, object> variables, 
+            [NotNull] TextWriter writer,
+            [NotNull] IReadOnlyDictionary<string, object> variables,
             CancellationToken cancellationToken)
         {
             Debug.Assert(writer != null, "Argument writer cannot be null.");
