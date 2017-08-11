@@ -383,7 +383,6 @@ namespace XtraLiteTemplates.Dialects.Standard
         /// <exception cref="ArgumentNullException">Argument <paramref name="formatProvider"/> is <c>null</c>.</exception>
         string IObjectFormatter.ToString(object obj, IFormatProvider formatProvider)
         {
-            string result;
 
             if (obj == null)
             {
@@ -392,16 +391,15 @@ namespace XtraLiteTemplates.Dialects.Standard
 
             NeedSpecialKeywords();
             Debug.Assert(_dialectSpecialConstantIdentifiers != null);
-            if (!_dialectSpecialConstantIdentifiers.TryGetValue(obj, out result))
+            if (!_dialectSpecialConstantIdentifiers.TryGetValue(obj, out string result))
             {
-                var s = obj as string;
-                if (s != null)
+                if (obj is string s)
                 {
                     result = s;
                 }
                 else if (obj is IFormattable)
                 {
-                    result = ((IFormattable) obj).ToString(null, formatProvider);
+                    result = ((IFormattable)obj).ToString(null, formatProvider);
                 }
                 else
                 {

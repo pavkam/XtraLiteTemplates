@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net45</TargetFramework>
+    <Version>1.3</Version>
+    <Authors>Alexandru Ciobanu (alex+git@ciobanu.org)</Authors>
+    <Company>Alexandru Ciobanu (alex+git@ciobanu.org)</Company>
+    <Product>XtraLiteTemplates</Product>
+    <Description>Testing package for XtraLiteTemplates</Description>
+    <Copyright>Alexandru Ciobanu (alex+git@ciobanu.org), 2015-2017</Copyright>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/pavkam/XtraLiteTemplates</PackageProjectUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/artwork/32px-transparent-bkg.png</PackageIconUrl>
+    <PackageTags>Template Domain Language Expression Parser</PackageTags>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="NUnit" Version="3.7.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\XtraLiteTemplates\XtraLiteTemplates.csproj" />
+  </ItemGroup>
+</Project>

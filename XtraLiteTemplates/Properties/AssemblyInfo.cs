@@ -24,20 +24,3 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using System.Diagnostics.CodeAnalysis;
-using System.Reflection;
-using System.Runtime.InteropServices;
-
-[module: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
-[assembly: AssemblyTitle("XtraLiteTemplates")]
-[assembly: AssemblyDescription("Lightweight Templating Engine for .NET")]
-[assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("Alexandru Ciobanu (alex+git@ciobanu.org)")]
-[assembly: AssemblyProduct("XtraLiteTemplates")]
-[assembly: AssemblyCopyright("Alexandru Ciobanu (alex+git@ciobanu.org) 2015-2017")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
-[assembly: AssemblyVersion("1.2.*")]
-[assembly: Guid("111F6683-8ADE-47B3-955C-476E26ACD021")]
-[assembly: AssemblyFileVersion("1.2")]

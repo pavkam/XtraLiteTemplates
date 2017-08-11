@@ -24,17 +24,13 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using System.Diagnostics.CodeAnalysis;
-
-[module: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Expressions.Nodes
 {
+    using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics;
 
     using LinqExpression = System.Linq.Expressions.Expression;
 
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class ExpressionNode
     {
         protected ExpressionNode(ExpressionNode parent)
@@ -44,6 +40,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public ExpressionNode Parent { get; set; }
 
+        [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
         public bool IsReduced { get; private set; }
 
         public object ReducedValue { get; private set; }
@@ -56,8 +53,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
             if (!IsReduced)
             {
-                object value;
-                if (TryReduce(reduceContext, out value))
+                if (TryReduce(reduceContext, out object value))
                 {
                     IsReduced = true;
                     ReducedValue = value;
@@ -69,12 +65,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
         public LinqExpression GetEvaluationLinqExpression()
         {
-            if (IsReduced)
-            {
-                return LinqExpression.Constant(ReducedValue, typeof(object));
-            }
-
-            return BuildLinqExpression();
+            return IsReduced ? LinqExpression.Constant(ReducedValue, typeof(object)) : BuildLinqExpression();
         }
 
         public abstract string ToString(ExpressionFormatStyle style);

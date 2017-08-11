@@ -246,8 +246,7 @@ namespace XtraLiteTemplates.Compilation
             var delegates = new List<CompiledEvaluationDelegate<TContext>>();
             foreach (var node in nodes)
             {
-                var directiveNode = node as DirectiveNode;
-                if (directiveNode != null)
+                if (node is DirectiveNode directiveNode)
                 {
                     delegates.Add(CompileDirectiveNode(directiveNode));
                 }

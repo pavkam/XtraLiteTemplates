@@ -193,8 +193,7 @@ namespace XtraLiteTemplates.Parsing
         {
             Expect.NotNull(nameof(@operator), @operator);
 
-            var unaryOperator = @operator as UnaryOperator;
-            if (unaryOperator != null)
+            if (@operator is UnaryOperator unaryOperator)
             {
                 if (_unaryExpressionOperators.Contains(unaryOperator.Symbol) || _specialConstants.ContainsKey(unaryOperator.Symbol))
                 {
@@ -206,8 +205,7 @@ namespace XtraLiteTemplates.Parsing
                 }
             }
 
-            var binaryOperator = @operator as BinaryOperator;
-            if (binaryOperator != null)
+            if (@operator is BinaryOperator binaryOperator)
             {
                 if (_binaryExpressionOperators.Contains(binaryOperator.Symbol) || _specialConstants.ContainsKey(binaryOperator.Symbol))
                 {
@@ -336,8 +334,7 @@ namespace XtraLiteTemplates.Parsing
                         {
                             var component = currentComponents[i];
 
-                            var tuple = component as Tuple<string, Expression>;
-                            if (tuple != null)
+                            if (component is Tuple<string, Expression> tuple)
                             {
                                 if (matchingTag.MatchesExpression(i))
                                 {

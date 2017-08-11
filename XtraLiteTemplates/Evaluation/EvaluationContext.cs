@@ -158,8 +158,7 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.Identifier(nameof(property), property);
 
-            object result;
-            if (!TryGetProperty(property, out result))
+            if (!TryGetProperty(property, out object result))
             {
                 result = GetProperty(_selfObject, property);
             }
@@ -201,8 +200,7 @@ namespace XtraLiteTemplates.Evaluation
             
             if (arguments == null || arguments.Length == 0)
             {
-                object result;
-                if (TryGetProperty(method, out result))
+                if (TryGetProperty(method, out object result))
                 {
                     return result;
                 }
@@ -326,8 +324,7 @@ namespace XtraLiteTemplates.Evaluation
         {
             Debug.Assert(type != null, "type cannot be null.");
 
-            SimpleTypeDisemboweler disemboweler;
-            if (!_disembowelers.TryGetValue(type, out disemboweler))
+            if (!_disembowelers.TryGetValue(type, out SimpleTypeDisemboweler disemboweler))
             {
                 disemboweler = new SimpleTypeDisemboweler(type, _identifierComparer, _objectFormatter);
 

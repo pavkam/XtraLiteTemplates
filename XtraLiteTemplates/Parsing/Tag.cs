@@ -229,8 +229,7 @@ namespace XtraLiteTemplates.Parsing
         [NotNull]
         public static Tag Parse([NotNull] string markup)
         {
-            Tag result;
-            if (!TryParse(markup, out result))
+            if (!TryParse(markup, out Tag result))
             {
                 ExceptionHelper.InvalidTagMarkup(markup);
             }
@@ -472,8 +471,7 @@ namespace XtraLiteTemplates.Parsing
 
                     if (component != null)
                     {
-                        var stringComponent = component as string;
-                        if (stringComponent != null)
+                        if (component is string stringComponent)
                         {
                             hash += comparer.GetHashCode(stringComponent);
                         }
@@ -529,8 +527,7 @@ namespace XtraLiteTemplates.Parsing
                 return false;
             }
 
-            var stringComponent = _components[index] as string;
-            if (stringComponent != null)
+            if (_components[index] is string stringComponent)
             {
                 return stringComponent == string.Empty;
             }

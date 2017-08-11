@@ -227,8 +227,7 @@ namespace XtraLiteTemplates.Compilation
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();
 
-                var expression = components[i] as Expression;
-                if (expression != null)
+                if (components[i] is Expression expression)
                 {
                     /* Evaluate the expression. */
                     result[i] = expression.Evaluate(context);
@@ -260,8 +259,7 @@ namespace XtraLiteTemplates.Compilation
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();
 
-                string directiveText;
-                flowDecision = directive.Execute(0, tagEvaluatedComponents, ref state, context, out directiveText);
+                flowDecision = directive.Execute(0, tagEvaluatedComponents, ref state, context, out string directiveText);
 
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();
@@ -292,8 +290,7 @@ namespace XtraLiteTemplates.Compilation
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();
 
-                string directiveText;
-                var flowDecision = directive.Execute(0, beginTagEvaluatedComponents, ref state, context, out directiveText);
+                var flowDecision = directive.Execute(0, beginTagEvaluatedComponents, ref state, context, out string directiveText);
 
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();
@@ -368,8 +365,7 @@ namespace XtraLiteTemplates.Compilation
                     evaluatedComponents[currentTagIndex] = EvaluateTag(context, components[currentTagIndex]);
                 }
 
-                string directiveText;
-                var flowDecision = directive.Execute(currentTagIndex, evaluatedComponents[currentTagIndex], ref state, context, out directiveText);
+                var flowDecision = directive.Execute(currentTagIndex, evaluatedComponents[currentTagIndex], ref state, context, out string directiveText);
 
                 /* Check for cancellation. */
                 context.CancellationToken.ThrowIfCancellationRequested();

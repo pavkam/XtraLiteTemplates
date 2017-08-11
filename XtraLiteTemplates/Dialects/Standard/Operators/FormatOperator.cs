@@ -91,8 +91,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Operators
         {
             Expect.NotNull(nameof(context), context);
 
-            var formattable = left as IFormattable;
-            if (formattable != null)
+            if (left is IFormattable formattable)
             {
                 try
                 {

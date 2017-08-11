@@ -170,8 +170,7 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.OperatorAlreadyRegistered(@operator);
             }
 
-            var unaryOperator = @operator as UnaryOperator;
-            if (unaryOperator != null)
+            if (@operator is UnaryOperator unaryOperator)
             {
                 if (_unaryOperatorSymbols.ContainsKey(unaryOperator.Symbol))
                 {
@@ -180,9 +179,8 @@ namespace XtraLiteTemplates.Expressions
 
                 _unaryOperatorSymbols.Add(unaryOperator.Symbol, unaryOperator);
             }
-            else if (@operator is BinaryOperator)
+            else if (@operator is BinaryOperator binaryOperator)
             {
-                var binaryOperator = (BinaryOperator)@operator;
                 if (_binaryOperatorSymbols.ContainsKey(binaryOperator.Symbol))
                 {
                     ExceptionHelper.OperatorAlreadyRegistered(binaryOperator);
@@ -267,15 +265,13 @@ namespace XtraLiteTemplates.Expressions
                 }
                 else
                 {
-                    var currentRootNode = _currentNode as RootNode;
-                    if (currentRootNode != null)
+                    if (_currentNode is RootNode currentRootNode)
                     {
                         fail = !currentRootNode.Closed;
                     }
                     else
                     {
-                        var currentReferenceNode = _currentNode as ReferenceNode;
-                        if (currentReferenceNode != null)
+                        if (_currentNode is ReferenceNode currentReferenceNode)
                         {
                             fail = currentReferenceNode.Identifier == null;
                         }
@@ -353,8 +349,7 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.InvalidExpressionTerm(FlowSymbols.GroupOpen);
             }
 
-            var currentReferenceNode = _currentNode as ReferenceNode;
-            if (currentReferenceNode != null)
+            if (_currentNode is ReferenceNode currentReferenceNode)
             {
                 Debug.Assert(currentReferenceNode.Identifier != null, "current reference node's identifier must not be null.");
 
@@ -363,9 +358,8 @@ namespace XtraLiteTemplates.Expressions
                 currentReferenceNode.Arguments = _currentGroupRootNode;
                 _currentNode = _currentGroupRootNode;
             }
-            else if (_currentNode is OperatorNode)
+            else if (_currentNode is OperatorNode currentOperatorNode)
             {
-                var currentOperatorNode = (OperatorNode)_currentNode;
                 Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                 /* Flip to the new root */
@@ -373,10 +367,8 @@ namespace XtraLiteTemplates.Expressions
                 currentOperatorNode.RightNode = _currentGroupRootNode;
                 _currentNode = _currentGroupRootNode;
             }
-            else if (_currentNode is RootNode)
+            else if (_currentNode is RootNode currentRootNode)
             {
-                var currentRootNode = (RootNode)_currentNode;
-
                 Debug.Assert(currentRootNode == _currentGroupRootNode, "current operator node must be the current root node.");
                 Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
@@ -444,17 +436,15 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.UnexpectedOperator(unaryOperator.Symbol);
             }
 
-            var currentOperatorNode = _currentNode as OperatorNode;
-            if (currentOperatorNode != null)
+            if (_currentNode is OperatorNode currentOperatorNode)
             {
                 Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                 currentOperatorNode.RightNode = new UnaryOperatorNode(currentOperatorNode, unaryOperator);
                 _currentNode = currentOperatorNode.RightNode;
             }
-            else if (_currentNode is RootNode)
+            else if (_currentNode is RootNode currentRootNode)
             {
-                var currentRootNode = (RootNode)_currentNode;
                 Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
                 var newNode = new UnaryOperatorNode(currentRootNode, unaryOperator);
@@ -514,8 +504,7 @@ namespace XtraLiteTemplates.Expressions
                 ExceptionHelper.InvalidExpressionTerm(symbol);
             }
 
-            var currentDisembowelerNode = _currentNode as ReferenceNode;
-            if (currentDisembowelerNode != null)
+            if (_currentNode is ReferenceNode currentDisembowelerNode)
             {
                 Debug.Assert(currentDisembowelerNode.Object != null, "current reference node's object must not be null.");
                 Debug.Assert(currentDisembowelerNode.Identifier == null, "current reference node's identifier must be null.");
@@ -526,17 +515,15 @@ namespace XtraLiteTemplates.Expressions
             {
                 var newNode = new ReferenceNode(_currentNode, symbol);
 
-                var currentOperatorNode = _currentNode as OperatorNode;
-                if (currentOperatorNode != null)
+                if (_currentNode is OperatorNode currentOperatorNode)
                 {
                     Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                     currentOperatorNode.RightNode = newNode;
                     _currentNode = newNode;
                 }
-                else if (_currentNode is RootNode)
+                else if (_currentNode is RootNode currentRootNode)
                 {
-                    var currentRootNode = (RootNode)_currentNode;
                     Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
                     currentRootNode.AddChild(newNode);
@@ -550,8 +537,7 @@ namespace XtraLiteTemplates.Expressions
             Debug.Assert(_currentNode != null);
             if (!_currentNode.Continuity.HasFlag(PermittedContinuations.Literal))
             {
-                var currentReferenceNode = _currentNode as ReferenceNode;
-                if (currentReferenceNode != null && currentReferenceNode.Identifier == null)
+                if (_currentNode is ReferenceNode currentReferenceNode && currentReferenceNode.Identifier == null)
                 {
                     ExceptionHelper.UnexpectedLiteralRequiresIdentifier(FlowSymbols.MemberAccess, literal);
                 }
@@ -563,17 +549,15 @@ namespace XtraLiteTemplates.Expressions
 
             var newNode = new LiteralNode(_currentNode, literal);
 
-            var currentOperatorNode = _currentNode as OperatorNode;
-            if (currentOperatorNode != null)
+            if (_currentNode is OperatorNode currentOperatorNode)
             {
                 Debug.Assert(currentOperatorNode.RightNode == null, "current operator node's right node must be null.");
 
                 currentOperatorNode.RightNode = newNode;
                 _currentNode = newNode;
             }
-            else if (_currentNode is RootNode)
+            else if (_currentNode is RootNode currentRootNode)
             {
-                var currentRootNode = (RootNode)_currentNode;
                 Debug.Assert(!currentRootNode.Closed, "current root node cannot be closed.");
 
                 currentRootNode.AddChild(newNode);
@@ -591,8 +575,7 @@ namespace XtraLiteTemplates.Expressions
 
             /* Left side now becomes the "object" of disembowelment and the right side will be the member name */
             var newNode = new ReferenceNode(_currentNode.Parent, _currentNode);
-            var parentOperatorNode = _currentNode.Parent as OperatorNode;
-            if (parentOperatorNode != null)
+            if (_currentNode.Parent is OperatorNode parentOperatorNode)
             {
                 Debug.Assert(parentOperatorNode.RightNode == _currentNode, "parent operator node's right node must be the current node.");
                 parentOperatorNode.RightNode = newNode;
@@ -645,8 +628,7 @@ namespace XtraLiteTemplates.Expressions
                 }
                 else
                 {
-                    UnaryOperator unaryOperator;
-                    if (_unaryOperatorSymbols.TryGetValue(symbol, out unaryOperator))
+                    if (_unaryOperatorSymbols.TryGetValue(symbol, out UnaryOperator unaryOperator))
                     {
                         Debug.Assert(_currentNode != null);
                         if (_currentNode.Continuity.HasFlag(PermittedContinuations.UnaryOperator))
@@ -656,8 +638,7 @@ namespace XtraLiteTemplates.Expressions
                         }
                     }
 
-                    BinaryOperator binaryOperator;
-                    if (_binaryOperatorSymbols.TryGetValue(symbol, out binaryOperator))
+                    if (_binaryOperatorSymbols.TryGetValue(symbol, out BinaryOperator binaryOperator))
                     {
                         Debug.Assert(_currentNode != null);
                         if (_currentNode.Continuity.HasFlag(PermittedContinuations.BinaryOperator))

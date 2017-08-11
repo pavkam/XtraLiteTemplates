@@ -128,8 +128,7 @@ namespace XtraLiteTemplates.Introspection
             }
             else
             {
-                var str = obj as string;
-                if (str != null)
+                if (obj is string str)
                 {
                     if (str.Length == 0)
                     {
@@ -157,14 +156,12 @@ namespace XtraLiteTemplates.Introspection
         /// <returns>A <see cref="string"/> value.</returns>
         public string ConvertToString(object obj)
         {
-            var str = obj as string;
-            if (str != null)
+            if (obj is string str)
             {
                 return str;
             }
 
-            var enumerable = obj as IEnumerable;
-            if (enumerable != null)
+            if (obj is IEnumerable enumerable)
             {
                 var builder = new StringBuilder();
                 foreach (var item in enumerable)
@@ -232,8 +229,7 @@ namespace XtraLiteTemplates.Introspection
                 return null;
             }
 
-            var objEnumerable = obj as IEnumerable<object>;
-            if (objEnumerable != null)
+            if (obj is IEnumerable<object> objEnumerable)
             {
                 return objEnumerable;
             }

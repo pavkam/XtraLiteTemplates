@@ -5,7 +5,7 @@ VisualStudioVersion = 12.0.31101.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XtraLiteTemplates", "XtraLiteTemplates\XtraLiteTemplates.csproj", "{B1E0BE63-E2C3-4A2B-BE2B-0B1EADDADCE3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XtraLiteTemplates.NUnit", "XtraLiteTemplates.NUnit\XtraLiteTemplates.NUnit.csproj", "{33B37C34-0E55-4CA2-9CA0-B0EF02DDBCA8}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "XtraLiteTemplates.Tests", "XtraLiteTemplates.Tests\XtraLiteTemplates.Tests.csproj", "{33B37C34-0E55-4CA2-9CA0-B0EF02DDBCA8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

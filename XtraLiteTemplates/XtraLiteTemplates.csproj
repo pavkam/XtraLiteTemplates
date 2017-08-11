@@ -1,157 +1,18 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{B1E0BE63-E2C3-4A2B-BE2B-0B1EADDADCE3}</ProjectGuid>
-    <OutputType>Library</OutputType>
-    <RootNamespace>XtraLiteTemplates</RootNamespace>
-    <AssemblyName>XtraLiteTemplates</AssemblyName>
-    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <TargetFramework>net45</TargetFramework>
+    <Version>1.3</Version>
+    <Authors>Alexandru Ciobanu (alex+git@ciobanu.org)</Authors>
+    <Company>Alexandru Ciobanu (alex+git@ciobanu.org)</Company>
+    <PackageLicenseUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/LICENSE</PackageLicenseUrl>
+    <PackageIconUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/artwork/32px-transparent-bkg.png</PackageIconUrl>
+    <PackageProjectUrl>https://github.com/pavkam/XtraLiteTemplates</PackageProjectUrl>
+    <Description>A highly customizable and lightweight template engine for Microsoft .NET and Mono.</Description>
+    <PackageReleaseNotes>Version 1.2 of XtraLiteTemplates. Stable.</PackageReleaseNotes>
+    <Copyright>Alexandru Ciobanu (alex+git@ciobanu.org), 2015-2017</Copyright>
+    <PackageTags>Template Domain Language Expression Parser</PackageTags>
+    <AssemblyVersion>1.3.0.0</AssemblyVersion>
+    <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+    <FileVersion>1.3.0.0</FileVersion>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug</OutputPath>
-    <DefineConstants>TRACE;DEBUG;</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <DocumentationFile>bin\Debug\XtraLiteTemplates.XML</DocumentationFile>
-    <RunCodeAnalysis>false</RunCodeAnalysis>
-    <CodeAnalysisIgnoreGeneratedCode>true</CodeAnalysisIgnoreGeneratedCode>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <DebugType>full</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release</OutputPath>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-    <ConsolePause>false</ConsolePause>
-    <DocumentationFile>bin\Release\XtraLiteTemplates.XML</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="Compilation\CompiledEvaluationDelegate.cs" />
-    <Compile Include="Compilation\CompiledTemplate.cs" />
-    <Compile Include="Compilation\CompiledTemplateFactory.cs" />
-    <Compile Include="Dialects\Standard\Directives\ForDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\UsingDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\SeparatedForEachDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\PreFormattedUnParsedTextDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\StandardDirective.cs" />
-    <Compile Include="Dialects\Standard\DialectCasing.cs" />
-    <Compile Include="Dialects\Standard\CodeMonkeySelfObject.cs" />
-    <Compile Include="Dialects\Standard\StandardSelfObject.cs" />
-    <Compile Include="Compilation\GenericCompiledTemplateFactory.cs" />
-    <Compile Include="Evaluation\EvaluationContext.cs" />
-    <Compile Include="Expressions\Nodes\LinqExpressionHelper.cs" />
-    <Compile Include="Introspection\MemberValidationEventArgs.cs" />
-    <Compile Include="Introspection\IObjectFormatter.cs" />
-    <Compile Include="Dialects\Standard\Operators\FormatOperator.cs" />
-    <Compile Include="Expressions\Nodes\PermittedContinuations.cs" />
-    <Compile Include="Expressions\Nodes\LiteralNode.cs" />
-    <Compile Include="Expressions\Nodes\ReferenceNode.cs" />
-    <Compile Include="Introspection\Static.cs" />
-    <Compile Include="Introspection\SimpleTypeDisemboweler.cs" />
-    <Compile Include="JetBrainsAnnotations.cs" />
-    <Compile Include="Parsing\LexingException.cs" />
-    <Compile Include="Dialects\Standard\CodeMonkeyDialect.cs" />
-    <Compile Include="Dialects\Standard\StandardDialectBase.cs" />
-    <Compile Include="ExceptionHelper.cs" />
-    <Compile Include="Expressions\ExpressionFlowSymbols.cs" />
-    <Compile Include="Expressions\Nodes\RootNode.cs" />
-    <Compile Include="Expressions\ReduceExpressionEvaluationContext.cs" />
-    <Compile Include="Expressions\IExpressionEvaluationContext.cs" />
-    <Compile Include="Expressions\ExpressionFormatStyle.cs" />
-    <Compile Include="Expressions\Nodes\OperatorNode.cs" />
-    <Compile Include="Dialects\Standard\Operators\SequenceOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\BitwiseAndOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\BitwiseOrOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\BitwiseNotOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\StandardRelationalOperator.cs" />
-    <Compile Include="Introspection\PrimitiveType.cs" />
-    <Compile Include="Introspection\IPrimitiveTypeConverter.cs" />
-    <Compile Include="Dialects\Standard\Operators\BitwiseShiftRightOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\BitwiseShiftLeftOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\RelationalGreaterThanOrEqualsOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\RelationalGreaterThanOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\RelationalLowerThanOrEqualsOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\RelationalLowerThanOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\RelationalNotEqualsOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\RelationalEqualsOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\BitwiseXorOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\LogicalOrOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\ArithmeticModuloOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\ArithmeticDivideOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\LogicalAndOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\StandardBinaryOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\StandardUnaryOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\ArithmeticMultiplyOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\ArithmeticSubtractOperator.cs" />
-    <Compile Include="Dialects\Standard\Directives\IfElseDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\IfDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\ConditionalInterpolationDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\ForEachDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\RepeatDirective.cs" />
-    <Compile Include="Dialects\Standard\Directives\InterpolationDirective.cs" />
-    <Compile Include="Evaluation\EvaluationException.cs" />
-    <Compile Include="Evaluation\InterpreterException.cs" />
-    <Compile Include="Evaluation\TagNode.cs" />
-    <Compile Include="Evaluation\TemplateDocument.cs" />
-    <Compile Include="Evaluation\CompositeNode.cs" />
-    <Compile Include="Evaluation\DirectiveNode.cs" />
-    <Compile Include="Evaluation\UnParsedNode.cs" />
-    <Compile Include="Evaluation\TemplateNode.cs" />
-    <Compile Include="Evaluation\Directive.cs" />
-    <Compile Include="Evaluation\Interpreter.cs" />
-    <Compile Include="Introspection\FlexiblePrimitiveTypeConverter.cs" />
-    <Compile Include="Dialects\Standard\StandardDialect.cs" />
-    <Compile Include="Dialects\IDialect.cs" />
-    <Compile Include="Parsing\TagLex.cs" />
-    <Compile Include="Parsing\UnParsedLex.cs" />
-    <Compile Include="Parsing\Lex.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Expect.cs" />
-    <Compile Include="Expressions\Nodes\ExpressionNode.cs" />
-    <Compile Include="Expressions\Nodes\LeafNode.cs" />
-    <Compile Include="Expressions\Nodes\UnaryOperatorNode.cs" />
-    <Compile Include="Expressions\Nodes\BinaryOperatorNode.cs" />
-    <Compile Include="Expressions\Operators\UnaryOperator.cs" />
-    <Compile Include="Expressions\Operators\BinaryOperator.cs" />
-    <Compile Include="Expressions\Expression.cs" />
-    <Compile Include="Expressions\ExpressionException.cs" />
-    <Compile Include="Expressions\Operators\Operator.cs" />
-    <Compile Include="Dialects\Standard\Operators\ArithmeticNeutralOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\ArithmeticNegateOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\LogicalNotOperator.cs" />
-    <Compile Include="Dialects\Standard\Operators\ArithmeticSumOperator.cs" />
-    <Compile Include="Expressions\Operators\Associativity.cs" />
-    <Compile Include="Parsing\ITokenizer.cs" />
-    <Compile Include="Parsing\ParseException.cs" />
-    <Compile Include="Parsing\Token.cs" />
-    <Compile Include="Parsing\Tokenizer.cs" />
-    <Compile Include="Parsing\Lexer.cs" />
-    <Compile Include="Parsing\Tag.cs" />
-    <Compile Include="XLTemplate.cs" />
-  </ItemGroup>
-  <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
-  <ItemGroup>
-    <None Include="XtraLiteTemplates.nuspec" />
-  </ItemGroup>
-  <ProjectExtensions>
-    <MonoDevelop>
-      <Properties>
-        <Policies>
-          <DotNetNamingPolicy DirectoryNamespaceAssociation="PrefixedHierarchical" ResourceNamePolicy="FileFormatDefault" />
-        </Policies>
-      </Properties>
-    </MonoDevelop>
-  </ProjectExtensions>
-  <ItemGroup />
 </Project>

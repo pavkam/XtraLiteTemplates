@@ -151,8 +151,7 @@ namespace XtraLiteTemplates.Introspection
             }
 
             /* Find a cached member from a previous lookup. */
-            Func<object, object[], object> getterMethod;
-            if (!_cachedMemberMap.TryGetValue(signature.ToString(), out getterMethod))
+            if (!_cachedMemberMap.TryGetValue(signature.ToString(), out Func<object, object[], object> getterMethod))
             {
                 /* No cache made for this call structure. Do it now and cache the invoke candidate. */
                 getterMethod = LocateSuitableInvokeCandidate(member, arguments);

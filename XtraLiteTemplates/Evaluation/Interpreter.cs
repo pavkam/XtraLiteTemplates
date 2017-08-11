@@ -48,8 +48,10 @@ namespace XtraLiteTemplates.Evaluation
     {
         [NotNull]
         private static readonly CompiledTemplateFactory CompiledTemplateFactory = new CompiledTemplateFactory();
+
         [NotNull]
         private readonly List<Directive> _registeredDirectives;
+
         [NotNull]
         private readonly Lexer _lexer;
 
@@ -61,8 +63,8 @@ namespace XtraLiteTemplates.Evaluation
         /// <param name="comparer">The keyword and identifier comparer.</param>
         /// <exception cref="ArgumentNullException">Argument <paramref name="tokenizer"/> or <paramref name="expressionFlowSymbols"/> or <paramref name="comparer"/> is <c>null</c>.</exception>
         public Interpreter(
-            [NotNull] ITokenizer tokenizer, 
-            [NotNull] ExpressionFlowSymbols expressionFlowSymbols, 
+            [NotNull] ITokenizer tokenizer,
+            [NotNull] ExpressionFlowSymbols expressionFlowSymbols,
             [NotNull] IEqualityComparer<string> comparer)
         {
             Expect.NotNull(nameof(tokenizer), tokenizer);
@@ -149,7 +151,7 @@ namespace XtraLiteTemplates.Evaluation
         /// <exception cref="ArgumentNullException">Argument <paramref name="factory"/> is <c>null</c>.</exception>
         [NotNull]
         [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
-        public CompiledTemplate<TContext> Compile<TContext>([NotNull] CompiledTemplateFactory<TContext> factory) 
+        public CompiledTemplate<TContext> Compile<TContext>([NotNull] CompiledTemplateFactory<TContext> factory)
             where TContext : IExpressionEvaluationContext
         {
             Expect.NotNull(nameof(factory), factory);
@@ -184,8 +186,7 @@ namespace XtraLiteTemplates.Evaluation
                     break;
                 }
 
-                var unParsedLex = lex as UnParsedLex;
-                if (unParsedLex != null)
+                if (lex is UnParsedLex unParsedLex)
                 {
                     /* This is an un-parsed lex. */
                     compositeNode.AddChild(new UnParsedNode(compositeNode, unParsedLex));
@@ -196,9 +197,8 @@ namespace XtraLiteTemplates.Evaluation
                     var tagLex = lex as TagLex;
                     Debug.Assert(tagLex != null, "lex must be a tag lex.");
 
-                    var directiveCompositeNode = compositeNode as DirectiveNode;
-                    if (directiveCompositeNode != null &&
-                        directiveCompositeNode.SelectDirective(matchIndex, tagLex.Tag, Comparer))
+                    if (compositeNode is DirectiveNode directiveCompositeNode
+                        && directiveCompositeNode.SelectDirective(matchIndex, tagLex.Tag, Comparer))
                     {
                         /* OK, this is the Nth part of the current directive. */
                         matchIndex++;
@@ -213,7 +213,8 @@ namespace XtraLiteTemplates.Evaluation
                     }
 
                     /* Match any directive that starts with this tag. */
-                    var candidateDirectives = _registeredDirectives.Where(p => p.Tags[0].Equals(tagLex.Tag, Comparer)).ToArray();
+                    var candidateDirectives = _registeredDirectives.Where(p => p.Tags[0].Equals(tagLex.Tag, Comparer))
+                        .ToArray();
                     if (candidateDirectives.Length == 0)
                     {
                         /* No directive found that starts with the supplied tag! Nothing we can do but bail at this point. */
@@ -234,7 +235,9 @@ namespace XtraLiteTemplates.Evaluation
                         if (!directiveNode.CandidateDirectiveLockedIn)
                         {
                             /* Expecting all child directives to have locked in. Otherwise they weren't closed! */
-                            ExceptionHelper.UnmatchedDirectiveTag(directiveNode.CandidateDirectives, lex.FirstCharacterIndex);
+                            ExceptionHelper.UnmatchedDirectiveTag(
+                                directiveNode.CandidateDirectives,
+                                lex.FirstCharacterIndex);
                         }
                     }
                 }
