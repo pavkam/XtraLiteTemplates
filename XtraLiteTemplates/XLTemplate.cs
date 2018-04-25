@@ -34,7 +34,6 @@ namespace XtraLiteTemplates
     using Compilation;
     using Dialects;
     using Evaluation;
-    using Expressions;
     using Parsing;
 
     /// <summary>
@@ -47,6 +46,7 @@ namespace XtraLiteTemplates
         [NotNull]
         private readonly CompiledTemplate<EvaluationContext> _compiledTemplate;
 
+        [NotNull]
         private IReadOnlyDictionary<string, object> ExpressionArrayToVariableDictionary(
             [NotNull] Expression<Func<object, object>>[] variables)
         {
@@ -84,7 +84,7 @@ namespace XtraLiteTemplates
         /// <param name="template">A <see cref="string" /> value that is compiled and used for evaluation.</param>
         /// <exception cref="ArgumentNullException">Either <paramref name="dialect" /> or <paramref name="template" /> parameters are <c>null</c>.</exception>
         /// <exception cref="ParseException">Parsing error during template compilation.</exception>
-        /// <exception cref="ExpressionException">Expression parsing error during template compilation.</exception>
+        /// <exception cref="Expressions.ExpressionException">Expression parsing error during template compilation.</exception>
         /// <exception cref="InterpreterException">Lexical error during template compilation.</exception>
         /// <remarks>
         /// The value supplied in the <paramref name="template" /> parameter will be parsed, <c>lexed</c> and interpreted in the constructor. There are a number of exceptions
@@ -133,7 +133,7 @@ namespace XtraLiteTemplates
         /// <returns>The result of evaluating the template.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="dialect"/>, <paramref name="template"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="ParseException">Parsing error during template compilation.</exception>
-        /// <exception cref="ExpressionException">Expression parsing error during template compilation.</exception>
+        /// <exception cref="Expressions.ExpressionException">Expression parsing error during template compilation.</exception>
         /// <exception cref="InterpreterException">Lexical error during template compilation.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
         [CanBeNull]
@@ -159,7 +159,7 @@ namespace XtraLiteTemplates
         /// <returns>The <see cref="Task"/> instance representing the asynchronous task.</returns>
         /// <exception cref="ArgumentNullException">Either <paramref name="dialect"/>, <paramref name="template"/> or <paramref name="variables"/> parameters are <c>null</c>.</exception>
         /// <exception cref="ParseException">Parsing error during template compilation.</exception>
-        /// <exception cref="ExpressionException">Expression parsing error during template compilation.</exception>
+        /// <exception cref="Expressions.ExpressionException">Expression parsing error during template compilation.</exception>
         /// <exception cref="InterpreterException">Lexical error during template compilation.</exception>
         /// <exception cref="EvaluationException">Any unrecoverable evaluation error.</exception>
         [NotNull]

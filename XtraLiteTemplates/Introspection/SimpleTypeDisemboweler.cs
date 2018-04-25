@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -151,7 +151,7 @@ namespace XtraLiteTemplates.Introspection
             }
 
             /* Find a cached member from a previous lookup. */
-            if (!_cachedMemberMap.TryGetValue(signature.ToString(), out Func<object, object[], object> getterMethod))
+            if (!_cachedMemberMap.TryGetValue(signature.ToString(), out var getterMethod))
             {
                 /* No cache made for this call structure. Do it now and cache the invoke candidate. */
                 getterMethod = LocateSuitableInvokeCandidate(member, arguments);
@@ -270,6 +270,8 @@ namespace XtraLiteTemplates.Introspection
                              */
                             Debug.Assert(parameterType.IsArray, "parameterType must be an array.");
                             var elementType = parameterType.GetElementType();
+                            Debug.Assert(elementType != null, "elementType must be valid");
+
                             indexOfParamsArray = parameterIndex;
                             for (var argsIndex = parameterIndex; argsIndex < arguments.Count; argsIndex++)
                             {
@@ -428,7 +430,10 @@ namespace XtraLiteTemplates.Introspection
             {
                 /* It's a "param" array. Use a default element-less one. */
                 reconciliationScore += 1.00;
-                defaultValue = Array.CreateInstance(parameter.ParameterType.GetElementType(), 0);
+                var elementType = parameter.ParameterType.GetElementType();
+                Debug.Assert(elementType != null, "elementType must be params[] array");
+
+                defaultValue = Array.CreateInstance(elementType, 0);
             }
             else
             {

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -30,12 +30,11 @@ namespace XtraLiteTemplates.Evaluation
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Threading;
-
     using JetBrains.Annotations;
-
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Introspection;
 
+    /// <inheritdoc />
     /// <summary>
     /// Provides a standard implementation of an evaluation context.
     /// </summary>
@@ -97,12 +96,7 @@ namespace XtraLiteTemplates.Evaluation
         /// </value>
         public bool IgnoreEvaluationExceptions { get; }
 
-        /// <summary>
-        /// Gets the cancellation token.
-        /// </summary>
-        /// <value>
-        /// The cancellation token that was supplied during construction.
-        /// </value>
+        /// <inheritdoc />
         public CancellationToken CancellationToken { get; }
 
         [NotNull]
@@ -125,13 +119,7 @@ namespace XtraLiteTemplates.Evaluation
             return _unParsedTextHandler(this, value);
         }
 
-        /// <summary>
-        /// Sets the value of context property (variable).
-        /// </summary>
-        /// <param name="property">The property name.</param>
-        /// <param name="value">The property value.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
+        /// <inheritdoc />
         public void SetProperty(string property, object value)
         {
             Expect.Identifier(nameof(property), property);
@@ -145,15 +133,7 @@ namespace XtraLiteTemplates.Evaluation
             topFrame.Variables[property] = value;
         }
 
-        /// <summary>
-        /// Gets the value of context property (variable).
-        /// </summary>
-        /// <param name="property">The property name.</param>
-        /// <returns>
-        /// The property value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
+        /// <inheritdoc />
         public object GetProperty(string property)
         {
             Expect.Identifier(nameof(property), property);
@@ -166,16 +146,7 @@ namespace XtraLiteTemplates.Evaluation
             return result;
         }
 
-        /// <summary>
-        /// Gets the value of an object's property.
-        /// </summary>
-        /// <param name="object">The object to get the property for.</param>
-        /// <param name="property">The property name.</param>
-        /// <returns>
-        /// The property value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="property" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="property" /> is not a valid identifier.</exception>
+        /// <inheritdoc />
         public object GetProperty([CanBeNull] object @object, string property)
         {
             Expect.Identifier(nameof(property), property);
@@ -184,23 +155,14 @@ namespace XtraLiteTemplates.Evaluation
                 GetDisembowelerForType(GetTypeOfObject(@object)).Invoke(@object, property) : null;
         }
 
-        /// <summary>
-        /// Invokes a context method (global).
-        /// </summary>
-        /// <param name="method">The method name.</param>
-        /// <param name="arguments">The arguments to be passed to the method. <c>null</c> value means no arguments.</param>
-        /// <returns>
-        /// The return value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
+        /// <inheritdoc />
         public object Invoke(string method, [CanBeNull] object[] arguments)
         {
             Expect.Identifier(nameof(method), method);
             
             if (arguments == null || arguments.Length == 0)
             {
-                if (TryGetProperty(method, out object result))
+                if (TryGetProperty(method, out var result))
                 {
                     return result;
                 }
@@ -210,17 +172,7 @@ namespace XtraLiteTemplates.Evaluation
             return Invoke(_selfObject, method, arguments);
         }
 
-        /// <summary>
-        /// Invokes an object's method.
-        /// </summary>
-        /// <param name="object">The object.</param>
-        /// <param name="method">The method name.</param>
-        /// <param name="arguments">The arguments to be passed to the method. <c>null</c> value means no arguments.</param>
-        /// <returns>
-        /// The return value.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="method" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException">Argument <paramref name="method" /> is not a valid identifier.</exception>
+        /// <inheritdoc />
         public object Invoke([CanBeNull] object @object, string method, [CanBeNull] object[] arguments)
         {
             Expect.Identifier(nameof(method), method);
@@ -229,15 +181,7 @@ namespace XtraLiteTemplates.Evaluation
                 GetDisembowelerForType(GetTypeOfObject(@object)).Invoke(@object, method, arguments) : null;
         }
 
-        /// <summary>
-        /// Adds a state object.
-        /// </summary>
-        /// <param name="state">The state object to add.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
-        /// <remarks>
-        /// State objects can represent anything and are a simple way of storing state information for special operators
-        /// or directives.
-        /// </remarks>
+        /// <inheritdoc />
         public void AddStateObject(object state)
         {
             Expect.NotNull(nameof(state), state);
@@ -251,15 +195,7 @@ namespace XtraLiteTemplates.Evaluation
             topFrame.StateObjects.Add(state);
         }
 
-        /// <summary>
-        /// Removes a state object.
-        /// </summary>
-        /// <param name="state">The state object to remove.</param>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
-        /// <remarks>
-        /// State objects can represent anything and are a simple way of storing state information for special operators
-        /// or directives.
-        /// </remarks>
+        /// <inheritdoc />
         public void RemoveStateObject(object state)
         {
             Expect.NotNull(nameof(state), state);
@@ -268,14 +204,7 @@ namespace XtraLiteTemplates.Evaluation
             topFrame.StateObjects?.Remove(state);
         }
 
-        /// <summary>
-        /// Determines whether a given state object was registered in this context.
-        /// </summary>
-        /// <param name="state">The state object to check for.</param>
-        /// <returns>
-        ///   <c>true</c> if the state object was added; <c>false</c> otherwise.
-        /// </returns>
-        /// <exception cref="ArgumentNullException">Argument <paramref name="state" /> is <c>null</c>.</exception>
+        /// <inheritdoc />
         public bool ContainsStateObject(object state)
         {
             Expect.NotNull(nameof(state), state);
@@ -315,8 +244,7 @@ namespace XtraLiteTemplates.Evaluation
         {
             Debug.Assert(@object != null, "Object cannot be null.");
 
-            var @static = @object as Static;
-            return @static != null ? @static.ExposedType : @object.GetType();
+            return @object is Static @static ? @static.ExposedType : @object.GetType();
         }
 
         [NotNull]
@@ -324,7 +252,7 @@ namespace XtraLiteTemplates.Evaluation
         {
             Debug.Assert(type != null, "type cannot be null.");
 
-            if (!_disembowelers.TryGetValue(type, out SimpleTypeDisemboweler disemboweler))
+            if (!_disembowelers.TryGetValue(type, out var disemboweler))
             {
                 disemboweler = new SimpleTypeDisemboweler(type, _identifierComparer, _objectFormatter);
 

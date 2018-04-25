@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,10 +24,6 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using System.Diagnostics.CodeAnalysis;
-
-[module: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System.Linq.Expressions;
@@ -36,24 +32,50 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
     using XtraLiteTemplates.Expressions.Operators;
 
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
-    internal static class LinqExpressionHelper    
+    internal static class LinqExpressionHelper
     {
-        public static readonly PropertyInfo CancellationTokenProperty  =
-            typeof(IExpressionEvaluationContext).GetProperty("CancellationToken");
+        public static readonly MethodInfo MethodInfoUnaryOperatorEvaluate = typeof(UnaryOperator).GetMethod(
+            nameof(UnaryOperator.Evaluate),
+            new[] { typeof(IExpressionEvaluationContext), typeof(object) });
 
-        public static readonly MethodInfo MethodInfoUnaryOperatorEvaluate = typeof(UnaryOperator).GetMethod("Evaluate", new[] { typeof(IExpressionEvaluationContext), typeof(object) });
-        public static readonly MethodInfo MethodInfoBinaryOperatorEvaluateLhs = typeof(BinaryOperator).GetMethod("EvaluateLhs", new[] { typeof(IExpressionEvaluationContext), typeof(object), typeof(object).MakeByRefType() });
-        public static readonly MethodInfo MethodInfoBinaryOperatorEvaluate = typeof(BinaryOperator).GetMethod("Evaluate", new[] { typeof(IExpressionEvaluationContext), typeof(object), typeof(object) });
-        public static readonly MethodInfo MethodInfoExpressionEvaluationContextInvokeObject = typeof(IExpressionEvaluationContext).GetMethod("Invoke", new[] { typeof(object), typeof(string), typeof(object[]) });
-        public static readonly MethodInfo MethodInfoExpressionEvaluationContextInvoke = typeof(IExpressionEvaluationContext).GetMethod("Invoke", new[] { typeof(string), typeof(object[]) });
-        public static readonly MethodInfo MethodInfoExpressionEvaluationContextGetPropertyObject = typeof(IExpressionEvaluationContext).GetMethod("GetProperty", new[] { typeof(object), typeof(string) });
-        public static readonly MethodInfo MethodInfoExpressionEvaluationContextGetProperty = typeof(IExpressionEvaluationContext).GetMethod("GetProperty", new[] { typeof(string) });
+        public static readonly MethodInfo MethodInfoBinaryOperatorEvaluateLhs = typeof(BinaryOperator).GetMethod(
+            nameof(BinaryOperator.EvaluateLhs),
+            new[] { typeof(IExpressionEvaluationContext), typeof(object), typeof(object).MakeByRefType() });
 
-        public static readonly ParameterExpression ExpressionParameterContext = Expression.Parameter(typeof(IExpressionEvaluationContext));
+        public static readonly MethodInfo MethodInfoBinaryOperatorEvaluate = typeof(BinaryOperator).GetMethod(
+            nameof(BinaryOperator.Evaluate),
+            new[] { typeof(IExpressionEvaluationContext), typeof(object), typeof(object) });
+
+        public static readonly MethodInfo MethodInfoExpressionEvaluationContextInvokeObject =
+            typeof(IExpressionEvaluationContext).GetMethod(
+                nameof(IExpressionEvaluationContext.Invoke),
+                new[] { typeof(object), typeof(string), typeof(object[]) });
+
+        public static readonly MethodInfo MethodInfoExpressionEvaluationContextInvoke =
+            typeof(IExpressionEvaluationContext).GetMethod(
+                nameof(IExpressionEvaluationContext.Invoke),
+                new[] { typeof(string), typeof(object[]) });
+
+        public static readonly MethodInfo MethodInfoExpressionEvaluationContextGetPropertyObject =
+            typeof(IExpressionEvaluationContext).GetMethod(
+                nameof(IExpressionEvaluationContext.GetProperty),
+                new[] { typeof(object), typeof(string) });
+
+        public static readonly MethodInfo MethodInfoExpressionEvaluationContextGetProperty =
+            typeof(IExpressionEvaluationContext).GetMethod(
+                nameof(IExpressionEvaluationContext.GetProperty),
+                new[] { typeof(string) });
+
+        public static readonly ParameterExpression ExpressionParameterContext =
+            Expression.Parameter(typeof(IExpressionEvaluationContext));
+
+        private static readonly PropertyInfo CancellationTokenProperty =
+            typeof(IExpressionEvaluationContext).GetProperty(nameof(IExpressionEvaluationContext.CancellationToken));
+
         public static readonly MethodCallExpression ExpressionCallThrowIfCancellationRequested =
-            Expression.Call(
-                Expression.Property(ExpressionParameterContext, CancellationTokenProperty),
-                typeof(CancellationToken).GetMethod("ThrowIfCancellationRequested"));
+            Expression.Call(Expression.Property(
+                ExpressionParameterContext,
+                CancellationTokenProperty), typeof(CancellationToken).GetMethod(
+                nameof(CancellationToken.ThrowIfCancellationRequested)));
     }
 }

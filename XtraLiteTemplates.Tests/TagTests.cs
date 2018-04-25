@@ -127,24 +127,23 @@ namespace XtraLiteTemplates.Tests
         [Test]
         public void TestCaseTryParseFailures()
         {
-
-            Assert.IsFalse(Tag.TryParse(null, out Tag tag));
-            Assert.IsFalse(Tag.TryParse(string.Empty, out tag));
-            Assert.IsFalse(Tag.TryParse(" ", out tag));
-            Assert.IsFalse(Tag.TryParse("{", out tag));
-            Assert.IsFalse(Tag.TryParse("9", out tag));
-            Assert.IsFalse(Tag.TryParse("KEYWORD+FAILURE", out tag));
-            Assert.IsFalse(Tag.TryParse("(LIST OF ITEMS", out tag));
-            Assert.IsFalse(Tag.TryParse("LIST OF ITEMS)", out tag));
-            Assert.IsFalse(Tag.TryParse("??", out tag));
-            Assert.IsFalse(Tag.TryParse("(?)", out tag));
-            Assert.IsFalse(Tag.TryParse("($)", out tag));
-            Assert.IsFalse(Tag.TryParse("EMPTY () GROUP", out tag));
-            Assert.IsFalse(Tag.TryParse("(ITEM () ITEM)", out tag));
-            Assert.IsFalse(Tag.TryParse("$$", out tag));
-            Assert.IsFalse(Tag.TryParse("?$", out tag));
-            Assert.IsFalse(Tag.TryParse("IF $ THEN $ ?", out tag));
-            Assert.IsFalse(Tag.TryParse("$ $", out tag));
+            Assert.IsFalse(Tag.TryParse(null, out _));
+            Assert.IsFalse(Tag.TryParse(string.Empty, out _));
+            Assert.IsFalse(Tag.TryParse(" ", out _));
+            Assert.IsFalse(Tag.TryParse("{", out _));
+            Assert.IsFalse(Tag.TryParse("9", out _));
+            Assert.IsFalse(Tag.TryParse("KEYWORD+FAILURE", out _));
+            Assert.IsFalse(Tag.TryParse("(LIST OF ITEMS", out _));
+            Assert.IsFalse(Tag.TryParse("LIST OF ITEMS)", out _));
+            Assert.IsFalse(Tag.TryParse("??", out _));
+            Assert.IsFalse(Tag.TryParse("(?)", out _));
+            Assert.IsFalse(Tag.TryParse("($)", out _));
+            Assert.IsFalse(Tag.TryParse("EMPTY () GROUP", out _));
+            Assert.IsFalse(Tag.TryParse("(ITEM () ITEM)", out _));
+            Assert.IsFalse(Tag.TryParse("$$", out _));
+            Assert.IsFalse(Tag.TryParse("?$", out _));
+            Assert.IsFalse(Tag.TryParse("IF $ THEN $ ?", out _));
+            Assert.IsFalse(Tag.TryParse("$ $", out _));
         }
 
         [Test]
