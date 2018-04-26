@@ -33,7 +33,6 @@ namespace XtraLiteTemplates.Introspection
     using System.Linq;
     using System.Reflection;
     using System.Text;
-
     using JetBrains.Annotations;
 
     /// <summary>

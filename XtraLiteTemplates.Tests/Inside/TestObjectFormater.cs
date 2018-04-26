@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -31,7 +31,6 @@ namespace XtraLiteTemplates.Tests.Inside
     using System;
     using System.Diagnostics;
     using System.Globalization;
-
     using XtraLiteTemplates.Introspection;
 
     public sealed class TestObjectFormatter : IObjectFormatter
@@ -48,14 +47,20 @@ namespace XtraLiteTemplates.Tests.Inside
         {
             string result;
 
-            if (obj == null)
-                return "!undefined!";
-            if (obj is string s)
-                result = s;
-            else if (obj is IFormattable)
-                result = ((IFormattable)obj).ToString(null, formatProvider);
-            else
-                result = obj.ToString();
+            switch (obj)
+            {
+                case null:
+                    return "!undefined!";
+                case string s:
+                    result = s;
+                    break;
+                case IFormattable _:
+                    result = ((IFormattable)obj).ToString(null, formatProvider);
+                    break;
+                default:
+                    result = obj.ToString();
+                    break;
+            }
 
             return result;
         }

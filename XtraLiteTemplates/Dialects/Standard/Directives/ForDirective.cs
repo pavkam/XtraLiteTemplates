@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -27,17 +27,15 @@
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
-    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
-
     using JetBrains.Annotations;
-
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Introspection;
     using XtraLiteTemplates.Parsing;
 
+    /// <inheritdoc />
     /// <summary>
     /// The FOR directive implementation.
     /// </summary>
@@ -46,14 +44,15 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
     {
         private readonly int _expressionComponentIndex;
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForDirective" /> class.
+        /// Initializes a new instance of the <see cref="T:XtraLiteTemplates.Dialects.Standard.Directives.ForDirective" /> class.
         /// </summary>
         /// <param name="startTagMarkup">The start tag markup.</param>
         /// <param name="endTagMarkup">The end tag markup.</param>
         /// <param name="typeConverter">The type converter.</param>
-        /// <exception cref="InvalidOperationException">Argument <paramref name="startTagMarkup" /> does not correspond to the expressed rules.</exception>
-        /// <exception cref="System.FormatException">Argument <paramref name="startTagMarkup" /> or <paramref name="endTagMarkup" /> cannot be parsed.</exception>
+        /// <exception cref="T:System.InvalidOperationException">Argument <paramref name="startTagMarkup" /> does not correspond to the expressed rules.</exception>
+        /// <exception cref="T:System.FormatException">Argument <paramref name="startTagMarkup" /> or <paramref name="endTagMarkup" /> cannot be parsed.</exception>
         /// <remarks>
         /// The <paramref name="startTagMarkup" /> is expected to contain exactly one expression components - the conditional expression.
         /// </remarks>
@@ -72,8 +71,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             _expressionComponentIndex = expressionComponents[0];
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="ForDirective"/> class using the standard markup {FOR $}...{END}.
+        /// Initializes a new instance of the <see cref="T:XtraLiteTemplates.Dialects.Standard.Directives.ForDirective" /> class using the standard markup {FOR $}...{END}.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
         public ForDirective([NotNull] IPrimitiveTypeConverter typeConverter) :

@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -29,7 +29,6 @@
 namespace XtraLiteTemplates.Tests.Inside
 {
     using global::NUnit.Framework;
-
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;
 

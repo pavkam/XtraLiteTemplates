@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -29,9 +29,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System;
     using System.Collections.Generic;
     using System.Globalization;
-
     using JetBrains.Annotations;
-
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Introspection;

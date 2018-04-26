@@ -29,7 +29,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
     using System.Linq.Expressions;
     using System.Reflection;
     using System.Threading;
-
     using XtraLiteTemplates.Expressions.Operators;
 
     internal static class LinqExpressionHelper
@@ -72,10 +71,13 @@ namespace XtraLiteTemplates.Expressions.Nodes
         private static readonly PropertyInfo CancellationTokenProperty =
             typeof(IExpressionEvaluationContext).GetProperty(nameof(IExpressionEvaluationContext.CancellationToken));
 
+        private static readonly Expression CancellationTokenPropertyExpression =
+            Expression.Property(ExpressionParameterContext, CancellationTokenProperty);
+
+        private static readonly MethodInfo ThrowIfCancellationRequestedMethod =
+            typeof(CancellationToken).GetMethod(nameof(CancellationToken.ThrowIfCancellationRequested));
+
         public static readonly MethodCallExpression ExpressionCallThrowIfCancellationRequested =
-            Expression.Call(Expression.Property(
-                ExpressionParameterContext,
-                CancellationTokenProperty), typeof(CancellationToken).GetMethod(
-                nameof(CancellationToken.ThrowIfCancellationRequested)));
+            Expression.Call(CancellationTokenPropertyExpression, ThrowIfCancellationRequestedMethod);
     }
 }

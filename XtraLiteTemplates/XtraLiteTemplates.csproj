@@ -8,11 +8,15 @@
     <PackageIconUrl>https://raw.githubusercontent.com/pavkam/XtraLiteTemplates/master/artwork/32px-transparent-bkg.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/pavkam/XtraLiteTemplates</PackageProjectUrl>
     <Description>A highly customizable and lightweight template engine for Microsoft .NET and Mono.</Description>
-    <PackageReleaseNotes>Version 1.2 of XtraLiteTemplates. Stable.</PackageReleaseNotes>
-    <Copyright>Alexandru Ciobanu (alex+git@ciobanu.org), 2015-2017</Copyright>
+    <PackageReleaseNotes>Targeting both .NET 4.5 and .NET Standard 2.0</PackageReleaseNotes>
+    <Copyright>Alexandru Ciobanu (alex+git@ciobanu.org), 2015-2018</Copyright>
     <PackageTags>Template Domain Language Expression Parser</PackageTags>
     <AssemblyVersion>1.3.0.0</AssemblyVersion>
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <FileVersion>1.3.0.0</FileVersion>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/pavkam/abacaxi</RepositoryUrl>
+	<DocumentationFile>$(OutputPath)\XtraLiteTemplates.xml</DocumentationFile>
   </PropertyGroup>
+
 </Project>

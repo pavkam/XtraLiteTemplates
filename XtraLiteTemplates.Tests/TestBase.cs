@@ -2,7 +2,7 @@
 //  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -36,9 +36,7 @@ namespace XtraLiteTemplates.Tests
     using System.IO;
     using System.Linq;
     using System.Threading;
-
     using global::NUnit.Framework;
-
     using XtraLiteTemplates.Compilation;
     using XtraLiteTemplates.Dialects.Standard.Directives;
     using XtraLiteTemplates.Evaluation;

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -26,17 +26,14 @@
 
 namespace XtraLiteTemplates.Dialects.Standard.Directives
 {
-    using System;
     using System.Diagnostics;
     using System.Linq;
-
     using JetBrains.Annotations;
-
-    using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Introspection;
     using XtraLiteTemplates.Parsing;
 
+    /// <inheritdoc />
     /// <summary>
     /// The conditional interpolation directive implementation.
     /// </summary>
@@ -46,14 +43,15 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         private readonly int _interpolatedExpressionComponentIndex;
         private readonly int _conditionalExpressionComponentIndex;
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConditionalInterpolationDirective" /> class.
+        /// Initializes a new instance of the <see cref="T:XtraLiteTemplates.Dialects.Standard.Directives.ConditionalInterpolationDirective" /> class.
         /// </summary>
         /// <param name="markup">The tag markup.</param>
         /// <param name="invertExpressionOrder">If set to <c>true</c> the conditional expression is expected to follow before the interpolated expression.</param>
         /// <param name="typeConverter">The type converter.</param>
-        /// <exception cref="InvalidOperationException">Argument <paramref name="markup" /> does not correspond to the expressed rules.</exception>
-        /// <exception cref="System.FormatException">Argument <paramref name="markup" /> cannot be parsed.</exception>
+        /// <exception cref="T:System.InvalidOperationException">Argument <paramref name="markup" /> does not correspond to the expressed rules.</exception>
+        /// <exception cref="T:System.FormatException">Argument <paramref name="markup" /> cannot be parsed.</exception>
         /// <remarks>
         /// The <paramref name="markup" /> is expected to contain exactly two expression components; one is the conditional expression, and the second
         /// one is the interpolated expression.
@@ -82,8 +80,9 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
             }
         }
 
+        /// <inheritdoc />
         /// <summary>
-        /// Initializes a new instance of the <see cref="ConditionalInterpolationDirective"/> class using the standard markup {$ IF $}.
+        /// Initializes a new instance of the <see cref="T:XtraLiteTemplates.Dialects.Standard.Directives.ConditionalInterpolationDirective" /> class using the standard markup {$ IF $}.
         /// The first expression is the interpolation expression followed by the conditional expression.
         /// </summary>
         /// <param name="typeConverter">The type converter.</param>
@@ -92,6 +91,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         {
         }
 
+        /// <inheritdoc />
         /// <summary>
         /// Executes the current directive.
         /// </summary>
@@ -101,7 +101,7 @@ namespace XtraLiteTemplates.Dialects.Standard.Directives
         /// <param name="context">The evaluation context.</param>
         /// <param name="text">Contains the value of the interpolated expression after execution.</param>
         /// <returns>
-        /// In the current implementation always equal to <see cref="Directive.FlowDecision.Terminate"/>.
+        /// In the current implementation always equal to <see cref="F:XtraLiteTemplates.Evaluation.Directive.FlowDecision.Terminate" />.
         /// </returns>
         protected internal override FlowDecision Execute(
             int tagIndex,
