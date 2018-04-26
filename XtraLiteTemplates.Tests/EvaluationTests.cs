@@ -31,6 +31,7 @@ namespace XtraLiteTemplates.Tests
     using System;
     using System.Collections.Generic;
     using System.Diagnostics.CodeAnalysis;
+    using System.Dynamic;
     using System.Linq;
     using global::NUnit.Framework;
     using XtraLiteTemplates.Dialects.Standard.Directives;
@@ -301,6 +302,43 @@ namespace XtraLiteTemplates.Tests
             var result = new string(originalResult.Where(c => !char.IsWhiteSpace(c)).ToArray());
 
             Assert.AreEqual("_unparsed1_1_unparsed2_23_unparsed3_456100100200_unparsed21_11_unparsed22_1213_unparsed23_141516", result);
+        }
+
+        [Test]
+        public void TestCaseEvaluationDynamic1()
+        {
+            const string Template = @"{IF D.Bool THEN}{D.Val}{END}";
+
+            var evaluable = new Interpreter(new Tokenizer(Template),
+                    ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new IfDirective(TypeConverter))
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .Compile();
+
+            dynamic expando = new ExpandoObject();
+            expando.Bool = true;
+            expando.Val = "Message";
+
+            var result = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, new KeyValuePair<string, object>("D", expando));
+            Assert.AreEqual(result, "Message");
+        }
+
+        [Test]
+        public void TestCaseEvaluationDynamic2()
+        {
+            const string Template = @"Start>{D.Message}<End";
+
+            var evaluable = new Interpreter(new Tokenizer(Template),
+                    ExpressionFlowSymbols.Default, StringComparer.OrdinalIgnoreCase)
+                .RegisterDirective(new InterpolationDirective(TypeConverter))
+                .Compile();
+
+            dynamic expando = new ExpandoObject();
+
+            var resultDynamic = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, new KeyValuePair<string, object>("D", expando));
+            var resultStatic = Evaluate(evaluable, StringComparer.OrdinalIgnoreCase, new KeyValuePair<string, object>("D", new object()));
+
+            Assert.AreEqual(resultStatic, resultDynamic);
         }
     }
 }

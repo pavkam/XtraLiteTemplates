@@ -32,7 +32,11 @@ namespace XtraLiteTemplates.Introspection
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq.Expressions;
+    using System.Reflection;
+
     using JetBrains.Annotations;
+
+    using Binder = Microsoft.CSharp.RuntimeBinder.Binder;
 
     internal sealed class SimpleDynamicInvoker
     {
@@ -142,9 +146,30 @@ namespace XtraLiteTemplates.Introspection
                 @delegate = CreateNewGetDelegate(member);
                 _cachedGetDelegateDict.Add(member, @delegate);
             }
+
             Debug.Assert(@delegate != null, "@delegate is always expected to be set.");
 
-            return @delegate(@object);
+            try
+            {
+                return @delegate(@object);
+            }
+            catch (TargetInvocationException targetInvokationError)
+            {
+                if (targetInvokationError.InnerException != null)
+                {
+                    if (targetInvokationError.InnerException is RuntimeBinderException)
+                    {
+                        return null;
+                    }
+
+                    throw targetInvokationError.InnerException;
+                }
+                throw;
+            }
+            catch (RuntimeBinderException)
+            {
+                return null;
+            }
         }
 
         [CanBeNull]
@@ -168,7 +193,27 @@ namespace XtraLiteTemplates.Introspection
             }
             Debug.Assert(@delegate != null, "@delegate is always expected to be set.");
 
-            return @delegate(@object, args);
+            try
+            {
+                return @delegate(@object, args);
+            }
+            catch (TargetInvocationException targetInvokationError)
+            {
+                if (targetInvokationError.InnerException != null)
+                {
+                    if (targetInvokationError.InnerException is RuntimeBinderException)
+                    {
+                        return null;
+                    }
+
+                    throw targetInvokationError.InnerException;
+                }
+                throw;
+            }
+            catch (RuntimeBinderException)
+            {
+                return null;
+            }
         }
     }
 }

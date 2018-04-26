@@ -32,9 +32,7 @@ namespace XtraLiteTemplates.Dialects.Standard
     using System.Diagnostics.CodeAnalysis;
     using System.Globalization;
     using System.Text;
-
     using JetBrains.Annotations;
-
     using XtraLiteTemplates.Evaluation;
     using XtraLiteTemplates.Expressions;
     using XtraLiteTemplates.Expressions.Operators;

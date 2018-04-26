@@ -33,9 +33,7 @@ namespace XtraLiteTemplates.Tests
     using System.Diagnostics.CodeAnalysis;
     using System.Dynamic;
     using System.Linq;
-    using System.Reflection;
     using Introspection;
-    using Microsoft.CSharp.RuntimeBinder;
 
     [TestFixture]
     [SuppressMessage("ReSharper", "MemberCanBePrivate.Global")]
@@ -65,6 +63,13 @@ namespace XtraLiteTemplates.Tests
             return $"{a1}-{a2}-{a3}-{a4}-{a5}-{a6}-{a7}-{a8}-{a9}-{a10}-{a11}-{a12}-{a13}-{a14}";
         }
 
+
+        [SuppressMessage("ReSharper", "UnusedMember.Global")]
+        [SuppressMessage("ReSharper", "MemberCanBeMadeStatic.Global")]
+        public string ThrowException()
+        {
+            throw new ArgumentException("Die!");
+        }
 
         [Test]
         [SuppressMessage("ReSharper", "AssignNullToNotNullAttribute")]
@@ -114,11 +119,12 @@ namespace XtraLiteTemplates.Tests
         }
 
         [Test]
-        public void GetValueThrowsErrorIfMemberIsNotAccessible()
+        public void GetValueReturnsNullIfMemberIsNotAccessible()
         {
             var invoker = new SimpleDynamicInvoker();
 
-            Assert.Throws<RuntimeBinderException>(() => invoker.GetValue(this, nameof(_privateField)));
+            var result = invoker.GetValue(this, nameof(_privateField));
+            Assert.IsNull(result);
         }
 
         [Test]
@@ -157,8 +163,8 @@ namespace XtraLiteTemplates.Tests
         {
             var invoker = new SimpleDynamicInvoker();
 
-            Assert.Throws<TargetInvocationException>(
-                () => invoker.Invoke(this, nameof(MatchArgumentMethod), new object[] { "arg1" }));
+            var result = invoker.Invoke(this, nameof(MatchArgumentMethod), new object[] { "arg1" });
+            Assert.IsNull(result);
         }
 
         [Test]
@@ -166,8 +172,8 @@ namespace XtraLiteTemplates.Tests
         {
             var invoker = new SimpleDynamicInvoker();
 
-            Assert.Throws<TargetInvocationException>(
-                () => invoker.Invoke(this, nameof(MatchArgumentMethod), new object[] { "arg1", 1 }));
+            var result = invoker.Invoke(this, nameof(MatchArgumentMethod), new object[] { "arg1", 1 });
+            Assert.IsNull(result);
         }
 
         [Test]
@@ -178,6 +184,24 @@ namespace XtraLiteTemplates.Tests
 
             Assert.AreEqual(102, result);
         }
+
+        [Test]
+        public void InvokeLeaksException()
+        {
+            var invoker = new SimpleDynamicInvoker();
+
+            Assert.Throws<ArgumentException>(() => invoker.Invoke(this, nameof(ThrowException)));
+        }
+
+        [Test]
+        public void InvokeReturnsNullForNonExistentMethod()
+        {
+            var invoker = new SimpleDynamicInvoker();
+            var result = invoker.Invoke(this, "Fake");
+
+            Assert.IsNull(result);
+        }
+
 
         [Test]
         public void GetValueReturnsTrulyDynamicPropertyValue()
