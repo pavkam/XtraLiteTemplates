@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -28,26 +28,28 @@ namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System.Diagnostics;
 
+    using JetBrains.Annotations;
+
     using XtraLiteTemplates.Expressions.Operators;
 
     using LinqExpression = System.Linq.Expressions.Expression;
 
     internal sealed class BinaryOperatorNode : OperatorNode
     {
-        internal BinaryOperatorNode(ExpressionNode parent, BinaryOperator @operator)
+        internal BinaryOperatorNode([NotNull] ExpressionNode parent, [NotNull] BinaryOperator @operator)
             : base(parent, @operator)
         {
+
         }
 
-        public new BinaryOperator Operator => base.Operator as BinaryOperator;
+        [NotNull]
+        public new BinaryOperator Operator => (BinaryOperator)base.Operator;
 
         public ExpressionNode LeftNode { get; internal set; }
 
-        public override PermittedContinuations Continuity => 
-            PermittedContinuations.UnaryOperator | 
-            PermittedContinuations.Identifier | 
-            PermittedContinuations.Literal | 
-            PermittedContinuations.NewGroup;
+        public override PermittedContinuations Continuity =>
+            PermittedContinuations.UnaryOperator | PermittedContinuations.Identifier | PermittedContinuations.Literal
+            | PermittedContinuations.NewGroup;
 
         public override string ToString(ExpressionFormatStyle style)
         {
@@ -111,18 +113,18 @@ namespace XtraLiteTemplates.Expressions.Nodes
                 LinqExpression.IfThen(
                     LinqExpression.Not(
                         LinqExpression.Call(
-                            LinqExpression.Constant(Operator), 
+                            LinqExpression.Constant(Operator),
                             LinqExpressionHelper.MethodInfoBinaryOperatorEvaluateLhs,
-                            LinqExpressionHelper.ExpressionParameterContext, 
-                            variableLeft, 
+                            LinqExpressionHelper.ExpressionParameterContext,
+                            variableLeft,
                             variableEvaluatedResult)),
                     LinqExpression.Assign(
-                        variableEvaluatedResult, 
+                        variableEvaluatedResult,
                         LinqExpression.Call(
-                            LinqExpression.Constant(Operator), 
-                            LinqExpressionHelper.MethodInfoBinaryOperatorEvaluate, 
-                            LinqExpressionHelper.ExpressionParameterContext, 
-                            variableLeft, 
+                            LinqExpression.Constant(Operator),
+                            LinqExpressionHelper.MethodInfoBinaryOperatorEvaluate,
+                            LinqExpressionHelper.ExpressionParameterContext,
+                            variableLeft,
                             rightOperandExpression))),
                 variableEvaluatedResult);
         }

@@ -28,7 +28,6 @@ namespace XtraLiteTemplates.Expressions.Nodes
 {
     using System.Diagnostics.CodeAnalysis;
     using System.Diagnostics;
-
     using LinqExpression = System.Linq.Expressions.Expression;
 
     internal abstract class ExpressionNode
@@ -53,7 +52,7 @@ namespace XtraLiteTemplates.Expressions.Nodes
 
             if (!IsReduced)
             {
-                if (TryReduce(reduceContext, out object value))
+                if (TryReduce(reduceContext, out var value))
                 {
                     IsReduced = true;
                     ReducedValue = value;

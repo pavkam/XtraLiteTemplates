@@ -24,13 +24,8 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using System.Diagnostics.CodeAnalysis;
-
-[module: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal abstract class LeafNode : ExpressionNode
     {
         public LeafNode(ExpressionNode parent)
@@ -38,8 +33,8 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
         }
 
-        public override PermittedContinuations Continuity => PermittedContinuations.BinaryOperator |
-                                                             PermittedContinuations.ContinueGroup |
-                                                             PermittedContinuations.CloseGroup;
+        public override PermittedContinuations Continuity =>
+            PermittedContinuations.BinaryOperator | PermittedContinuations.ContinueGroup
+                                                  | PermittedContinuations.CloseGroup;
     }
 }

@@ -1,7 +1,7 @@
 ﻿//  Author:
 //    Alexandru Ciobanu alex+git@ciobanu.org
 //
-//  Copyright (c) 2015-2017, Alexandru Ciobanu (alex+git@ciobanu.org)
+//  Copyright (c) 2015-2018, Alexandru Ciobanu (alex+git@ciobanu.org)
 //
 //  All rights reserved.
 //
@@ -24,20 +24,13 @@
 //  NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 //  SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
-using System.Diagnostics.CodeAnalysis;
-
-[module: SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1634:FileHeaderMustShowCopyright", Justification = "Does not apply.")]
-
 namespace XtraLiteTemplates.Expressions.Nodes
 {
-    using System.CodeDom;
-    using System.CodeDom.Compiler;
     using System.Diagnostics;
-    using System.IO;
-
+    using System.Globalization;
+    using System.Text;
     using LinqExpression = System.Linq.Expressions.Expression;
 
-    [SuppressMessage("StyleCop.CSharp.DocumentationRules", "SA1600:ElementsMustBeDocumented", Justification = "Not documenting internal entities.")]
     internal class LiteralNode : LeafNode
     {
         public LiteralNode(ExpressionNode parent, object literal)
@@ -52,14 +45,72 @@ namespace XtraLiteTemplates.Expressions.Nodes
         {
             if (Literal is string)
             {
-                using (var writer = new StringWriter())
+                var stringLiteral = (string)Literal;
+
+                var result = new StringBuilder(stringLiteral.Length * 2);
+                result.Append('\"');
+                var enumerator = StringInfo.GetTextElementEnumerator(stringLiteral);
+                while (enumerator.MoveNext())
                 {
-                    using (var provider = CodeDomProvider.CreateProvider("CSharp"))
+                    var segment = (string)enumerator.Current;
+
+                    if (segment.Length == 1)
                     {
-                        provider.GenerateCodeFromExpression(new CodePrimitiveExpression(Literal), writer, null);
-                        return writer.ToString();
+                        var c = segment[0];
+                        switch (c)
+                        {
+                            case '\'':
+                                result.Append("\\'");
+                                break;
+                            case '"':
+                                result.Append("\\\"");
+                                break;
+                            case '\\':
+                                result.Append("\\\\");
+                                break;
+                            case '\0':
+                                result.Append("\\0");
+                                break;
+                            case '\a':
+                                result.Append("\\a");
+                                break;
+                            case '\b':
+                                result.Append("\\b");
+                                break;
+                            case '\f':
+                                result.Append("\\f");
+                                break;
+                            case '\n':
+                                result.Append("\\n");
+                                break;
+                            case '\r':
+                                result.Append("\\r");
+                                break;
+                            case '\t':
+                                result.Append("\\t");
+                                break;
+                            case '\v':
+                                result.Append("\\v");
+                                break;
+                            default:
+                                if (char.IsControl(c))
+                                {
+                                    result.Append($"\\u{(int)segment[0]:x4}");
+                                }
+                                else
+                                {
+                                    result.Append(c);
+                                }
+                                break;
+                        }
+                    }
+                    else
+                    {
+                        result.Append(segment);
                     }
                 }
+                result.Append('\"');
+                return result.ToString();
             }
 
             return Literal.ToString();
