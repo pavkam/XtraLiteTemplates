@@ -32,11 +32,11 @@ namespace XtraLiteTemplates.Introspection
     using System.Diagnostics;
     using System.Globalization;
     using System.Text;
-
     using JetBrains.Annotations;
 
+    /// <inheritdoc />
     /// <summary>
-    /// An implementation of <see cref="IPrimitiveTypeConverter"/> interface. This class offers
+    /// An implementation of <see cref="T:XtraLiteTemplates.Introspection.IPrimitiveTypeConverter" /> interface. This class offers
     /// a flexible approach to type conversion. It will select the most appropriate way to convert one type to another primitive type guiding
     /// as much as possible by how JavaScript conversion rules operate.
     /// </summary>
@@ -78,12 +78,7 @@ namespace XtraLiteTemplates.Introspection
         [NotNull]
         public IObjectFormatter ObjectFormatter { get; }
 
-        /// <summary>
-        /// Tries to convert the value of <paramref name="obj"/> argument to a 32-bit integer.
-        /// <remarks>A value of <c>0</c> is returned if <paramref name="obj"/> is not directly convertible to an <c>int</c>.</remarks>
-        /// </summary>
-        /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="int"/> value.</returns>
+        /// <inheritdoc />
         public int ConvertToInteger(object obj)
         {
             var number = ConvertToNumber(obj);
@@ -95,154 +90,110 @@ namespace XtraLiteTemplates.Introspection
             return (int)number;
         }
 
-        /// <summary>
-        /// Tries to convert the value of <paramref name="obj"/> argument to a double-precision floating point number.
-        /// <remarks>A value of <see cref="double.NaN"/> is returned if <paramref name="obj"/> is not directly convertible to a <c>double</c>.</remarks>
-        /// </summary>
-        /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="double"/> value.</returns>
+        /// <inheritdoc />
         public double ConvertToNumber(object obj)
         {
-            if (obj is IEnumerable)
-            {
-                obj = ConvertToString(obj);
-            }
-            else
-            {
-                obj = ReduceObject(obj);
-            }
+            obj = obj is IEnumerable ? ConvertToString(obj) : ReduceObject(obj);
 
             double result;
 
-            if (obj == null)
+            switch (obj)
             {
-                result = double.NaN;
-            }
-            else if (obj is double)
-            {
-                result = (double)obj;
-            }
-            else if (obj is bool)
-            {
-                result = (bool)obj ? 1 : 0;
-            }
-            else
-            {
-                if (obj is string str)
-                {
-                    if (str.Length == 0)
-                    {
-                        result = 0;
-                    }
-                    else if (!double.TryParse(str, NumberStyles.Float, FormatProvider, out result))
+                case null:
+                    result = double.NaN;
+                    break;
+                case double _:
+                    result = (double)obj;
+                    break;
+                case bool _:
+                    result = (bool)obj ? 1 : 0;
+                    break;
+                case string str when str.Length == 0:
+                    result = 0;
+                    break;
+                case string str:
+                    if (!double.TryParse(str, NumberStyles.Float, FormatProvider, out result))
                     {
                         result = double.NaN;
                     }
-                }
-                else
-                {
+
+                    break;
+                default:
                     result = double.NaN;
-                }
+                    break;
             }
 
             return result;
         }
 
-        /// <summary>
-        /// Tries to convert the value of <paramref name="obj"/> argument to a string.
-        /// <remarks>A value of <c>null</c> is returned if <paramref name="obj"/> is null; otherwise the object is formatted accordingly.</remarks>
-        /// </summary>
-        /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="string"/> value.</returns>
+        /// <inheritdoc />
         public string ConvertToString(object obj)
         {
-            if (obj is string str)
+            switch (obj)
             {
-                return str;
-            }
-
-            if (obj is IEnumerable enumerable)
-            {
-                var builder = new StringBuilder();
-                foreach (var item in enumerable)
-                {
-                    if (builder.Length > 0)
+                case string str:
+                    return str;
+                case IEnumerable enumerable:
+                    var builder = new StringBuilder();
+                    foreach (var item in enumerable)
                     {
-                        builder.Append(',');
+                        if (builder.Length > 0)
+                        {
+                            builder.Append(',');
+                        }
+
+                        builder.Append(ConvertToString(item));
                     }
 
-                    builder.Append(ConvertToString(item));
-                }
-
-                return builder.ToString();
+                    return builder.ToString();
             }
 
             return ObjectFormatter.ToString(ReduceObject(obj), FormatProvider);
         }
 
-        /// <summary>
-        /// Tries to convert the value of <paramref name="obj"/> argument to a boolean.
-        /// <remarks>A value of <c>false</c> is returned if <paramref name="obj"/> is not directly convertible to a <c>bool</c>.</remarks>
-        /// </summary>
-        /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="bool"/> value.</returns>
+        /// <inheritdoc />
         public bool ConvertToBoolean(object obj)
         {
             obj = ReduceObject(obj);
 
             bool result;
-            if (obj == null)
+            switch (obj)
             {
-                result = false;
-            }
-            else if (obj is bool)
-            {
-                result = (bool)obj;
-            }
-            else if (obj is double)
-            {
-                result = Math.Abs((double)obj) > 0.000000001;
-            }
-            else if (obj is string)
-            {
-                result = ((string)obj).Length > 0;
-            }
-            else
-            {
-                result = true;
+                case null:
+                    result = false;
+                    break;
+                case bool _:
+                    result = (bool)obj;
+                    break;
+                case double _:
+                    result = Math.Abs((double)obj) > 0.000000001;
+                    break;
+                case string _:
+                    result = ((string)obj).Length > 0;
+                    break;
+                default:
+                    result = true;
+                    break;
             }
 
             return result;
         }
 
-        /// <summary>
-        /// Tries to convert the value of <paramref name="obj"/> argument to a sequence of objects.
-        /// <remarks>A value of <c>null</c> is returned if <paramref name="obj"/> is null. If <paramref name="obj"/> is not an enumerable object,
-        /// a new enumerable, containing <paramref name="obj"/> is returned.</remarks>
-        /// </summary>
-        /// <param name="obj">The value object to convert.</param>
-        /// <returns>A <see cref="IEnumerable{Object}"/> value.</returns>
+        /// <inheritdoc />
         public IEnumerable<object> ConvertToSequence(object obj)
         {
-            if (obj == null)
+            switch (obj)
             {
-                return null;
+                case null:
+                    return null;
+                case IEnumerable<object> objEnumerable:
+                    return objEnumerable;
             }
 
-            if (obj is IEnumerable<object> objEnumerable)
-            {
-                return objEnumerable;
-            }
-
-            var enumerable = obj as IEnumerable;
-            return enumerable != null ? UpgradeEnumerable(enumerable) : ObjectToSequence(obj);
+            return obj is IEnumerable enumerable ? UpgradeEnumerable(enumerable) : ObjectToSequence(obj);
         }
 
-        /// <summary>
-        /// Detects the primitive type of the supplied object.
-        /// </summary>
-        /// <param name="obj">The object to check the type for.</param>
-        /// <returns>A <see cref="PrimitiveType"/> value.</returns>
+        /// <inheritdoc />
         public PrimitiveType TypeOf(object obj)
         {
             if (obj == null)
@@ -252,24 +203,16 @@ namespace XtraLiteTemplates.Introspection
 
             obj = ReduceObject(obj);
 
-            if (obj is double)
+            switch (obj)
             {
-                return PrimitiveType.Number;
-            }
-
-            if (obj is bool)
-            {
-                return PrimitiveType.Boolean;
-            }
-
-            if (obj is string)
-            {
-                return PrimitiveType.String;
-            }
-
-            if (obj is IEnumerable)
-            {
-                return PrimitiveType.Sequence;
+                case double _:
+                    return PrimitiveType.Number;
+                case bool _:
+                    return PrimitiveType.Boolean;
+                case string _:
+                    return PrimitiveType.String;
+                case IEnumerable _:
+                    return PrimitiveType.Sequence;
             }
 
             return PrimitiveType.Object;
@@ -296,54 +239,47 @@ namespace XtraLiteTemplates.Introspection
         {
             object reduced;
 
-            /* Identify standard types */
-            if (obj is double || obj is bool || obj is string)
+            switch (obj)
             {
-                reduced = obj;
-            }
-            else if (obj is byte)
-            {
-                reduced = (double)(byte)obj;
-            }
-            else if (obj is sbyte)
-            {
-                reduced = (double)(sbyte)obj;
-            }
-            else if (obj is short)
-            {
-                reduced = (double)(short)obj;
-            }
-            else if (obj is ushort)
-            {
-                reduced = (double)(ushort)obj;
-            }
-            else if (obj is int)
-            {
-                reduced = (double)(int)obj;
-            }
-            else if (obj is uint)
-            {
-                reduced = (double)(uint)obj;
-            }
-            else if (obj is long)
-            {
-                reduced = (double)(long)obj;
-            }
-            else if (obj is ulong)
-            {
-                reduced = (double)(ulong)obj;
-            }
-            else if (obj is float)
-            {
-                reduced = (double)(float)obj;
-            }
-            else if (obj is decimal)
-            {
-                reduced = (double)(decimal)obj;
-            }
-            else
-            {
-                reduced = obj;
+                /* Identify standard types */
+                case double _:
+                case bool _:
+                case string _:
+                    reduced = obj;
+                    break;
+                case byte _:
+                    reduced = (double)(byte)obj;
+                    break;
+                case sbyte _:
+                    reduced = (double)(sbyte)obj;
+                    break;
+                case short _:
+                    reduced = (double)(short)obj;
+                    break;
+                case ushort _:
+                    reduced = (double)(ushort)obj;
+                    break;
+                case int _:
+                    reduced = (double)(int)obj;
+                    break;
+                case uint _:
+                    reduced = (double)(uint)obj;
+                    break;
+                case long _:
+                    reduced = (double)(long)obj;
+                    break;
+                case ulong _:
+                    reduced = (double)(ulong)obj;
+                    break;
+                case float _:
+                    reduced = (double)(float)obj;
+                    break;
+                case decimal _:
+                    reduced = (double)(decimal)obj;
+                    break;
+                default:
+                    reduced = obj;
+                    break;
             }
 
             return reduced;

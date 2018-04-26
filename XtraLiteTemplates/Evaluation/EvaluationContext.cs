@@ -29,6 +29,7 @@ namespace XtraLiteTemplates.Evaluation
     using System;
     using System.Collections.Generic;
     using System.Diagnostics;
+    using System.Dynamic;
     using System.Threading;
     using JetBrains.Annotations;
     using XtraLiteTemplates.Expressions;
@@ -45,6 +46,8 @@ namespace XtraLiteTemplates.Evaluation
         private readonly Stack<Frame> _frames;
         [NotNull]
         private readonly Dictionary<Type, SimpleTypeDisemboweler> _disembowelers;
+        [NotNull]
+        private readonly SimpleDynamicInvoker _dynamicInvoker;
         [NotNull]
         private readonly IEqualityComparer<string> _identifierComparer;
         [NotNull]
@@ -84,6 +87,7 @@ namespace XtraLiteTemplates.Evaluation
 
             _disembowelers = new Dictionary<Type, SimpleTypeDisemboweler>();
             _frames = new Stack<Frame>();
+            _dynamicInvoker = new SimpleDynamicInvoker();
 
             OpenEvaluationFrame();
         }
@@ -138,7 +142,7 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.Identifier(nameof(property), property);
 
-            if (!TryGetProperty(property, out object result))
+            if (!TryGetProperty(property, out var result))
             {
                 result = GetProperty(_selfObject, property);
             }
@@ -151,8 +155,16 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.Identifier(nameof(property), property);
 
-            return @object != null ? 
-                GetDisembowelerForType(GetTypeOfObject(@object)).Invoke(@object, property) : null;
+            if (@object == null)
+            {
+                return null;
+            }
+
+            var objectType = GetTypeOfObject(@object);
+
+            return typeof(IDynamicMetaObjectProvider).IsAssignableFrom(objectType) ? 
+                       _dynamicInvoker.GetValue(@object, property) : 
+                       GetDisembowelerForType(objectType).Invoke(@object, property);
         }
 
         /// <inheritdoc />
@@ -177,8 +189,16 @@ namespace XtraLiteTemplates.Evaluation
         {
             Expect.Identifier(nameof(method), method);
 
-            return @object != null ? 
-                GetDisembowelerForType(GetTypeOfObject(@object)).Invoke(@object, method, arguments) : null;
+            if (@object == null)
+            {
+                return null;
+            }
+
+            var objectType = GetTypeOfObject(@object);
+
+            return typeof(IDynamicMetaObjectProvider).IsAssignableFrom(objectType)
+                       ? _dynamicInvoker.Invoke(@object, method, arguments)
+                       : GetDisembowelerForType(objectType).Invoke(@object, method, arguments);
         }
 
         /// <inheritdoc />

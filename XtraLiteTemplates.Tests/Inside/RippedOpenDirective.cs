@@ -51,7 +51,7 @@ namespace XtraLiteTemplates.Tests.Inside
             _mMyTags = tags;
         }
 
-        protected override FlowDecision Execute(int tagIndex, object[] components,
+        protected internal override FlowDecision Execute(int tagIndex, object[] components,
             ref object state, IExpressionEvaluationContext context, out string text)
         {
             Assert.GreaterOrEqual(tagIndex, 0);

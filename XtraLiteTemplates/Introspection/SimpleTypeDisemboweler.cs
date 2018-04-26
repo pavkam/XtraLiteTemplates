@@ -35,23 +35,11 @@ namespace XtraLiteTemplates.Introspection
     using System.Text;
     using JetBrains.Annotations;
 
-    /// <summary>
-    /// Utility class that allows for easy access to a type's properties and methods.
-    /// This class is used internally to implement the member access operator.
-    /// </summary>
-    [PublicAPI]
-    public sealed class SimpleTypeDisemboweler
+    internal sealed class SimpleTypeDisemboweler
     {
         [NotNull]
         private readonly IDictionary<string, Func<object, object[], object>> _cachedMemberMap;
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="SimpleTypeDisemboweler" /> class.
-        /// </summary>
-        /// <param name="type">The <see cref="System.Type" /> to inspect.</param>
-        /// <param name="memberComparer">An instance of <see cref="IEqualityComparer{String}" /> used when looking up properties in the inspected type.</param>
-        /// <param name="objectFormatter">The object formatter.</param>
-        /// <exception cref="ArgumentNullException">Either <paramref name="type" /> or <paramref name="memberComparer" /> parameters are <c>null</c>.</exception>
+        
         public SimpleTypeDisemboweler(
             [NotNull] Type type,
             [NotNull] IEqualityComparer<string> memberComparer,
@@ -68,57 +56,18 @@ namespace XtraLiteTemplates.Introspection
             _cachedMemberMap = new Dictionary<string, Func<object, object[], object>>();
         }
 
-        /// <summary>
-        /// The event handler invoked by this class for each candidate type member. The registered delegates
-        /// are responsible with deciding if a member will be accepted or rejected during candidate selection.
-        /// </summary>
         [CanBeNull]
         public event EventHandler<MemberValidationEventArgs> ValidateMember;
 
-        /// <summary>
-        ///   <value>Gets the <see cref="System.Type" /> that represents the type being inspected.</value>
-        /// </summary>
-        /// <value>
-        /// The inspected type.
-        /// </value>
-        /// <remarks>
-        /// Value provided by the caller during construction.
-        /// </remarks>
         [NotNull]
         public Type Type { get; }
 
-        /// <summary>
-        /// Gets the <see cref="IEqualityComparer{String}" /> used by <see cref="SimpleTypeDisemboweler" /> to compare the
-        /// names of properties. This property is primarily used to decide the case-sensitivity of this <see cref="SimpleTypeDisemboweler" /> instance.
-        /// <remarks>Value provided by the caller during construction.</remarks>
-        /// </summary>
-        /// <value>
-        /// The equality comparer.
-        /// </value>
         [NotNull]
         public IEqualityComparer<string> Comparer { get; }
 
-        /// <summary>
-        /// Gets the <see cref="IObjectFormatter" /> used by <see cref="SimpleTypeDisemboweler" /> to convert object instances to their string representation.
-        /// <remarks>Value provided by the caller during construction.</remarks>
-        /// </summary>
-        /// <value>
-        /// The object formatter.
-        /// </value>
         [NotNull]
         public IObjectFormatter ObjectFormatter { get; }
 
-        /// <summary>
-        /// Invokes the <paramref name="member" /> of <paramref name="object" /> and returns its value.
-        /// </summary>
-        /// <param name="object">The object whose member is being invoked.</param>
-        /// <param name="member">The member name.</param>
-        /// <param name="arguments">The arguments to pass to the invoked member.</param>
-        /// <returns>
-        /// The result of member invoke.
-        /// </returns>
-        /// <exception cref="ArgumentNullException"><paramref name="member" /> is <c>null</c>.</exception>
-        /// <exception cref="ArgumentException"><paramref name="member" /> is not a valid identifier.</exception>
         [CanBeNull]
         public object Invoke([CanBeNull] object @object, [NotNull] string member, [CanBeNull] object[] arguments = null)
         {

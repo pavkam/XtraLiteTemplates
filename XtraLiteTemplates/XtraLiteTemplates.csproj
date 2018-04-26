@@ -18,5 +18,8 @@
     <RepositoryUrl>https://github.com/pavkam/abacaxi</RepositoryUrl>
 	<DocumentationFile>$(OutputPath)\XtraLiteTemplates.xml</DocumentationFile>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.3.0" />
+  </ItemGroup>
 
 </Project>

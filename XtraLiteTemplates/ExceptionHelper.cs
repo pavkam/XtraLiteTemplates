@@ -88,11 +88,23 @@ namespace XtraLiteTemplates
         internal static void ArgumentNotGreaterThanOrEqual([NotNull] string argumentName, [NotNull] string comparand)
         {
             Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
-            Debug.Assert(!string.IsNullOrEmpty(comparand), "argumentName cannot be comparand.");
+            Debug.Assert(!string.IsNullOrEmpty(comparand), "comparand cannot be comparand.");
 
             throw new ArgumentOutOfRangeException(
                 argumentName,
                 $"Argument \"{argumentName}\" is expected to be greater than or equal to {comparand}.");
+        }
+
+        [ContractAnnotation("=> halt")]
+        internal static void ArgumentNotBetween([NotNull] string argumentName, [NotNull] string min, [NotNull] string max)
+        {
+            Debug.Assert(!string.IsNullOrEmpty(argumentName), "argumentName cannot be empty.");
+            Debug.Assert(!string.IsNullOrEmpty(min), "min cannot be comparand.");
+            Debug.Assert(!string.IsNullOrEmpty(max), "max cannot be comparand.");
+
+            throw new ArgumentOutOfRangeException(
+                argumentName,
+                $"Argument \"{argumentName}\" is expected to be between {min} and {max}.");
         }
 
         [ContractAnnotation("=> halt")]

@@ -101,6 +101,15 @@ namespace XtraLiteTemplates
             }
         }
 
+        public static void Between<T>([NotNull] [InvokerParameterName] string argument, T value, T min, T max) where T : struct
+        {
+            if (Comparer<T>.Default.Compare(value, min) < 0 ||
+                Comparer<T>.Default.Compare(value, max) > 0)
+            {
+                ExceptionHelper.ArgumentNotBetween(argument, min.ToString(), max.ToString());
+            }
+        }
+
         [ContractAnnotation("halt <= condition: false")]
         public static void IsTrue([NotNull] [InvokerParameterName] string argument, bool condition)
         {
