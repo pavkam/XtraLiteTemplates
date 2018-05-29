@@ -1,5 +1,5 @@
 # XtraLiteTemplates [![Build status](https://ci.appveyor.com/api/projects/status/gapq9gvrneooy1ob/branch/master?svg=true)](https://ci.appveyor.com/project/pavkam/xtralitetemplates/branch/master)
-A lightweight templating engine for .NET Framework and Mono.
+A lightweight templating engine for .NET Framework 4.5+, .NET Core 2.0+ and Mono.
 
 ### What it is, and what it is not
 XtraLiteTemplates is a fully managed .NET Framework library that offers easy string templating features. XtraLiteTemplates offers support for `custom template constructs` (akin to statements), and support for `expressions` with custom operators. XtraLiteTemplates is not a programming language or a domain-specific language in its own right, its sole purpose is to aid in the creation and manipulation of string templates. Anything else is out of scope of this project.
@@ -10,7 +10,7 @@ XtraLiteTemplates is a fully managed .NET Framework library that offers easy str
 The easiest way to evaluate a template is by using the built-in facade class ```XLTemplate```. It works in conjunction with an instance of ```IDialect``` interface to parse and evaluate a template:
 
 ```c#
-  var customer = new
+  var @object = new
   {
       FirstName = "John",
       LastName = "McMann",
@@ -19,7 +19,7 @@ The easiest way to evaluate a template is by using the built-in facade class ```
   };
 
   var result = XLTemplate.Evaluate(CodeMonkeyDialect.DefaultIgnoreCase, 
-    @"{pre}Hello, {_0.FirstName} {_0.LastName}. You are {_0.Age} years old and you love: {for entity in _0.loves}{entity}, {end}{end}", customer);
+    @"{pre}Hello, {customer.FirstName} {customer.LastName}. You are {customer.Age} years old and you love: {for entity in customer.loves}{entity}, {end}{end}", customer => object);
   
   Console.WriteLine(result);
 ```
@@ -72,6 +72,7 @@ The expression builder in XtraLiteTemplates allows for:
 * Operators operate on `object`.
 * The standard set of operators provided in XtraLiteTemplates tries to emulate the behaviour of JavaScript as much as possible.
 * Support for **invoking object methods, properties and fields**. Runtime selection of overloaded methods is supported to the best possible extent.
+* Can invoke methods and properties on dynamic objects using DLR. Coversions and operators are not supported due to conflicting needs.
 
 #### Tags
 A tag is a collection of keywords, identifier rules and expressions. For example `IF $ THEN` defines a tag that accepts `IF` as a first keyword, followed by an expression and then by `THEN` keyword. A tag of the following form: `FOREACH ? IN $ DO` will match any phrase that starts with the `FOREACH` keyword, followed by any identifier, then by `IN` keyword, an expression and lastly by the `DO` keyword.
