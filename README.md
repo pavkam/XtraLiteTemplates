@@ -72,7 +72,7 @@ The expression builder in XtraLiteTemplates allows for:
 * Operators operate on `object`.
 * The standard set of operators provided in XtraLiteTemplates tries to emulate the behaviour of JavaScript as much as possible.
 * Support for **invoking object methods, properties and fields**. Runtime selection of overloaded methods is supported to the best possible extent.
-* Can invoke methods and properties on dynamic objects using DLR. Coversions and operators are not supported due to conflicting needs.
+* Can invoke methods and properties on **dynamic objects** using DLR. Conversions and operators are not supported due to conflicting needs.
 
 #### Tags
 A tag is a collection of keywords, identifier rules and expressions. For example `IF $ THEN` defines a tag that accepts `IF` as a first keyword, followed by an expression and then by `THEN` keyword. A tag of the following form: `FOREACH ? IN $ DO` will match any phrase that starts with the `FOREACH` keyword, followed by any identifier, then by `IN` keyword, an expression and lastly by the `DO` keyword.
